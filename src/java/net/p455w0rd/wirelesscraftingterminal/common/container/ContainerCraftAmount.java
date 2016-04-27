@@ -17,7 +17,7 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.tile.inventory.AppEngInternalInventory;
 
 
-public class ContainerCraftAmount extends AEBaseContainer
+public class ContainerCraftAmount extends WCTBaseContainer
 {
 
 	private final Slot craftingItem;

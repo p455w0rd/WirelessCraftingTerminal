@@ -31,7 +31,7 @@ import appeng.tile.crafting.TileCraftingTile;
 import appeng.util.Platform;
 
 
-public class ContainerCraftingCPU extends AEBaseContainer implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject
+public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject
 {
 
 	private final IItemList<IAEItemStack> list = AEApi.instance().storage().createItemList();

@@ -3,7 +3,7 @@ package net.p455w0rd.wirelesscraftingterminal.core.sync.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
@@ -41,8 +41,8 @@ public class PacketSwapSlots extends WCTPacket
 			if (player.openContainer instanceof ContainerWirelessCraftingTerminal) {
 				( (ContainerWirelessCraftingTerminal) player.openContainer ).swapSlotContents( this.slotA, this.slotB );
 			}
-			if (player.openContainer instanceof AEBaseContainer) {
-				( (AEBaseContainer) player.openContainer ).swapSlotContents( this.slotA, this.slotB );
+			if (player.openContainer instanceof WCTBaseContainer) {
+				( (WCTBaseContainer) player.openContainer ).swapSlotContents( this.slotA, this.slotB );
 			}
 		}
 	}

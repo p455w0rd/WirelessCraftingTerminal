@@ -5,7 +5,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import appeng.tile.inventory.AppEngInternalInventory;
 
@@ -95,8 +95,8 @@ public class AppEngSlot extends Slot
 				if (this.getContainer() instanceof ContainerWirelessCraftingTerminal) {
 					((ContainerWirelessCraftingTerminal) this.getContainer()).onSlotChange( this );
 				}
-				if (this.getContainer() instanceof AEBaseContainer) {
-					((AEBaseContainer) this.getContainer()).onSlotChange( this );
+				if (this.getContainer() instanceof WCTBaseContainer) {
+					((WCTBaseContainer) this.getContainer()).onSlotChange( this );
 				}
 			}
 		}
@@ -228,8 +228,8 @@ public class AppEngSlot extends Slot
 		if (this.myContainer instanceof ContainerWirelessCraftingTerminal) {
 			return (ContainerWirelessCraftingTerminal) this.myContainer;
 		}
-		if (this.myContainer instanceof AEBaseContainer) {
-			return (AEBaseContainer) this.myContainer;
+		if (this.myContainer instanceof WCTBaseContainer) {
+			return (WCTBaseContainer) this.myContainer;
 		}
 		return this.myContainer;
 	}
@@ -239,8 +239,8 @@ public class AppEngSlot extends Slot
 		if (this.myContainer instanceof ContainerWirelessCraftingTerminal) {
 			this.myContainer = (ContainerWirelessCraftingTerminal) myContainer;
 		}
-		else if (this.myContainer instanceof AEBaseContainer) {
-			this.myContainer = (AEBaseContainer) myContainer;
+		else if (this.myContainer instanceof WCTBaseContainer) {
+			this.myContainer = (WCTBaseContainer) myContainer;
 		}
 		else {
 			this.myContainer = myContainer;

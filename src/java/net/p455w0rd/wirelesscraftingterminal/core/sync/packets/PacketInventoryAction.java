@@ -15,7 +15,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerOpenContext;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
@@ -111,9 +111,9 @@ public class PacketInventoryAction extends WCTPacket
 			context = ((ContainerWirelessCraftingTerminal) baseContainer).getOpenContext();
 		}
 		
-		if( sender.openContainer instanceof AEBaseContainer ) {
-			baseContainer = (AEBaseContainer) sender.openContainer;
-			context = ((AEBaseContainer) baseContainer).getOpenContext();
+		if( sender.openContainer instanceof WCTBaseContainer ) {
+			baseContainer = (WCTBaseContainer) sender.openContainer;
+			context = ((WCTBaseContainer) baseContainer).getOpenContext();
 		}
 
 			if( this.action == InventoryAction.AUTO_CRAFT )
@@ -140,11 +140,11 @@ public class PacketInventoryAction extends WCTPacket
 							}
 						}
 						
-						if (baseContainer instanceof AEBaseContainer) {
-							if( ((AEBaseContainer) baseContainer).getTargetStack() != null )
+						if (baseContainer instanceof WCTBaseContainer) {
+							if( ((WCTBaseContainer) baseContainer).getTargetStack() != null )
 							{
-								cca.getCraftingItem().putStack( ((AEBaseContainer) baseContainer).getTargetStack().getItemStack() );
-								cca.setItemToCraft( ((AEBaseContainer) baseContainer).getTargetStack() );
+								cca.getCraftingItem().putStack( ((WCTBaseContainer) baseContainer).getTargetStack().getItemStack() );
+								cca.setItemToCraft( ((WCTBaseContainer) baseContainer).getTargetStack() );
 							}
 						}
 
@@ -157,8 +157,8 @@ public class PacketInventoryAction extends WCTPacket
 				if (baseContainer instanceof ContainerWirelessCraftingTerminal) {
 					((ContainerWirelessCraftingTerminal) baseContainer).doAction( sender, this.action, this.slot, this.id );
 				}
-				if (baseContainer instanceof AEBaseContainer) {
-					((AEBaseContainer) baseContainer).doAction( sender, this.action, this.slot, this.id );
+				if (baseContainer instanceof WCTBaseContainer) {
+					((WCTBaseContainer) baseContainer).doAction( sender, this.action, this.slot, this.id );
 				}
 			}
 	}

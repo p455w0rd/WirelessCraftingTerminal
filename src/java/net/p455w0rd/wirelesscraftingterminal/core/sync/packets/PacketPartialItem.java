@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
@@ -45,9 +45,9 @@ public class PacketPartialItem extends WCTPacket
 		{
 			( (ContainerWirelessCraftingTerminal) player.openContainer ).postPartial( this );
 		}
-		if( player.openContainer instanceof AEBaseContainer )
+		if( player.openContainer instanceof WCTBaseContainer )
 		{
-			( (AEBaseContainer) player.openContainer ).postPartial( this );
+			( (WCTBaseContainer) player.openContainer ).postPartial( this );
 		}
 	}
 

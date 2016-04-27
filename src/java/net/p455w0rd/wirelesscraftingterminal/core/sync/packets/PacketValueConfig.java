@@ -19,7 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiCraftingCPU;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftConfirm;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingCPU;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingStatus;
@@ -130,8 +130,8 @@ public class PacketValueConfig extends WCTPacket
 			if (c instanceof ContainerWirelessCraftingTerminal) {
 				( (ContainerWirelessCraftingTerminal) c ).setCustomName( this.Value );
 			}
-			if (c instanceof AEBaseContainer) {
-				( (AEBaseContainer) c ).setCustomName( this.Value );
+			if (c instanceof WCTBaseContainer) {
+				( (WCTBaseContainer) c ).setCustomName( this.Value );
 			}
 		}
 		else if( this.Name.startsWith( "SyncDat." ) )
@@ -139,8 +139,8 @@ public class PacketValueConfig extends WCTPacket
 			if (c instanceof ContainerWirelessCraftingTerminal) {
 				( (ContainerWirelessCraftingTerminal) c ).stringSync( Integer.parseInt( this.Name.substring( 8 ) ), this.Value );
 			}
-			if (c instanceof AEBaseContainer) {
-				( (AEBaseContainer) c ).stringSync( Integer.parseInt( this.Name.substring( 8 ) ), this.Value );
+			if (c instanceof WCTBaseContainer) {
+				( (WCTBaseContainer) c ).stringSync( Integer.parseInt( this.Name.substring( 8 ) ), this.Value );
 			}
 		}
 		else if( this.Name.equals( "CraftingStatus" ) && this.Value.equals( "Clear" ) )

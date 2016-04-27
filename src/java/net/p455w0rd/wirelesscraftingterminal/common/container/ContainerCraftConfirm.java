@@ -44,7 +44,7 @@ import appeng.api.storage.data.IItemList;
 import appeng.util.Platform;
 
 
-public class ContainerCraftConfirm extends AEBaseContainer
+public class ContainerCraftConfirm extends WCTBaseContainer
 {
 
 	private final ArrayList<CraftingCPURecord> cpus = new ArrayList<CraftingCPURecord>();

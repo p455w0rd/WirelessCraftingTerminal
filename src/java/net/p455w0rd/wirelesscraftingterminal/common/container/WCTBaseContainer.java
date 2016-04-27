@@ -62,7 +62,7 @@ import appeng.util.inv.AdaptorPlayerHand;
 import appeng.util.item.AEItemStack;
 
 
-public abstract class AEBaseContainer extends Container
+public abstract class WCTBaseContainer extends Container
 {
 
 	private final InventoryPlayer invPlayer;
@@ -82,12 +82,12 @@ public abstract class AEBaseContainer extends Container
 	private int ticksSinceCheck = 900;
 	private IAEItemStack clientRequestedTargetItem = null;
 
-	public AEBaseContainer( final InventoryPlayer ip, final TileEntity myTile, final IPart myPart )
+	public WCTBaseContainer( final InventoryPlayer ip, final TileEntity myTile, final IPart myPart )
 	{
 		this( ip, myTile, myPart, null );
 	}
 
-	public AEBaseContainer( final InventoryPlayer ip, final TileEntity myTile, final IPart myPart, final IGuiItemObject gio )
+	public WCTBaseContainer( final InventoryPlayer ip, final TileEntity myTile, final IPart myPart, final IGuiItemObject gio )
 	{
 		this.invPlayer = ip;
 		this.tileEntity = myTile;
@@ -136,7 +136,7 @@ public abstract class AEBaseContainer extends Container
 		}
 	}
 
-	public AEBaseContainer( final InventoryPlayer ip, final Object anchor )
+	public WCTBaseContainer( final InventoryPlayer ip, final Object anchor )
 	{
 		this.invPlayer = ip;
 		this.tileEntity = anchor instanceof TileEntity ? (TileEntity) anchor : null;

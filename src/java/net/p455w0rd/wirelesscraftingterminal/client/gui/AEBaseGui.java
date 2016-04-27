@@ -30,7 +30,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
 import net.p455w0rd.wirelesscraftingterminal.client.me.AppEngRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.client.me.InternalSlotME;
@@ -416,7 +416,7 @@ public abstract class AEBaseGui extends GuiContainer
 					slotNum = slot.slotNumber;
 				}
 
-				( (AEBaseContainer) this.inventorySlots ).setTargetStack( stack );
+				( (WCTBaseContainer) this.inventorySlots ).setTargetStack( stack );
 				final PacketInventoryAction p = new PacketInventoryAction( InventoryAction.MOVE_REGION, slotNum, 0 );
 				NetworkHandler.instance.sendToServer( p );
 				return;
@@ -505,7 +505,7 @@ public abstract class AEBaseGui extends GuiContainer
 
 			if( action != null )
 			{
-				( (AEBaseContainer) this.inventorySlots ).setTargetStack( stack );
+				( (WCTBaseContainer) this.inventorySlots ).setTargetStack( stack );
 				final PacketInventoryAction p = new PacketInventoryAction( action, this.getInventorySlots().size(), 0 );
 				NetworkHandler.instance.sendToServer( p );
 			}
@@ -574,9 +574,9 @@ public abstract class AEBaseGui extends GuiContainer
 					final List<Slot> slots = this.getInventorySlots();
 					for( final Slot s : slots )
 					{
-						if( s.getSlotIndex() == j && s.inventory == ( (AEBaseContainer) this.inventorySlots ).getPlayerInv() )
+						if( s.getSlotIndex() == j && s.inventory == ( (WCTBaseContainer) this.inventorySlots ).getPlayerInv() )
 						{
-							if( !s.canTakeStack( ( (AEBaseContainer) this.inventorySlots ).getPlayerInv().player ) )
+							if( !s.canTakeStack( ( (WCTBaseContainer) this.inventorySlots ).getPlayerInv().player ) )
 							{
 								return false;
 							}
@@ -592,7 +592,7 @@ public abstract class AEBaseGui extends GuiContainer
 					{
 						for( final Slot s : slots )
 						{
-							if( s.getSlotIndex() == j && s.inventory == ( (AEBaseContainer) this.inventorySlots ).getPlayerInv() )
+							if( s.getSlotIndex() == j && s.inventory == ( (WCTBaseContainer) this.inventorySlots ).getPlayerInv() )
 							{
 								NetworkHandler.instance.sendToServer( new PacketSwapSlots( s.slotNumber, theSlot.slotNumber ) );
 								return true;
@@ -656,7 +656,7 @@ public abstract class AEBaseGui extends GuiContainer
 			final IAEItemStack item = ( (SlotME) slot ).getAEStack();
 			if( item != null )
 			{
-				( (AEBaseContainer) this.inventorySlots ).setTargetStack( item );
+				( (WCTBaseContainer) this.inventorySlots ).setTargetStack( item );
 				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
 				final int times = Math.abs( wheel );
 				final int inventorySize = this.getInventorySlots().size();
@@ -704,16 +704,16 @@ public abstract class AEBaseGui extends GuiContainer
 
 	private boolean hasCustomInventoryName()
 	{
-		if( this.inventorySlots instanceof AEBaseContainer )
+		if( this.inventorySlots instanceof WCTBaseContainer )
 		{
-			return ( (AEBaseContainer) this.inventorySlots ).getCustomName() != null;
+			return ( (WCTBaseContainer) this.inventorySlots ).getCustomName() != null;
 		}
 		return false;
 	}
 
 	private String getInventoryName()
 	{
-		return ( (AEBaseContainer) this.inventorySlots ).getCustomName();
+		return ( (WCTBaseContainer) this.inventorySlots ).getCustomName();
 	}
 
 	private void drawSlot( final Slot s )

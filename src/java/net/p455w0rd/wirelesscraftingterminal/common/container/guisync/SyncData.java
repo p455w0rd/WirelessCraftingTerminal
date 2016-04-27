@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
@@ -26,8 +26,8 @@ public class SyncData
 		if (container instanceof ContainerWirelessCraftingTerminal) {
 			this.source = (ContainerWirelessCraftingTerminal) container;
 		}
-		else if (container instanceof AEBaseContainer) {
-			this.source = (AEBaseContainer) container;
+		else if (container instanceof WCTBaseContainer) {
+			this.source = (WCTBaseContainer) container;
 		}
 		else {
 			this.source = container;
@@ -186,8 +186,8 @@ public class SyncData
 			if (this.source instanceof ContainerWirelessCraftingTerminal) {
 				((ContainerWirelessCraftingTerminal) this.source).onUpdate( this.field.getName(), oldValue, this.field.get( this.source ) );
 			}
-			if (this.source instanceof AEBaseContainer) {
-				((AEBaseContainer) this.source).onUpdate( this.field.getName(), oldValue, this.field.get( this.source ) );
+			if (this.source instanceof WCTBaseContainer) {
+				((WCTBaseContainer) this.source).onUpdate( this.field.getName(), oldValue, this.field.get( this.source ) );
 			}
 		}
 		catch( final IllegalArgumentException e )

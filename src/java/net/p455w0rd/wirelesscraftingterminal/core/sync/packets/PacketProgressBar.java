@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.p455w0rd.wirelesscraftingterminal.common.container.AEBaseContainer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
@@ -47,9 +47,9 @@ public class PacketProgressBar extends WCTPacket
 		{
 			( (ContainerWirelessCraftingTerminal) c ).updateFullProgressBar( this.id, this.value );
 		}
-		if( c instanceof AEBaseContainer )
+		if( c instanceof WCTBaseContainer )
 		{
-			( (AEBaseContainer) c ).updateFullProgressBar( this.id, this.value );
+			( (WCTBaseContainer) c ).updateFullProgressBar( this.id, this.value );
 		}
 	}
 
@@ -61,9 +61,9 @@ public class PacketProgressBar extends WCTPacket
 		{
 			( (ContainerWirelessCraftingTerminal) c ).updateFullProgressBar( this.id, this.value );
 		}
-		if( c instanceof AEBaseContainer )
+		if( c instanceof WCTBaseContainer )
 		{
-			( (AEBaseContainer) c ).updateFullProgressBar( this.id, this.value );
+			( (WCTBaseContainer) c ).updateFullProgressBar( this.id, this.value );
 		}
 	}
 }
