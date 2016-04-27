@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
  * @author Nividica
  * 
  */
-public enum AEStateIconsEnum implements IStateIconTexture {
+public enum WCTStateIconsEnum implements IStateIconTexture {
 
 	// Redstone modes
 	REDSTONE_LOW(0, 0), REDSTONE_HIGH(16, 0), REDSTONE_PULSE(32, 0), REDSTONE_IGNORE(48, 0),
@@ -75,7 +75,7 @@ public enum AEStateIconsEnum implements IStateIconTexture {
 	 * @param u
 	 * @param v
 	 */
-	private AEStateIconsEnum(final int u, final int v) {
+	private WCTStateIconsEnum(final int u, final int v) {
 		this(u, v, STANDARD_ICON_SIZE, STANDARD_ICON_SIZE);
 	}
 
@@ -87,7 +87,7 @@ public enum AEStateIconsEnum implements IStateIconTexture {
 	 * @param width
 	 * @param height
 	 */
-	private AEStateIconsEnum(final int u, final int v, final int width, final int height) {
+	private WCTStateIconsEnum(final int u, final int v, final int width, final int height) {
 		// Set the u
 		this.minU = u;
 
@@ -109,7 +109,7 @@ public enum AEStateIconsEnum implements IStateIconTexture {
 
 	@Override
 	public ResourceLocation getTexture() {
-		return AEStateIconsEnum.AE_STATES_TEXTURE;
+		return WCTStateIconsEnum.AE_STATES_TEXTURE;
 	}
 
 	@Override

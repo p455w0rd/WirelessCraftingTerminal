@@ -32,7 +32,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
-import net.p455w0rd.wirelesscraftingterminal.client.me.AppEngRenderItem;
+import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.client.me.InternalSlotME;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotDisconnected;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotME;
@@ -60,13 +60,13 @@ import appeng.container.slot.SlotRestrictedInput;
 import appeng.helpers.InventoryAction;
 
 
-public abstract class AEBaseGui extends GuiContainer
+public abstract class WCTBaseGui extends GuiContainer
 {
 	private static boolean switchingGuis;
 	private final List<InternalSlotME> meSlots = new LinkedList<InternalSlotME>();
 	// drag y
 	private final Set<Slot> drag_click = new HashSet<Slot>();
-	private final AppEngRenderItem aeRenderItem = new AppEngRenderItem();
+	private final WCTRenderItem aeRenderItem = new WCTRenderItem();
 	private GuiScrollbar scrollBar = null;
 	private boolean disableShiftClick = false;
 	private Stopwatch dbl_clickTimer = Stopwatch.createStarted();
@@ -74,7 +74,7 @@ public abstract class AEBaseGui extends GuiContainer
 	private Slot bl_clicked;
 	private boolean subGui;
 
-	public AEBaseGui( final Container container )
+	public WCTBaseGui( final Container container )
 	{
 		super( container );
 		this.subGui = switchingGuis;
@@ -913,6 +913,6 @@ public abstract class AEBaseGui extends GuiContainer
 
 	public static final synchronized void setSwitchingGuis( final boolean switchingGuis )
 	{
-		AEBaseGui.switchingGuis = switchingGuis;
+		WCTBaseGui.switchingGuis = switchingGuis;
 	}
 }

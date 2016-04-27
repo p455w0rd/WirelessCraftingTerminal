@@ -31,7 +31,7 @@ import appeng.core.localization.GuiText;
 import appeng.util.Platform;
 
 
-public class GuiCraftConfirm extends AEBaseGui
+public class GuiCraftConfirm extends WCTBaseGui
 {
 
 	private final ContainerCraftConfirm ccc;

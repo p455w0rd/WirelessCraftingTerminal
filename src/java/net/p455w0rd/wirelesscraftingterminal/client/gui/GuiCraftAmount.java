@@ -23,7 +23,7 @@ import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 
 
-public class GuiCraftAmount extends AEBaseGui
+public class GuiCraftAmount extends WCTBaseGui
 {
 	private GuiNumberBox amountToCraft;
 	private GuiTabButton originalGuiBtn;

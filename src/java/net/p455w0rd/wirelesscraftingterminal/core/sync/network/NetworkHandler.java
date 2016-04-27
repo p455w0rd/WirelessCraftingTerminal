@@ -40,7 +40,7 @@ public class NetworkHandler
 	{
 		try
 		{
-			return new AppEngClientPacketHandler();
+			return new WCTClientPacketHandler();
 		}
 		catch( final Throwable t )
 		{
@@ -52,7 +52,7 @@ public class NetworkHandler
 	{
 		try
 		{
-			return new AppEngServerPacketHandler();
+			return new WCTServerPacketHandler();
 		}
 		catch( final Throwable t )
 		{

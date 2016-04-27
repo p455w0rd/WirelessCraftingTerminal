@@ -34,7 +34,7 @@ import appeng.util.Platform;
 import appeng.util.ReadableNumberConverter;
 
 
-public class GuiCraftingCPU extends AEBaseGui implements ISortSource
+public class GuiCraftingCPU extends WCTBaseGui implements ISortSource
 {
 	private static final int GUI_HEIGHT = 184;
 	private static final int GUI_WIDTH = 238;

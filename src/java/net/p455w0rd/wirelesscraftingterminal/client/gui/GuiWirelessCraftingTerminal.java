@@ -50,7 +50,7 @@ import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTabButton;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTrashButton;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.MEGuiTextField;
-import net.p455w0rd.wirelesscraftingterminal.client.me.AppEngRenderItem;
+import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.client.me.InternalSlotME;
 import net.p455w0rd.wirelesscraftingterminal.client.me.ItemRepo;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotDisconnected;
@@ -99,7 +99,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	private final List<InternalSlotME> meSlots = new LinkedList<InternalSlotME>();
 	// drag y
 	private final Set<Slot> drag_click = new HashSet<Slot>();
-	private final AppEngRenderItem aeRenderItem = new AppEngRenderItem();
+	private final WCTRenderItem aeRenderItem = new WCTRenderItem();
 	private GuiScrollbar scrollBar = null;
 	private boolean disableShiftClick = false;
 	private Stopwatch dbl_clickTimer = Stopwatch.createStarted();

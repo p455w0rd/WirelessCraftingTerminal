@@ -13,7 +13,7 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacketHandlerBase;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 
-public final class AppEngServerPacketHandler extends WCTPacketHandlerBase implements IPacketHandler
+public final class WCTServerPacketHandler extends WCTPacketHandlerBase implements IPacketHandler
 {
 
 	@Override

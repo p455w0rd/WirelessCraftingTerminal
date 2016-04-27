@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.client.me.AppEngRenderItem;
+import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingMatrix;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFakeCraftingMatrix;

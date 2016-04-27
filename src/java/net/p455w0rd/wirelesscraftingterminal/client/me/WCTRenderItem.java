@@ -24,7 +24,7 @@ import appeng.util.ReadableNumberConverter;
  * @version rv2
  * @since rv0
  */
-public class AppEngRenderItem extends RenderItem
+public class WCTRenderItem extends RenderItem
 {
 	private static final ISlimReadableNumberConverter SLIM_CONVERTER = ReadableNumberConverter.INSTANCE;
 	private static final IWideReadableNumberConverter WIDE_CONVERTER = ReadableNumberConverter.INSTANCE;

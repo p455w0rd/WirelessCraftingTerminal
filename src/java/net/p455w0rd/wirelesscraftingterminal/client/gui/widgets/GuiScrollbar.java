@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 
 import appeng.client.gui.widgets.IScrollSource;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.p455w0rd.wirelesscraftingterminal.client.gui.AEBaseGui;
+import net.p455w0rd.wirelesscraftingterminal.client.gui.WCTBaseGui;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
 
 public class GuiScrollbar implements IScrollSource
@@ -26,8 +26,8 @@ public class GuiScrollbar implements IScrollSource
 			((GuiWirelessCraftingTerminal) g).bindTexture( "minecraft", "gui/container/creative_inventory/tabs.png" );
 
 		}
-		else if (g instanceof AEBaseGui) {
-			((AEBaseGui) g).bindTexture("minecraft", "gui/container/creative_inventory/tabs.png");
+		else if (g instanceof WCTBaseGui) {
+			((WCTBaseGui) g).bindTexture("minecraft", "gui/container/creative_inventory/tabs.png");
 		}
 		
 		GL11.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
