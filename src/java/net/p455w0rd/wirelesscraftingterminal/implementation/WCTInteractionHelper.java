@@ -11,8 +11,8 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.p455w0rd.wirelesscraftingterminal.api.IWCTInteractionHelper;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class WCTInteractionHelper implements IWCTInteractionHelper {
 
@@ -88,7 +88,7 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 		// Attempt to launch the gui
 		// NOTE: Range check done in here
 		else {
-			WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_WCT, player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+			WCTGuiHandler.launchGui(Reference.GUI_WCT, player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		}
 
 	}

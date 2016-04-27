@@ -177,7 +177,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	{
 		if( btn == this.craftingStatusBtn )
 		{
-			NetworkHandler.instance.sendToServer( new PacketSwitchGuis( WirelessCraftingTerminal.GUI_CRAFTING_STATUS ) );
+			NetworkHandler.instance.sendToServer( new PacketSwitchGuis( Reference.GUI_CRAFTING_STATUS ) );
 		}
 
 		if( btn instanceof GuiImgButton )

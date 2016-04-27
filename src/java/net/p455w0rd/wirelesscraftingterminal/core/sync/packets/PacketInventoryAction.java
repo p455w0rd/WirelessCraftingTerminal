@@ -14,13 +14,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerOpenContext;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class PacketInventoryAction extends WCTPacket
 {
@@ -126,7 +126,7 @@ public class PacketInventoryAction extends WCTPacket
 					int y = player.serverPosY;
 					int z = player.serverPosZ;
 					
-					WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_CRAFT_AMOUNT, player, player.worldObj, x, y, z);
+					WCTGuiHandler.launchGui(Reference.GUI_CRAFT_AMOUNT, player, player.worldObj, x, y, z);
 
 					if( sender.openContainer instanceof ContainerCraftAmount )
 					{

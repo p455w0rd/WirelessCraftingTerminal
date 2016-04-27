@@ -45,7 +45,6 @@ import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
@@ -150,7 +149,7 @@ public class ItemMagnet extends Item {
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
-				WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_MAGNET, player, world, x, y, z);
+				WCTGuiHandler.launchGui(Reference.GUI_MAGNET, player, world, x, y, z);
 			}
 		}
 		return item;

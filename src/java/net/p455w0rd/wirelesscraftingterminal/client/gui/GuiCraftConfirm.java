@@ -16,13 +16,13 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftConfirm;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
@@ -64,7 +64,7 @@ public class GuiCraftConfirm extends WCTBaseGui
 
 		if( te instanceof WirelessTerminalGuiObject )
 		{
-			this.OriginalGui = WirelessCraftingTerminal.GUI_WCT;
+			this.OriginalGui = Reference.GUI_WCT;
 		}
 
 	}

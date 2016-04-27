@@ -19,7 +19,6 @@ import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryBooster;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
@@ -27,6 +26,7 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
@@ -306,7 +306,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 		final WCTIActionHost ah = this.getActionHost();
 		if( ah instanceof WirelessTerminalGuiObject )
 		{
-			originalGui = WirelessCraftingTerminal.GUI_WCT;
+			originalGui = Reference.GUI_WCT;
 		}
 
 		if( this.result != null && !this.isSimulation() )

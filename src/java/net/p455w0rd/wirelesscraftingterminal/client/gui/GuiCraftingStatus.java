@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTabButton;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingStatus;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
@@ -18,6 +17,7 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
 import appeng.api.definitions.IParts;
@@ -54,7 +54,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
 			
 			this.myIcon = RandomUtils.getWirelessTerm(inventoryPlayer);
 
-			this.originalGui = WirelessCraftingTerminal.GUI_WCT;
+			this.originalGui = Reference.GUI_WCT;
 		}
 	}
 

@@ -12,6 +12,7 @@ import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class PacketOpenWirelessTerm extends WCTPacket {
 
@@ -39,7 +40,7 @@ public class PacketOpenWirelessTerm extends WCTPacket {
 		//WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_WCT, player, world, x, y, z);
 		if (player.openContainer instanceof ContainerPlayer) {
 			//WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
-			player.openGui(WirelessCraftingTerminal.INSTANCE, WirelessCraftingTerminal.GUI_WCT, world, x, y, z);
+			player.openGui(WirelessCraftingTerminal.INSTANCE, Reference.GUI_WCT, world, x, y, z);
 		}
 	}
 
@@ -51,6 +52,6 @@ public class PacketOpenWirelessTerm extends WCTPacket {
 		int z = (int) player.posZ;
 		//WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_WCT, player, world, x, y, z);
 		//WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
-		player.openGui(WirelessCraftingTerminal.INSTANCE, WirelessCraftingTerminal.GUI_WCT, world, x, y, z);
+		player.openGui(WirelessCraftingTerminal.INSTANCE, Reference.GUI_WCT, world, x, y, z);
 	}
 }

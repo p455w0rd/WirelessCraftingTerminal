@@ -43,13 +43,6 @@ public class WirelessCraftingTerminal {
 	@SidedProxy(clientSide = Reference.CLIENT_PROXY_CLASS, serverSide = Reference.SERVER_PROXY_CLASS)
 	public static CommonProxy proxy;
 
-	private static int ae2wctGuiIndex = 0;
-	public static final int GUI_WCT = ++ae2wctGuiIndex;
-	public static final int GUI_CRAFTING_STATUS = ++ae2wctGuiIndex;
-	public static final int GUI_CRAFT_AMOUNT = ++ae2wctGuiIndex;
-	public static final int GUI_CRAFT_CONFIRM = ++ae2wctGuiIndex;
-	public static final int GUI_MAGNET = ++ae2wctGuiIndex;
-
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		if (!Loader.isModLoaded("wct-core")) {

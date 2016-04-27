@@ -23,6 +23,7 @@ import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class WCTGuiHandler implements IGuiHandler {
 
@@ -35,23 +36,23 @@ public class WCTGuiHandler implements IGuiHandler {
 		final WirelessTerminalGuiObject obj = new WirelessTerminalGuiObject(wh, RandomUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
 		final IPortableCell terminal = (IPortableCell) obj;
 
-		if (guiId == WirelessCraftingTerminal.GUI_WCT) {
+		if (guiId == Reference.GUI_WCT) {
 			return new ContainerWirelessCraftingTerminal(player, player.inventory);
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFTING_STATUS) {
+		if (guiId == Reference.GUI_CRAFTING_STATUS) {
 			return new ContainerCraftingStatus(player.inventory, (ITerminalHost) terminal);
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFT_AMOUNT) {
+		if (guiId == Reference.GUI_CRAFT_AMOUNT) {
 			return new ContainerCraftAmount(player.inventory, (ITerminalHost) terminal);
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFT_CONFIRM) {
+		if (guiId == Reference.GUI_CRAFT_CONFIRM) {
 			return new ContainerCraftConfirm(player.inventory, (ITerminalHost) terminal);
 		}
 		
-		if (guiId == WirelessCraftingTerminal.GUI_MAGNET) {
+		if (guiId == Reference.GUI_MAGNET) {
 			return new ContainerMagnet(player, player.inventory);
 		}
 		
@@ -64,23 +65,23 @@ public class WCTGuiHandler implements IGuiHandler {
 		final WirelessTerminalGuiObject obj = new WirelessTerminalGuiObject(wh, RandomUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
 		final IPortableCell terminal = (IPortableCell) obj;
 
-		if (guiId == WirelessCraftingTerminal.GUI_WCT) {
+		if (guiId == Reference.GUI_WCT) {
 			return new GuiWirelessCraftingTerminal((ContainerWirelessCraftingTerminal) new ContainerWirelessCraftingTerminal(player, player.inventory));
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFTING_STATUS) {
+		if (guiId == Reference.GUI_CRAFTING_STATUS) {
 			return new GuiCraftingStatus(player.inventory, (ITerminalHost) terminal);
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFT_AMOUNT) {
+		if (guiId == Reference.GUI_CRAFT_AMOUNT) {
 			return new GuiCraftAmount(player.inventory, (ITerminalHost) terminal);
 		}
 
-		if (guiId == WirelessCraftingTerminal.GUI_CRAFT_CONFIRM) {
+		if (guiId == Reference.GUI_CRAFT_CONFIRM) {
 			return new GuiCraftConfirm(player.inventory, (ITerminalHost) terminal);
 		}
 		
-		if (guiId == WirelessCraftingTerminal.GUI_MAGNET) {
+		if (guiId == Reference.GUI_MAGNET) {
 			return new GuiMagnet(new ContainerMagnet(player, player.inventory));
 		}
 
