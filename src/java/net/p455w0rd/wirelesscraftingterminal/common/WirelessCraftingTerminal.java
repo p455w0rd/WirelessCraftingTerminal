@@ -46,13 +46,13 @@ public class WirelessCraftingTerminal {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		if (!Loader.isModLoaded("wct-core")) {
-			proxy.missingCoreMod();
+			WirelessCraftingTerminal.proxy.missingCoreMod();
 		}
 		long stopwatch = WCTLog.beginSection("PreInit");
 		WirelessCraftingTerminal.WCTState = LoaderState.PREINITIALIZATION;
 		WirelessCraftingTerminal.INSTANCE = this;
 		creativeTab = new CreativeTabWCT(CreativeTabs.getNextID(), Reference.MODID).setNoScrollbar();
-		proxy.registerItems();
+		WirelessCraftingTerminal.proxy.registerItems();
 		ConfigHandler.init(new File(event.getModConfigurationDirectory(), Reference.CONFIG_FILE));
 		FMLCommonHandler.instance().bus().register(proxy);
 		AEApi.instance().registries().wireless().registerWirelessHandler((IWirelessTermHandler) ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem());
@@ -76,7 +76,7 @@ public class WirelessCraftingTerminal {
 		FMLCommonHandler.instance().registerCrashCallable(new IntegrationCrashEnhancement());
 		NetworkRegistry.INSTANCE.registerGuiHandler(this.INSTANCE, new WCTGuiHandler());
 		NetworkHandler.instance = new NetworkHandler("WCT");
-		proxy.removeItemsFromNEI();
+		WirelessCraftingTerminal.proxy.removeItemsFromNEI();
 		WCTLog.endSection("PostInit", stopwatch);
 	}
 

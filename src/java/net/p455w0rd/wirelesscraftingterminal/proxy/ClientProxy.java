@@ -28,9 +28,9 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 	
-	public void registerItems() {
+	//public void registerItems() {
 		// =]
-	}
+	//}
 
 	public void registerRenderers() {
 		// No renderers...yet =]

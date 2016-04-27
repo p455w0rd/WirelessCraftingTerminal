@@ -330,8 +330,6 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		for (int x = 0; x < 9; x++) {
 			ic.setInventorySlotContents(x, this.craftMatrixSlot[x].getStack());
 		}
-
-		//this.output.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(ic, worldObj));
 		this.craftingSlot.putStack(CraftingManager.getInstance().findMatchingRecipe(ic, this.worldObj));
 		writeToNBT("crafting");
 	}
@@ -750,12 +748,12 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		this.sendCustomName();
 
-		if (Platform.isSameItem(this.civ.getItemStack(), this.getPlayerInv().getCurrentItem())) {
-			this.getPlayerInv().setInventorySlotContents(this.getPlayerInv().currentItem, this.civ.getItemStack());
-		}
-		else {
-			this.setValidContainer(false);
-		}
+		//if (Platform.isSameItem(this.civ.getItemStack(), this.getPlayerInv().getCurrentItem())) {
+		//	this.getPlayerInv().setInventorySlotContents(this.getPlayerInv().currentItem, this.civ.getItemStack());
+		//}
+		//else {
+			//this.setValidContainer(false);
+		//}
 
 		// drain 1 ae t
 		this.ticks++;
