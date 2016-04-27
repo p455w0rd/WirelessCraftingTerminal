@@ -18,12 +18,11 @@ import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 public class PacketMagnetFilterMode extends WCTPacket {
 
 	boolean isWhitelisting;
-	
-	public PacketMagnetFilterMode( final ByteBuf stream )
-	{
+
+	public PacketMagnetFilterMode(final ByteBuf stream) {
 		this.isWhitelisting = stream.readBoolean();
 	}
-	
+
 	public PacketMagnetFilterMode(final boolean isWhitelisting) {
 		this.isWhitelisting = isWhitelisting;
 		if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
@@ -32,12 +31,11 @@ public class PacketMagnetFilterMode extends WCTPacket {
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(this.getPacketID());
 		data.writeBoolean(this.isWhitelisting);
-		this.configureWrite( data );
+		this.configureWrite(data);
 	}
-	
+
 	@Override
-	public void serverPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
-	{
+	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		ItemStack magnetItem = RandomUtils.getMagnet(player.inventory);
 		if (!(magnetItem.getItem() instanceof ItemMagnet)) {
 			return;
@@ -49,10 +47,9 @@ public class PacketMagnetFilterMode extends WCTPacket {
 			magnetItem.getTagCompound().setBoolean("Whitelisting", this.isWhitelisting);
 		}
 	}
-	
+
 	@Override
-	public void clientPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
-	{
+	public void clientPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		GuiMagnet.mode = this.isWhitelisting;
 	}
 }

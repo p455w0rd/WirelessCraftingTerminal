@@ -25,12 +25,12 @@ import net.p455w0rd.wirelesscraftingterminal.proxy.CommonProxy;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 
-@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "required-after:Forge@[" // require
-																																																		// forge.
+@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "required-after:Forge@["
 		+ net.minecraftforge.common.ForgeVersion.majorVersion + '.' // majorVersion
 		+ net.minecraftforge.common.ForgeVersion.minorVersion + '.' // minorVersion
 		+ net.minecraftforge.common.ForgeVersion.revisionVersion + '.' // revisionVersion
-		+ net.minecraftforge.common.ForgeVersion.buildVersion + ",);required-after:appliedenergistics2@[rv3-beta-1,);")
+		+ net.minecraftforge.common.ForgeVersion.buildVersion + ",);"
+				+ "required-after:appliedenergistics2@[rv3-beta-1,);")
 
 public class WirelessCraftingTerminal {
 
@@ -52,7 +52,7 @@ public class WirelessCraftingTerminal {
 		WirelessCraftingTerminal.WCTState = LoaderState.PREINITIALIZATION;
 		WirelessCraftingTerminal.INSTANCE = this;
 		creativeTab = new CreativeTabWCT(CreativeTabs.getNextID(), Reference.MODID).setNoScrollbar();
-		WirelessCraftingTerminal.proxy.registerItems();
+		proxy.registerItems();
 		ConfigHandler.init(new File(event.getModConfigurationDirectory(), Reference.CONFIG_FILE));
 		FMLCommonHandler.instance().bus().register(proxy);
 		AEApi.instance().registries().wireless().registerWirelessHandler((IWirelessTermHandler) ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem());
@@ -76,7 +76,7 @@ public class WirelessCraftingTerminal {
 		FMLCommonHandler.instance().registerCrashCallable(new IntegrationCrashEnhancement());
 		NetworkRegistry.INSTANCE.registerGuiHandler(this.INSTANCE, new WCTGuiHandler());
 		NetworkHandler.instance = new NetworkHandler("WCT");
-		WirelessCraftingTerminal.proxy.removeItemsFromNEI();
+		proxy.removeItemsFromNEI();
 		WCTLog.endSection("PostInit", stopwatch);
 	}
 

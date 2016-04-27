@@ -14,6 +14,11 @@ import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class ConfigHandler {
+	/*
+	 * A big part of what goes on here is reloading the cfg on-the-fly
+	 * since Ender-Core adds the abilitty to modify config stuff while in game,
+	 * I figured I'd add support for such possibilities
+	 */
 	public static Configuration config;
 	public static boolean enableInfinityBooster;
 	public static boolean enableEasyMode;
@@ -106,6 +111,8 @@ public class ConfigHandler {
 			}
 			ItemEnum.BOOSTER_CARD.getItem().setCreativeTab(null);
 		}
+		//Added here because the only item being added to creative was the Booster Card
+		//even when I set the Creative Tabs in the individual item classes
 		ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem().setCreativeTab(WirelessCraftingTerminal.creativeTab);
 		ItemEnum.MAGNET_CARD.getItem().setCreativeTab(WirelessCraftingTerminal.creativeTab);
 	}

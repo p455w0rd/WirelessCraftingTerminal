@@ -28,7 +28,6 @@ public class PacketCraftRequest extends WCTPacket {
 	private final long amount;
 	private final boolean heldShift;
 
-	// automatic.
 	public PacketCraftRequest(final ByteBuf stream) {
 		this.heldShift = stream.readBoolean();
 		this.amount = stream.readLong();

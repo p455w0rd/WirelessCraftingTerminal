@@ -20,38 +20,22 @@ public class PacketOpenWirelessTerm extends WCTPacket {
 	public PacketOpenWirelessTerm(final ByteBuf stream) {
 
 	}
-	
+
 	public PacketOpenWirelessTerm() {
-		if( Platform.isClient() ) {
-			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
-			//WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
-		}
 		final ByteBuf data = Unpooled.buffer();
-		data.writeInt( this.getPacketID() );
-		this.configureWrite( data );
+		data.writeInt(this.getPacketID());
+		this.configureWrite(data);
 	}
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		World world = player.worldObj;
-		int x = (int) player.posX;
-		int y = (int) player.posY;
-		int z = (int) player.posZ;
-		//WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_WCT, player, world, x, y, z);
 		if (player.openContainer instanceof ContainerPlayer) {
-			//WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
-			player.openGui(WirelessCraftingTerminal.INSTANCE, Reference.GUI_WCT, world, x, y, z);
+			WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
 		}
 	}
 
 	@Override
 	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
-		World world = player.worldObj;
-		int x = (int) player.posX;
-		int y = (int) player.posY;
-		int z = (int) player.posZ;
-		//WCTGuiHandler.launchGui(WirelessCraftingTerminal.GUI_WCT, player, world, x, y, z);
 		//WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
-		player.openGui(WirelessCraftingTerminal.INSTANCE, Reference.GUI_WCT, world, x, y, z);
 	}
 }

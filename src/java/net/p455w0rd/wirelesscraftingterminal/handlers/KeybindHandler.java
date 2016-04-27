@@ -38,17 +38,14 @@ public class KeybindHandler {
 
 	@SubscribeEvent
 	public void onKeyInput(KeyInputEvent event) {
-		//if (event.phase == Phase.END) {
-			EntityClientPlayerMP p = (EntityClientPlayerMP) Minecraft.getMinecraft().thePlayer;
-			if (openTerminal.isPressed()) {
-				//if (p.openContainer != null && p.openContainer instanceof ContainerPlayer) {
-				//WCTApi.instance().interact().openWirelessCraftingTerminalGui(p);
+		EntityClientPlayerMP p = (EntityClientPlayerMP) Minecraft.getMinecraft().thePlayer;
+		if (openTerminal.isPressed()) {
+			if (p.openContainer != null && p.openContainer instanceof ContainerPlayer) {
 				if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
-					NetworkHandler.instance.sendToServer( new PacketOpenWirelessTerm() );
+					NetworkHandler.instance.sendToServer(new PacketOpenWirelessTerm());
 				}
-				//}
 			}
-		//}
+		}
 	}
 
 }

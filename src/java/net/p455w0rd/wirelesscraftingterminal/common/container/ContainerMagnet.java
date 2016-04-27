@@ -51,7 +51,7 @@ public class ContainerMagnet extends Container {
 			}
 		}
 	}
-	
+
 	private boolean isInHotbar(int slotNum) {
 		return (slotNum >= HOTBAR_START) && (slotNum <= HOTBAR_END);
 	}
@@ -68,6 +68,7 @@ public class ContainerMagnet extends Container {
 	public boolean canInteractWith(EntityPlayer p) {
 		return true;
 	}
+
 	private boolean alreadyFiltered(ItemStack item) {
 		for (int i = 0; i < magnetInventory.getSizeInventory(); i++) {
 			if (isIdenticalItem(item, magnetInventory.getStackInSlot(i))) {
@@ -92,7 +93,7 @@ public class ContainerMagnet extends Container {
 		//	return null;
 		//}
 		if (getSlot(slotNum) instanceof SlotMagnetFilter) {
-			
+
 			SlotMagnetFilter slot = (SlotMagnetFilter) getSlot(slotNum);
 			ItemStack stack = null;
 
@@ -158,7 +159,7 @@ public class ContainerMagnet extends Container {
 			}
 		}
 	}
-	
+
 	private void fillPhantomSlot(SlotMagnetFilter slot, ItemStack stackHeld, int mouseButton) {
 		if (!slot.canAdjustPhantom()) {
 			return;
@@ -237,20 +238,6 @@ public class ContainerMagnet extends Container {
 		}
 		slot.onPickupFromSlot(p, stack);
 		return stack;
-		/*
-		 * 
-		 * int numSlots = inventorySlots.size(); ItemStack stackInSlot =
-		 * slot.getStack(); ItemStack originalStack = stackInSlot.copy();
-		 * 
-		 * slot.onSlotChange(stackInSlot, originalStack); if
-		 * (stackInSlot.stackSize <= 0) { slot.putStack(null); } else {
-		 * slot.onSlotChanged(); }
-		 * 
-		 * if (stackInSlot.stackSize == originalStack.stackSize) { return null;
-		 * }
-		 * 
-		 * slot.onPickupFromSlot(player, stackInSlot); return originalStack;
-		 */
 	}
 
 	public boolean isIdenticalItem(ItemStack lhs, ItemStack rhs) {

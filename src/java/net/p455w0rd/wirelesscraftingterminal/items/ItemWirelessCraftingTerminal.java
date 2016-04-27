@@ -1,5 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.items;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -14,6 +15,7 @@ import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
 import appeng.api.util.IConfigManager;
+import appeng.core.features.AEFeature;
 import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.ConfigManager;
 import appeng.util.IConfigManagerHost;
@@ -51,7 +53,6 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	public ItemWirelessCraftingTerminal() {
 		super(Reference.WCT_MAX_POWER, Optional.<String> absent());
-		//this.setFeature(EnumSet.of(AEFeature.WirelessAccessTerminal, AEFeature.PoweredTools));
 		this.setUnlocalizedName("wirelessCraftingTerminal");
 		this.setTextureName(Reference.MODID + ":wirelessCraftingTerminal");
 		this.setMaxStackSize(1);

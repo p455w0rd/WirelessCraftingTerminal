@@ -36,7 +36,6 @@ public class AchievementHandler {
 	public static void init() {
 		registerAchievements();
 		registerPage();
-		//addAchievementToPage(wctAch);
 	}
 
 	public static void registerAchievements() {

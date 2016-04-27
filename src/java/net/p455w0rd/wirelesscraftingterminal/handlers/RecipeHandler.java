@@ -100,17 +100,5 @@ public class RecipeHandler {
 		}
 		recipeList.clear();
 		init();
-		/*
-		 * ItemStack recipeRegistryItem = null; ArrayList recipeRegistry =
-		 * (ArrayList) CraftingManager.getInstance().getRecipeList(); for (int i
-		 * = 0; i < recipeRegistry.size(); i++) { IRecipe tmpRecipe = (IRecipe)
-		 * recipeRegistry.get(i); if (tmpRecipe instanceof ShapedOreRecipe) {
-		 * ShapedOreRecipe recipeRegistryRecipe = (ShapedOreRecipe)tmpRecipe;
-		 * recipeRegistryItem = recipeRegistryRecipe.getRecipeOutput(); } else {
-		 * continue; } for (IRecipe recipe : recipeList) { ItemStack
-		 * recipeOutput = recipe.getRecipeOutput(); if
-		 * (ItemStack.areItemStacksEqual(recipeOutput, recipeRegistryItem)) {
-		 * recipeRegistry.remove(i); } } }
-		 */
 	}
 }

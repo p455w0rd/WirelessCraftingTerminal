@@ -44,6 +44,7 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.register( this );
 		FMLCommonHandler.instance().bus().register(new ConfigHandler());
 	}
+	
 	public void registerItems() {
 		for (ItemEnum item : ItemEnum.VALUES) {
 			GameRegistry.registerItem(item.getItem(), item.getInternalName());
@@ -51,10 +52,11 @@ public class CommonProxy {
 	}
 
 	public void removeItemsFromNEI() {
+		// XD
 	}
 
 	public void registerRenderers() {
-		// Ignored server side.
+		// =P
 	}
 
 	public void missingCoreMod() {
@@ -125,7 +127,7 @@ public class CommonProxy {
 				ConfigHandler.reloadRecipes();
 			}
 			// Was using this for hidden booster achievement
-			// it was giving me too much of a headache..mayeb
+			// it was giving me too much of a headache..maybe
 			// i'll implement in the future
 			/*
 			AchievementPage achPg = AchievementPage.getAchievementPage("Wireless Crafting Term");
@@ -155,6 +157,17 @@ public class CommonProxy {
 	}
 
 	@SubscribeEvent
+	public void pickupEvent(PlayerEvent.ItemPickupEvent e) {
+		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED) {
+			if (e.pickedUp.getEntityItem().getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
+				if (AchievementHandler.isAchievementUnlocked(e.player, wctAch)) {
+					AchievementHandler.triggerAch(boosterAch, e.player);
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
 	public void onPlayerCraftingEvent(final PlayerEvent.ItemCraftedEvent event) {
 		boolean hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
 		if (event.player == null || event.player.isDead || event.player instanceof FakePlayer || event.crafting == null) {
@@ -180,7 +193,7 @@ public class CommonProxy {
 			}
 		}
 	}
-
+	
 	/*
 	@SubscribeEvent
 	public void achievementGetEvent(AchievementEvent event) {
@@ -194,15 +207,4 @@ public class CommonProxy {
 		}
 	}
 	*/
-
-	@SubscribeEvent
-	public void pickupEvent(PlayerEvent.ItemPickupEvent e) {
-		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED) {
-			if (e.pickedUp.getEntityItem().getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
-				if (AchievementHandler.isAchievementUnlocked(e.player, wctAch)) {
-					AchievementHandler.triggerAch(boosterAch, e.player);
-				}
-			}
-		}
-	}
 }

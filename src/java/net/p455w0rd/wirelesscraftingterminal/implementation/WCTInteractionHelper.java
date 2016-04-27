@@ -18,12 +18,7 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 
 	@Override
 	public void openWirelessCraftingTerminalGui(final EntityPlayer player) {
-		// Valid player?
-		if ((player == null) || (player instanceof FakePlayer)) {
-			return;
-		}
-
-		if (player.worldObj.isRemote) {
+		if ((player == null) || (player instanceof FakePlayer) || player.worldObj.isRemote) {
 			return;
 		}
 
@@ -33,7 +28,8 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 			return;
 		}
 
-		// Get the item the first wireless terminal
+		// Get the first wireless terminal
+		// If one is held, it takes precidence
 		ItemStack wirelessTerminal = null;
 
 		for (int i = 0; i < invSize; ++i) {
@@ -46,51 +42,26 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 				break;
 			}
 		}
-		// Ensure the stack is valid
 		if ((wirelessTerminal == null)) {
-			// Invalid terminal
 			return;
 		}
-
-		// Get the interface
 		IWirelessCraftingTermHandler terminalInterface = (IWirelessCraftingTermHandler) wirelessTerminal.getItem();
-
-		// Ensure the terminal has power
-		if (terminalInterface.getAECurrentPower(wirelessTerminal) == 0) {
-			// Terminal is dead
+		if (terminalInterface.getAECurrentPower(wirelessTerminal) <= 0) {
 			player.addChatMessage(PlayerMessages.DeviceNotPowered.get());
 			return;
 		}
-
-		// Ensure the terminal is linked
 		if (!isTerminalLinked(terminalInterface, wirelessTerminal)) {
-			// Unlinked terminal
 			player.addChatMessage(PlayerMessages.DeviceNotLinked.get());
 			return;
 		}
-
-		// Get the encryption key
 		String encKey = terminalInterface.getEncryptionKey(wirelessTerminal);
-
-		// Are any AP's in range?
 		ArrayList<IWirelessAccessPoint> accessPoints = WirelessAELink.locateAPsInRangeOfPlayer(player, encKey);
-
-		// Error occured
 		if (accessPoints == null) {
 			player.addChatMessage(PlayerMessages.StationCanNotBeLocated.get());
 		}
-		// None in range
-		/*
-		 * else if( accessPoints.isEmpty() ) { player.addChatMessage(
-		 * PlayerMessages.OutOfRange.get() ); player.addChatMessage(new
-		 * ChatComponentText("XX")); }
-		 */
-		// Attempt to launch the gui
-		// NOTE: Range check done in here
 		else {
 			WCTGuiHandler.launchGui(Reference.GUI_WCT, player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		}
-
 	}
 
 	public static boolean isTerminalLinked(final IWirelessCraftingTermHandler wirelessTerminal, final ItemStack wirelessTerminalItemstack) {

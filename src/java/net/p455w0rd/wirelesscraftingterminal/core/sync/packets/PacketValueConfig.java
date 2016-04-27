@@ -28,89 +28,70 @@ import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 
-public class PacketValueConfig extends WCTPacket
-{
+public class PacketValueConfig extends WCTPacket {
 
 	private final String Name;
 	private final String Value;
 
 	// automatic.
-	public PacketValueConfig( final ByteBuf stream ) throws IOException
-	{
-		final DataInputStream dis = new DataInputStream( new ByteArrayInputStream( stream.array(), stream.readerIndex(), stream.readableBytes() ) );
+	public PacketValueConfig(final ByteBuf stream) throws IOException {
+		final DataInputStream dis = new DataInputStream(new ByteArrayInputStream(stream.array(), stream.readerIndex(), stream.readableBytes()));
 		this.Name = dis.readUTF();
 		this.Value = dis.readUTF();
-		// dis.close();
 	}
 
 	// api
-	public PacketValueConfig( final String name, final String value ) throws IOException
-	{
+	public PacketValueConfig(final String name, final String value) throws IOException {
 		this.Name = name;
 		this.Value = value;
 
 		final ByteBuf data = Unpooled.buffer();
 
-		data.writeInt( this.getPacketID() );
-
+		data.writeInt(this.getPacketID());
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		final DataOutputStream dos = new DataOutputStream( bos );
-		dos.writeUTF( name );
-		dos.writeUTF( value );
-		// dos.close();
-
-		data.writeBytes( bos.toByteArray() );
-
-		this.configureWrite( data );
+		final DataOutputStream dos = new DataOutputStream(bos);
+		dos.writeUTF(name);
+		dos.writeUTF(value);
+		data.writeBytes(bos.toByteArray());
+		this.configureWrite(data);
 	}
 
 	@Override
-	public void serverPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
-	{
+	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;
 
-		if( this.Name.equals( "Item" ) && RandomUtils.getWirelessTerm(player.inventory) != null && RandomUtils.getWirelessTerm(player.inventory).getItem() instanceof IMouseWheelItem )
-		{
+		if (this.Name.equals("Item") && RandomUtils.getWirelessTerm(player.inventory) != null && RandomUtils.getWirelessTerm(player.inventory).getItem() instanceof IMouseWheelItem) {
 			final ItemStack is = RandomUtils.getWirelessTerm(player.inventory);
 			final IMouseWheelItem si = (IMouseWheelItem) is.getItem();
-			si.onWheel( is, this.Value.equals( "WheelUp" ) );
+			si.onWheel(is, this.Value.equals("WheelUp"));
 		}
-		else if( this.Name.equals( "Terminal.Cpu" ) && c instanceof ContainerCraftingStatus )
-		{
+		else if (this.Name.equals("Terminal.Cpu") && c instanceof ContainerCraftingStatus) {
 			final ContainerCraftingStatus qk = (ContainerCraftingStatus) c;
-			qk.cycleCpu( this.Value.equals( "Next" ) );
+			qk.cycleCpu(this.Value.equals("Next"));
 		}
-		else if( this.Name.equals( "Terminal.Cpu" ) && c instanceof ContainerCraftConfirm )
-		{
+		else if (this.Name.equals("Terminal.Cpu") && c instanceof ContainerCraftConfirm) {
 			final ContainerCraftConfirm qk = (ContainerCraftConfirm) c;
-			qk.cycleCpu( this.Value.equals( "Next" ) );
+			qk.cycleCpu(this.Value.equals("Next"));
 		}
-		else if( this.Name.equals( "Terminal.Start" ) && c instanceof ContainerCraftConfirm )
-		{
+		else if (this.Name.equals("Terminal.Start") && c instanceof ContainerCraftConfirm) {
 			final ContainerCraftConfirm qk = (ContainerCraftConfirm) c;
 			qk.startJob();
 		}
-		else if( this.Name.equals( "TileCrafting.Cancel" ) && c instanceof ContainerCraftingCPU )
-		{
+		else if (this.Name.equals("TileCrafting.Cancel") && c instanceof ContainerCraftingCPU) {
 			final ContainerCraftingCPU qk = (ContainerCraftingCPU) c;
 			qk.cancelCrafting();
 		}
-		else if( c instanceof IConfigurableObject )
-		{
-			final IConfigManager cm = ( (IConfigurableObject) c ).getConfigManager();
+		else if (c instanceof IConfigurableObject) {
+			final IConfigManager cm = ((IConfigurableObject) c).getConfigManager();
 
-			for( final Settings e : cm.getSettings() )
-			{
-				if( e.name().equals( this.Name ) )
-				{
-					final Enum<?> def = cm.getSetting( e );
+			for (final Settings e : cm.getSettings()) {
+				if (e.name().equals(this.Name)) {
+					final Enum<?> def = cm.getSetting(e);
 
-					try
-					{
-						cm.putSetting( e, Enum.valueOf( def.getClass(), this.Value ) );
+					try {
+						cm.putSetting(e, Enum.valueOf(def.getClass(), this.Value));
 					}
-					catch( final IllegalArgumentException err )
-					{
+					catch (final IllegalArgumentException err) {
 						// :P
 					}
 
@@ -121,55 +102,44 @@ public class PacketValueConfig extends WCTPacket
 	}
 
 	@Override
-	public void clientPacketData( final INetworkInfo network, final WCTPacket packet, final EntityPlayer player )
-	{
+	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;
 
-		if( this.Name.equals( "CustomName" ))
-		{
+		if (this.Name.equals("CustomName")) {
 			if (c instanceof ContainerWirelessCraftingTerminal) {
-				( (ContainerWirelessCraftingTerminal) c ).setCustomName( this.Value );
+				((ContainerWirelessCraftingTerminal) c).setCustomName(this.Value);
 			}
 			if (c instanceof WCTBaseContainer) {
-				( (WCTBaseContainer) c ).setCustomName( this.Value );
+				((WCTBaseContainer) c).setCustomName(this.Value);
 			}
 		}
-		else if( this.Name.startsWith( "SyncDat." ) )
-		{
+		else if (this.Name.startsWith("SyncDat.")) {
 			if (c instanceof ContainerWirelessCraftingTerminal) {
-				( (ContainerWirelessCraftingTerminal) c ).stringSync( Integer.parseInt( this.Name.substring( 8 ) ), this.Value );
+				((ContainerWirelessCraftingTerminal) c).stringSync(Integer.parseInt(this.Name.substring(8)), this.Value);
 			}
 			if (c instanceof WCTBaseContainer) {
-				( (WCTBaseContainer) c ).stringSync( Integer.parseInt( this.Name.substring( 8 ) ), this.Value );
+				((WCTBaseContainer) c).stringSync(Integer.parseInt(this.Name.substring(8)), this.Value);
 			}
 		}
-		else if( this.Name.equals( "CraftingStatus" ) && this.Value.equals( "Clear" ) )
-		{
+		else if (this.Name.equals("CraftingStatus") && this.Value.equals("Clear")) {
 			final GuiScreen gs = Minecraft.getMinecraft().currentScreen;
-			if( gs instanceof GuiCraftingCPU )
-			{
-				( (GuiCraftingCPU) gs ).clearItems();
+			if (gs instanceof GuiCraftingCPU) {
+				((GuiCraftingCPU) gs).clearItems();
 			}
 		}
-		else if( c instanceof IConfigurableObject )
-		{
-			final IConfigManager cm = ( (IConfigurableObject) c ).getConfigManager();
+		else if (c instanceof IConfigurableObject) {
+			final IConfigManager cm = ((IConfigurableObject) c).getConfigManager();
 
-			for( final Settings e : cm.getSettings() )
-			{
-				if( e.name().equals( this.Name ) )
-				{
-					final Enum<?> def = cm.getSetting( e );
+			for (final Settings e : cm.getSettings()) {
+				if (e.name().equals(this.Name)) {
+					final Enum<?> def = cm.getSetting(e);
 
-					try
-					{
-						cm.putSetting( e, Enum.valueOf( def.getClass(), this.Value ) );
+					try {
+						cm.putSetting(e, Enum.valueOf(def.getClass(), this.Value));
 					}
-					catch( final IllegalArgumentException err )
-					{
+					catch (final IllegalArgumentException err) {
 						// :P
 					}
-
 					break;
 				}
 			}

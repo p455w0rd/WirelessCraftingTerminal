@@ -14,9 +14,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEve
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
-
-public class NetworkHandler
-{
+public class NetworkHandler {
 
 	public static NetworkHandler instance;
 
@@ -26,86 +24,69 @@ public class NetworkHandler
 	private final IPacketHandler clientHandler;
 	private final IPacketHandler serveHandler;
 
-	public NetworkHandler( final String channelName )
-	{
-		FMLCommonHandler.instance().bus().register( this );
-		this.ec = NetworkRegistry.INSTANCE.newEventDrivenChannel( this.myChannelName = channelName );
-		this.ec.register( this );
+	public NetworkHandler(final String channelName) {
+		FMLCommonHandler.instance().bus().register(this);
+		this.ec = NetworkRegistry.INSTANCE.newEventDrivenChannel(this.myChannelName = channelName);
+		this.ec.register(this);
 
 		this.clientHandler = this.createClientSide();
 		this.serveHandler = this.createServerSide();
 	}
 
-	private IPacketHandler createClientSide()
-	{
-		try
-		{
+	private IPacketHandler createClientSide() {
+		try {
 			return new WCTClientPacketHandler();
 		}
-		catch( final Throwable t )
-		{
+		catch (final Throwable t) {
 			return null;
 		}
 	}
 
-	private IPacketHandler createServerSide()
-	{
-		try
-		{
+	private IPacketHandler createServerSide() {
+		try {
 			return new WCTServerPacketHandler();
 		}
-		catch( final Throwable t )
-		{
+		catch (final Throwable t) {
 			return null;
 		}
 	}
 
 	@SubscribeEvent
-	public void serverPacket( final ServerCustomPacketEvent ev )
-	{
+	public void serverPacket(final ServerCustomPacketEvent ev) {
 		final NetHandlerPlayServer srv = (NetHandlerPlayServer) ev.packet.handler();
-		if( this.serveHandler != null )
-		{
-			this.serveHandler.onPacketData( null, ev.packet, srv.playerEntity );
+		if (this.serveHandler != null) {
+			this.serveHandler.onPacketData(null, ev.packet, srv.playerEntity);
 		}
 	}
 
 	@SubscribeEvent
-	public void clientPacket( final ClientCustomPacketEvent ev )
-	{
-		if( this.clientHandler != null )
-		{
-			this.clientHandler.onPacketData( null, ev.packet, null );
+	public void clientPacket(final ClientCustomPacketEvent ev) {
+		if (this.clientHandler != null) {
+			this.clientHandler.onPacketData(null, ev.packet, null);
 		}
 	}
 
-	public String getChannel()
-	{
+	public String getChannel() {
 		return this.myChannelName;
 	}
 
-	public void sendToAll( final WCTPacket message )
-	{
-		this.ec.sendToAll( message.getProxy() );
+	public void sendToAll(final WCTPacket message) {
+		this.ec.sendToAll(message.getProxy());
 	}
 
-	public void sendTo( final WCTPacket message, final EntityPlayerMP player )
-	{
-		this.ec.sendTo( message.getProxy(), player );
+	public void sendTo(final WCTPacket message, final EntityPlayerMP player) {
+		this.ec.sendTo(message.getProxy(), player);
 	}
 
-	public void sendToAllAround( final WCTPacket message, final NetworkRegistry.TargetPoint point )
-	{
-		this.ec.sendToAllAround( message.getProxy(), point );
+	public void sendToAllAround(final WCTPacket message, final NetworkRegistry.TargetPoint point) {
+		this.ec.sendToAllAround(message.getProxy(), point);
 	}
 
-	public void sendToDimension( final WCTPacket message, final int dimensionId )
-	{
-		this.ec.sendToDimension( message.getProxy(), dimensionId );
+	public void sendToDimension(final WCTPacket message, final int dimensionId) {
+		this.ec.sendToDimension(message.getProxy(), dimensionId);
 	}
 
-	public void sendToServer( final WCTPacket message )
-	{
-		this.ec.sendToServer( message.getProxy() );
+	public void sendToServer(final WCTPacket message) {
+		this.ec.sendToServer(message.getProxy());
 	}
 }

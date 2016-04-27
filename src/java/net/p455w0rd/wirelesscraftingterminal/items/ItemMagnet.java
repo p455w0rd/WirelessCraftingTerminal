@@ -156,7 +156,6 @@ public class ItemMagnet extends Item {
 	}
 
 	@SuppressWarnings("rawtypes")
-	// @Override
 	public void doMagnet(ItemStack item, World world, EntityPlayer player, ItemStack wirelessTerm) {
 		if (world.isRemote || getItemStack() == null)
 			return;
