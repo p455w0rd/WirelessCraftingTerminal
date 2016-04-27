@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/resources"/>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Minecraft"/>
+	<classpathentry kind="lib" path="J:/mc_modding/libs/CoFHCore-[1.7.10]3.1.2-325-dev.jar"/>
+	<classpathentry kind="lib" path="J:/mc_modding/libs/industrialcraft-2-2.2.818-experimental-api.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/Waila-1.5.11-RC1_1.7.10-dev.jar" sourcepath="J:/mc_modding/libs/Waila-1.5.11-RC1_1.7.10-sources.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/NotEnoughItems-1.7.10-1.0.5.120-dev.jar" sourcepath="J:/mc_modding/libs/NotEnoughItems-1.7.10-1.0.5.120-src.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/CodeChickenCore-1.7.10-1.0.7.47-dev.jar" sourcepath="J:/mc_modding/libs/CodeChickenCore-1.7.10-1.0.7.47-src.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/neiaddons-1.12.15.41-mc1.7.10-dev.jar" sourcepath="J:/mc_modding/libs/neiaddons-1.12.15.41-mc1.7.10-sources.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/NEIIntegration-MC1.7.10-1.1.2-deobf.jar" sourcepath="J:/mc_modding/libs/NEIIntegration-MC1.7.10-1.1.2-sources.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/EnderCore-1.7.10-0.2.0.33_beta-dev.jar"/>
+	<classpathentry kind="lib" path="/Minecraft/libs/EnderIO-1.7.10-2.3.0.424_beta-dev.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
