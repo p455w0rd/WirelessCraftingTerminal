@@ -1,9 +1,9 @@
-# Wireless Crafting Terminal
+# Wireless Crafting Terminal (Beta)
 
 ## Table of Contents
 
 * [About](#about)
-* [Contacts](#contacts)
+* [Contact](#contact)
 * [License](#license)
 * [Downloads](#downloads)
 * [Installation](#installation)
@@ -19,7 +19,9 @@
 An OP addon to an already OP mod =]
 Adds a Wireless Terminal version of the AE2 Crafting Terminal with the ability to install upgrades
 
-## Contacts
+Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter](#contact)
+
+## Contact
 
 * [Website](http://p455w0rd.net/mc/)
 * [IRC #p455w0rdCraft on esper.net](http://webchat.esper.net/?channels=p455w0rdCraft&prompt=1)
