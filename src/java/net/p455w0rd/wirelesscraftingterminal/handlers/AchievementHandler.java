@@ -28,7 +28,7 @@ import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 public class AchievementHandler {
 
 	private static ItemInfinityBooster booster = (ItemInfinityBooster) ItemEnum.BOOSTER_ICON.getItem();
-	public static final Achievement wctAch = new Achievement("achievement.wctAchievement", "wctAchievement", 0, 0, ItemEnum.WCT_DUMMY_ICON.getItem(), (Achievement) null);
+	public static final Achievement wctAch = new Achievement("achievement.wctAchievement", "wctAchievement", 0, 0, ItemEnum.WIRELESS_CRAFTING_TERMINAL.getStack(), (Achievement) null);
 	public static final Achievement boosterAch = new Achievement("achievment.boosterAchievement", "boosterAchievement", 0, 2, booster.hasEffect(true), wctAch);
 	public static final Achievement magnetAch = new Achievement("achievement.magnetAchievement", "magnetAchievement", 2, 0, ItemEnum.MAGNET_CARD.getItem(), wctAch);
 	private static final AchievementPage achPage = new AchievementPage("Wireless Crafting Term", wctAch, boosterAch, magnetAch);

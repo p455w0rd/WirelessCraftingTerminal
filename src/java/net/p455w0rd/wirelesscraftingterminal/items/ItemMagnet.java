@@ -17,7 +17,6 @@ import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
@@ -25,7 +24,6 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.util.Platform;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -37,7 +35,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -45,6 +43,7 @@ import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
+import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
@@ -87,6 +86,11 @@ public class ItemMagnet extends Item {
 	public void setItemStack(ItemStack is) {
 		this.thisItemStack = is;
 	}
+	
+	@Override
+	public boolean isDamageable() {
+		return false;
+	}
 
 	public ItemStack getItemStack() {
 		if (thisItemStack != null && (thisItemStack.getItem() instanceof ItemMagnet)) {
@@ -98,36 +102,43 @@ public class ItemMagnet extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
-		list.add(color("aqua") + "===========================");
+		list.add(color("aqua") + "==============================");
 		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + "" + color("bold") + "" + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
 			String info = LocaleHandler.MagnetDesc.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {
 				list.add(line.trim());
 			}
-			
+
 			list.add("");
 			list.add(LocaleHandler.MagnetDesc2.getLocal());
-			
+
 			list.add("");
 			list.add(LocaleHandler.Status.getLocal() + ": " + (isActivated(is) ? color("green") + "" + LocaleHandler.Active.getLocal() : color("red") + "" + LocaleHandler.Inactive.getLocal()));
+			if (is.getItemDamage() == 1) {
+				list.add(color("white") + "  " + LocaleHandler.MagnetActiveDesc1.getLocal());
+			}
+			else if (is.getItemDamage() == 2) {
+				list.add(color("white") + "  " + LocaleHandler.MagnetActiveDesc2.getLocal());
+			}
+			
 			String white = LocaleHandler.Whitelisting.getLocal();
 			String black = LocaleHandler.Blacklisting.getLocal();
-			
+
 			list.add(LocaleHandler.FilterMode.getLocal() + ": " + color("white") + "" + (getMode(is) ? white : black));
 			list.add("");
-			
+
 			String onlyWorks = LocaleHandler.OnlyWorks.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(onlyWorks, 27, "\n", false))) {
 				list.add(color("white") + "" + color("bold") + "" + color("italics") + "" + line.trim());
 			}
-			
+
 		}
 		else {
 			list.add(shift);
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	private String color(String color) {
 		return RandomUtils.color(color);
@@ -143,7 +154,7 @@ public class ItemMagnet extends Item {
 	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
 		if (!world.isRemote) {
 			if (player.isSneaking()) {
-				item.setItemDamage(item.getItemDamage() == 0 ? 1 : 0);
+				switchMagnetMode(item, player);
 			}
 			else {
 				int x = (int) player.posX;
@@ -154,15 +165,35 @@ public class ItemMagnet extends Item {
 		}
 		return item;
 	}
+	
+	public void switchMagnetMode(ItemStack item, EntityPlayer player) {
+		if (item.getItemDamage() == 0) {
+			item.setItemDamage(1);
+			player.addChatMessage(new ChatComponentText(LocaleHandler.MagnetMode2.getLocal()));
+		}
+		else if (item.getItemDamage() == 1) {
+			item.setItemDamage(2);
+			player.addChatMessage(new ChatComponentText(LocaleHandler.MagnetMode3.getLocal()));
+		}
+		else {
+			item.setItemDamage(0);
+			player.addChatMessage(new ChatComponentText(LocaleHandler.MagnetMode1.getLocal()));
+		}
+	}
 
 	@SuppressWarnings("rawtypes")
 	public void doMagnet(ItemStack item, World world, EntityPlayer player, ItemStack wirelessTerm) {
-		if (world.isRemote || getItemStack() == null)
+		if (world.isRemote) {
 			return;
+		}
+		if (getItemStack() == null) {
+			return;
+		}
 		if (!isActivated(item))
 			return;
 		if (player == null)
 			return;
+		
 		List<ItemStack> filteredList = getFilteredItems(this.getItemStack());
 		// items
 		Iterator iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
@@ -194,33 +225,37 @@ public class ItemMagnet extends Item {
 
 					// whitelist
 					if (getMode(this.getItemStack())) {
-						if (isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() == 0) {
+						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
 							itemToGet.setDead();
 							doInject(ais, pickupEvent, stackSize, player, itemToGet, itemStackToGet, world);
 							continue;
 						}
 						else {
-							if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
-								player.onItemPickup(itemToGet, stackSize);
-								world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+							if (item.getItemDamage() == 1) {
+								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
+									player.onItemPickup(itemToGet, stackSize);
+									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+								}
+								FMLCommonHandler.instance().bus().post(itemPickupEvent);
 							}
 						}
-						FMLCommonHandler.instance().bus().post(itemPickupEvent);
 					}
 					// blacklist
 					else {
-						if (!isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
+						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() <= 0) {
 							itemToGet.setDead();
 							doInject(ais, pickupEvent, stackSize, player, itemToGet, itemStackToGet, world);
 							continue;
 						}
 						else {
-							if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
-								player.onItemPickup(itemToGet, stackSize);
-								world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+							if (item.getItemDamage() == 1) {
+								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
+									player.onItemPickup(itemToGet, stackSize);
+									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+								}
+								FMLCommonHandler.instance().bus().post(itemPickupEvent);
 							}
 						}
-						FMLCommonHandler.instance().bus().post(itemPickupEvent);
 					}
 
 				}
@@ -377,7 +412,7 @@ public class ItemMagnet extends Item {
 	}
 
 	protected boolean isActivated(ItemStack item) {
-		return item.getItemDamage() == 1;
+		return item.getItemDamage() != 0;
 	}
 
 	@Override

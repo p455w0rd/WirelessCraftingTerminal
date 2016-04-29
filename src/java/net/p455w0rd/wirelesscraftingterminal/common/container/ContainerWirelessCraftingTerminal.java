@@ -145,7 +145,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	private SlotArmor[] armorSlot;
 	private SlotCraftingMatrix[] craftMatrixSlot;
 	private SlotCraftingTerm craftingSlot;
-	private SlotTrash trashSlot;
+	public SlotTrash trashSlot;
 	private int firstCraftingSlotNumber = -1, lastCraftingSlotNumber = -1, craftingSlotNumber = -1;
 
 	private final WirelessTerminalGuiObject obj;
@@ -282,7 +282,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		magnetSlot = new SlotMagnet(this.magnetInventory, 152, MAGNET_Y_OFFSET);
 		this.addSlotToContainer(magnetSlot);
 
-		trashSlot = new SlotTrash(trashInventory, 80, TRASH_Y_OFFSET, player);
+		trashSlot = new SlotTrash(this.trashInventory, 80, TRASH_Y_OFFSET, player);
 		trashSlot.setContainer(this);
 		this.addSlotToContainer(trashSlot);
 
@@ -290,10 +290,6 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		this.onCraftMatrixChanged(this.craftingGrid);
 		thisItem.checkForBooster(containerstack);
-	}
-
-	public void emptyTrash() {
-		this.trashSlot.clearStack();
 	}
 
 	public void setCellInventory(final IMEInventoryHandler<IAEItemStack> cellInv) {
@@ -752,7 +748,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		//	this.getPlayerInv().setInventorySlotContents(this.getPlayerInv().currentItem, this.civ.getItemStack());
 		//}
 		//else {
-			//this.setValidContainer(false);
+		//this.setValidContainer(false);
 		//}
 
 		// drain 1 ae t
@@ -826,29 +822,30 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 				}
 			}
 		}
-		boolean hasAxxess = hasAccess(SecurityPermissions.CRAFT, true) || hasAccess(SecurityPermissions.EXTRACT, true) || hasAccess(SecurityPermissions.INJECT, true);
-		if (!isInRange()) {
-			if (!isBoosterInstalled() || !Reference.WCT_BOOSTER_ENABLED) {
-				if (Platform.isServer() && this.isValidContainer()) {
-					this.getPlayerInv().player.addChatMessage(PlayerMessages.OutOfRange.get());
+		if (Platform.isServer()) {
+			if (!isInRange()) {
+				if (!isBoosterInstalled() || !Reference.WCT_BOOSTER_ENABLED) {
+					if (this.isValidContainer()) {
+						this.getPlayerInv().player.addChatMessage(PlayerMessages.OutOfRange.get());
+					}
+					this.setValidContainer(false);
+				}
+				if (!networkIsPowered()) {
+					if (this.isValidContainer()) {
+						this.getPlayerInv().player.addChatMessage(new ChatComponentText(LocaleHandler.NoNetworkPower.getLocal()));
+					}
+					this.setValidContainer(false);
+				}
+			}
+			else if (!hasAccess(SecurityPermissions.CRAFT, true) || !hasAccess(SecurityPermissions.EXTRACT, true) || !hasAccess(SecurityPermissions.INJECT, true)) {
+				if (this.isValidContainer()) {
+					this.getPlayerInv().player.addChatMessage(PlayerMessages.CommunicationError.get());
 				}
 				this.setValidContainer(false);
 			}
-			if (!networkIsPowered()) {
-				if (Platform.isServer() && this.isValidContainer()) {
-					this.getPlayerInv().player.addChatMessage(new ChatComponentText(LocaleHandler.NoNetworkPower.getLocal()));
-				}
-				this.setValidContainer(false);
+			else {
+				this.setPowerMultiplier(AEConfig.instance.wireless_getDrainRate(this.obj.getRange()));
 			}
-		}
-		else if (!hasAxxess) {
-			if (Platform.isServer() && this.isValidContainer()) {
-				this.getPlayerInv().player.addChatMessage(PlayerMessages.CommunicationError.get());
-			}
-			this.setValidContainer(false);
-		}
-		else {
-			this.setPowerMultiplier(AEConfig.instance.wireless_getDrainRate(this.obj.getRange()));
 		}
 		super.detectAndSendChanges();
 	}
@@ -986,19 +983,18 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 				if (g != null) {
 					if (requirePower) {
 						final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-						if (!eg.isNetworkPowered()) {
+						if (!eg.isNetworkPowered() && Platform.isServer()) {
 							return false;
 						}
 					}
 
 					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-					if (sg.hasPermission(this.getInventoryPlayer().player, perm)) {
+					if (sg.hasPermission(this.player, perm) && Platform.isServer()) {
 						return true;
 					}
 				}
 			}
 		}
-
 		return false;
 	}
 
@@ -1225,7 +1221,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	public boolean isPowered() {
 		NBTTagCompound testnbt = this.containerstack.getTagCompound();
 		double pwr = testnbt.getDouble("internalCurrentPower");
-		return (pwr > 0.8);
+		return (pwr > 0.0);
 	}
 
 	public void setPowerSource(final IEnergySource powerSrc) {
@@ -1681,10 +1677,16 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 	@Override
 	public ItemStack slotClick(int slot, int button, int flag, EntityPlayer player) {
-		if (slot >= 0 && getSlot(slot) != null && getSlot(slot).getStack() == RandomUtils.getWirelessTerm(player.inventory)) {
-			return null;
+		try {
+			if (slot >= 0 && getSlot(slot) != null && getSlot(slot).getStack() == RandomUtils.getWirelessTerm(player.inventory)) {
+				return null;
+			}
+			return super.slotClick(slot, button, flag, player);
 		}
-		return super.slotClick(slot, button, flag, player);
+		catch (IndexOutOfBoundsException e) {
+			//When clicking super fast, for some reason, MC tried to access this inv size (max index + 1)
+		}
+		return null;
 	}
 
 	public final void updateFullProgressBar(final int idx, final long value) {

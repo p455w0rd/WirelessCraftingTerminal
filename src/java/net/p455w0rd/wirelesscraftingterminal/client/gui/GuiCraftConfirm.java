@@ -169,11 +169,12 @@ public class GuiCraftConfirm extends WCTBaseGui
 	@Override
 	public void drawFG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
-		final long BytesUsed = this.ccc.getUsedBytes();
-		//final long BytesUsed = ((ContainerCraftConfirm) this.inventorySlots).getUsedBytes();
+		//final long BytesUsed = this.ccc.getUsedBytes();
+		final long BytesUsed = ((ContainerCraftConfirm) this.inventorySlots).getUsedBytes();
 		final String byteUsed = NumberFormat.getInstance().format( BytesUsed );
 		final String Add = BytesUsed > 0 ? ( byteUsed + ' ' + GuiText.BytesUsed.getLocal() ) : GuiText.CalculatingWait.getLocal();
-		this.fontRendererObj.drawString( GuiText.CraftingPlan.getLocal() + " -- " + Add, 8, 7, 4210752 );
+		//this.fontRendererObj.drawString( GuiText.CraftingPlan.getLocal() + " -- " + Add, 8, 7, 4210752 );
+		this.fontRendererObj.drawString( GuiText.CraftingPlan.getLocal(), 8, 7, 4210752 );
 
 		String dsp = null;
 
@@ -183,7 +184,8 @@ public class GuiCraftConfirm extends WCTBaseGui
 		}
 		else
 		{
-			dsp = this.ccc.getCpuAvailableBytes() > 0 ? ( GuiText.Bytes.getLocal() + ": " + this.ccc.getCpuAvailableBytes() + " : " + GuiText.CoProcessors.getLocal() + ": " + this.ccc.getCpuCoProcessors() ) : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
+			//dsp = this.ccc.getCpuAvailableBytes() > 0 ? ( GuiText.Bytes.getLocal() + ": " + this.ccc.getCpuAvailableBytes() + " : " + GuiText.CoProcessors.getLocal() + ": " + this.ccc.getCpuCoProcessors() ) : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
+			dsp = "";
 		}
 
 		final int offset = ( 219 - this.fontRendererObj.getStringWidth( dsp ) ) / 2;

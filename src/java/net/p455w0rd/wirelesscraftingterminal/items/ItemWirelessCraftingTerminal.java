@@ -1,6 +1,5 @@
 package net.p455w0rd.wirelesscraftingterminal.items;
 
-import java.util.EnumSet;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
@@ -15,7 +14,6 @@ import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
 import appeng.api.util.IConfigManager;
-import appeng.core.features.AEFeature;
 import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.ConfigManager;
 import appeng.util.IConfigManagerHost;
@@ -23,14 +21,10 @@ import appeng.util.Platform;
 import cofh.api.energy.IEnergyContainerItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,6 +34,7 @@ import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
+import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -219,7 +214,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		if ((int) aeCurrPowerPct <= 5) {
 			pctTxtColor = color("red") + "";
 		}
-		list.add(color("aqua") + "===========================");
+		list.add(color("aqua") + "==============================");
 		list.add(StatCollector.translateToLocal("gui.appliedenergistics2.StoredEnergy") + ": " + pctTxtColor + (int) aeCurrPower + " AE - " + aeCurrPowerPct + "%");
 		if (isShiftKeyDown()) {
 			String linked = color("red") + StatCollector.translateToLocal("gui.appliedenergistics2.Unlinked");

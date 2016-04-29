@@ -300,7 +300,7 @@ public class WirelessTerminalGuiObject implements IPortableCell, IActionHost, II
 				}
 			}
 			else {
-				if (wap.isActive()) {
+				if (wap.isActive() && ignoreRange) {
 					this.sqRange = r;
 					this.myRange = Math.sqrt(r);
 					return true;

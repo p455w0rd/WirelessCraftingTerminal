@@ -15,7 +15,6 @@ public class ClientProxy extends CommonProxy {
 	public ClientProxy() {
 		MinecraftForge.EVENT_BUS.register(this);
 		KeybindHandler.registerKeybinds();
-		//MinecraftForge.EVENT_BUS.register(new KeybindHandler());
 		FMLCommonHandler.instance().bus().register(new KeybindHandler());
 	}
 
@@ -23,14 +22,9 @@ public class ClientProxy extends CommonProxy {
 	public void removeItemsFromNEI() {
 		if (IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI)) {
 			codechicken.nei.api.API.hideItem(new ItemStack(ItemEnum.WCT_BOOSTER_BG_ICON.getItem(), 1));
-			codechicken.nei.api.API.hideItem(new ItemStack(ItemEnum.WCT_DUMMY_ICON.getItem(), 1));
 			return;
 		}
 	}
-	
-	//public void registerItems() {
-		// =]
-	//}
 
 	public void registerRenderers() {
 		// No renderers...yet =]

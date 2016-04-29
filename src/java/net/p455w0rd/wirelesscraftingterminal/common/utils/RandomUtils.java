@@ -4,6 +4,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumChatFormatting;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
@@ -37,7 +39,7 @@ public class RandomUtils {
 			return EnumChatFormatting.GRAY.toString();
 		}
 	}
-	
+
 	public static ItemStack getWirelessTerm(InventoryPlayer playerInv) {
 		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemWirelessCraftingTerminal) {
 			return playerInv.player.getHeldItem();
@@ -72,13 +74,29 @@ public class RandomUtils {
 			return wirelessTerm;
 		}
 	}
-	
+
 	public static ItemStack getMagnet(InventoryPlayer playerInv) {
+		// Is player holding a Magnet Card?
 		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemMagnet) {
 			return playerInv.player.getHeldItem();
 		}
-		ItemStack magnetItem = null;
 		int invSize = playerInv.getSizeInventory();
+		// if not true, try to return first wireless crafting terminal
+		// that has a MagnetCard installed
+		ItemStack wirelessTerm = getWirelessTerm(playerInv);
+		if (wirelessTerm != null && wirelessTerm.getItem() instanceof ItemWirelessCraftingTerminal) {
+			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
+			if (nbtTC.hasKey("MagnetSlot")) {
+				NBTTagList magnetSlot = nbtTC.getTagList("MagnetSlot", 10);
+				ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetSlot.getCompoundTagAt(0));
+				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+					return magnetItem;
+				}
+			}
+		}
+		// No wireless crafting terminal with Magnet Card installed,
+		// is there a Magnet Card in the player's inventory?
+		ItemStack magnetItem = null;
 		if (invSize <= 0) {
 			return null;
 		}
@@ -95,17 +113,7 @@ public class RandomUtils {
 				continue;
 			}
 		}
-		if (magnetItem == null) {
-			if (playerInv.player.getHeldItem() != null) {
-				return playerInv.player.getHeldItem();
-			}
-			else {
-				return ItemEnum.WIRELESS_CRAFTING_TERMINAL.getStack();
-			}
-		}
-		else {
-			return magnetItem;
-		}
+		return magnetItem;
 	}
-	
+
 }

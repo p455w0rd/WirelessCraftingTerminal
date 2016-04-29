@@ -7,7 +7,6 @@ public enum ItemEnum {
 	BOOSTER_CARD("infinityBoosterCard", new ItemInfinityBooster().setUnlocalizedName("infinityBoosterCard")),
 	BOOSTER_ICON("infinityBoosterIcon", new ItemInfinityBooster().setUnlocalizedName("infinityBoosterIcon")),
 	WIRELESS_CRAFTING_TERMINAL("wirelessCraftingTerminal", new ItemWirelessCraftingTerminal()),
-	WCT_DUMMY_ICON("ae2wctDummyIcon", new ItemAE2WCTDummyIcon()),
 	MAGNET_CARD("magnetCard", new ItemMagnet().setUnlocalizedName("magnetCard")),
 	WCT_BOOSTER_BG_ICON("boosterBG", new ItemBoosterBGIcon());
 

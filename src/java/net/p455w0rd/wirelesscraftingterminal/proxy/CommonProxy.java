@@ -19,14 +19,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.Achievement;
-import net.minecraft.stats.AchievementList;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.player.AchievementEvent;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketConfigSync;
 import net.p455w0rd.wirelesscraftingterminal.handlers.AchievementHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.ConfigHandler;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
@@ -114,8 +112,8 @@ public class CommonProxy {
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
 		// SSP Login
 		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-			boolean hasWCTAch = ((EntityPlayerMP) e.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
-			boolean hasBoosterAch = ((EntityPlayerMP) e.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.boosterAch);
+			//boolean hasWCTAch = ((EntityPlayerMP) e.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
+			//boolean hasBoosterAch = ((EntityPlayerMP) e.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.boosterAch);
 
 			ConfigHandler.removeBooster();
 			ConfigHandler.removeBoosterIcon();
@@ -138,6 +136,10 @@ public class CommonProxy {
 				AchievementHandler.addAchievementToPage(AchievementHandler.boosterAch, true, e.player);
 			}
 			*/
+		}
+		else {
+			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED);
+			NetworkHandler.instance.sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
 

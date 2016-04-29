@@ -49,7 +49,7 @@ public class ItemInfinityBooster extends Item {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
 		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + "" + color("bold") + "" + color("italics") + "Shift" + color("gray"));
-		list.add(color("aqua") + "===========================");
+		list.add(color("aqua") + "==============================");
 		if (isShiftKeyDown()) {
 			String info = LocaleHandler.InfinityBoosterDesc.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {

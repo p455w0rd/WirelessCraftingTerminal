@@ -7,16 +7,18 @@ import java.util.Map;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacketHandlerBase.PacketTypes;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketConfigSync;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketCraftRequest;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketEmptyTrash;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAction;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilterMode;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenWirelessTerm;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchMagnetMode;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 
 public class WCTPacketHandlerBase {
@@ -26,8 +28,6 @@ public class WCTPacketHandlerBase {
 		PACKET_INVENTORY_ACTION(PacketInventoryAction.class),
 
 		PACKET_ME_INVENTORY_UPDATE(PacketMEInventoryUpdate.class),
-
-		//PACKET_CONFIG_BUTTON( PacketConfigButton.class ),
 
 		PACKET_VALUE_CONFIG(PacketValueConfig.class),
 
@@ -43,7 +43,13 @@ public class WCTPacketHandlerBase {
 
 		PACKET_MAGNETFILTER_MODE(PacketMagnetFilterMode.class),
 
-		PACKET_OPENWIRELESSTERM(PacketOpenWirelessTerm.class);
+		PACKET_OPENWIRELESSTERM(PacketOpenGui.class),
+		
+		PACKET_SWITCHMAGNETMODE(PacketSwitchMagnetMode.class),
+		
+		PACKET_EMPTY_TRASH(PacketEmptyTrash.class),
+		
+		PACKET_SYNC_CONFIGS(PacketConfigSync.class);
 
 		private final Class<? extends WCTPacket> packetClass;
 		private final Constructor<? extends WCTPacket> packetConstructor;

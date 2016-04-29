@@ -20,7 +20,7 @@ public class SlotTrash extends AppEngSlot {
 	public SlotTrash(IInventory inv, int x, int y, EntityPlayer player) {
 		super(null, 0, x, y);
 		entityPlayer = player;
-		//readNBT();
+		readNBT();
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class SlotTrash extends AppEngSlot {
 	public void putStack(ItemStack itemStack) {
 		shouldDeleteMouseStack = (this.itemStack != null);
 		this.itemStack = itemStack;
-		//writeNBT();
+		writeNBT();
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class SlotTrash extends AppEngSlot {
 				returnStack = itemStack;
 				itemStack = null;
 				shouldDeleteMouseStack = true;
-				//writeNBT();
+				writeNBT();
 				return returnStack;
 			} else {
 				returnStack = itemStack.splitStack(amount);
@@ -79,7 +79,7 @@ public class SlotTrash extends AppEngSlot {
 					itemStack = null;
 					shouldDeleteMouseStack = true;
 				}
-				//writeNBT();
+				writeNBT();
 				return returnStack;
 			}
 		}

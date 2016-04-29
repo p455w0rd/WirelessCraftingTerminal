@@ -11,6 +11,8 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.p455w0rd.wirelesscraftingterminal.api.IWCTInteractionHelper;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -60,7 +62,7 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 			player.addChatMessage(PlayerMessages.StationCanNotBeLocated.get());
 		}
 		else {
-			WCTGuiHandler.launchGui(Reference.GUI_WCT, player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+			NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
 		}
 	}
 

@@ -1,8 +1,16 @@
 package net.p455w0rd.wirelesscraftingterminal.client.gui;
 
 import java.io.IOException;
-import java.text.*;
-import java.util.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.input.Keyboard;
@@ -17,7 +25,6 @@ import appeng.api.config.ActionItems;
 import appeng.api.config.SearchBoxMode;
 import appeng.api.config.Settings;
 import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
 import appeng.client.gui.widgets.GuiImgButton;
@@ -30,9 +37,7 @@ import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
-
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -50,18 +55,27 @@ import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTabButton;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTrashButton;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.MEGuiTextField;
-import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.client.me.InternalSlotME;
 import net.p455w0rd.wirelesscraftingterminal.client.me.ItemRepo;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotDisconnected;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotME;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.common.container.slot.*;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngCraftingSlot;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngSlot;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngSlot.hasCalculatedValidness;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.OptionalSlotFake;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingMatrix;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingTerm;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotDisabled;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFake;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotInaccessible;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotOutput;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotTrash;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryBooster;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketEmptyTrash;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAction;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
@@ -70,7 +84,6 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.integration.abstraction.INEI;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSource, IConfigManagerHost {
@@ -214,7 +227,9 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 				if (s != null) {
 					if (s.getHasStack()) {
-						containerWCT.emptyTrash();
+						containerWCT.trashSlot.clearStack();
+						final PacketEmptyTrash p = new PacketEmptyTrash();
+						NetworkHandler.instance.sendToServer(p);
 					}
 				}
 			}

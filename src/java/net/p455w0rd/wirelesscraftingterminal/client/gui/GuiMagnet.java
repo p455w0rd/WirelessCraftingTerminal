@@ -27,9 +27,12 @@ public class GuiMagnet extends GuiContainer {
 	public GuiMagnet(ContainerMagnet c) {
 		super(c);
 		this.xSize = 176;
+		this.width = this.xSize;
 		this.ySize = 168;
+		this.height = this.ySize;
 		magnetItem = c.heldItem;
 		this.mode = getMode();
+		this.container = c;
 	}
 
 	@Override

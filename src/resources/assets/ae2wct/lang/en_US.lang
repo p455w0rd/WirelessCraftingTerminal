@@ -27,7 +27,8 @@ gui.tooltips.ae2wct.MagnetFilterTitle=Magnet Filter
 gui.tooltips.ae2wct.FilterMode=Filter Mode
 gui.tooltips.ae2wct.Whitelisting=Whitelisting
 gui.tooltips.ae2wct.Blacklisting=Blacklisting
-
+gui.tooltips.ae2wct.MagnetActiveDesc1=Extra items added to inventory
+gui.tooltips.ae2wct.MagnetActiveDesc2=Extra items left on ground
 //Labels
 gui.labels.ae2wct.WirelessTermLabel=Wireless Term
 
@@ -46,9 +47,12 @@ achievement.magnetAchievement.desc=Craft a Magnet Card
 
 //Chat Messages
 chatmessages.ae2wct.NoNetworkPower=Network has no power!
+chatmessages.ae2wct.MagnetMode1=Magnet Card Deactivated
+chatmessages.ae2wct.MagnetMode2=Magnet Card Activated - Items not stored in AE network will be placed in inventory
+chatmessages.ae2wct.MagnetMode3=Magnet Card Activated - Items not stored in AE network will be left on ground
 
 //Keybindings
 key.OpenTerminal=Open Wireless Crafting Terminal
-key.OpenMagnetFilter=Open Magnet Filter GUI
-key.DisableMagnet=Deactivate Magnet
+key.OpenMagnetFilter=Open Magnet Card Filter GUI
+key.SwitchMagnetMode=Activate/Deactivate Magnet Card
 key.categories.ae2wct=Wireless Crafting Terminal

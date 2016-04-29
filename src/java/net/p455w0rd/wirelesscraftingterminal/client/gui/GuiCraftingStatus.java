@@ -23,7 +23,6 @@ import appeng.api.definitions.IDefinitions;
 import appeng.api.definitions.IParts;
 import appeng.api.storage.ITerminalHost;
 import appeng.core.localization.GuiText;
-import appeng.core.sync.GuiBridge;
 
 
 public class GuiCraftingStatus extends GuiCraftingCPU
