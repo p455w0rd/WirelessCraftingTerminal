@@ -1,0 +1,58 @@
+//**************************//
+//WIRELESS CRAFTING TEMRINAL//
+//**************************//
+
+//Items
+item.wirelessCraftingTerminal.name=Drahtlose Fertigungskonsole
+item.infinityBoosterCard.name=Unendliche Drahtlosverstärkerkarte
+item.magnetCard.name=Magnetkarte
+itemGroup.ae2wct=§9AE2 Wireless Crafting Terminal
+
+//Tooltips
+gui.tooltips.ae2wct.PressShift=Infos via Shiftklick
+gui.tooltips.ae2wct.OnlyWorks=Funktioniert nur im Slot der drahtlosen Fertigungskonsole
+gui.tooltips.ae2wct.TitleDesc=Beschreibung
+gui.tooltips.ae2wct.InfinityBoosterDesc=Ermöglicht es, eine verbundene AE2 Drahtlosfertigungskonsole über Dimensionen hinweg in jeder Distanz zu nutzen.
+gui.tooltips.ae2wct.MagnetDesc=Eine Magnetkarte, die automagisch Items in das AE-Netzwerk insertiert
+gui.tooltips.ae2wct.MagnetDesc2=Rechtsklick, um den Filter zu setzen
+gui.tooltips.ae2wct.LinkStatus=Verbindungsstatus
+gui.tooltips.ae2wct.Installed=Installiert
+gui.tooltips.ae2wct.NotInstalled=Nicht installiert
+gui.tooltips.ae2wct.Active=Aktiv
+gui.tooltips.ae2wct.Inactive=Inaktiv
+gui.tooltips.ae2wct.Status=Status
+gui.tooltips.ae2wct.EmptyTrash=Lösche Müll
+gui.tooltips.ae2wct.EmptyTrashDesc=Leere den Müll-Slot
+gui.tooltips.ae2wct.MagnetFilterTitle=Magnetfilter
+gui.tooltips.ae2wct.FilterMode=Filter-Modus
+gui.tooltips.ae2wct.Whitelisting=Erlauben
+gui.tooltips.ae2wct.Blacklisting=Verbieten
+gui.tooltips.ae2wct.MagnetActiveDesc1=Zusätzliche Items im Inventar platzieren
+gui.tooltips.ae2wct.MagnetActiveDesc2=Zusätzliche Items auf dem Boden liegen lassen
+//Labels
+gui.labels.ae2wct.WirelessTermLabel=Drahtloskonsole
+
+//Config Descriptions
+config.ae2wct.MaxPowerDesc=In der Drahtloskonsole maximal speicherbare Energie in AE
+config.ae2wct.InfinityBoosterCfgDesc=Erlaube das unendliche Drahtlosverstärkerupgrade
+config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte + Rezept für unendlichen Drahtlosverstärker)
+
+//Achievements
+achievement.wctAchievement=Digitales Fertigen über WLAN
+achievement.wctAchievement.desc=Fertige eine drahtlose Fertigungskonsole
+achievement.boosterAchievement=Interdimensionales Fertigen
+achievement.boosterAchievement.desc=Erwerbe eine unendliche Drahtlosverstärkerkarte
+achievement.magnetAchievement=Digitales Staubsaugen!
+achievement.magnetAchievement.desc=Fertige eine Magnetkarte
+
+//Chat Messages
+chatmessages.ae2wct.NoNetworkPower=Netzwerk hat keine Energie!
+chatmessages.ae2wct.MagnetMode1=Magnetkarte deaktiviert
+chatmessages.ae2wct.MagnetMode2=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden im Inventar platziert
+chatmessages.ae2wct.MagnetMode3=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden auf dem Boden liegen gelassen
+
+//Keybindings
+key.OpenTerminal=Öffne drahtlose Fertigungskonsole
+key.OpenMagnetFilter=Öffne Magnetkartenfilter-GUI
+key.SwitchMagnetMode=Aktiviere/Deaktiviere Magnetkarte
+key.categories.ae2wct=Wireless Crafting Terminal
