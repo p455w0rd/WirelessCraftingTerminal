@@ -18,8 +18,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketCraftRequest;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class GuiCraftAmount extends WCTBaseGui {
@@ -47,6 +45,7 @@ public class GuiCraftAmount extends WCTBaseGui {
 		myIcon = RandomUtils.getWirelessTerm(inventoryPlayer);
 	}
 
+	@SuppressWarnings({ "unchecked", "unused" })
 	@Override
 	public void initGui() {
 		super.initGui();

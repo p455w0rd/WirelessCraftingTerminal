@@ -43,7 +43,6 @@ import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
@@ -60,7 +59,6 @@ public class ItemMagnet extends Item {
 
 	private int distanceFromPlayer;
 	private WirelessTerminalGuiObject obj;
-	private WCTIActionHost wctAH;
 	private IPortableCell civ;
 	private IEnergySource powerSrc;
 	private IMEMonitor<IAEItemStack> monitor;
@@ -99,6 +97,7 @@ public class ItemMagnet extends Item {
 		return null;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
@@ -212,7 +211,6 @@ public class ItemMagnet extends Item {
 				this.obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
 				this.civ = (IPortableCell) this.obj;
 				this.powerSrc = (IEnergySource) this.civ;
-				this.wctAH = (WCTIActionHost) this.powerSrc;
 				this.monitor = civ.getItemInventory();
 				this.cellInv = this.monitor;
 				this.mySrc = new WCTPlayerSource(player, (WCTIActionHost) this.obj);
@@ -321,6 +319,7 @@ public class ItemMagnet extends Item {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
 		if (is != null && itemList != null) {
 			Iterator thisList = itemList.iterator();
@@ -343,7 +342,6 @@ public class ItemMagnet extends Item {
 					return null;
 				}
 				NBTTagList tagList = nbtTC.getTagList("MagnetFilter", 10);
-				boolean test1 = false;
 				if (tagList.tagCount() > 0 && tagList != null) {
 					List<ItemStack> itemList = new ArrayList<ItemStack>();
 					for (int i = 0; i < tagList.tagCount(); i++) {

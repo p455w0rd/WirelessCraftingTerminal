@@ -15,6 +15,7 @@ public final class IntegrationNode
 	private final String modID;
 	private final IntegrationType shortName;
 	private IntegrationStage state = IntegrationStage.PRE_INIT;
+	@SuppressWarnings("unused")
 	private IntegrationStage failedStage = IntegrationStage.PRE_INIT;
 	private Throwable exception = null;
 	private String name = null;

@@ -1,14 +1,10 @@
 package net.p455w0rd.wirelesscraftingterminal.api;
 
-import javax.annotation.Nonnull;
-
-//import appeng.api.features.INetworkEncodable;
 import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.items.IAEItemPowerStorage;
 import appeng.api.util.IConfigManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 
 /**
  * Provides the required functionality of a wireless terminal.

@@ -3,7 +3,6 @@ package net.p455w0rd.wirelesscraftingterminal.client.gui.widgets;
 import org.lwjgl.opengl.GL11;
 
 import appeng.client.gui.widgets.ITooltip;
-import appeng.client.texture.ExtraBlockTextures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.util.EnumChatFormatting;

@@ -100,6 +100,7 @@ public class ItemRepo
 		this.updateView();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void updateView()
 	{
 		this.view.clear();
@@ -227,6 +228,7 @@ public class ItemRepo
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void updateNEI( final String filter )
 	{
 		try

@@ -8,7 +8,6 @@ import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotInaccessible;
-import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryBooster;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.security.BaseActionSource;

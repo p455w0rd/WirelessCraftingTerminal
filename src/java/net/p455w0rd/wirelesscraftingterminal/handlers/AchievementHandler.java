@@ -1,29 +1,14 @@
 package net.p455w0rd.wirelesscraftingterminal.handlers;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.potion.Potion;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.AchievementPage;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.player.AchievementEvent;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
-import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class AchievementHandler {
 

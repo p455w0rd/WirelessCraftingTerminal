@@ -9,6 +9,7 @@ import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class WCTGuiConfig extends GuiConfig {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public WCTGuiConfig(GuiScreen guiScreen)
 	{
 		super(guiScreen,

@@ -1,6 +1,5 @@
 package net.p455w0rd.wirelesscraftingterminal.client.gui;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Collection;

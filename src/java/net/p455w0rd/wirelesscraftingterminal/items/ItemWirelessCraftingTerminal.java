@@ -34,7 +34,6 @@ import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
-import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -48,9 +47,9 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	public ItemWirelessCraftingTerminal() {
 		super(Reference.WCT_MAX_POWER, Optional.<String> absent());
-		this.setUnlocalizedName("wirelessCraftingTerminal");
-		this.setTextureName(Reference.MODID + ":wirelessCraftingTerminal");
-		this.setMaxStackSize(1);
+		setUnlocalizedName("wirelessCraftingTerminal");
+		setTextureName(Reference.MODID + ":wirelessCraftingTerminal");
+		setMaxStackSize(1);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -103,7 +102,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof ItemWirelessCraftingTerminal)) {
 			return;
 		}
-		this.checkForBooster(wirelessTerminal);
+		checkForBooster(wirelessTerminal);
 	}
 
 	@Override
@@ -150,12 +149,12 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	@Override
 	public boolean usePower(final EntityPlayer player, final double amount, final ItemStack is) {
-		return this.extractAEPower(is, amount) >= amount - 0.5;
+		return extractAEPower(is, amount) >= amount - 0.5;
 	}
 
 	@Override
 	public boolean hasPower(final EntityPlayer player, final double amt, final ItemStack is) {
-		return this.getAECurrentPower(is) >= amt;
+		return getAECurrentPower(is) >= amt;
 	}
 
 	@Override
@@ -163,7 +162,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		final ConfigManager out = new ConfigManager(new IConfigManagerHost() {
 
 			@Override
-			public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
+			public void updateSetting(final IConfigManager manager, @SuppressWarnings("rawtypes") final Enum settingName, @SuppressWarnings("rawtypes") final Enum newValue) {
 				final NBTTagCompound data = Platform.openNbtData(target);
 				manager.writeToNBT(data);
 			}
@@ -197,7 +196,6 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		return true;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addCheckedInformation(ItemStack is, EntityPlayer player, List<String> list, boolean displayMore) {
@@ -254,7 +252,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		final NBTTagCompound data = ensureTagCompound(is);
 
 		double currentStorage = data.getDouble(POWER_NBT_KEY);
-		final double maxStorage = this.getAEMaxPower(is);
+		final double maxStorage = getAEMaxPower(is);
 
 		switch (op) {
 		case INJECT:
@@ -283,7 +281,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	@Override
 	public double getDurabilityForDisplay(ItemStack is) {
-		return 1 - getAECurrentPower(is) / this.getAEMaxPower(is);
+		return 1 - getAECurrentPower(is) / getAEMaxPower(is);
 	}
 
 	private NBTTagCompound ensureTagCompound(ItemStack is) {
@@ -295,7 +293,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	@Override
 	public double getAECurrentPower(final ItemStack is) {
-		return this.getInternalBattery(is, batteryOperation.STORAGE, 0);
+		return getInternalBattery(is, batteryOperation.STORAGE, 0);
 	}
 
 	@Override
@@ -305,12 +303,12 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	@Override
 	public double injectAEPower(final ItemStack is, final double amt) {
-		return this.getInternalBattery(is, batteryOperation.INJECT, amt);
+		return getInternalBattery(is, batteryOperation.INJECT, amt);
 	}
 
 	@Override
 	public double extractAEPower(final ItemStack is, final double amt) {
-		return this.getInternalBattery(is, batteryOperation.EXTRACT, amt);
+		return getInternalBattery(is, batteryOperation.EXTRACT, amt);
 	}
 
 	@Override

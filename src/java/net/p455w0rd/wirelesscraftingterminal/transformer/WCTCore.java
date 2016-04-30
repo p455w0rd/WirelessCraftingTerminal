@@ -1,6 +1,5 @@
 package net.p455w0rd.wirelesscraftingterminal.transformer;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

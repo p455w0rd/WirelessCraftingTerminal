@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
-import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.IConfigManager;
@@ -55,9 +54,6 @@ import appeng.api.networking.security.BaseActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.container.ContainerNull;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -66,7 +62,6 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
@@ -75,10 +70,8 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.oredict.OreDictionary;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
@@ -103,7 +96,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotPlayerHot
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotPlayerInv;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotTrash;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryBooster;
-import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryCraftResult;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryCrafting;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryMagnet;
 import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryTrash;
@@ -129,6 +121,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	public ItemStack craftItem;
 	private World worldObj;
 	private EntityPlayer player;
+	@SuppressWarnings("unused")
 	private static final int HOTBAR_START = 1, HOTBAR_END = HOTBAR_START + 8, INV_START = HOTBAR_END + 1,
 			INV_END = INV_START + 26, ARMOR_START = INV_END + 1, ARMOR_END = ARMOR_START + 3,
 			CRAFT_GRID_START = ARMOR_END + 1, CRAFT_GRID_END = CRAFT_GRID_START + 8, CRAFT_RESULT = CRAFT_GRID_END + 1,
@@ -146,6 +139,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	private SlotCraftingMatrix[] craftMatrixSlot;
 	private SlotCraftingTerm craftingSlot;
 	public SlotTrash trashSlot;
+	@SuppressWarnings("unused")
 	private int firstCraftingSlotNumber = -1, lastCraftingSlotNumber = -1, craftingSlotNumber = -1;
 
 	private final WirelessTerminalGuiObject obj;
@@ -957,7 +951,6 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 	protected boolean networkIsPowered() {
 		final WCTIActionHost host = this.getActionHost();
-		boolean test2 = false;
 		if (host != null) {
 			final IGridNode gn = host.getActionableNode(Reference.WCT_BOOSTER_ENABLED && this.isBoosterInstalled());
 			if (gn != null) {
@@ -1124,6 +1117,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		return this.clientCM;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
 		if (this.getGui() != null) {
@@ -1623,6 +1617,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		b.putStack(testB);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isCraftMatrixSlot(AppEngSlot cs) {
 		return (cs.getSlotIndex() >= this.firstCraftingSlotNumber) && !(cs.getSlotIndex() <= this.lastCraftingSlotNumber);
 	}
@@ -1650,22 +1645,27 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		return (index >= INV_START && index <= INV_END);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isInArmorSlot(@Nonnull int index) {
 		return (index >= ARMOR_START && index <= ARMOR_END);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isInBoosterSlot(@Nonnull int index) {
 		return (index == BOOSTER_INDEX);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isCraftResult(@Nonnull int index) {
 		return (index == CRAFT_RESULT);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isInCraftMatrix(@Nonnull int index) {
 		return (index >= CRAFT_GRID_START && index <= CRAFT_GRID_END);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean notArmorOrBooster(ItemStack is) {
 		if ((is.getItem() instanceof ItemInfinityBooster) || (is.getItem() instanceof ItemArmor)) {
 			return false;

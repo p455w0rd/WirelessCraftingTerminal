@@ -11,7 +11,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketProgressBar;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 
 public class SyncData
@@ -70,6 +69,7 @@ public class SyncData
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void send( final ICrafting o, final Object val ) throws IOException
 	{
 		if( val instanceof String )
@@ -139,6 +139,7 @@ public class SyncData
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void updateValue( final Object oldValue, final long val )
 	{
 		try

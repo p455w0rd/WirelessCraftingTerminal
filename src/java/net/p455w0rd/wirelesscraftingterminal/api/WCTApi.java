@@ -9,6 +9,7 @@ public abstract class WCTApi {
 
 	protected static WCTApi api = null;
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Nullable
 	public static WCTApi instance()
 	{

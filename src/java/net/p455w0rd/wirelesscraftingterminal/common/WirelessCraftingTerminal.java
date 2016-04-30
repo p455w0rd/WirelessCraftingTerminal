@@ -1,8 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.common;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.*;
 import cpw.mods.fml.common.event.*;
@@ -18,7 +16,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
 import net.p455w0rd.wirelesscraftingterminal.handlers.AchievementHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.ConfigHandler;
-import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.RecipeHandler;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
 import net.p455w0rd.wirelesscraftingterminal.proxy.CommonProxy;
@@ -74,7 +71,7 @@ public class WirelessCraftingTerminal {
 		long stopwatch = WCTLog.beginSection("PostInit");
 		IntegrationRegistry.INSTANCE.postInit();
 		FMLCommonHandler.instance().registerCrashCallable(new IntegrationCrashEnhancement());
-		NetworkRegistry.INSTANCE.registerGuiHandler(this.INSTANCE, new WCTGuiHandler());
+		NetworkRegistry.INSTANCE.registerGuiHandler(WirelessCraftingTerminal.INSTANCE, new WCTGuiHandler());
 		NetworkHandler.instance = new NetworkHandler("WCT");
 		WirelessCraftingTerminal.proxy.removeItemsFromNEI();
 		WCTLog.endSection("PostInit", stopwatch);

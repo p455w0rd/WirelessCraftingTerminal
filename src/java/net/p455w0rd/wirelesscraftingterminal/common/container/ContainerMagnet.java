@@ -18,18 +18,17 @@ import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 public class ContainerMagnet extends Container {
 
 	public final InventoryPlayer inventoryPlayer;
-	private EntityPlayer player;
 	public ItemStack heldItem;
 	public WCTInventoryMagnetFilter magnetInventory;
 	private int distributeState = 0;
 	private int pressedKeyInRange = -1;
+	@SuppressWarnings("rawtypes")
 	private final Set distributeSlotSet = new HashSet();
 	private final int PLAYER_INV_START = 0, PLAYER_INV_END = 26, HOTBAR_START = 27, HOTBAR_END = 35, FILTERS_START = 36,
 			FILTERS_END = 62;
 
 	public ContainerMagnet(EntityPlayer player, InventoryPlayer inventoryPlayer) {
 		this.inventoryPlayer = inventoryPlayer;
-		this.player = player;
 		this.heldItem = RandomUtils.getMagnet(inventoryPlayer);
 		this.magnetInventory = new WCTInventoryMagnetFilter(heldItem);
 
@@ -51,7 +50,6 @@ public class ContainerMagnet extends Container {
 				this.addSlotToContainer(new SlotMagnetFilter(this.magnetInventory, j + i * 9, j * 18 + 8, 18 + i * 18));
 			}
 		}
-		boolean test1 = false;
 	}
 
 	private boolean isInHotbar(int slotNum) {
@@ -62,6 +60,7 @@ public class ContainerMagnet extends Container {
 		return (slotNum >= PLAYER_INV_START) && (slotNum <= PLAYER_INV_END);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isInFilters(int slotNum) {
 		return (slotNum >= FILTERS_START) && (slotNum <= FILTERS_END);
 	}
@@ -80,6 +79,7 @@ public class ContainerMagnet extends Container {
 		return false;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public ItemStack slotClick(int slotNum, int mouseButton, int modifier, EntityPlayer player) {
 		if (slotNum >= this.inventorySlots.size()) {
@@ -236,6 +236,7 @@ public class ContainerMagnet extends Container {
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void setSlotStack(Set slotSet, int stackSizeSelector, ItemStack stackToResize, int currentSlotStackSize) {
 		switch (stackSizeSelector) {
 		case 0:
@@ -312,7 +313,6 @@ public class ContainerMagnet extends Container {
 		}
 		ItemStack phantomStack = stackHeld.copy();
 		phantomStack.stackSize = stackSize;
-		ItemStack plainItem = new ItemStack(phantomStack.getItem(), 1);
 
 		slot.putStack(phantomStack);
 		arrangeSlots();
@@ -347,13 +347,11 @@ public class ContainerMagnet extends Container {
 
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int slotIndex) {
-		ItemStack itemStack = null;
 		Slot slot = (Slot) inventorySlots.get(slotIndex);
 		if (slot == null || slot.getStack() == null) {
 			return null;
 		}
 		ItemStack stack = slot.getStack();
-		itemStack = stack.copy();
 		if (isInHotbar(slotIndex)) {
 			if (!mergePhantomStack(stack)) {
 				if (!mergeItemStack(stack, PLAYER_INV_START, PLAYER_INV_END + 1, false)) {

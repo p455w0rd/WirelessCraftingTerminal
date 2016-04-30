@@ -1,7 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.client.gui;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -74,6 +73,7 @@ public class GuiCraftConfirm extends WCTBaseGui
 		return ( (ContainerCraftConfirm) this.inventorySlots ).isAutoStart();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui()
 	{
@@ -170,9 +170,9 @@ public class GuiCraftConfirm extends WCTBaseGui
 	public void drawFG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
 	{
 		//final long BytesUsed = this.ccc.getUsedBytes();
-		final long BytesUsed = ((ContainerCraftConfirm) this.inventorySlots).getUsedBytes();
-		final String byteUsed = NumberFormat.getInstance().format( BytesUsed );
-		final String Add = BytesUsed > 0 ? ( byteUsed + ' ' + GuiText.BytesUsed.getLocal() ) : GuiText.CalculatingWait.getLocal();
+		//final long BytesUsed = ((ContainerCraftConfirm) this.inventorySlots).getUsedBytes();
+		//final String byteUsed = NumberFormat.getInstance().format( BytesUsed );
+		//final String Add = BytesUsed > 0 ? ( byteUsed + ' ' + GuiText.BytesUsed.getLocal() ) : GuiText.CalculatingWait.getLocal();
 		//this.fontRendererObj.drawString( GuiText.CraftingPlan.getLocal() + " -- " + Add, 8, 7, 4210752 );
 		this.fontRendererObj.drawString( GuiText.CraftingPlan.getLocal(), 8, 7, 4210752 );
 

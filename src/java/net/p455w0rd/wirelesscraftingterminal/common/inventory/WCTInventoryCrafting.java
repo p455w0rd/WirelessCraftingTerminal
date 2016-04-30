@@ -117,6 +117,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 		return true;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public IMEInventory getMEInventory() {
 		return new MEIInventoryWrapper(this, null);

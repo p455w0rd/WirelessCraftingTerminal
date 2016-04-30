@@ -113,6 +113,7 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui()
 	{
@@ -451,18 +452,21 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource
 		return stack;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortBy()
 	{
 		return SortOrder.NAME;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDir()
 	{
 		return SortDir.ASCENDING;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDisplay()
 	{

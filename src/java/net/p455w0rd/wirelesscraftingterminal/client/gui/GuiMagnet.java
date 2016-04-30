@@ -2,18 +2,14 @@ package net.p455w0rd.wirelesscraftingterminal.client.gui;
 
 import org.lwjgl.opengl.GL11;
 
-import appeng.helpers.InventoryAction;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerMagnet;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAction;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilterMode;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 
@@ -22,7 +18,6 @@ public class GuiMagnet extends GuiContainer {
 	private GuiButton modeBtn;
 	public static boolean mode = true;
 	private ItemStack magnetItem;
-	private ContainerMagnet container;
 
 	public GuiMagnet(ContainerMagnet c) {
 		super(c);
@@ -31,8 +26,7 @@ public class GuiMagnet extends GuiContainer {
 		this.ySize = 168;
 		this.height = this.ySize;
 		magnetItem = c.heldItem;
-		this.mode = getMode();
-		this.container = c;
+		GuiMagnet.mode = getMode();
 	}
 
 	@Override
@@ -48,11 +42,12 @@ public class GuiMagnet extends GuiContainer {
 		this.mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, 74, 4210752);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();
 		this.buttonList.clear();
-		this.buttonList.add(this.modeBtn = new GuiButton(1, this.guiLeft + 108, this.guiTop + 3, 60, 10, getLabel(this.mode)));
+		this.buttonList.add(this.modeBtn = new GuiButton(1, this.guiLeft + 108, this.guiTop + 3, 60, 10, getLabel(GuiMagnet.mode)));
 	}
 	
 	String getLabel(boolean filterMode) {
@@ -62,9 +57,9 @@ public class GuiMagnet extends GuiContainer {
 	@Override
 	protected void actionPerformed(final GuiButton btn) {
 		if (btn == this.modeBtn) {
-			btn.displayString = getLabel(!this.mode);
-			this.mode = !this.mode;
-			setMode(this.mode);
+			btn.displayString = getLabel(!GuiMagnet.mode);
+			GuiMagnet.mode = !GuiMagnet.mode;
+			setMode(GuiMagnet.mode);
 		}
 	}
 	

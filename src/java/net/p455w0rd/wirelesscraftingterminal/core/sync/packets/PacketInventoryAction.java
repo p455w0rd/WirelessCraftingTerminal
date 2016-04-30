@@ -12,7 +12,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
@@ -100,6 +99,7 @@ public class PacketInventoryAction extends WCTPacket
 		this.configureWrite( data );
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void serverPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
 	{

@@ -61,6 +61,7 @@ public final class ASMIntegration implements IClassTransformer {
 		return basicClass;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private boolean removeOptionals(final ClassNode classNode) {
 		boolean changed = false;
 
@@ -144,6 +145,7 @@ public final class ASMIntegration implements IClassTransformer {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private boolean stripMethod(final ClassNode classNode, final MethodNode mn, final Iterator<MethodNode> i,
 			final Class class1, final AnnotationNode an) {
 		if (an.values.size() != 2) {

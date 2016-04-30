@@ -5,9 +5,6 @@ import javax.annotation.Nonnull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import appeng.core.AEConfig;
-import appeng.core.features.AEFeature;
-
 public class WCTLog {
 	public static final Logger log = LogManager.getLogger("Wireless Crafting Terminal");
 

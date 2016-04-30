@@ -45,7 +45,6 @@ public class ShapelessRecipe implements IRecipe, IRecipeBakeable
 		return !this.disable;
 	}
 
-	@SuppressWarnings( "unchecked" )
 	@Override
 	public boolean matches( final InventoryCrafting var1, final World world )
 	{

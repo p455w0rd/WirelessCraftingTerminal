@@ -37,6 +37,7 @@ public class NEIAEShapedRecipeHandler extends TemplateRecipeHandler
 		this.transferRects.add( new TemplateRecipeHandler.RecipeTransferRect( new Rectangle( 84, 23, 24, 18 ), "crafting" ) );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void loadCraftingRecipes( final String outputId, final Object... results )
 	{
@@ -62,6 +63,7 @@ public class NEIAEShapedRecipeHandler extends TemplateRecipeHandler
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void loadCraftingRecipes( final ItemStack result )
 	{

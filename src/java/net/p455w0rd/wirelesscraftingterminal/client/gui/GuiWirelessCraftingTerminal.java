@@ -72,7 +72,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFake;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotInaccessible;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotOutput;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotTrash;
-import net.p455w0rd.wirelesscraftingterminal.common.inventory.WCTInventoryBooster;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketEmptyTrash;
@@ -97,9 +96,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			slotYOffset;
 	protected static final int BUTTON_SEARCH_MODE_ID = 5;
 	protected static final long TOOLTIP_UPDATE_INTERVAL = 3000L;
-	private int currScreenWidth, currScreenHeight, previousMouseX = 0, previousMouseY = 0;
+	private int currScreenWidth, currScreenHeight;
 	private static final String bgTexturePath = "gui/crafting.png";
-	private final WCTInventoryBooster inventory;
 	private final ContainerWirelessCraftingTerminal containerWCT;
 	private boolean isFullScreen, init = true, reInit, wasResized = false;
 	public static GuiWirelessCraftingTerminal INSTANCE;
@@ -116,21 +114,17 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	public static int craftingGridOffsetX = 80;
 	public static int craftingGridOffsetY;
 	private static String memoryText = "";
-	private static String memoryText2 = "";
 	private final ItemRepo repo;
 	private final int offsetX = 8;
 	private final IConfigManager configSrc;
-	private final ItemStack[] myCurrentViewCells = new ItemStack[5];
 	private GuiTabButton craftingStatusBtn;
 	private MEGuiTextField searchField;
 	private int perRow = 9;
 	private boolean customSortOrder = true;
-	private int maxRows = Integer.MAX_VALUE;
 	private GuiImgButton ViewBox;
 	private GuiImgButton SortByBox;
 	private GuiImgButton SortDirBox;
 	private GuiImgButton searchBoxSettings;
-	private GuiImgButton terminalStyleBox;
 	private GuiImgButton clearBtn;
 	private GuiTrashButton trashBtn;
 	public boolean devicePowered = false;
@@ -140,9 +134,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	public GuiWirelessCraftingTerminal(Container container) {
 		super(container);
-		this.INSTANCE = this;
+		GuiWirelessCraftingTerminal.INSTANCE = this;
 		this.containerWCT = (ContainerWirelessCraftingTerminal) container;
-		this.inventory = containerWCT.boosterInventory;
 		this.scrollBar = new GuiScrollbar();
 		this.subGui = switchingGuis;
 		switchingGuis = false;
@@ -168,6 +161,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		this.getScrollBar().setRange(0, (this.repo.size() + this.perRow - 1) / this.perRow - (AE_NUM_ROWS + 3), Math.max(1, (AE_NUM_ROWS + 3) / 6));
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected void actionPerformed(final GuiButton btn) {
 		if (btn == this.craftingStatusBtn) {
@@ -264,6 +258,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	/**
 	 * Initializes the GUI
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
@@ -288,8 +283,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		int offset = this.guiTop + 8;
 
 		this.buttonList.clear();
-		this.buttonList.add(this.clearBtn = new GuiImgButton(this.guiLeft + 134, this.GUI_HEIGHT - this.GUI_LOWER_HEIGHT + 46, Settings.ACTIONS, ActionItems.STASH));
-		this.buttonList.add(this.trashBtn = new GuiTrashButton(this.guiLeft + 98, this.GUI_HEIGHT - this.GUI_LOWER_HEIGHT + 103));
+		this.buttonList.add(this.clearBtn = new GuiImgButton(this.guiLeft + 134, GuiWirelessCraftingTerminal.GUI_HEIGHT - GuiWirelessCraftingTerminal.GUI_LOWER_HEIGHT + 46, Settings.ACTIONS, ActionItems.STASH));
+		this.buttonList.add(this.trashBtn = new GuiTrashButton(this.guiLeft + 98, GuiWirelessCraftingTerminal.GUI_HEIGHT - GuiWirelessCraftingTerminal.GUI_LOWER_HEIGHT + 103));
 		this.clearBtn.setHalfSize(true);
 		if (this.customSortOrder) {
 			this.buttonList.add(this.SortByBox = new GuiImgButton(this.guiLeft - 18, offset, Settings.SORT_BY, this.configSrc.getSetting(Settings.SORT_BY)));
@@ -615,6 +610,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		GuiInventory.func_147046_a(this.guiLeft + 51, this.guiTop + GUI_UPPER_HEIGHT + AE_TOTAL_ROWS_HEIGHT + 112, 32, (float) (this.guiLeft + 51) - this.xSize_lo, (float) (this.guiTop + 95 + (AE_NUM_ROWS * AE_ROW_HEIGHT)) - this.ySize_lo, this.mc.thePlayer);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected void mouseClicked(final int xCoord, final int yCoord, final int btn) {
 
@@ -987,7 +983,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			return;
 		}
 		else {
-			this.itemRender = new RenderItem();
+			GuiWirelessCraftingTerminal.itemRender = new RenderItem();
 			try {
 				final ItemStack is = s.getStack();
 				if (s instanceof AppEngSlot && (((AppEngSlot) s).renderIconWithItem() || is == null) && (((AppEngSlot) s).shouldDisplay())) {
@@ -1189,6 +1185,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		return currentToolTip;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected void renderToolTip(final ItemStack stack, final int x, final int y) {
 		final Slot s = this.getSlot(x, y);
@@ -1205,7 +1202,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 
 			if (myStack != null) {
-				@SuppressWarnings("unchecked")
 				final List<String> currentToolTip = stack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
 
 				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
@@ -1229,6 +1225,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		// super.drawItemStackTooltip( stack, x, y );
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
 		if (this.SortByBox != null) {
@@ -1254,16 +1251,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		this.customSortOrder = customSortOrder;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortBy() {
 		return this.configSrc.getSetting(Settings.SORT_BY);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDir() {
 		return this.configSrc.getSetting(Settings.SORT_DIRECTION);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDisplay() {
 		return this.configSrc.getSetting(Settings.VIEW_MODE);

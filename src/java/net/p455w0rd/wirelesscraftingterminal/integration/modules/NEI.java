@@ -1,9 +1,5 @@
 package net.p455w0rd.wirelesscraftingterminal.integration.modules;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,11 +16,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingMatrix;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFakeCraftingMatrix;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
 import net.p455w0rd.wirelesscraftingterminal.helpers.Reflected;
@@ -32,7 +26,6 @@ import net.p455w0rd.wirelesscraftingterminal.integration.IIntegrationModule;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationHelper;
 import net.p455w0rd.wirelesscraftingterminal.integration.abstraction.INEI;
 import net.p455w0rd.wirelesscraftingterminal.integration.modules.NEIHelpers.NEIAEShapedRecipeHandler;
-import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IOverlayHandler;
@@ -45,6 +38,7 @@ public class NEI implements INEI, IContainerTooltipHandler, IIntegrationModule {
 	@Reflected
 	public static NEI instance;
 
+	@SuppressWarnings("unused")
 	private final Class<?> apiClass;
 
 	@Reflected
@@ -207,6 +201,7 @@ public class NEI implements INEI, IContainerTooltipHandler, IIntegrationModule {
 			// overlayItems);
 		}
 
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public void overlayRecipe( final GuiContainer gui, final IRecipeHandler recipe, final int recipeIndex, final boolean shift )
 		{
@@ -223,6 +218,7 @@ public class NEI implements INEI, IContainerTooltipHandler, IIntegrationModule {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		private void overlayRecipe( final GuiContainer gui, final List<PositionedStack> ingredients, final boolean shift )
 		{
 			try

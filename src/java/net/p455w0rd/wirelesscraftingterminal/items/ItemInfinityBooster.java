@@ -12,10 +12,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
-import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 
@@ -44,9 +41,10 @@ public class ItemInfinityBooster extends Item {
 	public int getMaxItemUseDuration(ItemStack stack) {
 		return 1;
 	}
-
-	@Override
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SideOnly(Side.CLIENT)
+	@Override
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
 		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + "" + color("bold") + "" + color("italics") + "Shift" + color("gray"));
 		list.add(color("aqua") + "==============================");

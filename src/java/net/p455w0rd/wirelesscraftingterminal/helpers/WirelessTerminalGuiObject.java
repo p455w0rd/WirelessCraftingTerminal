@@ -109,6 +109,7 @@ public class WirelessTerminalGuiObject implements IPortableCell, IActionHost, II
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public IItemList<IAEItemStack> getAvailableItems(final IItemList out) {
 		if (this.itemStorage != null) {

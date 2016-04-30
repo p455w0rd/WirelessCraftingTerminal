@@ -87,6 +87,7 @@ public class PacketNEIRecipe extends WCTPacket
 		this.configureWrite( data );
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void serverPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
 	{
@@ -229,7 +230,7 @@ public class PacketNEIRecipe extends WCTPacket
 	{
 		final InventoryAdaptor ia = InventoryAdaptor.getAdaptor( player, ForgeDirection.UNKNOWN );
 		final AEItemStack request = AEItemStack.create( patternItem );
-		final boolean isSimulated = mode == Actionable.SIMULATE;
+		//final boolean isSimulated = mode == Actionable.SIMULATE;
 		final boolean checkFuzzy = request.isOre() || patternItem.getItemDamage() == OreDictionary.WILDCARD_VALUE || patternItem.hasTagCompound() || patternItem.isItemStackDamageable();
 
 		if( !checkFuzzy )

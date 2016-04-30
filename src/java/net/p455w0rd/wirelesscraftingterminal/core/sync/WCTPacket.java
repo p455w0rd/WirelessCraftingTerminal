@@ -3,14 +3,12 @@ package net.p455w0rd.wirelesscraftingterminal.core.sync;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 public abstract class WCTPacket {
 
-	private WCTPacketHandlerBase.PacketTypes id;
 	private ByteBuf p;
 
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
@@ -36,10 +34,6 @@ public abstract class WCTPacket {
 		}
 
 		final FMLProxyPacket pp = new FMLProxyPacket(this.p, NetworkHandler.instance.getChannel());
-
-		//if (AEConfig.instance.isFeatureEnabled(AEFeature.PacketLogging)) {
-		//	WCTLog.info(this.getClass().getName() + " : " + pp.payload().readableBytes());
-		//}
 
 		return pp;
 	}

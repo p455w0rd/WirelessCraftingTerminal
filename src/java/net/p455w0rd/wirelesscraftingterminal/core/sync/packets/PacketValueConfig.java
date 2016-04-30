@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import appeng.api.config.FuzzyMode;
 import appeng.api.config.Settings;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
@@ -56,6 +55,7 @@ public class PacketValueConfig extends WCTPacket {
 		this.configureWrite(data);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;
@@ -101,6 +101,7 @@ public class PacketValueConfig extends WCTPacket {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;

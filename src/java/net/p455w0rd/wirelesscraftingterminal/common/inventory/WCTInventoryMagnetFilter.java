@@ -1,13 +1,10 @@
 package net.p455w0rd.wirelesscraftingterminal.common.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 
 public class WCTInventoryMagnetFilter implements IInventory {
 

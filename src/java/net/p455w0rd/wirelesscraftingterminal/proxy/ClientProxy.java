@@ -3,7 +3,6 @@ package net.p455w0rd.wirelesscraftingterminal.proxy;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;

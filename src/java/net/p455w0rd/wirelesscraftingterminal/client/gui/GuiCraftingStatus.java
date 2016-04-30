@@ -15,8 +15,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
@@ -35,6 +33,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
 	private int originalGui;
 	private ItemStack myIcon = null;
 
+	@SuppressWarnings("unused")
 	public GuiCraftingStatus( final InventoryPlayer inventoryPlayer, final ITerminalHost te )
 	{
 		super( new ContainerCraftingStatus( inventoryPlayer, te ) );
@@ -82,6 +81,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui()
 	{

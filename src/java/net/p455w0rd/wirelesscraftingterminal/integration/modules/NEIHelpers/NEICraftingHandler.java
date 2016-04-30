@@ -27,6 +27,7 @@ public class NEICraftingHandler implements IOverlayHandler
 	{
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void overlayRecipe( final GuiContainer gui, final IRecipeHandler recipe, final int recipeIndex, final boolean shift )
 	{
@@ -43,6 +44,7 @@ public class NEICraftingHandler implements IOverlayHandler
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void overlayRecipe( final GuiContainer gui, final List<PositionedStack> ingredients, final boolean shift )
 	{
 		try

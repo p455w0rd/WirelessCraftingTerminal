@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class CreativeTabWCT extends CreativeTabs {
 	

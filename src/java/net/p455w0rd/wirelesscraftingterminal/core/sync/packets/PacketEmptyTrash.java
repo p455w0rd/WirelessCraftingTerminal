@@ -9,7 +9,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
 
 public class PacketEmptyTrash extends WCTPacket {
 
