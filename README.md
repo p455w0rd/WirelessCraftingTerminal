@@ -26,6 +26,7 @@ Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter
 * [Website](http://p455w0rd.net/mc/)
 * [IRC #p455w0rdCraft on esper.net](http://webchat.esper.net/?channels=p455w0rdCraft&prompt=1)
 * [GitHub](https://github.com/p455w0rd/WirelessCraftingTerminal)
+* [Twitter](https://twitter.com/TheRealp455w0rd)
 
 ## License
 
@@ -61,7 +62,7 @@ Providing as many details as possible does help us to find and resolve the issue
 5. For add-on developer: Core-Mod Detection
   - In order to have FML detect AE and WCT from your dev environment, add the following VM Arguments to your run profile
   - `-Dfml.coreMods.load=appeng.transformer.AppEngCore`
-  - '-Dfml.coreMods.load=net.p455w0rd.wirelesscraftingterminal.transformer.WCTCore'
+  - `-Dfml.coreMods.load=net.p455w0rd.wirelesscraftingterminal.transformer.WCTCore`
 
 ## Contribution
 
