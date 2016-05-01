@@ -171,16 +171,17 @@ public class CommonProxy {
 	
 	@SubscribeEvent
 	public void onPlayerCraftingEvent(final PlayerEvent.ItemCraftedEvent event) {
-		boolean hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
-		if (event.player == null || event.player.isDead || event.player instanceof FakePlayer || event.crafting == null) {
-			return;
-		}
-		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
-			AchievementHandler.triggerAch(wctAch, event.player);
-		}
-		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
-			AchievementHandler.triggerAch(magnetAch, event.player);
-		}
+		if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
+			boolean hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
+			if (event.player == null || event.player.isDead || event.player instanceof FakePlayer || event.crafting == null) {
+				return;
+			}
+			if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
+				AchievementHandler.triggerAch(wctAch, event.player);
+			}
+			if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
+				AchievementHandler.triggerAch(magnetAch, event.player);
+			}
 		/*
 		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
 			AchievementHandler.triggerAch(wctAch, event.player);
@@ -189,9 +190,10 @@ public class CommonProxy {
 			}
 		}
 		*/
-		if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED && hasWCTAch) {
-			if (event.crafting.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
-				AchievementHandler.triggerAch(boosterAch, event.player);
+			if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED && hasWCTAch) {
+				if (event.crafting.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
+					AchievementHandler.triggerAch(boosterAch, event.player);
+				}
 			}
 		}
 	}

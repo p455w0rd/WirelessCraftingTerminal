@@ -19,6 +19,8 @@ import appeng.util.ConfigManager;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import cofh.api.energy.IEnergyContainerItem;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.creativetab.CreativeTabs;
@@ -32,14 +34,16 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
-import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
+import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.transformer.annotations.Integration.Interface;
 
-@Interface( iface = "cofh.api.energy.IEnergyContainerItem", iname = IntegrationType.RFItem )
+@Interface(iface = "cofh.api.energy.IEnergyContainerItem", iname = IntegrationType.RFItem)
 public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements IWirelessCraftingTermHandler, IEnergyContainerItem {
 
 	private static final String LINK_KEY_STRING = "key";
@@ -76,7 +80,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		}
 		return false;
 	}
-	
+
 	private boolean isMagnetInstalled(final ItemStack wirelessTerminal) {
 		if (wirelessTerminal.hasTagCompound()) {
 			NBTTagList magnetNBTList = wirelessTerminal.getTagCompound().getTagList(MAGNET_SLOT_NBT, 10);
@@ -110,11 +114,19 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 
 	@Override
 	public ItemStack onItemRightClick(final ItemStack itemStack, final World world, final EntityPlayer player) {
-		if (world.isRemote) {
-			return itemStack;
+		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+			// Open the gui
+			ItemStack is = RandomUtils.getWirelessTerm(player.inventory);
+			if (is == null) {
+				return itemStack;
+			}
+			ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) is.getItem();
+			if (wirelessTerm != null) {
+				if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
+					NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
+				}
+			}
 		}
-		// Open the gui
-		WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
 		return itemStack;
 	}
 
@@ -234,12 +246,12 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 			list.add(shift);
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	private String color(String color) {
 		return RandomUtils.color(color);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	private static String getItemName(String item) {
 		return StatCollector.translateToLocal("item." + item + ".name");
@@ -329,12 +341,14 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 			double max = PowerUnits.AE.convertTo(PowerUnits.RF, getAEMaxPower(container));
 			if (max - current >= maxReceive) {
 				return maxReceive;
-			} else {
+			}
+			else {
 				return (int) (max - current);
 			}
-		} else {
+		}
+		else {
 			double currentAEPower = getAECurrentPower(container);
-			if ((int)currentAEPower < Reference.WCT_MAX_POWER) {
+			if ((int) currentAEPower < Reference.WCT_MAX_POWER) {
 				int leftOver = (int) PowerUnits.AE.convertTo(PowerUnits.RF, injectAEPower(container, PowerUnits.RF.convertTo(PowerUnits.AE, maxReceive)));
 				return (int) maxReceive - leftOver;
 			}
@@ -352,10 +366,12 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 		if (simulate) {
 			if (getEnergyStored(container) >= maxExtract) {
 				return maxExtract;
-			} else {
+			}
+			else {
 				return getEnergyStored(container);
 			}
-		} else {
+		}
+		else {
 			return (int) PowerUnits.AE.convertTo(PowerUnits.RF, extractAEPower(container, PowerUnits.RF.convertTo(PowerUnits.AE, maxExtract)));
 		}
 	}
