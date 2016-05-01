@@ -874,7 +874,9 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		super.onGuiClosed();
 		this.subGui = true; // in case the gui is reopened later ( i'm looking at you NEI )
 		Keyboard.enableRepeatEvents(false);
-		memoryText = this.searchField.getText();
+		if (this.searchField.getText() != null) {
+			memoryText = this.searchField.getText();
+		}
 	}
 
 	protected Slot getSlot(final int mouseX, final int mouseY) {

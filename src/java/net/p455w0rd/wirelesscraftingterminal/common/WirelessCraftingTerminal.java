@@ -27,7 +27,7 @@ import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 		+ net.minecraftforge.common.ForgeVersion.minorVersion + '.' // minorVersion
 		+ net.minecraftforge.common.ForgeVersion.revisionVersion + '.' // revisionVersion
 		+ net.minecraftforge.common.ForgeVersion.buildVersion + ",);"
-				+ "required-after:appliedenergistics2@[rv3-beta-1,);")
+				+ "required-after:appliedenergistics2@[rv3-beta-1,);after:NotEnoughItems;")
 
 public class WirelessCraftingTerminal {
 
@@ -53,7 +53,6 @@ public class WirelessCraftingTerminal {
 		ConfigHandler.init(new File(event.getModConfigurationDirectory(), Reference.CONFIG_FILE));
 		FMLCommonHandler.instance().bus().register(proxy);
 		AEApi.instance().registries().wireless().registerWirelessHandler((IWirelessTermHandler) ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem());
-		AchievementHandler.init();
 		WCTLog.endSection("PreInit", stopwatch);
 	}
 
@@ -63,6 +62,7 @@ public class WirelessCraftingTerminal {
 		WirelessCraftingTerminal.WCTState = LoaderState.INITIALIZATION;
 		RecipeHandler.addRecipes(true);
 		IntegrationRegistry.INSTANCE.init();
+		AchievementHandler.init();
 		WCTLog.endSection("Init", stopwatch);
 	}
 

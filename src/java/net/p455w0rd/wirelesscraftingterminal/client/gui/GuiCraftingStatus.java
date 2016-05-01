@@ -9,12 +9,13 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTabButton;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingStatus;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
@@ -50,7 +51,9 @@ public class GuiCraftingStatus extends GuiCraftingCPU
 				this.myIcon = wirelessTerminalStack;
 			}
 			
-			this.myIcon = RandomUtils.getWirelessTerm(inventoryPlayer);
+			ItemStack is = new ItemStack(ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem());
+			((ItemWirelessCraftingTerminal) is.getItem()).injectAEPower(is, 6400001);
+			myIcon = is;
 
 			this.originalGui = Reference.GUI_WCT;
 		}

@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumChatFormatting;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 
@@ -58,21 +57,8 @@ public class RandomUtils {
 				wirelessTerm = item;
 				break;
 			}
-			if (wirelessTerm == null) {
-				continue;
-			}
 		}
-		if (wirelessTerm == null) {
-			if (playerInv.player.getHeldItem() != null) {
-				return playerInv.player.getHeldItem();
-			}
-			else {
-				return ItemEnum.WIRELESS_CRAFTING_TERMINAL.getStack();
-			}
-		}
-		else {
-			return wirelessTerm;
-		}
+		return wirelessTerm;
 	}
 
 	public static ItemStack getMagnet(InventoryPlayer playerInv) {
@@ -108,9 +94,6 @@ public class RandomUtils {
 			if (item.getItem() instanceof ItemMagnet) {
 				magnetItem = item;
 				break;
-			}
-			if (magnetItem == null) {
-				continue;
 			}
 		}
 		return magnetItem;

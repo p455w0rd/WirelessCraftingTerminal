@@ -748,7 +748,12 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		// drain 1 ae t
 		this.ticks++;
 		if (this.ticks > 10) {
-			this.civ.extractAEPower(this.getPowerMultiplier() * this.ticks, Actionable.MODULATE, PowerMultiplier.CONFIG);
+			if (!isBoosterInstalled() || !Reference.WCT_BOOSTER_ENABLED) {
+				this.civ.extractAEPower(this.getPowerMultiplier() * this.ticks, Actionable.MODULATE, PowerMultiplier.CONFIG);
+			}
+			else {
+				this.civ.extractAEPower((int)(0.5 * this.ticks), Actionable.MODULATE, PowerMultiplier.CONFIG);
+			}
 			this.ticks = 0;
 		}
 

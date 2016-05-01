@@ -13,11 +13,12 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiTabButton;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketCraftRequest;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class GuiCraftAmount extends WCTBaseGui {
@@ -42,7 +43,9 @@ public class GuiCraftAmount extends WCTBaseGui {
 	@Reflected
 	public GuiCraftAmount(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
 		super(new ContainerCraftAmount(inventoryPlayer, te));
-		myIcon = RandomUtils.getWirelessTerm(inventoryPlayer);
+		ItemStack is = new ItemStack(ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem());
+		((ItemWirelessCraftingTerminal) is.getItem()).injectAEPower(is, 6400001);
+		myIcon = is;
 	}
 
 	@SuppressWarnings({ "unchecked", "unused" })

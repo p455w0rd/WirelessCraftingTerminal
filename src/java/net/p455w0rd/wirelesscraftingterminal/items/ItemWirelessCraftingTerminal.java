@@ -36,7 +36,10 @@ import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
+import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
+import net.p455w0rd.wirelesscraftingterminal.transformer.annotations.Integration.Interface;
 
+@Interface( iface = "cofh.api.energy.IEnergyContainerItem", iname = IntegrationType.RFItem )
 public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements IWirelessCraftingTermHandler, IEnergyContainerItem {
 
 	private static final String LINK_KEY_STRING = "key";
@@ -330,7 +333,14 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 				return (int) (max - current);
 			}
 		} else {
-			return (int) PowerUnits.AE.convertTo(PowerUnits.RF, injectAEPower(container, PowerUnits.RF.convertTo(PowerUnits.AE, maxReceive)));
+			double currentAEPower = getAECurrentPower(container);
+			if ((int)currentAEPower < Reference.WCT_MAX_POWER) {
+				int leftOver = (int) PowerUnits.AE.convertTo(PowerUnits.RF, injectAEPower(container, PowerUnits.RF.convertTo(PowerUnits.AE, maxReceive)));
+				return (int) maxReceive - leftOver;
+			}
+			else {
+				return 0;
+			}
 		}
 	}
 

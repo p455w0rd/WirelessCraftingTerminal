@@ -46,14 +46,26 @@ public class KeybindHandler {
 		}
 		if (p.openContainer != null && p.openContainer instanceof ContainerPlayer) {
 			if (openTerminal.isPressed()) {
-				if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
-					NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
+				ItemStack is = RandomUtils.getWirelessTerm(p.inventory);
+				if (is == null) {
+					return;
+				}
+				ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) is.getItem();
+				if (wirelessTerm != null) {
+					if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
+						NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
+					}
 				}
 			}
 			else if (openMagnetFilter.isPressed()) {
-				ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) RandomUtils.getWirelessTerm(p.inventory).getItem();
-				//ensure player has a Wireless Crafting Terminal (with Magnet Card Installed) or Magnet Card in their inventory
-				if (wirelessTerm != null && wirelessTerm instanceof ItemWirelessCraftingTerminal) {
+				ItemStack is = RandomUtils.getWirelessTerm(p.inventory);
+				if (is == null) {
+					return;
+				}
+				ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) is.getItem();
+				// ensure player has a Wireless Crafting Terminal (with Magnet
+				// Card Installed) or Magnet Card in their inventory
+				if (wirelessTerm != null) {
 					ItemStack magnetItem = RandomUtils.getMagnet(p.inventory);
 					if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
 						NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_MAGNET));
