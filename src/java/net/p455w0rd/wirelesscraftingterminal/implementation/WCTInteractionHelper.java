@@ -4,7 +4,10 @@ import java.util.ArrayList;
 
 import appeng.api.implementations.tiles.IWirelessAccessPoint;
 import appeng.core.localization.PlayerMessages;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.FakePlayer;
 import net.p455w0rd.wirelesscraftingterminal.api.IWCTInteractionHelper;
@@ -19,7 +22,7 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 
 	@Override
 	public void openWirelessCraftingTerminalGui(final EntityPlayer player) {
-		if ((player == null) || (player instanceof FakePlayer) || player.worldObj.isRemote) {
+		if ((player == null) || (player instanceof FakePlayer) || (player instanceof EntityPlayerMP) || FMLCommonHandler.instance().getSide() == Side.SERVER) {
 			return;
 		}
 

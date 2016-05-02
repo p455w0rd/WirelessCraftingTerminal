@@ -23,9 +23,10 @@ public class ConfigHandler {
 	public static boolean enableInfinityBooster;
 	public static boolean enableEasyMode;
 	public static int ae2wctMaxPower = Reference.WCT_MAX_POWER;
+	public static int boosterDropChance = Reference.WCT_BOOSTER_DROPCHANCE;
 	private static boolean doSave;
 	public static boolean firstLoad = true;
-	private static int pwrInCfgFile;
+	private static int pwrInCfgFile, boosterDropInCfgFile;
 
 	public static void init(File configFile) {
 		if (config == null) {
@@ -46,6 +47,7 @@ public class ConfigHandler {
 		String pwrDesc = LocaleHandler.MaxPowerDesc.getLocal() + " [default: 1600000, min: 800000, max:6400000]";
 		String boosterDesc = LocaleHandler.InfinityBoosterCfgDesc.getLocal();
 		String easyModeDesc = LocaleHandler.EasyModeDesc.getLocal();
+		String boosterDropDesc = LocaleHandler.BoosterDropChance.getLocal();
 		enableInfinityBooster = config.getBoolean("enableInfinityBooster", Configuration.CATEGORY_GENERAL, true, boosterDesc);
 		enableEasyMode = config.getBoolean("enableEasyMode", Configuration.CATEGORY_GENERAL, false, easyModeDesc);
 		/*
@@ -70,10 +72,29 @@ public class ConfigHandler {
 			pwrCfgKey.comment = pwrDesc;
 			doSave = true;
 		}
+		
+		Property boosterDropKey = config.get(Configuration.CATEGORY_GENERAL, "boosterDropChance", Reference.WCT_BOOSTER_DROPCHANCE);
+		boosterDropKey.comment = boosterDropDesc;
+		boosterDropKey.setDefaultValue(Reference.WCT_BOOSTER_DROPCHANCE);
+
+		boosterDropInCfgFile = boosterDropKey.getInt();
+		boosterDropChance = boosterDropInCfgFile;
+		if (boosterDropInCfgFile > 100) {
+			boosterDropChance = 100;
+			boosterDropKey.setValue(boosterDropChance);
+			boosterDropKey.comment = boosterDropDesc;
+			doSave = true;
+		} else if (boosterDropInCfgFile < 1) {
+			boosterDropChance = 1;
+			boosterDropKey.setValue(boosterDropChance);
+			boosterDropKey.comment = boosterDropDesc;
+			doSave = true;
+		}
 
 		Reference.WCT_BOOSTER_ENABLED = enableInfinityBooster;
 		Reference.WCT_EASYMODE_ENABLED = enableEasyMode;
 		Reference.WCT_MAX_POWER = ae2wctMaxPower;
+		Reference.WCT_BOOSTER_DROPCHANCE = boosterDropChance;
 
 		if (config.hasChanged() || doSave) {
 			config.save();

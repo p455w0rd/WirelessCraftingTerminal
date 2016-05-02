@@ -138,7 +138,7 @@ public class CommonProxy {
 			*/
 		}
 		else {
-			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED);
+			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE);
 			NetworkHandler.instance.sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
@@ -146,12 +146,15 @@ public class CommonProxy {
 	@SubscribeEvent
 	public void onMobDrop(LivingDropsEvent event) {
 		if (!Reference.WCT_EASYMODE_ENABLED && Reference.WCT_BOOSTER_ENABLED) {
-			if (event.entity instanceof EntityWither || event.entity instanceof EntityDragon) {
-				ItemStack stack = new ItemStack(ItemEnum.BOOSTER_CARD.getItem());
-				EntityItem drop = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, stack);
+			ItemStack stack = new ItemStack(ItemEnum.BOOSTER_CARD.getItem());
+			EntityItem drop = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, stack);
+			if (event.entity instanceof EntityDragon) {
+				event.drops.add(drop);
+			}
+			if (event.entity instanceof EntityWither) {
 				Random rand = new Random();
-				int n = rand.nextInt(50) + 1;
-				if (n == 25) {
+				int n = rand.nextInt();
+				if (n <= Reference.WCT_BOOSTER_DROPCHANCE) {
 					event.drops.add(drop);
 				}
 			}

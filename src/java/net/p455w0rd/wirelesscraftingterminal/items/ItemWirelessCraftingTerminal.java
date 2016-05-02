@@ -19,7 +19,6 @@ import appeng.util.ConfigManager;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import cofh.api.energy.IEnergyContainerItem;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -34,10 +33,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
-import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
@@ -116,16 +113,7 @@ public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements I
 	public ItemStack onItemRightClick(final ItemStack itemStack, final World world, final EntityPlayer player) {
 		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
 			// Open the gui
-			ItemStack is = RandomUtils.getWirelessTerm(player.inventory);
-			if (is == null) {
-				return itemStack;
-			}
-			ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) is.getItem();
-			if (wirelessTerm != null) {
-				if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
-					NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
-				}
-			}
+			WCTApi.instance().interact().openWirelessCraftingTerminalGui(player);
 		}
 		return itemStack;
 	}

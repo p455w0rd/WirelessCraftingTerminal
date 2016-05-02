@@ -69,6 +69,7 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingM
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingTerm;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotDisabled;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFake;
+import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFakeCraftingMatrix;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotInaccessible;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotOutput;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotTrash;
@@ -89,7 +90,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	private float xSize_lo;
 	private float ySize_lo;
-	public static int tick = 0, GUI_HEIGHT = 240, GUI_WIDTH = 198, AE_ROW_HEIGHT = 18, AE_NUM_ROWS = 3,
+	public static int tick = 0, GUI_HEIGHT = 240, GUI_WIDTH = 198, AE_ROW_HEIGHT = 18, AE_NUM_ROWS = 0,
 			GUI_UPPER_HEIGHT = 35, GUI_SEARCH_ROW = 35, SEARCH_X = 81, SEARCH_Y = 6, SEARCH_WIDTH = 88,
 			SEARCH_HEIGHT = 10, SEARCH_MAXCHARS = 15, GUI_LOWER_HEIGHT, AE_TOTAL_ROWS_HEIGHT,
 			BUTTON_SEARCH_MODE_POS_X = -18, BUTTON_SEARCH_MODE_POS_Y = 68, BUTTON_SIZE = 16, NEI_EXTRA_SPACE = 30,
@@ -131,10 +132,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	private boolean isNEIEnabled;
 	private boolean wasTextboxFocused = false;
 	private int screenResTicks = 0;
+	private int reservedSpace = 0;
+	private int maxRows = Integer.MAX_VALUE;
+	private int standardSize;
+	private final int lowerTextureOffset = 0;
+	private int rows = 0;
 
 	public GuiWirelessCraftingTerminal(Container container) {
 		super(container);
 		GuiWirelessCraftingTerminal.INSTANCE = this;
+		this.xSize = GUI_WIDTH;
+		this.ySize = GUI_HEIGHT;
+		this.standardSize = this.xSize;
+		this.setReservedSpace(73);
 		this.containerWCT = (ContainerWirelessCraftingTerminal) container;
 		this.scrollBar = new GuiScrollbar();
 		this.subGui = switchingGuis;
@@ -144,21 +154,23 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		this.configSrc = ((IConfigurableObject) this.inventorySlots).getConfigManager();
 		this.devicePowered = containerWCT.isPowered();
 		((ContainerWirelessCraftingTerminal) this.inventorySlots).setGui(this);
-		this.isNEIEnabled = IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI);
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
 		for (final IAEItemStack is : list) {
 			this.repo.postUpdate(is);
 		}
-
 		this.repo.updateView();
 		this.setScrollBar();
 	}
 
 	private void setScrollBar() {
-		this.getScrollBar().setTop(18).setLeft(174).setHeight((AE_NUM_ROWS + 3) * 18 - 2);
-		this.getScrollBar().setRange(0, (this.repo.size() + this.perRow - 1) / this.perRow - (AE_NUM_ROWS + 3), Math.max(1, (AE_NUM_ROWS + 3) / 6));
+		this.getScrollBar().setTop( 18 ).setLeft( 174 ).setHeight( this.rows * 18 - 2 );
+		this.getScrollBar().setRange( 0, ( this.repo.size() + this.perRow - 1 ) / this.perRow - this.rows, Math.max( 1, this.rows / 6 ) );
+	}
+	
+	protected void setScrollBar(final GuiScrollbar myScrollBar) {
+		this.scrollBar = myScrollBar;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -255,6 +267,24 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		return this.subGui;
 	}
 
+	int getReservedSpace() {
+		return this.reservedSpace;
+	}
+
+	void setReservedSpace(final int reservedSpace) {
+		this.reservedSpace = reservedSpace;
+	}
+	
+	public int getStandardSize()
+	{
+		return this.standardSize;
+	}
+
+	void setStandardSize( final int standardSize )
+	{
+		this.standardSize = standardSize;
+	}
+
 	/**
 	 * Initializes the GUI
 	 */
@@ -262,13 +292,39 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
+		this.maxRows = this.getMaxRows();
+		this.isNEIEnabled = IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI);
+		int top = isNEIEnabled ? 22 : 0;
+		final int magicNumber = 114 + 1;
+		final int extraSpace = this.height - magicNumber - 0 - top - this.reservedSpace;
+		this.rows = (int) Math.floor(extraSpace / 18);
+		if (this.rows > this.maxRows) {
+			top += (this.rows - this.maxRows) * 18 / 2;
+			this.rows = this.maxRows;
+		}
+
+		if (isNEIEnabled) {
+			this.rows--;
+		}
+
+		if (this.rows < 3) {
+			this.rows = 3;
+		}
+
 		this.getMeSlots().clear();
-		for (int y = 0; y < AE_NUM_ROWS + 3; y++) {
+		for (int y = 0; y < this.rows; y++) {
 			for (int x = 0; x < this.perRow; x++) {
 				this.getMeSlots().add(new InternalSlotME(this.repo, x + y * this.perRow, this.offsetX + x * 18, 18 + y * 18));
 			}
 		}
+		this.xSize = this.standardSize;
 		super.initGui();
+
+		this.ySize = magicNumber + this.rows * 18 + this.reservedSpace;
+		final int unusedSpace = this.height - this.ySize;
+		this.guiTop = (int) Math.floor(unusedSpace / (unusedSpace < 0 ? 3.8f : 2.0f));
+		int offset = this.guiTop + 8;
+
 		final List<Slot> slots = this.getInventorySlots();
 		final Iterator<Slot> i = slots.iterator();
 		while (i.hasNext()) {
@@ -280,11 +336,10 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		for (final InternalSlotME me : this.meSlots) {
 			slots.add(new SlotME(me));
 		}
-		int offset = this.guiTop + 8;
 
 		this.buttonList.clear();
-		this.buttonList.add(this.clearBtn = new GuiImgButton(this.guiLeft + 134, GuiWirelessCraftingTerminal.GUI_HEIGHT - GuiWirelessCraftingTerminal.GUI_LOWER_HEIGHT + 46, Settings.ACTIONS, ActionItems.STASH));
-		this.buttonList.add(this.trashBtn = new GuiTrashButton(this.guiLeft + 98, GuiWirelessCraftingTerminal.GUI_HEIGHT - GuiWirelessCraftingTerminal.GUI_LOWER_HEIGHT + 103));
+		this.buttonList.add(this.clearBtn = new GuiImgButton(this.guiLeft + 134, this.guiTop + this.ySize - 160, Settings.ACTIONS, ActionItems.STASH));
+		this.buttonList.add(this.trashBtn = new GuiTrashButton(this.guiLeft + 98, this.guiTop + this.ySize - 104));
 		this.clearBtn.setHalfSize(true);
 		if (this.customSortOrder) {
 			this.buttonList.add(this.SortByBox = new GuiImgButton(this.guiLeft - 18, offset, Settings.SORT_BY, this.configSrc.getSetting(Settings.SORT_BY)));
@@ -314,7 +369,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		final Enum setting = AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE);
 		this.searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.NEI_AUTOSEARCH == setting);
 
-		if (this.isSubGui() || this.init) {
+		if (this.isSubGui()) {
 			if (this.isSubGui()) {
 				this.searchField.setText(memoryText);
 				this.repo.setSearchString(memoryText);
@@ -322,11 +377,38 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			this.repo.updateView();
 			this.setScrollBar();
 		}
+
+		craftingGridOffsetX = Integer.MAX_VALUE;
+		craftingGridOffsetY = Integer.MAX_VALUE;
+
+		for (final Object s : this.inventorySlots.inventorySlots) {
+			if (s instanceof AppEngSlot) {
+				if (((Slot) s).xDisplayPosition < 197) {
+					this.repositionSlot((AppEngSlot) s);
+				}
+			}
+
+			if (s instanceof SlotCraftingMatrix || s instanceof SlotFakeCraftingMatrix) {
+				final Slot g = (Slot) s;
+				if (g.xDisplayPosition > 0 && g.yDisplayPosition > 0) {
+					craftingGridOffsetX = Math.min(craftingGridOffsetX, g.xDisplayPosition);
+					craftingGridOffsetY = Math.min(craftingGridOffsetY, g.yDisplayPosition);
+				}
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<Slot> getInventorySlots() {
 		return this.inventorySlots.inventorySlots;
+	}
+
+	int getMaxRows() {
+		return Integer.MAX_VALUE;
+	}
+
+	protected void repositionSlot(final AppEngSlot s) {
+		s.yDisplayPosition = s.getY() + this.ySize - 78 - 5;
 	}
 
 	/**
@@ -342,7 +424,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	public void updateScreen() {
 		this.devicePowered = containerWCT.isPowered();
 		this.repo.setPower(devicePowered);
-		//this.repo.setPower( true );
 
 		super.updateScreen();
 		if (this.init) {
@@ -370,7 +451,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 					this.wasTextboxFocused = false;
 					this.wasResized = false;
 				}
-				containerWCT.updateSlots(slotYOffset);
 				this.reInit = false;
 				tick = 0;
 			}
@@ -381,26 +461,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		}
 		if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {
 			this.mc.thePlayer.closeScreen();
-		}
-		else {
-			// this block of variables is used to automatically
-			// reposition the slots in the container
-			GUI_HEIGHT = this.mc.displayHeight / 2;
-			AE_NUM_ROWS = Math.max(0, ((GUI_HEIGHT) - 240) / AE_ROW_HEIGHT);
-			if (isNEIEnabled && AE_NUM_ROWS >= 2) {
-				AE_NUM_ROWS -= 2;
-				GUI_HEIGHT -= AE_ROW_HEIGHT * 2 + 5;
-				this.clearBtn.yPosition = AE_TOTAL_ROWS_HEIGHT + GUI_SEARCH_ROW + GUI_UPPER_HEIGHT + 32;
-				this.trashBtn.yPosition = AE_TOTAL_ROWS_HEIGHT + GUI_SEARCH_ROW + GUI_UPPER_HEIGHT + 89;
-			}
-			else {
-				this.clearBtn.yPosition = AE_TOTAL_ROWS_HEIGHT + GUI_SEARCH_ROW + GUI_UPPER_HEIGHT + 13;
-				this.trashBtn.yPosition = AE_TOTAL_ROWS_HEIGHT + GUI_SEARCH_ROW + GUI_UPPER_HEIGHT + 68;
-			}
-			AE_TOTAL_ROWS_HEIGHT = AE_NUM_ROWS * AE_ROW_HEIGHT;
-			GUI_LOWER_HEIGHT = GUI_HEIGHT - AE_TOTAL_ROWS_HEIGHT - GUI_UPPER_HEIGHT;
-			slotYOffset = AE_TOTAL_ROWS_HEIGHT;
-			craftingGridOffsetY = slotYOffset + 83;
 		}
 	}
 
@@ -427,8 +487,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		super.drawScreen(mouseX, mouseY, btn);
 		this.xSize_lo = (float) mouseX;
 		this.ySize_lo = (float) mouseY;
-		this.xSize = GUI_WIDTH;
-		this.ySize = GUI_HEIGHT;
 
 		final boolean hasClicked = Mouse.isButtonDown(0);
 		if (hasClicked && this.scrollBar != null) {
@@ -542,6 +600,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	/**
 	 * Draw GUI Labels and item tooltips
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		final int ox = this.guiLeft; // (width - xSize) / 2;
 		final int oy = this.guiTop; // (height - ySize) / 2;
@@ -556,7 +615,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	public void drawFG(int offsetX, int offsetY, int mouseX, int mouseY) {
 		String s = LocaleHandler.WirelessTermLabel.getLocal();
 		this.mc.fontRenderer.drawString(s, 7, 5, 4210752);
-		this.mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, AE_TOTAL_ROWS_HEIGHT + GUI_SEARCH_ROW + GUI_UPPER_HEIGHT + 3, 4210752);
+		this.mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, this.ySize - 172 + 3, 4210752);
 		if (this.searchField != null) {
 			this.searchField.drawTextBox();
 		}
@@ -565,6 +624,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	/**
 	 * Draw and piece together the background texture
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(final float f, final int x, final int y) {
 		final int ox = this.guiLeft; // (width - xSize) / 2;
 		final int oy = this.guiTop; // (height - ySize) / 2;
@@ -592,22 +652,24 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		}
 	}
 
-	public void drawBG(int ox, int oy, int x, int y) {
+	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		this.bindTexture(bgTexturePath);
+		final int x_width = 199;
 
-		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, GUI_WIDTH, GUI_UPPER_HEIGHT);
-
-		for (int i = 0; i <= AE_NUM_ROWS; ++i) {
-			int yPos = this.guiTop + GUI_UPPER_HEIGHT + (i * AE_ROW_HEIGHT);
-			// Draw the texture
-			this.drawTexturedModalRect(this.guiLeft, yPos, 0, GUI_SEARCH_ROW, GUI_WIDTH, AE_ROW_HEIGHT);
+		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, x_width, 18 );
+		
+		for( int x = 0; x < this.rows; x++ )
+		{
+			this.drawTexturedModalRect( offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18 );
 		}
+		
+		this.drawTexturedModalRect( offsetX, offsetY + 16 + this.rows * 18 + this.lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + this.reservedSpace - this.lowerTextureOffset );
 
-		this.drawTexturedModalRect(this.guiLeft, this.guiTop + GUI_UPPER_HEIGHT + AE_TOTAL_ROWS_HEIGHT, 0, AE_ROW_HEIGHT + 17, GUI_WIDTH, GUI_LOWER_HEIGHT);
 		if (Reference.WCT_BOOSTER_ENABLED) {
-			this.drawTexturedModalRect(this.guiLeft + 132, this.guiTop + GUI_UPPER_HEIGHT + AE_TOTAL_ROWS_HEIGHT + 102, 237, 237, 19, 19);
+			this.drawTexturedModalRect(this.guiLeft + 132, (this.guiTop + this.rows * 18) + 83, 237, 237, 19, 19);
 		}
-		GuiInventory.func_147046_a(this.guiLeft + 51, this.guiTop + GUI_UPPER_HEIGHT + AE_TOTAL_ROWS_HEIGHT + 112, 32, (float) (this.guiLeft + 51) - this.xSize_lo, (float) (this.guiTop + 95 + (AE_NUM_ROWS * AE_ROW_HEIGHT)) - this.ySize_lo, this.mc.thePlayer);
+		GuiInventory.func_147046_a(this.guiLeft + 51, (this.guiTop + this.rows * 18) + 94, 32, (float) (this.guiLeft + 51) - this.xSize_lo, (float) ((this.guiTop + this.rows * 18) + 50) - this.ySize_lo, this.mc.thePlayer);
+		
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -872,7 +934,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
-		this.subGui = true; // in case the gui is reopened later ( i'm looking at you NEI )
+		this.subGui = true; // in case the gui is reopened later ( i'm looking
+							// at you NEI )
 		Keyboard.enableRepeatEvents(false);
 		if (this.searchField.getText() != null) {
 			memoryText = this.searchField.getText();
@@ -1125,10 +1188,6 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	protected GuiScrollbar getScrollBar() {
 		return this.scrollBar;
-	}
-
-	protected void setScrollBar(final GuiScrollbar myScrollBar) {
-		this.scrollBar = myScrollBar;
 	}
 
 	protected List<InternalSlotME> getMeSlots() {

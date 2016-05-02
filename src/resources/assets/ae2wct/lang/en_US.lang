@@ -36,6 +36,7 @@ gui.labels.ae2wct.WirelessTermLabel=Wireless Term
 config.ae2wct.MaxPowerDesc=Maximum Power in AE units the wireless terminal can hold
 config.ae2wct.InfinityBoosterCfgDesc=Enable Infinite Range Booster Upgrade
 config.ae2wct.EasyModeDesc=Enable Easy Mode (Easier Recipes+Infinity Booster Recipe)
+config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
 
 //Achievements
 achievement.wctAchievement=Digital Crafting Over WiFi

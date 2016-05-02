@@ -36,6 +36,7 @@ gui.labels.ae2wct.WirelessTermLabel=Drahtloskonsole
 config.ae2wct.MaxPowerDesc=In der Drahtloskonsole maximal speicherbare Energie in AE
 config.ae2wct.InfinityBoosterCfgDesc=Erlaube das unendliche Drahtlosverstärkerupgrade
 config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte + Rezept für unendlichen Drahtlosverstärker)
+config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
 
 //Achievements
 achievement.wctAchievement=Digitales Fertigen über WLAN

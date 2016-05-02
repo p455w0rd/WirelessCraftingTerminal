@@ -121,14 +121,10 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	public ItemStack craftItem;
 	private World worldObj;
 	private EntityPlayer player;
-	@SuppressWarnings("unused")
 	private static final int HOTBAR_START = 1, HOTBAR_END = HOTBAR_START + 8, INV_START = HOTBAR_END + 1,
 			INV_END = INV_START + 26, ARMOR_START = INV_END + 1, ARMOR_END = ARMOR_START + 3,
 			CRAFT_GRID_START = ARMOR_END + 1, CRAFT_GRID_END = CRAFT_GRID_START + 8, CRAFT_RESULT = CRAFT_GRID_END + 1,
-			BOOSTER_INDEX = 0, MAGNET_INDEX = CRAFT_RESULT + 1, TRASH_INDEX = MAGNET_INDEX + 1;
-	private int BOOSTER_Y_OFFSET = 139, HOTBAR_Y_OFFSET = 217, INV_Y_OFFSET = 159, ARMOR_Y_OFFSET = 83,
-			CRAFTMATRIX_Y_OFFSET = 83, CRAFTING_Y_OFFSET = 100, MAGNET_Y_OFFSET = BOOSTER_Y_OFFSET,
-			TRASH_Y_OFFSET = MAGNET_Y_OFFSET;
+			BOOSTER_INDEX = 0, MAGNET_INDEX = CRAFT_RESULT + 1;
 	public static int CRAFTING_SLOT_X_POS = 80, CRAFTING_SLOT_Y_POS = 83;
 	private SlotBooster boosterSlot;
 	private SlotMagnet magnetSlot;
@@ -139,8 +135,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	private SlotCraftingMatrix[] craftMatrixSlot;
 	private SlotCraftingTerm craftingSlot;
 	public SlotTrash trashSlot;
-	@SuppressWarnings("unused")
-	private int firstCraftingSlotNumber = -1, lastCraftingSlotNumber = -1, craftingSlotNumber = -1;
+	private int firstCraftingSlotNumber = -1, lastCraftingSlotNumber = -1;
 
 	private final WirelessTerminalGuiObject obj;
 	private boolean isContainerValid = true;
@@ -224,7 +219,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		}
 
 		if (Reference.WCT_BOOSTER_ENABLED) {
-			boosterSlot = new SlotBooster(this.boosterInventory, 0, 134, BOOSTER_Y_OFFSET);
+			boosterSlot = new SlotBooster(this.boosterInventory, 0, 134, -20);
 			this.addSlotToContainer(boosterSlot);
 		}
 		else {
@@ -234,7 +229,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		// Add hotbar slots
 		for (int i = 0; i < 9; ++i) {
-			hotbarSlot[i] = new SlotPlayerHotBar(this.inventoryPlayer, i, i * 18 + 8, HOTBAR_Y_OFFSET);
+			hotbarSlot[i] = new SlotPlayerHotBar(this.inventoryPlayer, i, i * 18 + 8, 58);
 			this.addSlotToContainer(hotbarSlot[i]);
 		}
 
@@ -243,7 +238,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		// Add player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				inventorySlot[k] = new SlotPlayerInv(this.inventoryPlayer, j + i * 9 + 9, j * 18 + 8, INV_Y_OFFSET + i * 18);
+				inventorySlot[k] = new SlotPlayerInv(this.inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 0 + i * 18);
 				this.addSlotToContainer(inventorySlot[k]);
 				k++;
 			}
@@ -251,14 +246,14 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		// Add armor slots
 		for (int i = 0; i < 4; ++i) {
-			armorSlot[i] = new SlotArmor(this.player, this.inventoryPlayer, 39 - i, (int) 8.5, ARMOR_Y_OFFSET + i * 18, i);
+			armorSlot[i] = new SlotArmor(this.player, this.inventoryPlayer, 39 - i, (int) 8.5, (i * 18) - 76, i);
 			this.addSlotToContainer(armorSlot[i]);
 		}
 		k = 0;
 		// Add crafting grid slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-				craftMatrixSlot[k] = new SlotCraftingMatrix(this, this.craftingGrid, j + i * 3, 80 + j * 18, CRAFTMATRIX_Y_OFFSET + i * 18);
+				craftMatrixSlot[k] = new SlotCraftingMatrix(this, this.craftingGrid, j + i * 3, 80 + j * 18, (i * 18) - 76);
 				this.addSlotToContainer(craftMatrixSlot[k]);
 				if (k == 0) {
 					this.firstCraftingSlotNumber = craftMatrixSlot[k].slotNumber;
@@ -268,15 +263,14 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		}
 		this.lastCraftingSlotNumber = craftMatrixSlot[8].slotNumber;
 
-		craftingSlot = new SlotCraftingTerm(this.getPlayerInv().player, this.mySrc, this.getPowerSource(), this.obj, this.craftingGrid, this.craftingGrid, this.output, 174, CRAFTING_Y_OFFSET, this);
-		this.craftingSlotNumber = this.lastCraftingSlotNumber + 1;
+		craftingSlot = new SlotCraftingTerm(this.getPlayerInv().player, this.mySrc, this.getPowerSource(), this.obj, this.craftingGrid, this.craftingGrid, this.output, 174, -58, this);
 		// Add crafting result slot
 		this.addSlotToContainer(craftingSlot);
 
-		magnetSlot = new SlotMagnet(this.magnetInventory, 152, MAGNET_Y_OFFSET);
+		magnetSlot = new SlotMagnet(this.magnetInventory, 152, -20);
 		this.addSlotToContainer(magnetSlot);
 
-		trashSlot = new SlotTrash(this.trashInventory, 80, TRASH_Y_OFFSET, player);
+		trashSlot = new SlotTrash(this.trashInventory, 80, -20, player);
 		trashSlot.setContainer(this);
 		this.addSlotToContainer(trashSlot);
 
@@ -683,43 +677,6 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	@Override
 	public ItemStack[] getViewCells() {
 		return null;
-	}
-
-	public void updateSlots(int yOffset) {
-		int i, j, index = 0;
-
-		this.getSlot(index).yDisplayPosition = BOOSTER_Y_OFFSET + yOffset;
-
-		for (i = 0; i < 9; ++i) {
-			index++;
-			this.getSlot(index).yDisplayPosition = HOTBAR_Y_OFFSET + yOffset;
-		}
-
-		for (i = 0; i < 3; ++i) {
-			for (j = 0; j < 9; ++j) {
-				index++;
-				this.getSlot(index).yDisplayPosition = INV_Y_OFFSET + yOffset + (18 * i);
-			}
-		}
-
-		for (i = 0; i < 4; ++i) {
-			index++;
-			this.getSlot(index).yDisplayPosition = ARMOR_Y_OFFSET + yOffset + (18 * i);
-		}
-
-		Reference.WCT_CRAFTMATRIX_Y_OFFSET = CRAFTMATRIX_Y_OFFSET + yOffset;
-		for (i = 0; i < 3; ++i) {
-			for (j = 0; j < 3; ++j) {
-				index++;
-				this.getSlot(index).yDisplayPosition = (CRAFTMATRIX_Y_OFFSET + yOffset) + (18 * i);
-			}
-		}
-		index++;
-		this.getSlot(index).yDisplayPosition = CRAFTING_Y_OFFSET + yOffset;
-		index++;
-		this.getSlot(index).yDisplayPosition = MAGNET_Y_OFFSET + yOffset;
-		index++;
-		this.getSlot(index).yDisplayPosition = TRASH_Y_OFFSET + yOffset;
 	}
 
 	private WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
