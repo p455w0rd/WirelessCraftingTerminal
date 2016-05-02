@@ -23,6 +23,7 @@ Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter
 
 ## Contact
 
+Author: TheRealp455w0rd (reddit flair)
 * [Website](http://p455w0rd.net/mc/)
 * [IRC #p455w0rdCraft on esper.net](http://webchat.esper.net/?channels=p455w0rdCraft&prompt=1)
 * [GitHub](https://github.com/p455w0rd/WirelessCraftingTerminal)
