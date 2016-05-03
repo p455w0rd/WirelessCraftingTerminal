@@ -38,18 +38,10 @@ public class PacketSwitchGuis extends WCTPacket {
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		World world = player.worldObj;
-		if (world.isRemote) {
-			int x = player.serverPosX;
-			int y = player.serverPosY;
-			int z = player.serverPosZ;
-			WCTGuiHandler.launchGui(newGui, player, world, x, y, z);
-		}
-		else {
-			int x = (int) player.posX;
-			int y = (int) player.posY;
-			int z = (int) player.posZ;
-			WCTGuiHandler.launchGui(newGui, player, world, x, y, z);
-		}
+		int x = (int) player.posX;
+		int y = (int) player.posY;
+		int z = (int) player.posZ;
+		WCTGuiHandler.launchGui(newGui, player, world, x, y, z);
 	}
 
 	@Override

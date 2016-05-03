@@ -122,9 +122,9 @@ public class PacketInventoryAction extends WCTPacket
 				//{
 					//final TileEntity te = context.getTile();
 					
-					int x = player.serverPosX;
-					int y = player.serverPosY;
-					int z = player.serverPosZ;
+					int x = (int)player.posX;
+					int y = (int)player.posY;
+					int z = (int)player.posZ;
 					
 					WCTGuiHandler.launchGui(Reference.GUI_CRAFT_AMOUNT, player, player.worldObj, x, y, z);
 

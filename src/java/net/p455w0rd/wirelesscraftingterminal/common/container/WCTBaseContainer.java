@@ -68,7 +68,7 @@ public abstract class WCTBaseContainer extends Container {
 	private final HashSet<Integer> locked = new HashSet<Integer>();
 	private final TileEntity tileEntity;
 	private final IPart part;
-	private final IGuiItemObject obj;
+	public final IGuiItemObject obj;
 	private final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
 	private final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
 	private boolean isContainerValid = true;

@@ -16,9 +16,11 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilte
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchMagnetMode;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 
 public class WCTPacketHandlerBase {
@@ -49,7 +51,11 @@ public class WCTPacketHandlerBase {
 		
 		PACKET_EMPTY_TRASH(PacketEmptyTrash.class),
 		
-		PACKET_SYNC_CONFIGS(PacketConfigSync.class);
+		PACKET_SYNC_CONFIGS(PacketConfigSync.class),
+		
+		PACKET_SET_JOB(PacketSetJobBytes.class),
+		
+		PACKET_UPDATECPUINFO(PacketUpdateCPUInfo.class);
 
 		private final Class<? extends WCTPacket> packetClass;
 		private final Constructor<? extends WCTPacket> packetConstructor;

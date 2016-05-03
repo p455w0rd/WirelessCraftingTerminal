@@ -67,8 +67,8 @@ public class RandomUtils {
 			return playerInv.player.getHeldItem();
 		}
 		int invSize = playerInv.getSizeInventory();
-		// if not true, try to return first wireless crafting terminal
-		// that has a MagnetCard installed
+		// if not true, try to return first magnet card from first
+		// wireless term that has a MagnetCard installed
 		ItemStack wirelessTerm = getWirelessTerm(playerInv);
 		if (wirelessTerm != null && wirelessTerm.getItem() instanceof ItemWirelessCraftingTerminal) {
 			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();

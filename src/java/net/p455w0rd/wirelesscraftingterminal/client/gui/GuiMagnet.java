@@ -69,6 +69,9 @@ public class GuiMagnet extends GuiContainer {
 	}
 	
 	private synchronized boolean getMode() {
+		if (!magnetItem.hasTagCompound()) {
+			NetworkHandler.instance.sendToServer(new PacketMagnetFilterMode(true));
+		}
 		NBTTagCompound nbtTC = magnetItem.getTagCompound();
 		if (nbtTC.hasKey("Whitelisting")) {
 			return nbtTC.getBoolean("Whitelisting");

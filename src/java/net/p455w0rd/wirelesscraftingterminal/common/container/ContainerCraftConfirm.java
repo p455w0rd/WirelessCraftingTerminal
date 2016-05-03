@@ -22,7 +22,10 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
+import net.p455w0rd.wirelesscraftingterminal.common.container.CraftingCPURecord;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
@@ -45,7 +48,7 @@ import appeng.util.Platform;
 public class ContainerCraftConfirm extends WCTBaseContainer
 {
 
-	private final ArrayList<CraftingCPURecord> cpus = new ArrayList<CraftingCPURecord>();
+	public final ArrayList<CraftingCPURecord> cpus = new ArrayList<CraftingCPURecord>();
 	private Future<ICraftingJob> job;
 	private ICraftingJob result;
 	@GuiSync( 0 )
@@ -64,10 +67,12 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 	public boolean noCPU = true;
 	@GuiSync( 7 )
 	public String myName = "";
+	InventoryPlayer inventoryPlayer;
 
 	public ContainerCraftConfirm( final InventoryPlayer ip, final ITerminalHost te )
 	{
 		super( ip, te );
+		inventoryPlayer = ip;
 	}
 
 	public void cycleCpu( final boolean next )
@@ -95,12 +100,24 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 			this.setCpuAvailableBytes( 0 );
 			this.setCpuCoProcessors( 0 );
 			this.setName( "" );
+			try {
+				NetworkHandler.instance.sendTo(new PacketUpdateCPUInfo(0, 0), (EntityPlayerMP) this.getPlayerInv().player);
+			}
+			catch (IOException e) {
+				// 
+			}
 		}
-		else
-		{
+		else {
 			this.setName( this.cpus.get( this.getSelectedCpu() ).getName() );
 			this.setCpuAvailableBytes( this.cpus.get( this.getSelectedCpu() ).getSize() );
 			this.setCpuCoProcessors( this.cpus.get( this.getSelectedCpu() ).getProcessors() );
+			
+			try {
+				NetworkHandler.instance.sendTo(new PacketUpdateCPUInfo((int)this.getCpuAvailableBytes(), (int)this.getCpuCoProcessors()), (EntityPlayerMP) this.getPlayerInv().player);
+			}
+			catch (IOException e) {
+				// 
+			}
 		}
 	}
 
@@ -187,6 +204,13 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 
 					final IItemList<IAEItemStack> plan = AEApi.instance().storage().createItemList();
 					this.result.populatePlan( plan );
+					
+					try {
+						NetworkHandler.instance.sendTo(new PacketSetJobBytes((int)this.result.getByteTotal()), (EntityPlayerMP) this.getPlayerInv().player);
+					}
+					catch (IOException e) {
+						// 
+					}
 
 					this.setUsedBytes( this.result.getByteTotal() );
 
@@ -293,7 +317,6 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 			this.setName( this.cpus.get( this.getSelectedCpu() ).getName() );
 			this.setCpuAvailableBytes( this.cpus.get( this.getSelectedCpu() ).getSize() );
 			this.setCpuCoProcessors( this.cpus.get( this.getSelectedCpu() ).getProcessors() );
-			System.out.println("XD");
 		}
 	}
 
@@ -320,9 +343,9 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 				//Platform.openGUI( this.getInventoryPlayer().player, te, this.getOpenContext().getSide(), originalGui );
 				EntityPlayerMP player = (EntityPlayerMP) this.getInventoryPlayer().player;
 				World world = player.worldObj;
-				int x = player.serverPosX;
-				int y = player.serverPosY;
-				int z = player.serverPosZ;
+				int x = (int)player.posX;
+				int y = (int)player.posY;
+				int z = (int)player.posZ;
 				WCTGuiHandler.launchGui(originalGui, player, world, x, y, z);
 			}
 		}
@@ -440,7 +463,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 		this.simulation = simulation;
 	}
 
-	private Future<ICraftingJob> getJob()
+	public Future<ICraftingJob> getJob()
 	{
 		return this.job;
 	}

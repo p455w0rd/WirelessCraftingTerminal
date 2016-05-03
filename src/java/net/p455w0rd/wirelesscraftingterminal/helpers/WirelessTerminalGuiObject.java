@@ -74,6 +74,10 @@ public class WirelessTerminalGuiObject implements IPortableCell, IActionHost, II
 			}
 		}
 	}
+	
+	public IGrid getTargetGrid() {
+		return this.targetGrid;
+	}
 
 	public double getRange() {
 		return this.myRange;

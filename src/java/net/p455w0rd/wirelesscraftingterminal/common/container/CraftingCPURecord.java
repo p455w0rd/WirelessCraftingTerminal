@@ -33,7 +33,7 @@ public class CraftingCPURecord implements Comparable<CraftingCPURecord>
 		return ItemSorters.compareLong( o.getSize(), this.getSize() );
 	}
 
-	ICraftingCPU getCpu()
+	public ICraftingCPU getCpu()
 	{
 		return this.cpu;
 	}
