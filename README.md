@@ -34,15 +34,15 @@ Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter
 
 ## Downloads
 
-* TODO
+* Both the RV2 and RV3 versions are available on [CurseForge](http://minecraft.curseforge.com/projects/wireless-crafting-terminal)
 
 ## Installation
 
 You install this mod by putting it into the `minecraft/mods/` folder. It requires that [AE2 RV3 Beta](http://ae-mod.info/Downloads/) (any build) also be installed.
 
-## Issues
+## Issues/Feature Requests
 
-* TODO
+* Post 'em in the [issues](https://github.com/p455w0rd/WirelessCraftingTerminal/issues) section. =D
 
 Providing as many details as possible does help us to find and resolve the issue faster and also you getting a fixed version as fast as possible.
 
@@ -66,7 +66,7 @@ Providing as many details as possible does help us to find and resolve the issue
 
 ## Contribution
 
-* TODO
+* Fork -> Edit -> PR
 
 If you are only doing single file pull requests, GitHub supports using a quick way without the need of cloning your fork. Also read up about [synching](https://help.github.com/articles/syncing-a-fork) if you plan to contribute on regular basis.
 
