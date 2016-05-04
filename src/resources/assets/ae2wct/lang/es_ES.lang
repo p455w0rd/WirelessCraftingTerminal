@@ -37,6 +37,7 @@ config.ae2wct.MaxPowerDesc=Potencia m?xima en unidades AE que puede sostener el 
 config.ae2wct.InfinityBoosterCfgDesc=Activar infinita gama Booster mejora
 config.ae2wct.EasyModeDesc=Activar el modo f?cil (Recetas m?s f?ciles y Infinity Booster receta)
 config.ae2wct.BoosterDropChance=Oportunidad que marchitar caer? infinito Booster tarjeta (en %-100 = caer siempre)
+config.ae2wct.BoosterDropDisableDesc=Desactivar la gota & la elaboraci?n de la tarjeta de acelerador de infinito
 
 //Achievements
 achievement.wctAchievement=Digital elaboraci?n sobre WiFi
