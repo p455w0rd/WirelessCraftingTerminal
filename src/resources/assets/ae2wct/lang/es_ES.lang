@@ -40,7 +40,7 @@ config.ae2wct.BoosterDropChance=Oportunidad que marchitar caer? infinito Booster
 config.ae2wct.BoosterDropDisableDesc=Desactivar la gota & la elaboraci?n de la tarjeta de acelerador de infinito
 
 //Achievements
-achievement.wctAchievement=Digital elaboraci?n sobre WiFi
+achievement.wctAchievement=Digital elaboraci?n sobre WLAN
 achievement.wctAchievement.desc=Un Wireless Terminal de elaboraci?n del arte
 achievement.boosterAchievement=Saco de fabricaci?n interdimensional
 achievement.boosterAchievement.desc=Adquirir una tarjeta de acelerador de infinito

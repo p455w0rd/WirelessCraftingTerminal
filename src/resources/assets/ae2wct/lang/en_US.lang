@@ -40,7 +40,7 @@ config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Ca
 config.ae2wct.BoosterDropDisableDesc=Disable Drop & Crafting Of The Infinity Booster Card
 
 //Achievements
-achievement.wctAchievement=Digital Crafting Over The WAN
+achievement.wctAchievement=Digital Crafting Over WLAN
 achievement.wctAchievement.desc=Craft a Wireless Crafting Terminal
 achievement.boosterAchievement=Interdimensional Crafting Sack
 achievement.boosterAchievement.desc=Aquire an Infinity Booster Card
