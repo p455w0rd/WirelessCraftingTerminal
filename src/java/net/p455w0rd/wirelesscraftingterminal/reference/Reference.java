@@ -14,6 +14,7 @@ public class Reference {
 	public static boolean WCT_EASYMODE_ENABLED = false;
 	public static int WCT_CRAFTMATRIX_Y_OFFSET = 100;
 	public static int WCT_BOOSTER_DROPCHANCE = 50;
+	public static boolean WCT_BOOSTER_DISABLE_DROP = false;
 	
 	// Gui IDs
 	private static int ae2wctGuiIndex = 0;

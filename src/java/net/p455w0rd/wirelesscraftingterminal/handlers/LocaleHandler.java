@@ -5,7 +5,7 @@ import net.minecraft.util.StatCollector;
 public enum LocaleHandler {
 
 	TitleDesc, InfinityBoosterDesc, WirelessTermLabel("gui.labels.ae2wct"),
-	MaxPowerDesc("config.ae2wct"), InfinityBoosterCfgDesc("config.ae2wct"), EasyModeDesc("config.ae2wct"),
+	MaxPowerDesc("config.ae2wct"), InfinityBoosterCfgDesc("config.ae2wct"), EasyModeDesc("config.ae2wct"), BoosterDropDisableDesc("config.ae2wct"),
 	MagnetDesc, MagnetDesc2, PressShift, OnlyWorks, LinkStatus, Installed, NotInstalled, Active, Inactive,
 	Status, EmptyTrash, EmptyTrashDesc, MagnetFilterTitle, NoNetworkPower("chatmessages.ae2wct"), FilterMode,
 	Whitelisting, Blacklisting, MagnetMode1("chatmessages.ae2wct"), MagnetMode2("chatmessages.ae2wct"), MagnetMode3("chatmessages.ae2wct"),

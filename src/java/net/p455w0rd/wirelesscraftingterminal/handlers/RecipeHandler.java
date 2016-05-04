@@ -39,8 +39,8 @@ public class RecipeHandler {
 					Character.valueOf('c'), "ingotIron",
 					Character.valueOf('d'), new ItemStack(multiMaterial, 1, 28) }));
 						
-			// Is Booster Card Enabled?
-			if (Reference.WCT_BOOSTER_ENABLED) {
+			// Is Booster Card Enabled w/ Crafting?
+			if (Reference.WCT_BOOSTER_ENABLED&&!Reference.WCT_BOOSTER_DISABLE_DROP) {
 				// Infinity Booster Card
 				recipeList.add(new ShapedOreRecipe(ItemEnum.BOOSTER_CARD.getStack(), new Object[] { "abc", "ded", "cba", Character.valueOf('a'), new ItemStack(blockSpatialIO, 1, 0), Character.valueOf('b'), new ItemStack(multiMaterial, 1, 42), Character.valueOf('c'), new ItemStack(blockCraftingStorage, 1, 3), Character.valueOf('d'), new ItemStack(multiMaterial, 1, 48), Character.valueOf('e'), new ItemStack(itemWAP, 1, 0) }));
 			}

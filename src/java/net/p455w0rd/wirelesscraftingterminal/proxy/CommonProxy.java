@@ -138,14 +138,14 @@ public class CommonProxy {
 			*/
 		}
 		else {
-			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE);
+			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE, Reference.WCT_BOOSTER_DISABLE_DROP);
 			NetworkHandler.instance.sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
 
 	@SubscribeEvent
 	public void onMobDrop(LivingDropsEvent event) {
-		if (!Reference.WCT_EASYMODE_ENABLED && Reference.WCT_BOOSTER_ENABLED) {
+		if (!Reference.WCT_EASYMODE_ENABLED && Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_BOOSTER_DISABLE_DROP) {
 			ItemStack stack = new ItemStack(ItemEnum.BOOSTER_CARD.getItem());
 			EntityItem drop = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, stack);
 			if (event.entity instanceof EntityDragon) {
@@ -163,7 +163,7 @@ public class CommonProxy {
 
 	@SubscribeEvent
 	public void pickupEvent(PlayerEvent.ItemPickupEvent e) {
-		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED) {
+		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED && !Reference.WCT_BOOSTER_DISABLE_DROP) {
 			if (e.pickedUp.getEntityItem().getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
 				if (AchievementHandler.isAchievementUnlocked(e.player, wctAch)) {
 					AchievementHandler.triggerAch(boosterAch, e.player);

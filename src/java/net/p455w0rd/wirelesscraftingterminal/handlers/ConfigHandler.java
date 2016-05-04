@@ -21,7 +21,7 @@ public class ConfigHandler {
 	 */
 	public static Configuration config;
 	public static boolean enableInfinityBooster;
-	public static boolean enableEasyMode;
+	public static boolean enableEasyMode, enableBoosterDrop;
 	public static int ae2wctMaxPower = Reference.WCT_MAX_POWER;
 	public static int boosterDropChance = Reference.WCT_BOOSTER_DROPCHANCE;
 	private static boolean doSave;
@@ -48,8 +48,10 @@ public class ConfigHandler {
 		String boosterDesc = LocaleHandler.InfinityBoosterCfgDesc.getLocal();
 		String easyModeDesc = LocaleHandler.EasyModeDesc.getLocal();
 		String boosterDropDesc = LocaleHandler.BoosterDropChance.getLocal();
+		String boosterDropDisableDesc = LocaleHandler.BoosterDropDisableDesc.getLocal();
 		enableInfinityBooster = config.getBoolean("enableInfinityBooster", Configuration.CATEGORY_GENERAL, true, boosterDesc);
 		enableEasyMode = config.getBoolean("enableEasyMode", Configuration.CATEGORY_GENERAL, false, easyModeDesc);
+		enableBoosterDrop = config.getBoolean("enableBoosterDrop", Configuration.CATEGORY_GENERAL,false, boosterDropDisableDesc);
 		/*
 		 * I did the max power cfg loading like this because while using
 		 * Configuration#getInt did enforce the min/max values in-game, it
@@ -95,7 +97,7 @@ public class ConfigHandler {
 		Reference.WCT_EASYMODE_ENABLED = enableEasyMode;
 		Reference.WCT_MAX_POWER = ae2wctMaxPower;
 		Reference.WCT_BOOSTER_DROPCHANCE = boosterDropChance;
-
+        Reference.WCT_BOOSTER_DISABLE_DROP = enableBoosterDrop;
 		if (config.hasChanged() || doSave) {
 			config.save();
 			reloadRecipes();
