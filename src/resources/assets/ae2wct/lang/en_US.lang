@@ -39,7 +39,7 @@ config.ae2wct.EasyModeDesc=Enable Easy Mode (Easier Recipes+Infinity Booster Rec
 config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
 
 //Achievements
-achievement.wctAchievement=Digital Crafting Over WiFi
+achievement.wctAchievement=Digital Crafting Over The WAN
 achievement.wctAchievement.desc=Craft a Wireless Crafting Terminal
 achievement.boosterAchievement=Interdimensional Crafting Sack
 achievement.boosterAchievement.desc=Aquire an Infinity Booster Card
