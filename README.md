@@ -30,7 +30,9 @@ Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter
 
 ## License
 
-* TODO
+I'm a huge fan of Open Source software as well as helping people learn.
+As far as licensing, do what you want. Claim it as your own if you so wish. I don't care =D If you become popular/rich/get a hot wife due to claiming that you made my mod,
+I'm just glad I could help make another person's life better in some way.
 
 ## Downloads
 
@@ -92,5 +94,6 @@ I would love for someone to do translations for me =]
 
 Thanks to the following people for support, code, et al
  
-* Notch, brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz
+* Code/tutorials/general help: Notch, @brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz
 
+* Contributors: @condensedapple
