@@ -778,7 +778,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 				}
 			}
 		}
-		if (Platform.isServer()) {
+		//if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
 			if (!isInRange()) {
 				if (!isBoosterInstalled() || !Reference.WCT_BOOSTER_ENABLED) {
 					if (this.isValidContainer()) {
@@ -802,7 +802,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 			else {
 				this.setPowerMultiplier(AEConfig.instance.wireless_getDrainRate(this.obj.getRange()));
 			}
-		}
+		//}
 		super.detectAndSendChanges();
 	}
 
@@ -914,14 +914,11 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	protected boolean networkIsPowered() {
 		final WCTIActionHost host = this.getActionHost();
 		if (host != null) {
-			final IGridNode gn = host.getActionableNode(Reference.WCT_BOOSTER_ENABLED && this.isBoosterInstalled());
-			if (gn != null) {
-				final IGrid g = gn.getGrid();
-				if (g != null) {
-					final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-					if (eg.isNetworkPowered()) {
-						return true;
-					}
+			final IGrid grid = this.obj.getTargetGrid();
+			if (grid != null) {
+				final IEnergyGrid eg = grid.getCache(IEnergyGrid.class);
+				if (eg.isNetworkPowered()) {
+					return true;
 				}
 			}
 		}

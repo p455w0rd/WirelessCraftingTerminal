@@ -5,12 +5,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerMagnet;
 
 public class WCTInventoryMagnetFilter implements IInventory {
 
 	private String name = "MagnetFilter";
 	private final ItemStack invItem;
 	private ItemStack[] inventory;
+	private ContainerMagnet container;
 
 	public WCTInventoryMagnetFilter(ItemStack stack) {
 		super();
@@ -21,6 +23,8 @@ public class WCTInventoryMagnetFilter implements IInventory {
 		}
 		readFromNBT(stack.getTagCompound());
 	}
+	
+	public void setContainer(ContainerMagnet container) { this.container = container; }
 
 	@Override
 	public int getSizeInventory() {
@@ -90,6 +94,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 	@Override
 	public void markDirty() {
 		writeNBT(invItem.getTagCompound());
+		container.detectAndSendChanges();
 	}
 	
 	@Override

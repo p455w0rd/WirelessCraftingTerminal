@@ -66,7 +66,6 @@ public class RandomUtils {
 		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemMagnet) {
 			return playerInv.player.getHeldItem();
 		}
-		int invSize = playerInv.getSizeInventory();
 		// if not true, try to return first magnet card from first
 		// wireless term that has a MagnetCard installed
 		ItemStack wirelessTerm = getWirelessTerm(playerInv);
@@ -82,6 +81,7 @@ public class RandomUtils {
 		}
 		// No wireless crafting terminal with Magnet Card installed,
 		// is there a Magnet Card in the player's inventory?
+		int invSize = playerInv.getSizeInventory();
 		ItemStack magnetItem = null;
 		if (invSize <= 0) {
 			return null;
@@ -97,6 +97,40 @@ public class RandomUtils {
 			}
 		}
 		return magnetItem;
+	}
+	
+	public static boolean isMagnetInitialized(ItemStack magnetItem) {
+		if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+			if (magnetItem.hasTagCompound()) {
+				if (magnetItem.getTagCompound().hasKey("Initialized")) {
+					return magnetItem.getTagCompound().getBoolean("Initialized");						
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isMagnetInstalled(InventoryPlayer ip) {
+		NBTTagCompound magnetNBTForm = RandomUtils.getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
+		if (magnetNBTForm != null) {
+			ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
+			if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean readBoolean(ItemStack is, String key) {
+		return (is.hasTagCompound() ? is.getTagCompound().getBoolean(key) : false);
+	}
+	
+	public static int readInt(ItemStack is, String key) {
+		return (is.hasTagCompound() ? is.getTagCompound().getInteger(key) : 0);
+	}
+	
+	public static ItemStack readStack(NBTTagCompound nbtTC, String key) {
+		return (nbtTC.hasKey(key) ? ItemStack.loadItemStackFromNBT(nbtTC) : null);
 	}
 
 }

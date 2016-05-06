@@ -18,7 +18,7 @@ import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 public class ContainerMagnet extends Container {
 
 	public final InventoryPlayer inventoryPlayer;
-	public ItemStack heldItem;
+	public ItemStack magnetItem;
 	public WCTInventoryMagnetFilter magnetInventory;
 	private int distributeState = 0;
 	private int pressedKeyInRange = -1;
@@ -29,25 +29,25 @@ public class ContainerMagnet extends Container {
 
 	public ContainerMagnet(EntityPlayer player, InventoryPlayer inventoryPlayer) {
 		this.inventoryPlayer = inventoryPlayer;
-		this.heldItem = RandomUtils.getMagnet(inventoryPlayer);
-		this.magnetInventory = new WCTInventoryMagnetFilter(heldItem);
-
+		this.magnetItem = RandomUtils.getMagnet(inventoryPlayer);
+		this.magnetInventory = new WCTInventoryMagnetFilter(magnetItem);
+		this.magnetInventory.setContainer(this);
 		// Add player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				this.addSlotToContainer(new Slot(this.inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 86 + i * 18));
+				this.addSlotToContainer(new Slot(this.inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 126 + i * 18));
 			}
 		}
 
 		// Add hotbar slots
 		for (int i = 0; i < 9; ++i) {
-			this.addSlotToContainer(new Slot(this.inventoryPlayer, i, i * 18 + 8, 144));
+			this.addSlotToContainer(new Slot(this.inventoryPlayer, i, i * 18 + 8, 184));
 		}
 
 		// Add filter slots
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				this.addSlotToContainer(new SlotMagnetFilter(this.magnetInventory, j + i * 9, j * 18 + 8, 18 + i * 18));
+				this.addSlotToContainer(new SlotMagnetFilter(this.magnetInventory, j + i * 9, j * 18 + 8, 58 + i * 18));
 			}
 		}
 	}

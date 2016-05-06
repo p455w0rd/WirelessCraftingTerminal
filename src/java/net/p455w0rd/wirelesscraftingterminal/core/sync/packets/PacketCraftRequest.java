@@ -6,17 +6,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftConfirm;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridHost;
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
 
@@ -49,13 +46,7 @@ public class PacketCraftRequest extends WCTPacket {
 			final ContainerCraftAmount cca = (ContainerCraftAmount) player.openContainer;
 			final Object target = cca.getTarget();
 			if (target instanceof IGridHost) {
-				final IGridHost gh = (IGridHost) target;
-				final IGridNode gn = gh.getGridNode(ForgeDirection.UNKNOWN);
-				if (gn == null) {
-					return;
-				}
-
-				final IGrid g = gn.getGrid();
+				final IGrid g = cca.obj2.getTargetGrid();
 				if (g == null || cca.getItemToCraft() == null) {
 					return;
 				}
@@ -84,7 +75,7 @@ public class PacketCraftRequest extends WCTPacket {
 					if (futureJob != null) {
 						futureJob.cancel(true);
 					}
-					WCTLog.debug(e.getLocalizedMessage());
+					//WCTLog.debug(e.getLocalizedMessage());
 				}
 			}
 		}

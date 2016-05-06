@@ -3,12 +3,14 @@ package net.p455w0rd.wirelesscraftingterminal.proxy;
 import java.util.Random;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
@@ -39,10 +41,10 @@ public class CommonProxy {
 	Achievement magnetAch = AchievementHandler.magnetAch;
 
 	public CommonProxy() {
-		MinecraftForge.EVENT_BUS.register( this );
+		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().bus().register(new ConfigHandler());
 	}
-	
+
 	public void registerItems() {
 		for (ItemEnum item : ItemEnum.VALUES) {
 			GameRegistry.registerItem(item.getItem(), item.getInternalName());
@@ -107,7 +109,6 @@ public class CommonProxy {
 		}
 	}
 
-
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
 		// SSP Login
@@ -128,14 +129,17 @@ public class CommonProxy {
 			// it was giving me too much of a headache..maybe
 			// i'll implement in the future
 			/*
-			AchievementPage achPg = AchievementPage.getAchievementPage("Wireless Crafting Term");
-			if (achPg != null && AchievementList.achievementList.contains(AchievementHandler.boosterAch) && !achPg.getAchievements().contains(AchievementHandler.boosterAch)) {
-				AchievementList.achievementList.remove(AchievementHandler.boosterAch);
-			}
-			if ((Reference.WCT_BOOSTER_ENABLED && hasWCTAch) || hasBoosterAch) {
-				AchievementHandler.addAchievementToPage(AchievementHandler.boosterAch, true, e.player);
-			}
-			*/
+			 * AchievementPage achPg = AchievementPage.getAchievementPage(
+			 * "Wireless Crafting Term"); if (achPg != null &&
+			 * AchievementList.achievementList.contains(AchievementHandler.
+			 * boosterAch) &&
+			 * !achPg.getAchievements().contains(AchievementHandler.boosterAch))
+			 * { AchievementList.achievementList.remove(AchievementHandler.
+			 * boosterAch); } if ((Reference.WCT_BOOSTER_ENABLED && hasWCTAch)
+			 * || hasBoosterAch) {
+			 * AchievementHandler.addAchievementToPage(AchievementHandler.
+			 * boosterAch, true, e.player); }
+			 */
 		}
 		else {
 			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE);
@@ -145,7 +149,7 @@ public class CommonProxy {
 
 	@SubscribeEvent
 	public void onMobDrop(LivingDropsEvent event) {
-		if (!Reference.WCT_EASYMODE_ENABLED && Reference.WCT_BOOSTER_ENABLED) {
+		if (!Reference.WCT_EASYMODE_ENABLED && Reference.WCT_BOOSTER_ENABLED && Reference.WCT_BOOSTERDROP_ENABLED) {
 			ItemStack stack = new ItemStack(ItemEnum.BOOSTER_CARD.getItem());
 			EntityItem drop = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, stack);
 			if (event.entity instanceof EntityDragon) {
@@ -171,47 +175,54 @@ public class CommonProxy {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void onPlayerCraftingEvent(final PlayerEvent.ItemCraftedEvent event) {
-		if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
-			boolean hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
-			if (event.player == null || event.player.isDead || event.player instanceof FakePlayer || event.crafting == null) {
+		if (event.player == null || event.player.isDead || event.player instanceof FakePlayer || event.crafting == null) {
+			return;
+		}
+		if (Loader.isModLoaded("LogisticsPipes")) {
+			if (event.player instanceof logisticspipes.blocks.crafting.FakePlayer) {
 				return;
 			}
-			if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
-				AchievementHandler.triggerAch(wctAch, event.player);
-			}
-			if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
-				AchievementHandler.triggerAch(magnetAch, event.player);
-			}
-		/*
+		}
+		boolean hasWCTAch = false;
+		if (event.player instanceof EntityPlayerMP) {
+			hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
+		}
+		if (event.player instanceof EntityClientPlayerMP) {
+			hasWCTAch = ((EntityClientPlayerMP) event.player).getStatFileWriter().hasAchievementUnlocked(AchievementHandler.wctAch);
+		}
 		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
 			AchievementHandler.triggerAch(wctAch, event.player);
-			if (Reference.WCT_BOOSTER_ENABLED) {
-				AchievementHandler.addAchievementToPage(AchievementHandler.boosterAch, true, event.player);
-			}
 		}
-		*/
-			if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED && hasWCTAch) {
-				if (event.crafting.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
-					AchievementHandler.triggerAch(boosterAch, event.player);
-				}
+		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
+			AchievementHandler.triggerAch(magnetAch, event.player);
+		}
+		/*
+		 * if (event.crafting.getItem() ==
+		 * ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
+		 * AchievementHandler.triggerAch(wctAch, event.player); if
+		 * (Reference.WCT_BOOSTER_ENABLED) {
+		 * AchievementHandler.addAchievementToPage(AchievementHandler.
+		 * boosterAch, true, event.player); } }
+		 */
+		if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED && hasWCTAch) {
+			if (event.crafting.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
+				AchievementHandler.triggerAch(boosterAch, event.player);
 			}
 		}
 	}
-	
+
 	/*
-	@SubscribeEvent
-	public void achievementGetEvent(AchievementEvent event) {
-		int index = AchievementList.achievementList.indexOf(wctAch);
-		if (event.achievement.equals(AchievementList.achievementList.get(index))) {
-			if (Reference.WCT_BOOSTER_ENABLED) {
-				EnumChatFormatting purple = EnumChatFormatting.LIGHT_PURPLE;
-				EnumChatFormatting green = EnumChatFormatting.GREEN;
-				event.entityPlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.ITALIC + "" + purple + "[" + green + "Wireless Crafting Terminal" + purple + "]: " + green + " New" + purple + " Achievment" + green + " Unlocked" + purple + "!"));
-			}
-		}
-	}
-	*/
+	 * @SubscribeEvent public void achievementGetEvent(AchievementEvent event) {
+	 * int index = AchievementList.achievementList.indexOf(wctAch); if
+	 * (event.achievement.equals(AchievementList.achievementList.get(index))) {
+	 * if (Reference.WCT_BOOSTER_ENABLED) { EnumChatFormatting purple =
+	 * EnumChatFormatting.LIGHT_PURPLE; EnumChatFormatting green =
+	 * EnumChatFormatting.GREEN; event.entityPlayer.addChatMessage(new
+	 * ChatComponentText(EnumChatFormatting.ITALIC + "" + purple + "[" + green +
+	 * "Wireless Crafting Terminal" + purple + "]: " + green + " New" + purple +
+	 * " Achievment" + green + " Unlocked" + purple + "!")); } } }
+	 */
 }

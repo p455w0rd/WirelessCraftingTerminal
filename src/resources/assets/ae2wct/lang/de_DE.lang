@@ -36,7 +36,8 @@ gui.labels.ae2wct.WirelessTermLabel=Drahtloskonsole
 config.ae2wct.MaxPowerDesc=In der Drahtloskonsole maximal speicherbare Energie in AE
 config.ae2wct.InfinityBoosterCfgDesc=Erlaube das unendliche Drahtlosverstärkerupgrade
 config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte + Rezept für unendlichen Drahtlosverstärker)
-config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
+config.ae2wct.BoosterDropChance=Wahrscheinlichkeit, dass ein Wither eine unendliche Drahtlosverstärkerkarte dropt (in % - 100=immer)
+config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
 
 //Achievements
 achievement.wctAchievement=Digitales Fertigen über WLAN
@@ -51,6 +52,7 @@ chatmessages.ae2wct.NoNetworkPower=Netzwerk hat keine Energie!
 chatmessages.ae2wct.MagnetMode1=Magnetkarte deaktiviert
 chatmessages.ae2wct.MagnetMode2=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden im Inventar platziert
 chatmessages.ae2wct.MagnetMode3=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden auf dem Boden liegen gelassen
+chatmessages.ae2wct.InitializeMagnet=Vor dem Benutzen des Tastenkürzels muss zuerst mit der Magnetkarte in der Hand ein Rechtsklick ausgeführt werden!
 
 //Keybindings
 key.OpenTerminal=Öffne drahtlose Fertigungskonsole

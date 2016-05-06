@@ -13,7 +13,6 @@ import appeng.api.AEApi;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.implementations.guiobjects.IPortableCell;
 import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
@@ -39,11 +38,14 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.oredict.OreDictionary;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilter;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
@@ -84,7 +86,7 @@ public class ItemMagnet extends Item {
 	public void setItemStack(ItemStack is) {
 		this.thisItemStack = is;
 	}
-	
+
 	@Override
 	public boolean isDamageable() {
 		return false;
@@ -120,7 +122,7 @@ public class ItemMagnet extends Item {
 			else if (is.getItemDamage() == 2) {
 				list.add(color("white") + "  " + LocaleHandler.MagnetActiveDesc2.getLocal());
 			}
-			
+
 			String white = LocaleHandler.Whitelisting.getLocal();
 			String black = LocaleHandler.Blacklisting.getLocal();
 
@@ -156,6 +158,9 @@ public class ItemMagnet extends Item {
 				switchMagnetMode(item, player);
 			}
 			else {
+				if (!RandomUtils.isMagnetInitialized(item)) {
+					NetworkHandler.instance.sendToServer(new PacketMagnetFilter(0, true));
+				}
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
@@ -164,7 +169,7 @@ public class ItemMagnet extends Item {
 		}
 		return item;
 	}
-	
+
 	public void switchMagnetMode(ItemStack item, EntityPlayer player) {
 		if (item.getItemDamage() == 0) {
 			item.setItemDamage(1);
@@ -192,7 +197,7 @@ public class ItemMagnet extends Item {
 			return;
 		if (player == null)
 			return;
-		
+
 		List<ItemStack> filteredList = getFilteredItems(this.getItemStack());
 		// items
 		Iterator iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
@@ -203,9 +208,11 @@ public class ItemMagnet extends Item {
 
 			EntityItemPickupEvent pickupEvent = new EntityItemPickupEvent(player, itemToGet);
 			ItemPickupEvent itemPickupEvent = new ItemPickupEvent(player, itemToGet);
-			MinecraftForge.EVENT_BUS.post(pickupEvent);
 			ItemStack itemStackToGet = itemToGet.getEntityItem();
 			int stackSize = itemStackToGet.stackSize;
+
+			MinecraftForge.EVENT_BUS.post(pickupEvent);
+			FMLCommonHandler.instance().bus().post(itemPickupEvent);
 
 			if (this.obj == null) {
 				this.obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
@@ -216,7 +223,9 @@ public class ItemMagnet extends Item {
 				this.mySrc = new WCTPlayerSource(player, (WCTIActionHost) this.obj);
 			}
 
-			if (obj.rangeCheck(isBoosterInstalled(wirelessTerm) && Reference.WCT_BOOSTER_ENABLED) && hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm)) {
+			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && Reference.WCT_BOOSTER_ENABLED);
+			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);
+			if ((ignoreRange && hasAxxess) || (obj.rangeCheck(false) && hasAxxess)) {
 				IAEItemStack ais = AEApi.instance().storage().createItemStack(itemStackToGet);
 				ais.setStackSize(stackSize);
 				if (!itemToGet.isDead) {
@@ -225,7 +234,7 @@ public class ItemMagnet extends Item {
 					if (getMode(this.getItemStack())) {
 						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
 							itemToGet.setDead();
-							doInject(ais, pickupEvent, stackSize, player, itemToGet, itemStackToGet, world);
+							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
 							continue;
 						}
 						else {
@@ -234,7 +243,9 @@ public class ItemMagnet extends Item {
 									player.onItemPickup(itemToGet, stackSize);
 									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 								}
-								FMLCommonHandler.instance().bus().post(itemPickupEvent);
+							}
+							else {
+								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
 							}
 						}
 					}
@@ -242,7 +253,7 @@ public class ItemMagnet extends Item {
 					else {
 						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() <= 0) {
 							itemToGet.setDead();
-							doInject(ais, pickupEvent, stackSize, player, itemToGet, itemStackToGet, world);
+							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
 							continue;
 						}
 						else {
@@ -251,18 +262,17 @@ public class ItemMagnet extends Item {
 									player.onItemPickup(itemToGet, stackSize);
 									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 								}
-								FMLCommonHandler.instance().bus().post(itemPickupEvent);
+							}
+							else {
+								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
 							}
 						}
 					}
-
 				}
 			}
+			// network isn't powered, WCT has no power, too far away with no booster installed..something is preventing use of WCT, so use niller cannix
 			else {
-				if (pickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
-					player.onItemPickup(itemToGet, stackSize);
-					world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-				}
+				doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
 			}
 		}
 
@@ -282,35 +292,68 @@ public class ItemMagnet extends Item {
 			world.playSoundAtEntity(player, "random.orb", 0.08F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
 		}
 	}
-
-	private void doInject(IAEItemStack ais, EntityItemPickupEvent pickupEvent, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
-		ais = Platform.poweredInsert(this.powerSrc, this.cellInv, ais, this.mySrc);
-		if (ais != null) {
-			if (pickupEvent.getResult() == Result.ALLOW || stackSize <= 0) {
+	
+	private void doVanillaPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
+		if (itemToGet.getDistanceToEntity(player) <= 2.0F) {
+			if (player.inventory.addItemStackToInventory(itemStackToGet)) {
 				player.onItemPickup(itemToGet, stackSize);
-				player.inventory.addItemStackToInventory(itemStackToGet);
 				world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 			}
 		}
 	}
 
-	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
-		final WCTIActionHost host = (WCTIActionHost) this.obj;
+	private boolean doesMagnetIgnoreNBT() {
+		return RandomUtils.readBoolean(this.getItemStack(), "IgnoreNBT");
+	}
 
-		if (host != null) {
-			final IGridNode gn = host.getActionableNode(Reference.WCT_BOOSTER_ENABLED && this.isBoosterInstalled(wirelessTerm));
-			if (gn != null) {
-				final IGrid g = gn.getGrid();
-				if (g != null) {
-					if (requirePower) {
-						final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-						if (!eg.isNetworkPowered()) {
-							return false;
-						}
+	private boolean doesMagnetIgnoreMeta() {
+		return RandomUtils.readBoolean(this.getItemStack(), "IgnoreMeta");
+	}
+
+	private boolean doesMagnetUseOreDict() {
+		return RandomUtils.readBoolean(this.getItemStack(), "UseOreDict");
+	}
+
+	private boolean areOresEqual(ItemStack is1, ItemStack is2) {
+		int[] list1 = OreDictionary.getOreIDs(is1);
+		int[] list2 = OreDictionary.getOreIDs(is2);
+		for (int i = 0; i < list1.length; i++) {
+			for (int j = 0; j < list2.length; j++) {
+				if (list1[i] == list2[j]) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
+		if (is != null && itemList != null) {
+			for (int i = 0; i < itemList.size(); i++) {
+				ItemStack thisStack = (ItemStack) itemList.get(i);
+				if (doesMagnetUseOreDict()) {
+					if (areOresEqual(is, thisStack)) {
+					//if (OreDictionary.itemMatches(is, thisStack, false)) {
+						return true;
 					}
-
-					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-					if (sg.hasPermission(player, perm)) {
+				}
+				if (doesMagnetIgnoreMeta() && doesMagnetIgnoreNBT()) {
+					if (is.getItem().equals(thisStack.getItem()) && (is.getItem() == thisStack.getItem())) {
+						return true;
+					}
+				}
+				else if (doesMagnetIgnoreMeta() && !doesMagnetIgnoreNBT()) {
+					if (ItemStack.areItemStackTagsEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
+						return true;
+					}
+				}
+				else if (!doesMagnetIgnoreMeta() && doesMagnetIgnoreNBT()) {
+					if (isMetaEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
+						return true;
+					}
+				}
+				else {
+					if (isMetaEqual(is, thisStack) && ItemStack.areItemStackTagsEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
 						return true;
 					}
 				}
@@ -319,22 +362,32 @@ public class ItemMagnet extends Item {
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
-	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
-		if (is != null && itemList != null) {
-			Iterator thisList = itemList.iterator();
-			while (thisList.hasNext()) {
-				ItemStack thisItemStack = (ItemStack) thisList.next();
-				Item thisItem = (Item) thisItemStack.getItem();
-				if (is.getItem() == thisItem) {
-					return true;
+	private boolean isMetaEqual(ItemStack is1, ItemStack is2) {
+		return is1.getItemDamage() == is2.getItemDamage();
+	}
+
+	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
+		final IGrid g = this.obj.getTargetGrid();
+		if (g != null) {
+			if (requirePower) {
+				final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
+				if (!eg.isNetworkPowered()) {
+					return false;
 				}
+			}
+
+			final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
+			if (sg.hasPermission(player, perm)) {
+				return true;
 			}
 		}
 		return false;
 	}
 
 	private List<ItemStack> getFilteredItems(ItemStack magnetItem) {
+		if (magnetItem == null) {
+			return null;
+		}
 		if (magnetItem.getItem() instanceof ItemMagnet) {
 			if (magnetItem.hasTagCompound()) {
 				NBTTagCompound nbtTC = magnetItem.getTagCompound();
@@ -352,6 +405,15 @@ public class ItemMagnet extends Item {
 			}
 		}
 		return null;
+	}
+
+	private void doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
+		ais = Platform.poweredInsert(this.powerSrc, this.cellInv, ais, this.mySrc);
+		if (ais != null) {
+			player.onItemPickup(itemToGet, stackSize);
+			player.inventory.addItemStackToInventory(itemStackToGet);
+			world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+		}
 	}
 
 	private boolean isBoosterInstalled(ItemStack wirelessTerm) {

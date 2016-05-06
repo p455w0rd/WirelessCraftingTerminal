@@ -32,7 +32,7 @@ import appeng.api.util.IConfigManager;
 import appeng.container.interfaces.IInventorySlotAware;
 import appeng.tile.networking.TileWireless;
 
-public class WirelessTerminalGuiObject implements IPortableCell, IActionHost, IInventorySlotAware, WCTIActionHost {
+public class WirelessTerminalGuiObject implements IActionHost, IPortableCell, IInventorySlotAware, WCTIActionHost {
 
 	private final ItemStack effectiveItem;
 	private final IWirelessTermHandler wth;

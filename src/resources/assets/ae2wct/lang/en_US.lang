@@ -37,6 +37,7 @@ config.ae2wct.MaxPowerDesc=Maximum Power in AE units the wireless terminal can h
 config.ae2wct.InfinityBoosterCfgDesc=Enable Infinite Range Booster Upgrade
 config.ae2wct.EasyModeDesc=Enable Easy Mode (Easier Recipes+Infinity Booster Recipe)
 config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
+config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
 
 //Achievements
 achievement.wctAchievement=Digital Crafting Over WiFi
@@ -51,6 +52,7 @@ chatmessages.ae2wct.NoNetworkPower=Network has no power!
 chatmessages.ae2wct.MagnetMode1=Magnet Card Deactivated
 chatmessages.ae2wct.MagnetMode2=Magnet Card Activated - Items not stored in AE network will be placed in inventory
 chatmessages.ae2wct.MagnetMode3=Magnet Card Activated - Items not stored in AE network will be left on ground
+chatmessages.ae2wct.InitializeMagnet=You must first right-click with the Magnet Card in hand before using the keybind!
 
 //Keybindings
 key.OpenTerminal=Open Wireless Crafting Terminal

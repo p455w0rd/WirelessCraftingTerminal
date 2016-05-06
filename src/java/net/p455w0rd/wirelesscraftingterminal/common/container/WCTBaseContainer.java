@@ -21,7 +21,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
@@ -34,17 +36,18 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFake;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotInaccessible;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotPlayerHotBar;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotPlayerInv;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAction;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
+import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.implementations.guiobjects.IGuiItemObject;
 import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
@@ -69,6 +72,7 @@ public abstract class WCTBaseContainer extends Container {
 	private final TileEntity tileEntity;
 	private final IPart part;
 	public final IGuiItemObject obj;
+	public final WirelessTerminalGuiObject obj2;
 	private final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
 	private final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
 	private boolean isContainerValid = true;
@@ -89,8 +93,21 @@ public abstract class WCTBaseContainer extends Container {
 		this.tileEntity = myTile;
 		this.part = myPart;
 		this.obj = gio;
+		EntityPlayer player = ip.player;
+		this.obj2 = getGuiObject(RandomUtils.getWirelessTerm(ip), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		this.mySrc = new WCTPlayerSource(ip.player, this.getActionHost());
 		this.prepareSync();
+	}
+
+	protected WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+		if (it != null) {
+			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			if (wh != null) {
+				return new WirelessTerminalGuiObject(wh, it, player, w, x, y, z);
+			}
+		}
+
+		return null;
 	}
 
 	protected WCTIActionHost getActionHost() {
@@ -128,6 +145,9 @@ public abstract class WCTBaseContainer extends Container {
 		this.tileEntity = anchor instanceof TileEntity ? (TileEntity) anchor : null;
 		this.part = anchor instanceof IPart ? (IPart) anchor : null;
 		this.obj = anchor instanceof IGuiItemObject ? (IGuiItemObject) anchor : null;
+
+		EntityPlayer player = ip.player;
+		this.obj2 = getGuiObject(RandomUtils.getWirelessTerm(ip), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 
 		if (this.tileEntity == null && this.part == null && this.obj == null) {
 			throw new IllegalArgumentException("Must have a valid anchor, instead " + anchor + " in " + ip);
@@ -245,28 +265,17 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
-		final WCTIActionHost host = this.getActionHost();
-
-		if (host != null) {
-			final IGridNode gn = host.getActionableNode();
-			if (gn != null) {
-				final IGrid g = gn.getGrid();
-				if (g != null) {
-					if (requirePower) {
-						final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-						if (!eg.isNetworkPowered()) {
-							return false;
-						}
-					}
-
-					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-					if (sg.hasPermission(this.getInventoryPlayer().player, perm)) {
-						return true;
-					}
-				}
+		final IGrid grid = this.obj2.getTargetGrid();
+		if (grid != null) {
+			final IEnergyGrid eg = grid.getCache(IEnergyGrid.class);
+			if (!eg.isNetworkPowered()) {
+				return false;
 			}
 		}
-
+		final ISecurityGrid sg = grid.getCache(ISecurityGrid.class);
+		if (sg.hasPermission(this.getInventoryPlayer().player, perm)) {
+			return true;
+		}
 		return false;
 	}
 
@@ -281,8 +290,8 @@ public abstract class WCTBaseContainer extends Container {
 		if (this.part != null) {
 			return this.part;
 		}
-		if (this.obj != null) {
-			return this.obj;
+		if (this.obj2 != null) {
+			return this.obj2;
 		}
 		return null;
 	}

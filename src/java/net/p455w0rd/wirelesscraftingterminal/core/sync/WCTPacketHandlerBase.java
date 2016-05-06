@@ -12,14 +12,14 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketCraftReques
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketEmptyTrash;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAction;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilterMode;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilter;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchMagnetMode;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetMagnet;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 
@@ -43,11 +43,11 @@ public class WCTPacketHandlerBase {
 
 		PACKET_CRAFTING_REQUEST(PacketCraftRequest.class),
 
-		PACKET_MAGNETFILTER_MODE(PacketMagnetFilterMode.class),
+		PACKET_MAGNETFILTER_MODE(PacketMagnetFilter.class),
 
 		PACKET_OPENWIRELESSTERM(PacketOpenGui.class),
 		
-		PACKET_SWITCHMAGNETMODE(PacketSwitchMagnetMode.class),
+		PACKET_SWITCHMAGNETMODE(PacketSetMagnet.class),
 		
 		PACKET_EMPTY_TRASH(PacketEmptyTrash.class),
 		

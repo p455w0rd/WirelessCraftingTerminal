@@ -13,12 +13,12 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchMagnetMode;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetMagnet;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -60,14 +60,20 @@ public class KeybindHandler {
 			else if (openMagnetFilter.isPressed()) {
 				ItemStack magnetItem = RandomUtils.getMagnet(p.inventory);
 				//ensure player has a Wireless Crafting Terminal (with Magnet Card Installed) or Magnet Card in their inventory
-				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+				//and that they have manually right=clicked it to initialize it
+				if (RandomUtils.isMagnetInitialized(magnetItem)) {
 					NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_MAGNET));
 				}
+				else {
+					p.addChatMessage(new ChatComponentText(LocaleHandler.InitializeMagnet.getLocal()));
+				}
+
 			}
+
 			else if (changeMagnetMode.isPressed()) {
 				ItemStack magnetItem = RandomUtils.getMagnet(p.inventory);
 				if (magnetItem != null) {
-					NetworkHandler.instance.sendToServer(new PacketSwitchMagnetMode(magnetItem.getItemDamage()));
+					NetworkHandler.instance.sendToServer(new PacketSetMagnet(magnetItem.getItemDamage()));
 				}
 			}
 			else {

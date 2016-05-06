@@ -24,6 +24,7 @@ import com.google.common.base.Stopwatch;
 import appeng.api.config.ActionItems;
 import appeng.api.config.SearchBoxMode;
 import appeng.api.config.Settings;
+import appeng.api.config.TerminalStyle;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
@@ -128,6 +129,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	private GuiImgButton searchBoxSettings;
 	private GuiImgButton clearBtn;
 	private GuiTrashButton trashBtn;
+	private GuiImgButton terminalStyleBox;
 	public boolean devicePowered = false;
 	private boolean isNEIEnabled;
 	private boolean wasTextboxFocused = false;
@@ -188,6 +190,10 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				final Enum cv = iBtn.getCurrentValue();
 				final Enum next = Platform.rotateEnum(cv, backwards, iBtn.getSetting().getPossibleValues());
 
+				if( btn == this.terminalStyleBox )
+				{
+					AEConfig.instance.settings.putSetting( iBtn.getSetting(), next );
+				}
 				if (btn == this.searchBoxSettings) {
 					AEConfig.instance.settings.putSetting(iBtn.getSetting(), next);
 				}
@@ -202,7 +208,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 				iBtn.set(next);
 
-				if (next.getClass() == SearchBoxMode.class) {
+				if (next.getClass() == SearchBoxMode.class || next.getClass() == TerminalStyle.class) {
 					this.reinitalize();
 				}
 			}
@@ -234,8 +240,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				if (s != null) {
 					if (s.getHasStack()) {
 						containerWCT.trashSlot.clearStack();
-						final PacketEmptyTrash p = new PacketEmptyTrash();
-						NetworkHandler.instance.sendToServer(p);
+						NetworkHandler.instance.sendToServer(new PacketEmptyTrash());
 					}
 				}
 			}
@@ -293,6 +298,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		this.maxRows = this.getMaxRows();
+		this.perRow = AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) != TerminalStyle.FULL ? 9 : 9 + ( ( this.width - this.standardSize ) / 18 );
 		this.isNEIEnabled = IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI);
 		int top = isNEIEnabled ? 22 : 0;
 		final int magicNumber = 114 + 1;
@@ -317,7 +323,14 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				this.getMeSlots().add(new InternalSlotME(this.repo, x + y * this.perRow, this.offsetX + x * 18, 18 + y * 18));
 			}
 		}
-		this.xSize = this.standardSize;
+		if( AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) != TerminalStyle.FULL )
+		{
+			this.xSize = this.standardSize + ( ( this.perRow - 9 ) * 18 );
+		}
+		else
+		{
+			this.xSize = this.standardSize;
+		}
 		super.initGui();
 
 		this.ySize = magicNumber + this.rows * 18 + this.reservedSpace;
@@ -354,6 +367,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 		this.buttonList.add(this.searchBoxSettings = new GuiImgButton(this.guiLeft - 18, offset, Settings.SEARCH_MODE, AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE)));
 		offset += 20;
+		
+		this.buttonList.add( this.terminalStyleBox = new GuiImgButton( this.guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance.settings.getSetting( Settings.TERMINAL_STYLE ) ) );
 
 		this.searchField = new MEGuiTextField(this.fontRendererObj, SEARCH_X, SEARCH_Y, SEARCH_WIDTH, SEARCH_HEIGHT);
 
@@ -404,7 +419,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	}
 
 	int getMaxRows() {
-		return Integer.MAX_VALUE;
+		return AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) == TerminalStyle.SMALL ? 6 : Integer.MAX_VALUE;
 	}
 
 	protected void repositionSlot(final AppEngSlot s) {

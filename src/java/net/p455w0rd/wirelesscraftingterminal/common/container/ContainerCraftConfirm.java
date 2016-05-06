@@ -292,8 +292,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer
 
 	private IGrid getGrid()
 	{
-		final WCTIActionHost h = ( (WCTIActionHost) this.getTarget() );
-		return h.getActionableNode().getGrid();
+		return this.obj2.getTargetGrid();
 	}
 
 	private boolean cpuMatches( final ICraftingCPU c )
