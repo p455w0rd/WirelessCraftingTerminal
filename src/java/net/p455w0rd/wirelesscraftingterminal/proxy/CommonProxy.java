@@ -183,10 +183,10 @@ public class CommonProxy {
 			}
 		}
 		boolean hasWCTAch = false;
-		if (event.player instanceof EntityPlayerMP) {
+		if (!event.player.worldObj.isRemote) {
 			hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
 		}
-		if (event.player instanceof EntityClientPlayerMP) {
+		else {
 			hasWCTAch = ((EntityClientPlayerMP) event.player).getStatFileWriter().hasAchievementUnlocked(AchievementHandler.wctAch);
 		}
 		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
