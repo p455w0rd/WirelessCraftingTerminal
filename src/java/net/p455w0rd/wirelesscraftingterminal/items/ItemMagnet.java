@@ -197,7 +197,7 @@ public class ItemMagnet extends Item {
 			return;
 		if (player == null)
 			return;
-
+	
 		List<ItemStack> filteredList = getFilteredItems(this.getItemStack());
 		// items
 		Iterator iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
@@ -367,6 +367,9 @@ public class ItemMagnet extends Item {
 	}
 
 	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
+		if (player.capabilities.isCreativeMode) {
+			return true;
+		}
 		final IGrid g = this.obj.getTargetGrid();
 		if (g != null) {
 			if (requirePower) {

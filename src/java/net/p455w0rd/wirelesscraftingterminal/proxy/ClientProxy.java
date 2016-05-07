@@ -1,13 +1,11 @@
 package net.p455w0rd.wirelesscraftingterminal.proxy;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
-import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
-import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
-import net.p455w0rd.wirelesscraftingterminal.transformer.MissingCoreMod;
 
 public class ClientProxy extends CommonProxy {
 
@@ -19,7 +17,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void removeItemsFromNEI() {
-		if (IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI)) {
+		if (Loader.isModLoaded("NotEnoughItems")) {
 			codechicken.nei.api.API.hideItem(new ItemStack(ItemEnum.WCT_BOOSTER_BG_ICON.getItem(), 1));
 			return;
 		}
@@ -27,11 +25,6 @@ public class ClientProxy extends CommonProxy {
 
 	public void registerRenderers() {
 		// No renderers...yet =]
-	}
-
-	@Override
-	public void missingCoreMod() {
-		throw new MissingCoreMod();
 	}
 
 }

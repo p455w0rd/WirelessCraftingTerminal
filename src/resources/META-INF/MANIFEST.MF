@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+FMLCorePlugin: net.p455w0rd.wirelesscraftingterminal.transformer.WCTCore
+FMLCorePluginContainsFMLMod: true
+

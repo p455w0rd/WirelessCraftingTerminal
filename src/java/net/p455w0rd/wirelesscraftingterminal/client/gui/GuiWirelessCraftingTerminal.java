@@ -38,6 +38,7 @@ import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -299,7 +300,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		Keyboard.enableRepeatEvents(true);
 		this.maxRows = this.getMaxRows();
 		this.perRow = AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) != TerminalStyle.FULL ? 9 : 9 + ( ( this.width - this.standardSize ) / 18 );
-		this.isNEIEnabled = IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI);
+		this.isNEIEnabled = Loader.isModLoaded("NotEnoughItems");
 		int top = isNEIEnabled ? 22 : 0;
 		final int magicNumber = 114 + 1;
 		final int extraSpace = this.height - magicNumber - 0 - top - this.reservedSpace;

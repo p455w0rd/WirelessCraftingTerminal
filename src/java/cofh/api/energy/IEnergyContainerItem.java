@@ -1,5 +1,8 @@
 package cofh.api.energy;
 
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -48,5 +51,7 @@ public interface IEnergyContainerItem {
 	 * Get the max amount of energy that can be stored in the container item.
 	 */
 	int getMaxEnergyStored(ItemStack container);
+
+	void addInformation(ItemStack is, EntityPlayer player, List<String> list, boolean displayMore);
 
 }

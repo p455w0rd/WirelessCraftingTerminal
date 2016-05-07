@@ -3,13 +3,12 @@ package net.p455w0rd.wirelesscraftingterminal.handlers;
 import java.io.File;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
-import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
-import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -115,7 +114,7 @@ public class ConfigHandler {
 	}
 	
 	public static void removeBoosterIcon() {
-		if (IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI)) {
+		if (Loader.isModLoaded("NotEnoughItems")) {
 			if (!codechicken.nei.api.ItemInfo.hiddenItems.contains(ItemEnum.BOOSTER_ICON.getStack())) {
 				codechicken.nei.api.API.hideItem(ItemEnum.BOOSTER_ICON.getStack());
 			}
@@ -124,14 +123,14 @@ public class ConfigHandler {
 
 	public static void removeBooster() {
 		if (Reference.WCT_BOOSTER_ENABLED) {
-			if (IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI)) {
+			if (Loader.isModLoaded("NotEnoughItems")) {
 				if (codechicken.nei.api.ItemInfo.hiddenItems.contains(ItemEnum.BOOSTER_CARD.getStack())) {
 					codechicken.nei.api.ItemInfo.hiddenItems.remove(ItemEnum.BOOSTER_CARD.getStack());
 				}
 			}
 			ItemEnum.BOOSTER_CARD.getItem().setCreativeTab(WirelessCraftingTerminal.creativeTab);
 		} else {
-			if (IntegrationRegistry.INSTANCE.isEnabled(IntegrationType.NEI)) {
+			if (Loader.isModLoaded("NotEnoughItems")) {
 				codechicken.nei.api.API.hideItem(ItemEnum.BOOSTER_CARD.getStack());
 			}
 			ItemEnum.BOOSTER_CARD.getItem().setCreativeTab(null);

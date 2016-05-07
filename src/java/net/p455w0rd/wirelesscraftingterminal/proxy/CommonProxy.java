@@ -59,10 +59,6 @@ public class CommonProxy {
 		// =P
 	}
 
-	public void missingCoreMod() {
-		throw new IllegalStateException("Unable to Load WCT Core Mod, please verify that WCT is properly install in the mods folder, with a .jar extension.");
-	}
-
 	@SubscribeEvent
 	public void tickEvent(TickEvent.PlayerTickEvent e) {
 		ItemStack wirelessTerm = null;

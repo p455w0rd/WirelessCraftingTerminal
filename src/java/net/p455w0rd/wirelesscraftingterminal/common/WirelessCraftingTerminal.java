@@ -11,7 +11,6 @@ import java.io.File;
 import appeng.api.AEApi;
 import appeng.api.features.IWirelessTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
-import net.p455w0rd.wirelesscraftingterminal.core.crash.IntegrationCrashEnhancement;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
 import net.p455w0rd.wirelesscraftingterminal.handlers.AchievementHandler;
@@ -22,7 +21,8 @@ import net.p455w0rd.wirelesscraftingterminal.proxy.CommonProxy;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 
-@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "required-after:Forge@["
+@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = ""
+		+ "required-after:Forge@["
 		+ net.minecraftforge.common.ForgeVersion.majorVersion + '.' // majorVersion
 		+ net.minecraftforge.common.ForgeVersion.minorVersion + '.' // minorVersion
 		+ net.minecraftforge.common.ForgeVersion.revisionVersion + '.' // revisionVersion
@@ -42,9 +42,6 @@ public class WirelessCraftingTerminal {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		if (!Loader.isModLoaded("wct-core")) {
-			WirelessCraftingTerminal.proxy.missingCoreMod();
-		}
 		long stopwatch = WCTLog.beginSection("PreInit");
 		WirelessCraftingTerminal.WCTState = LoaderState.PREINITIALIZATION;
 		WirelessCraftingTerminal.INSTANCE = this;
@@ -59,9 +56,9 @@ public class WirelessCraftingTerminal {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		long stopwatch = WCTLog.beginSection("Init");
+		IntegrationRegistry.INSTANCE.init();
 		WirelessCraftingTerminal.WCTState = LoaderState.INITIALIZATION;
 		RecipeHandler.addRecipes(true);
-		IntegrationRegistry.INSTANCE.init();
 		AchievementHandler.init();
 		WCTLog.endSection("Init", stopwatch);
 	}
@@ -70,7 +67,6 @@ public class WirelessCraftingTerminal {
 	public void postInit(final FMLPostInitializationEvent event) {
 		long stopwatch = WCTLog.beginSection("PostInit");
 		IntegrationRegistry.INSTANCE.postInit();
-		FMLCommonHandler.instance().registerCrashCallable(new IntegrationCrashEnhancement());
 		NetworkRegistry.INSTANCE.registerGuiHandler(WirelessCraftingTerminal.INSTANCE, new WCTGuiHandler());
 		NetworkHandler.instance = new NetworkHandler("WCT");
 		WirelessCraftingTerminal.proxy.removeItemsFromNEI();

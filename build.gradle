@@ -1,0 +1,94 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+		maven {
+            name "ChickenBones"
+            url "http://chickenbones.net/maven/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+targetCompatibility=7
+sourceCompatibility=7
+
+version = minecraft_version + "-" + aeversion + "-" + wctbuild + "" + wctchannel
+group = wctgroup
+archivesBaseName = wctbasename
+
+minecraft {
+    version = minecraft_version + "-" + forge_version
+    runDir = "run"
+	
+    replaceIn "Reference.java"
+    replaceIn "package-info.java"
+	
+	replace "@version@", project.version
+}
+
+jar {
+    include "net/p455w0rd/wirelesscraftingterminal/**"
+	include "cofh/api/**"
+    include "assets/**"
+	include "ic2/**"
+    include "mcmod.info"
+    include "pack.mcmeta"
+}
+
+task deobfJar(type: Jar) { // Generate deobfuscated
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+task sourceJar(type: Jar) { // Generate sources
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+tasks.build.dependsOn('sourceJar', 'deobfJar')
+artifacts {
+    archives deobfJar
+    archives sourceJar
+    archives jar
+}
+
+dependencies {
+	compile("appeng:appliedenergistics2:rv3-beta-5:dev") {
+		transitive = false
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "src/java/"
+			
+        }
+
+        resources {
+            srcDir "src/resources/"
+            include "assets/ae2wct/lang/*.lang",
+                    "assets/ae2wct/textures/gui/*",
+                    "assets/ae2wct/textures/items/*",
+					"mcmod.info",
+                    "pack.mcmeta"
+        }
+    }
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': minecraft_version
+    }
+}
+
