@@ -9,9 +9,7 @@ public enum IntegrationType
 
 	//InvTweaks( IntegrationSide.CLIENT, "Inventory Tweaks", "inventorytweaks" ),
 
-	NEI( IntegrationSide.CLIENT, "Not Enough Items", "NotEnoughItems" ),
-	
-	IC2( IntegrationSide.BOTH, "Industrial Craft 2", "IC2" );
+	NEI( IntegrationSide.CLIENT, "Not Enough Items", "NotEnoughItems" );
 
 	public final IntegrationSide side;
 	public final String dspName;
