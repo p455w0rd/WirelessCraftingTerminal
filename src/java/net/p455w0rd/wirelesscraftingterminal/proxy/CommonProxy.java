@@ -182,6 +182,7 @@ public class CommonProxy {
 				return;
 			}
 		}
+		/*
 		boolean hasWCTAch = false;
 		if (!event.player.worldObj.isRemote) {
 			hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
@@ -195,6 +196,14 @@ public class CommonProxy {
 		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
 			AchievementHandler.triggerAch(magnetAch, event.player);
 		}
+		*/
+		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
+			AchievementHandler.triggerAch(wctAch, event.player);
+		}
+		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem()) {
+			AchievementHandler.triggerAch(magnetAch, event.player);
+		}
+		
 		/*
 		 * if (event.crafting.getItem() ==
 		 * ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
@@ -203,7 +212,7 @@ public class CommonProxy {
 		 * AchievementHandler.addAchievementToPage(AchievementHandler.
 		 * boosterAch, true, event.player); } }
 		 */
-		if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED && hasWCTAch) {
+		if (Reference.WCT_BOOSTER_ENABLED && Reference.WCT_EASYMODE_ENABLED) {
 			if (event.crafting.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
 				AchievementHandler.triggerAch(boosterAch, event.player);
 			}
