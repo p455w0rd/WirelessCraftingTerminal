@@ -38,6 +38,7 @@ config.ae2wct.InfinityBoosterCfgDesc=Erlaube das unendliche Drahtlosverstärkeru
 config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte + Rezept für unendlichen Drahtlosverstärker)
 config.ae2wct.BoosterDropChance=Wahrscheinlichkeit, dass ein Wither eine unendliche Drahtlosverstärkerkarte dropt (in % - 100=immer)
 config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
+config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
 
 //Achievements
 achievement.wctAchievement=Digitales Fertigen über WLAN

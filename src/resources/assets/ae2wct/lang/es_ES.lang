@@ -38,6 +38,7 @@ config.ae2wct.InfinityBoosterCfgDesc=Activar infinita gama Booster mejora
 config.ae2wct.EasyModeDesc=Activar el modo f?cil (Recetas m?s f?ciles y Infinity Booster receta)
 config.ae2wct.BoosterDropChance=Oportunidad que marchitar caer? infinito Booster tarjeta (en %-100 = caer siempre)
 config.ae2wct.DisableBoosterDrop=Activado Booster Card cae en modo dif?cil (true=permitir)
+config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
 
 //Achievements
 achievement.wctAchievement=Digital elaboraci?n sobre WLAN

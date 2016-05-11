@@ -312,6 +312,7 @@ public class ContainerMagnet extends Container {
 			stackSize = slot.getSlotStackLimit();
 		}
 		ItemStack phantomStack = stackHeld.copy();
+		RandomUtils.removeTimerTags(phantomStack);
 		phantomStack.stackSize = stackSize;
 
 		slot.putStack(phantomStack);

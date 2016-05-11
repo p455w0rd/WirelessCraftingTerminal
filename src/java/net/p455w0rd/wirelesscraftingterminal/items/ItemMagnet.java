@@ -197,18 +197,24 @@ public class ItemMagnet extends Item {
 			return;
 		if (player == null)
 			return;
-	
+
 		List<ItemStack> filteredList = getFilteredItems(this.getItemStack());
 		// items
 		Iterator iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
 
 			EntityItem itemToGet = (EntityItem) iterator.next();
-			itemToGet.delayBeforeCanPickup = 50;
+			if (itemToGet == null) {
+				return;
+			}
+			itemToGet.delayBeforeCanPickup = 75;
 
 			EntityItemPickupEvent pickupEvent = new EntityItemPickupEvent(player, itemToGet);
 			ItemPickupEvent itemPickupEvent = new ItemPickupEvent(player, itemToGet);
 			ItemStack itemStackToGet = itemToGet.getEntityItem();
+			if (itemStackToGet == null) {
+				return;
+			}
 			int stackSize = itemStackToGet.stackSize;
 
 			MinecraftForge.EVENT_BUS.post(pickupEvent);
@@ -292,13 +298,27 @@ public class ItemMagnet extends Item {
 			world.playSoundAtEntity(player, "random.orb", 0.08F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
 		}
 	}
-	
+
 	private void doVanillaPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
-		if (itemToGet.getDistanceToEntity(player) <= 2.0F) {
-			if (player.inventory.addItemStackToInventory(itemStackToGet)) {
-				player.onItemPickup(itemToGet, stackSize);
-				world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+		ItemStack is = itemToGet.getEntityItem();
+		if (is.getTagCompound() == null) {
+			RandomUtils.writeBoolean(is, "WCTReset", true);
+		}
+		int pickupTimer = RandomUtils.readInt(is, "WCTPickupTimer");
+		if (pickupTimer >= 200) {
+			if (itemToGet.getDistanceToEntity(player) <= 2.0F) {
+				RandomUtils.delKey(is, "WCTPickupTimer");
+				if (RandomUtils.readBoolean(is, "WCTReset")) {
+					is.setTagCompound(null);
+				}
+				if (player.inventory.addItemStackToInventory(itemStackToGet)) {
+					player.onItemPickup(itemToGet, stackSize);
+					world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+				}
 			}
+		}
+		else {
+			RandomUtils.writeInt(is, "WCTPickupTimer", pickupTimer + 1);
 		}
 	}
 
@@ -331,30 +351,48 @@ public class ItemMagnet extends Item {
 		if (is != null && itemList != null) {
 			for (int i = 0; i < itemList.size(); i++) {
 				ItemStack thisStack = (ItemStack) itemList.get(i);
+				//use oredict
 				if (doesMagnetUseOreDict()) {
 					if (areOresEqual(is, thisStack)) {
 					//if (OreDictionary.itemMatches(is, thisStack, false)) {
 						return true;
 					}
 				}
+				//ignore meta & nbt
 				if (doesMagnetIgnoreMeta() && doesMagnetIgnoreNBT()) {
-					if (is.getItem().equals(thisStack.getItem()) && (is.getItem() == thisStack.getItem())) {
+					if (is.getItem().equals(thisStack.getItem())) {
 						return true;
 					}
 				}
+				//ignore meta only
 				else if (doesMagnetIgnoreMeta() && !doesMagnetIgnoreNBT()) {
-					if (ItemStack.areItemStackTagsEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
+					if (ItemStack.areItemStackTagsEqual(is, thisStack) && is.getItem() == thisStack.getItem()) {
 						return true;
 					}
 				}
-				else if (!doesMagnetIgnoreMeta() && doesMagnetIgnoreNBT()) {
-					if (isMetaEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
+				//ignore nbt only
+				else if (!doesMagnetIgnoreMeta() && doesMagnetIgnoreNBT() && is.getItem() == thisStack.getItem()) {
+					if (isMetaEqual(is, thisStack)) {
 						return true;
 					}
 				}
+				//ignore nothing/don't use oredict--must be exact match
 				else {
-					if (isMetaEqual(is, thisStack) && ItemStack.areItemStackTagsEqual(is, thisStack) && (is.getItem() == thisStack.getItem())) {
-						return true;
+					// This is necessary since we give all items these temp tags
+					if (is.hasTagCompound() && (is.getTagCompound().hasKey("WCTReset") || is.getTagCompound().hasKey("WCTPickupTimer"))) {
+						//if either of these are false, no sense in continuing
+						if (isMetaEqual(is, thisStack) && is.getItem() == thisStack.getItem()) {
+							ItemStack newIS = is.copy();
+							RandomUtils.removeTimerTags(newIS);
+							if (ItemStack.areItemStackTagsEqual(newIS, thisStack)) {
+								return true;
+							}
+						}
+					}
+					else {
+						if (isMetaEqual(is, thisStack) && ItemStack.areItemStackTagsEqual(is, thisStack) && is.getItem() == thisStack.getItem()) {
+							return true;
+						}
 					}
 				}
 			}
@@ -411,7 +449,11 @@ public class ItemMagnet extends Item {
 	}
 
 	private void doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
-		ais = Platform.poweredInsert(this.powerSrc, this.cellInv, ais, this.mySrc);
+		if (RandomUtils.readBoolean(itemStackToGet, "WCTReset")) {
+			itemStackToGet.setTagCompound(null);
+		}
+		IAEItemStack ais2 = AEApi.instance().storage().createItemStack(itemStackToGet); 
+		ais = Platform.poweredInsert(this.powerSrc, this.cellInv, ais2, this.mySrc);
 		if (ais != null) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);

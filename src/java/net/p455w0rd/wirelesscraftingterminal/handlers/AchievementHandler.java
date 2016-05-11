@@ -1,9 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.handlers;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
@@ -43,19 +40,10 @@ public class AchievementHandler {
 	}
 
 	public static void addAchievementToPage(Achievement a, boolean hidden, EntityPlayer player) {
-		if (hidden) {
-			if (player != null && FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-				if (!isAchievementUnlocked(player, wctAch) || achPage.getAchievements().contains(boosterAch)) {
-					return;
-				}
-			}
-		}
 		achPage.getAchievements().add(a);
 	}
 	
-	public static boolean isAchievementUnlocked(EntityPlayer p, Achievement a) {
-		return ((EntityPlayerMP) p).func_147099_x().hasAchievementUnlocked(a);
-	}
+
 
 	public static void triggerAch(Achievement a, EntityPlayer p) {
 		p.addStat(a, 1);

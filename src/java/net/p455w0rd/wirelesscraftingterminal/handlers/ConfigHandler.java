@@ -8,7 +8,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.p455w0rd.wirelesscraftingterminal.common.WirelessCraftingTerminal;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
@@ -24,9 +23,11 @@ public class ConfigHandler {
 	public static int ae2wctMaxPower = Reference.WCT_MAX_POWER;
 	public static int boosterDropChance = Reference.WCT_BOOSTER_DROPCHANCE;
 	public static boolean boosterDropsEnabled = Reference.WCT_BOOSTERDROP_ENABLED;
+	public static boolean mineTweakerOverride = Reference.WCT_MINETWEAKER_OVERRIDE;
 	private static boolean doSave;
 	public static boolean firstLoad = true;
 	private static int pwrInCfgFile, boosterDropInCfgFile;
+	private static boolean mtChanged = false;
 
 	public static void init(File configFile) {
 		if (config == null) {
@@ -49,9 +50,11 @@ public class ConfigHandler {
 		String easyModeDesc = LocaleHandler.EasyModeDesc.getLocal();
 		String boosterDropDesc = LocaleHandler.BoosterDropChance.getLocal();
 		String boosterDropEnabledDesc = LocaleHandler.DisableBoosterDrop.getLocal();
+		String mineTweakerOverrideDesc = LocaleHandler.MineTweakerOverride.getLocal();
 		enableInfinityBooster = config.getBoolean("enableInfinityBooster", Configuration.CATEGORY_GENERAL, true, boosterDesc);
 		enableEasyMode = config.getBoolean("enableEasyMode", Configuration.CATEGORY_GENERAL, false, easyModeDesc);
 		boosterDropsEnabled = config.getBoolean("boosterDropsEnabled", Configuration.CATEGORY_GENERAL, true, boosterDropEnabledDesc);
+		mineTweakerOverride = config.getBoolean("mineTweakerOverride", Configuration.CATEGORY_GENERAL, false, mineTweakerOverrideDesc);
 		/*
 		 * I did the max power cfg loading like this because while using
 		 * Configuration#getInt did enforce the min/max values in-game, it
@@ -92,25 +95,29 @@ public class ConfigHandler {
 			boosterDropKey.comment = boosterDropDesc;
 			doSave = true;
 		}
+		if (Reference.WCT_MINETWEAKER_OVERRIDE != mineTweakerOverride) {
+			mtChanged = true;
+		}
 
 		Reference.WCT_BOOSTER_ENABLED = enableInfinityBooster;
 		Reference.WCT_EASYMODE_ENABLED = enableEasyMode;
 		Reference.WCT_MAX_POWER = ae2wctMaxPower;
 		Reference.WCT_BOOSTER_DROPCHANCE = boosterDropChance;
 		Reference.WCT_BOOSTERDROP_ENABLED = boosterDropsEnabled;
+		Reference.WCT_MINETWEAKER_OVERRIDE = mineTweakerOverride;
 
 		if (config.hasChanged() || doSave) {
 			config.save();
 			reloadRecipes();
 			removeBooster();
 			removeBoosterIcon();
+			doSave = false;
 		}
 	}
 
 	public static void reloadRecipes() {
-		WCTLog.info("Reinitializing Recipes");
-		RecipeHandler.removeRecipes();
-		RecipeHandler.addRecipes();
+		RecipeHandler.loadRecipes(mtChanged);
+		mtChanged = false;
 	}
 	
 	public static void removeBoosterIcon() {

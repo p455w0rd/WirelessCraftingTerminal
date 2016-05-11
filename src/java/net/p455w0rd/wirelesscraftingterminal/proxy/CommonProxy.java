@@ -10,7 +10,6 @@ import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
@@ -138,7 +137,7 @@ public class CommonProxy {
 			 */
 		}
 		else {
-			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE);
+			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE, Reference.WCT_MINETWEAKER_OVERRIDE);
 			NetworkHandler.instance.sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
@@ -165,9 +164,7 @@ public class CommonProxy {
 	public void pickupEvent(PlayerEvent.ItemPickupEvent e) {
 		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED) {
 			if (e.pickedUp.getEntityItem().getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
-				if (AchievementHandler.isAchievementUnlocked(e.player, wctAch)) {
-					AchievementHandler.triggerAch(boosterAch, e.player);
-				}
+				AchievementHandler.triggerAch(boosterAch, e.player);
 			}
 		}
 	}
@@ -182,21 +179,6 @@ public class CommonProxy {
 				return;
 			}
 		}
-		/*
-		boolean hasWCTAch = false;
-		if (!event.player.worldObj.isRemote) {
-			hasWCTAch = ((EntityPlayerMP) event.player).func_147099_x().hasAchievementUnlocked(AchievementHandler.wctAch);
-		}
-		else {
-			hasWCTAch = ((EntityClientPlayerMP) event.player).getStatFileWriter().hasAchievementUnlocked(AchievementHandler.wctAch);
-		}
-		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
-			AchievementHandler.triggerAch(wctAch, event.player);
-		}
-		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem() && hasWCTAch) {
-			AchievementHandler.triggerAch(magnetAch, event.player);
-		}
-		*/
 		if (event.crafting.getItem() == ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {
 			AchievementHandler.triggerAch(wctAch, event.player);
 		}

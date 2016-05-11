@@ -122,15 +122,68 @@ public class RandomUtils {
 	}
 	
 	public static boolean readBoolean(ItemStack is, String key) {
-		return (is.hasTagCompound() ? is.getTagCompound().getBoolean(key) : false);
+		if (is == null) {
+			return false;
+		}
+		NBTTagCompound tag = getTag(is);
+		return (tag.hasKey(key) ? tag.getBoolean(key) : false);
 	}
 	
 	public static int readInt(ItemStack is, String key) {
-		return (is.hasTagCompound() ? is.getTagCompound().getInteger(key) : 0);
+		if (is == null) {
+			return 0;
+		}
+		NBTTagCompound tag = getTag(is);
+		return (tag.hasKey(key) ? tag.getInteger(key) : -1);
+	}
+	
+	public static void writeInt(ItemStack is, String key, int value) {
+		if (is == null) {
+			return;
+		}
+		NBTTagCompound tag = getTag(is);
+		tag.setInteger(key, value);
+	}
+	
+	public static void writeBoolean(ItemStack is, String key, boolean value) {
+		if (is == null) {
+			return;
+		}
+		NBTTagCompound tag = getTag(is);
+		tag.setBoolean(key, value);
+	}
+	
+	public static void delKey(ItemStack is, String key) {
+		if (is == null) {
+			return;
+		}
+		NBTTagCompound tag = getTag(is);
+		tag.removeTag(key);
+	}
+	
+	public static NBTTagCompound getTag(ItemStack is) {
+		if (!is.hasTagCompound()) {
+			is.setTagCompound(new NBTTagCompound());
+		}
+		return is.getTagCompound();
 	}
 	
 	public static ItemStack readStack(NBTTagCompound nbtTC, String key) {
 		return (nbtTC.hasKey(key) ? ItemStack.loadItemStackFromNBT(nbtTC) : null);
+	}
+	
+	public static void removeTimerTags(ItemStack is) {
+		if (is == null || is.getTagCompound() == null) {
+			return;
+		}
+		if (is.getTagCompound().hasKey("WCTReset")) {
+			is.setTagCompound(null);
+		}
+		if (is.getTagCompound() != null) {
+			if (is.getTagCompound().hasKey("WCTPickupTimer")) {
+				is.getTagCompound().removeTag("WCTPickupTimer");
+			}
+		}
 	}
 
 }

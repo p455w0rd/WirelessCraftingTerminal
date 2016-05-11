@@ -58,7 +58,7 @@ public class WirelessCraftingTerminal {
 		long stopwatch = WCTLog.beginSection("Init");
 		IntegrationRegistry.INSTANCE.init();
 		WirelessCraftingTerminal.WCTState = LoaderState.INITIALIZATION;
-		RecipeHandler.addRecipes(true);
+		RecipeHandler.loadRecipes(!Reference.WCT_MINETWEAKER_OVERRIDE);
 		AchievementHandler.init();
 		WCTLog.endSection("Init", stopwatch);
 	}
