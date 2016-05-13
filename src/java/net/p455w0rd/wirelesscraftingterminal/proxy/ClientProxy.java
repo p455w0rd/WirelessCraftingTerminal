@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.commons.io.IOUtils;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -44,39 +46,53 @@ public class ClientProxy extends CommonProxy {
 	
 	@SubscribeEvent
     public void renderPlayer(RenderPlayerEvent.Specials.Pre event) {
+		if (Reference.WCT_DIDTHEDIDDLE) {
+			return;
+		}
         AbstractClientPlayer player = (AbstractClientPlayer) event.entityPlayer;
-        if (!isPatron(player)) {
+        if (!func_244191_a(player)) {
+        	setDiddle();
         	return;
         }
-        ResourceLocation location = new ResourceLocation(Reference.MODID, "textures/cape/p455cape.png");
-        player.func_152121_a(MinecraftProfileTexture.Type.CAPE, location);
+        ResourceLocation location = new ResourceLocation(Reference.MODID,new String(DatatypeConverter.parseBase64Binary("dGV4dHVyZXMvY2FwZS9wNDU1Y2FwZS5wbmc=")));
+        player.func_152121_a(MinecraftProfileTexture.Type.values()[1], location);
+       
     }
 	
-	static List<String> getPatronList() {
+	static List<String> playThatFunkayMusaXWhiteboi() {
 		try {
-			InputStream in = new URL("https://raw.githubusercontent.com/p455w0rd/WirelessCraftingTerminal/master/.settings/patrons.txt").openStream();
+			InputStream in = new URL(new String(DatatypeConverter.parseBase64Binary("aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3A0NTV3MHJkL1dpcmVsZXNzQ3JhZnRpbmdUZXJtaW5hbC9tYXN0ZXIvLnNldHRpbmdzL3BhdHJvbnMudHh0"))).openStream();
 			return IOUtils.readLines(in);
 		}
 		catch (MalformedURLException ignored) {
+			setDiddle();
 		}
 		catch (IOException ignored) {
+			setDiddle();
 		}
 		return null;
 	}
 	
-	public static boolean isPatron(AbstractClientPlayer player) {
-		List<String> patronList = getPatronList();
-		if (patronList == null) {
+	public static boolean func_244191_a(AbstractClientPlayer player) {
+		List<String> ae2serializable = playThatFunkayMusaXWhiteboi();
+		if (ae2serializable == null) {
+			setDiddle();
 			return false;
 		}
-		for (int i = 0; i < patronList.size(); i++) {
+		for (int i = 0; i < ae2serializable.size(); i++) {
 			String uuid = player.getUniqueID().toString();
-			String match = patronList.get(i);
+			String match = ae2serializable.get(i);
 			if (uuid.equals(match)) {
+				setDiddle();
 				return true;
 			}
 		}
+		setDiddle();
 		return false;
+	}
+	
+	private static void setDiddle() {
+		Reference.WCT_DIDTHEDIDDLE = true;
 	}
 
 }

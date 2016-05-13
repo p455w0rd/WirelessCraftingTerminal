@@ -6,16 +6,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ICrafting;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
+import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import appeng.api.AEApi;
 import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridHost;
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.crafting.CraftingItemList;
 import appeng.api.networking.crafting.ICraftingCPU;
 import appeng.api.networking.security.BaseActionSource;
@@ -24,9 +26,7 @@ import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.helpers.ICustomNameObject;
-import appeng.me.cluster.IAEMultiBlock;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
-import appeng.tile.crafting.TileCraftingTile;
 import appeng.util.Platform;
 
 
@@ -34,9 +34,9 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 {
 
 	private final IItemList<IAEItemStack> list = AEApi.instance().storage().createItemList();
-	private IGrid network;
 	private CraftingCPUCluster monitor = null;
 	private String cpuName = null;
+	private final WirelessTerminalGuiObject obj;
 
 	@GuiSync( 0 )
 	public long eta = -1;
@@ -44,6 +44,11 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 	public ContainerCraftingCPU( final InventoryPlayer ip, final Object te )
 	{
 		super( ip, te );
+		this.obj = getGuiObject(RandomUtils.getWirelessTerm(ip), ip.player, ip.player.worldObj, (int) ip.player.posX, (int) ip.player.posY, (int) ip.player.posZ);
+		if (this.obj == null) {
+			this.setValidContainer(false);
+		}
+		/*
 		final IGridHost host = (IGridHost) ( te instanceof IGridHost ? te : null );
 
 		if( host != null )
@@ -64,18 +69,18 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 		{
 			this.setValidContainer( false );
 		}
+		*/
 	}
-
-	private void findNode( final IGridHost host, final ForgeDirection d )
-	{
-		if( this.getNetwork() == null )
-		{
-			final IGridNode node = host.getGridNode( d );
-			if( node != null )
-			{
-				this.setNetwork( node.getGrid() );
+	
+	protected WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+		if (it != null) {
+			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			if (wh != null) {
+				return new WirelessTerminalGuiObject(wh, it, player, w, x, y, z);
 			}
 		}
+
+		return null;
 	}
 
 	protected void setCPU( final ICraftingCPU c )
@@ -267,11 +272,6 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 
 	IGrid getNetwork()
 	{
-		return this.network;
-	}
-
-	private void setNetwork( final IGrid network )
-	{
-		this.network = network;
+		return this.obj.getTargetGrid();
 	}
 }

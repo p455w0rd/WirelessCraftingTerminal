@@ -9,6 +9,7 @@ public class Reference {
 	public static final String GUI_FACTORY = "net.p455w0rd.wirelesscraftingterminal.client.gui.GuiFactory";
 	public static final String CREDITS_LIST = "brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz, jotato";
 	public static final String CONFIG_FILE = "WirelessCraftingTerminal.cfg";
+	public static boolean WCT_DIDTHEDIDDLE =  false;
 	public static int WCT_MAX_POWER = 1600000;
 	public static boolean WCT_BOOSTER_ENABLED = true;
 	public static boolean WCT_EASYMODE_ENABLED = false;

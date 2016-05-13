@@ -926,6 +926,22 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	}
 
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
+		final IGrid grid = this.obj.getTargetGrid();
+		if (grid != null) {
+			final IEnergyGrid eg = grid.getCache(IEnergyGrid.class);
+			if (!eg.isNetworkPowered()) {
+				return false;
+			}
+		}
+		final ISecurityGrid sg = grid.getCache(ISecurityGrid.class);
+		if (sg.hasPermission(this.getInventoryPlayer().player, perm)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final WCTIActionHost host = this.getActionHost();
 
 		if (host != null) {
@@ -949,7 +965,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		}
 		return false;
 	}
-
+*/
 	public void lockPlayerInventorySlot(final int idx) {
 		this.locked.add(idx);
 	}
