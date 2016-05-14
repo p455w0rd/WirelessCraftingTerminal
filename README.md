@@ -94,6 +94,6 @@ I would love for someone to do translations for me =]
 
 Thanks to the following people for support, code, et al
  
-* Code/tutorials/general help: Notch, @brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz
+* Code/tutorials/general help: Notch, brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz
 
-* Contributors: @condensedapple
+* Contributors: condensedapple
