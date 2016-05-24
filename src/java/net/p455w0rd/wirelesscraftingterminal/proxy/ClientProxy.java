@@ -81,7 +81,7 @@ public class ClientProxy extends CommonProxy {
 
 	private String fetchVersion() {
 		try {
-			InputStream in = new URL(new String("https://raw.githubusercontent.com/p455w0rd/WirelessCraftingTerminal/master/latestversion.txt")).openStream();
+			InputStream in = new URL(new String("https://raw.githubusercontent.com/p455w0rd/WirelessCraftingTerminal/master/latestversionrv3.txt")).openStream();
 			BufferedReader r = new BufferedReader(new InputStreamReader(in));
 			return r.readLine();
 		}
