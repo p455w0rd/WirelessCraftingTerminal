@@ -17,6 +17,8 @@ public class Reference {
 	public static int WCT_BOOSTER_DROPCHANCE = 50;
 	public static boolean WCT_BOOSTERDROP_ENABLED = true;
 	public static boolean WCT_MINETWEAKER_OVERRIDE = false;
+	public static boolean WCT_DOVERSIONCHECK = true;
+	public static boolean WCT_HASCHECKEDVERSION = false;
 	
 	// Gui IDs
 	private static int ae2wctGuiIndex = 0;

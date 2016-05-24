@@ -29,6 +29,18 @@ gui.tooltips.ae2wct.Whitelisting=Erlauben
 gui.tooltips.ae2wct.Blacklisting=Verbieten
 gui.tooltips.ae2wct.MagnetActiveDesc1=Zusätzliche Items im Inventar platzieren
 gui.tooltips.ae2wct.MagnetActiveDesc2=Zusätzliche Items auf dem Boden liegen lassen
+gui.tooltips.ae2wct.Not=Not
+gui.tooltips.ae2wct.Using=Using
+gui.tooltips.ae2wct.Ignore=Ignore
+gui.tooltips.ae2wct.Ignoring=Ignoring
+gui.tooltips.ae2wct.NBTData=NBT Data
+gui.tooltips.ae2wct.MetaData=Meta Data
+gui.tooltips.ae2wct.OreDict=Ore Dictionary
+gui.tooltips.ae2wct.FilteredItems=Filtered Items
+gui.tooltips.ae2wct.OrPress=or press
+gui.tooltips.ae2wct.Press=Press
+gui.tooltips.ae2wct.ToSwitchMode=to switch magnet mode
+
 //Labels
 gui.labels.ae2wct.WirelessTermLabel=Drahtloskonsole
 
@@ -39,6 +51,9 @@ config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte +
 config.ae2wct.BoosterDropChance=Wahrscheinlichkeit, dass ein Wither eine unendliche Drahtlosverstärkerkarte dropt (in % - 100=immer)
 config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
 config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
+config.ae2wct.DoVersionCheck=Check for updates
+config.ae2wct.NewVersionAvailable=New version of Wireless Crafting Terminal is available!
+config.ae2wct.ClickString=["Click here to go to download page [",{"text":"Download","color":"green","hoverEvent":{"action":"show_text","value":{"text":"Click this to download the latest version","color":"green"}},"clickEvent":{"action":"open_url","value":"http://minecraft.curseforge.com/projects/wireless-crafting-terminal"}},"]"]
 
 //Achievements
 achievement.wctAchievement=Digitales Fertigen über WLAN

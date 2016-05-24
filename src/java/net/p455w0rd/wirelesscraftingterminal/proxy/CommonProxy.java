@@ -1,7 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.proxy;
 
 import java.util.Random;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -140,6 +139,7 @@ public class CommonProxy {
 			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE, Reference.WCT_MINETWEAKER_OVERRIDE);
 			NetworkHandler.instance.sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
+
 	}
 
 	@SubscribeEvent
@@ -185,7 +185,7 @@ public class CommonProxy {
 		if (event.crafting.getItem() == ItemEnum.MAGNET_CARD.getItem()) {
 			AchievementHandler.triggerAch(magnetAch, event.player);
 		}
-		
+
 		/*
 		 * if (event.crafting.getItem() ==
 		 * ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem()) {

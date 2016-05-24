@@ -6,13 +6,11 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.AchievementPage;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 
 public class AchievementHandler {
 
-	private static ItemInfinityBooster booster = (ItemInfinityBooster) ItemEnum.BOOSTER_ICON.getItem();
 	public static final Achievement wctAch = new Achievement("achievement.wctAchievement", "wctAchievement", 0, 0, new ItemStack(ItemEnum.WIRELESS_CRAFTING_TERMINAL.getItem(), 1), (Achievement) null);
-	public static final Achievement boosterAch = new Achievement("achievment.boosterAchievement", "boosterAchievement", 0, 2, booster.hasEffect(true), wctAch);
+	public static final Achievement boosterAch = new Achievement("achievment.boosterAchievement", "boosterAchievement", 0, 2, ItemEnum.BOOSTER_ICON.getItem(), wctAch);
 	public static final Achievement magnetAch = new Achievement("achievement.magnetAchievement", "magnetAchievement", 2, 0, ItemEnum.MAGNET_CARD.getItem(), wctAch);
 	private static final AchievementPage achPage = new AchievementPage("Wireless Crafting Term", wctAch, boosterAch, magnetAch);
 	

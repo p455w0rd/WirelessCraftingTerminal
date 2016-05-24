@@ -46,12 +46,13 @@ import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMagnetFilter;
+import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 /**
- * Jotato's amazing magnet item from QuantumFlux adpated for use in the Wireless
+ * Jotato's amazing magnet item from QuantumFlux adapted for use in the Wireless
  * Crafting Terminal
  * 
  * @author p455w0rd, Jotato
@@ -105,7 +106,7 @@ public class ItemMagnet extends Item {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
 		list.add(color("aqua") + "==============================");
-		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + "" + color("bold") + "" + color("italics") + "Shift" + color("gray"));
+		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
 			String info = LocaleHandler.MagnetDesc.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {
@@ -113,10 +114,21 @@ public class ItemMagnet extends Item {
 			}
 
 			list.add("");
-			list.add(LocaleHandler.MagnetDesc2.getLocal());
+			list.add(color("italics") + "" + LocaleHandler.MagnetDesc2.getLocal());
+			
+			if (isActivated(getItemStack())) {
+				String boundKey = Keyboard.getKeyName(KeybindHandler.openMagnetFilter.getKeyCode());
+				if (!boundKey.equals("NONE")) {
+					list.add(color("italics") + LocaleHandler.OrPress.getLocal() + " " + color("yellow") + color("bold") + "[" + boundKey + "]");
+				}
+				String boundKey2 = Keyboard.getKeyName(KeybindHandler.changeMagnetMode.getKeyCode());
+				if (!boundKey2.equals("NONE")) {
+					list.add(color("italics") + LocaleHandler.Press.getLocal() + " " + color("yellow") + color("bold") + "[" + boundKey2 + "] " + color("gray") + color("italics") + LocaleHandler.ToSwitchMode.getLocal());
+				}
+			}
 
 			list.add("");
-			list.add(LocaleHandler.Status.getLocal() + ": " + (isActivated(is) ? color("green") + "" + LocaleHandler.Active.getLocal() : color("red") + "" + LocaleHandler.Inactive.getLocal()));
+			list.add(LocaleHandler.Status.getLocal() + ": " + (isActivated(is) ? color("green") + LocaleHandler.Active.getLocal() : color("red") + LocaleHandler.Inactive.getLocal()));
 			if (is.getItemDamage() == 1) {
 				list.add(color("white") + "  " + LocaleHandler.MagnetActiveDesc1.getLocal());
 			}
@@ -127,12 +139,31 @@ public class ItemMagnet extends Item {
 			String white = LocaleHandler.Whitelisting.getLocal();
 			String black = LocaleHandler.Blacklisting.getLocal();
 
-			list.add(LocaleHandler.FilterMode.getLocal() + ": " + color("white") + "" + (getMode(is) ? white : black));
-			list.add("");
+			list.add(LocaleHandler.FilterMode.getLocal() + ": " + color("white") + (getMode(is) ? white : black));
+			String not = LocaleHandler.Not.getLocal();
+			String ignoring = LocaleHandler.Ignoring.getLocal();
+			String nbtData = LocaleHandler.NBTData.getLocal();
+			String metaData = LocaleHandler.MetaData.getLocal();
+			String usingOreDict = LocaleHandler.Using.getLocal() + " " + LocaleHandler.OreDict.getLocal();
+			
+			list.add((!doesMagnetUseOreDict() ? " " + not : color("green")) + " " + usingOreDict);
+			list.add((!doesMagnetIgnoreNBT() ? " " + not : color("green")) + " " + ignoring + " " + nbtData);
+			list.add((!doesMagnetIgnoreMeta() ? " " + not : color("green")) + " " + ignoring + " " + metaData);
 
+			List<ItemStack> filteredItems = getFilteredItems(getItemStack());
+			
+			if (filteredItems != null) {
+				list.add("");
+				list.add(color("gray") + LocaleHandler.FilteredItems.getLocal() + ":");
+				for (int i = 0; i < filteredItems.size(); i++) {
+					list.add("  " + filteredItems.get(i).getDisplayName());
+				}
+			}
+			
+			list.add("");
 			String onlyWorks = LocaleHandler.OnlyWorks.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(onlyWorks, 27, "\n", false))) {
-				list.add(color("white") + "" + color("bold") + "" + color("italics") + "" + line.trim());
+				list.add(color("white") + color("bold") + color("italics") + line.trim());
 			}
 
 		}

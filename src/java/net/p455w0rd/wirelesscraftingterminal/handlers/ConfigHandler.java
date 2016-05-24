@@ -24,6 +24,7 @@ public class ConfigHandler {
 	public static int boosterDropChance = Reference.WCT_BOOSTER_DROPCHANCE;
 	public static boolean boosterDropsEnabled = Reference.WCT_BOOSTERDROP_ENABLED;
 	public static boolean mineTweakerOverride = Reference.WCT_MINETWEAKER_OVERRIDE;
+	public static boolean doVersionCheck = Reference.WCT_DOVERSIONCHECK;
 	private static boolean doSave;
 	public static boolean firstLoad = true;
 	private static int pwrInCfgFile, boosterDropInCfgFile;
@@ -51,10 +52,12 @@ public class ConfigHandler {
 		String boosterDropDesc = LocaleHandler.BoosterDropChance.getLocal();
 		String boosterDropEnabledDesc = LocaleHandler.DisableBoosterDrop.getLocal();
 		String mineTweakerOverrideDesc = LocaleHandler.MineTweakerOverride.getLocal();
+		String doVersionCheckDesc = LocaleHandler.DoVersionCheck.getLocal();
 		enableInfinityBooster = config.getBoolean("enableInfinityBooster", Configuration.CATEGORY_GENERAL, true, boosterDesc);
 		enableEasyMode = config.getBoolean("enableEasyMode", Configuration.CATEGORY_GENERAL, false, easyModeDesc);
 		boosterDropsEnabled = config.getBoolean("boosterDropsEnabled", Configuration.CATEGORY_GENERAL, true, boosterDropEnabledDesc);
 		mineTweakerOverride = config.getBoolean("mineTweakerOverride", Configuration.CATEGORY_GENERAL, false, mineTweakerOverrideDesc);
+		doVersionCheck = config.getBoolean("doVersionCheck", Configuration.CATEGORY_GENERAL, true, doVersionCheckDesc);
 		/*
 		 * I did the max power cfg loading like this because while using
 		 * Configuration#getInt did enforce the min/max values in-game, it
@@ -105,6 +108,7 @@ public class ConfigHandler {
 		Reference.WCT_BOOSTER_DROPCHANCE = boosterDropChance;
 		Reference.WCT_BOOSTERDROP_ENABLED = boosterDropsEnabled;
 		Reference.WCT_MINETWEAKER_OVERRIDE = mineTweakerOverride;
+		Reference.WCT_DOVERSIONCHECK = doVersionCheck;
 
 		if (config.hasChanged() || doSave) {
 			config.save();
