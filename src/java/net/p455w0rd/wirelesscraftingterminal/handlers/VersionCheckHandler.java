@@ -50,6 +50,7 @@ public class VersionCheckHandler {
 			player.addChatComponentMessage(component);
 			player.addChatMessage(new ChatComponentText(EnumChatFormatting.BLUE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"));
 		}
+		FMLCommonHandler.instance().bus().unregister(this);
 	}
 
 	private String fetchVersion() {
