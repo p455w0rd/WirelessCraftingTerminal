@@ -6,6 +6,7 @@ import java.util.List;
 
 import appeng.api.AEApi;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.integration.modules.NEIHelpers.NEIAEShapelessRecipeHandler;
 import appeng.util.Platform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -61,6 +62,7 @@ public class NEI implements INEI, IContainerTooltipHandler, IIntegrationModule {
 		API.registerGuiOverlay(net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal.class, "crafting", new WCTSlotPositioner());
 		API.registerGuiOverlayHandler(net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal.class, new WCTOverlayHandler(), "crafting");
 		API.registerRecipeHandler(new NEIAEShapedRecipeHandler());
+		API.registerRecipeHandler( new NEIAEShapelessRecipeHandler() );
 		
 		/*
 		final Method registerGuiOverlay = this.apiClass.getDeclaredMethod("registerGuiOverlay", Class.class, String.class, IStackPositioner.class);

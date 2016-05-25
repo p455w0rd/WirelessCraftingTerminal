@@ -27,6 +27,7 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketConfigSync;
 import net.p455w0rd.wirelesscraftingterminal.handlers.AchievementHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.ConfigHandler;
+import net.p455w0rd.wirelesscraftingterminal.handlers.VersionCheckHandler;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
@@ -134,6 +135,7 @@ public class CommonProxy {
 			 * AchievementHandler.addAchievementToPage(AchievementHandler.
 			 * boosterAch, true, e.player); }
 			 */
+			new VersionCheckHandler();
 		}
 		else {
 			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE, Reference.WCT_MINETWEAKER_OVERRIDE);
