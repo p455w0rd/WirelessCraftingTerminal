@@ -195,7 +195,8 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		this.obj = getGuiObject(containerstack, player, worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		this.civ = (IPortableCell) this.obj;
-		final IGridNode node = ((IGridNode) ((IGrid) this.obj.getTargetGrid()).getPivot()).getMachine().getGridNode(ForgeDirection.UNKNOWN);
+		//final IGridNode node = ((IGridNode) ((IGrid) this.obj.getTargetGrid()).getPivot()).getMachine().getGridNode(ForgeDirection.UNKNOWN);
+		final IGridNode node = this.obj.getActionableNode();
 		this.networkNode = node;
 
 		this.prepareSync();
