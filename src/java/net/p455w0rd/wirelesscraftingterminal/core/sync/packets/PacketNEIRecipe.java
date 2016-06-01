@@ -101,6 +101,7 @@ public class PacketNEIRecipe extends WCTPacket
 			if( node != null )
 			{
 				final IGrid grid = node.getGrid();
+				
 				if( grid == null )
 				{
 					return;

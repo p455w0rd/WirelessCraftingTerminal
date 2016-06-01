@@ -40,6 +40,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
@@ -468,7 +469,7 @@ public class ItemMagnet extends Item {
 	}
 
 	private boolean isBoosterInstalled(ItemStack wirelessTerm) {
-		if (wirelessTerm.getItem() instanceof ItemWirelessCraftingTerminal) {
+		if (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
 			if (wirelessTerm.hasTagCompound()) {
 				NBTTagList boosterNBTList = wirelessTerm.getTagCompound().getTagList("BoosterSlot", 10);
 				if (boosterNBTList != null) {

@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumChatFormatting;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 
 public class RandomUtils {
 
@@ -40,7 +40,7 @@ public class RandomUtils {
 	}
 
 	public static ItemStack getWirelessTerm(InventoryPlayer playerInv) {
-		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemWirelessCraftingTerminal) {
+		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof IWirelessCraftingTerminalItem) {
 			return playerInv.player.getHeldItem();
 		}
 		ItemStack wirelessTerm = null;
@@ -53,7 +53,7 @@ public class RandomUtils {
 			if (item == null) {
 				continue;
 			}
-			if (item.getItem() instanceof ItemWirelessCraftingTerminal) {
+			if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
 				wirelessTerm = item;
 				break;
 			}
@@ -69,7 +69,7 @@ public class RandomUtils {
 		// if not true, try to return first magnet card from first
 		// wireless term that has a MagnetCard installed
 		ItemStack wirelessTerm = getWirelessTerm(playerInv);
-		if (wirelessTerm != null && wirelessTerm.getItem() instanceof ItemWirelessCraftingTerminal) {
+		if (wirelessTerm != null && wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
 			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
 			if (nbtTC.hasKey("MagnetSlot")) {
 				NBTTagList magnetSlot = nbtTC.getTagList("MagnetSlot", 10);

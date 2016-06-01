@@ -11,7 +11,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 
 public class WCTInventoryCrafting extends AppEngInternalInventory {
 
@@ -188,7 +188,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 	}
 
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		return !(stack.getItem() instanceof ItemWirelessCraftingTerminal);
+		return !(stack.getItem() instanceof IWirelessCraftingTerminalItem);
 	}
 
 	public void writeNBT(NBTTagCompound nbtTagCompound) {

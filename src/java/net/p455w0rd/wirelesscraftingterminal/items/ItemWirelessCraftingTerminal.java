@@ -35,12 +35,13 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
-public class ItemWirelessCraftingTerminal extends  AERootPoweredItem implements IWirelessCraftingTermHandler, IAEItemPowerStorage, IAEFeature, IEnergyContainerItem
+public class ItemWirelessCraftingTerminal extends  AERootPoweredItem implements IWirelessCraftingTermHandler, IAEItemPowerStorage, IAEFeature, IEnergyContainerItem, IWirelessCraftingTerminalItem
 {
 
 	private static final String LINK_KEY_STRING = "key";
@@ -107,7 +108,7 @@ public class ItemWirelessCraftingTerminal extends  AERootPoweredItem implements 
 		ItemStack wirelessTerminal = null;
 		InventoryPlayer inv = p.inventory;
 		wirelessTerminal = RandomUtils.getWirelessTerm(inv);
-		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof ItemWirelessCraftingTerminal)) {
+		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
 			return;
 		}
 		checkForBooster(wirelessTerminal);

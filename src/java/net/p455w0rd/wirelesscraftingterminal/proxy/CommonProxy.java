@@ -22,6 +22,7 @@ import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketConfigSync;
@@ -30,7 +31,6 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.ConfigHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.VersionCheckHandler;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class CommonProxy {
@@ -78,7 +78,7 @@ public class CommonProxy {
 			if (item == null) {
 				continue;
 			}
-			if (item.getItem() instanceof ItemWirelessCraftingTerminal) {
+			if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
 				wirelessTerm = item;
 			}
 			if (wirelessTerm == null) {
