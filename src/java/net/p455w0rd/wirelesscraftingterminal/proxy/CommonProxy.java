@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.Achievement;
@@ -23,6 +24,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketConfigSync;
@@ -135,7 +137,12 @@ public class CommonProxy {
 			 * AchievementHandler.addAchievementToPage(AchievementHandler.
 			 * boosterAch, true, e.player); }
 			 */
-			new VersionCheckHandler();
+			if ((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) {
+				WCTLog.info("Dev environment detected, skipping version check");
+			}
+			else {
+				new VersionCheckHandler();
+			}
 		}
 		else {
 			final PacketConfigSync p = new PacketConfigSync(Reference.WCT_MAX_POWER, Reference.WCT_EASYMODE_ENABLED, Reference.WCT_BOOSTER_ENABLED, Reference.WCT_BOOSTER_DROPCHANCE, Reference.WCT_MINETWEAKER_OVERRIDE);

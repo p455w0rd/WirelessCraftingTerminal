@@ -71,11 +71,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 import net.p455w0rd.wirelesscraftingterminal.items.ItemMagnet;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
@@ -159,7 +159,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	private ContainerOpenContext openContext;
 	private final AppEngInternalInventory output = new AppEngInternalInventory(this, 1);
 	private final HashSet<Integer> locked = new HashSet<Integer>();
-	private ItemWirelessCraftingTerminal thisItem;
+	private IWirelessCraftingTerminalItem thisItem;
 	private IGridNode networkNode;
 	private IMEInventoryHandler<IAEItemStack> cellInv;
 
@@ -181,7 +181,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		this.magnetInventory = new WCTInventoryMagnet(RandomUtils.getWirelessTerm(inventoryPlayer));
 		this.trashInventory = new WCTInventoryTrash(RandomUtils.getWirelessTerm(inventoryPlayer));
 		this.containerstack = RandomUtils.getWirelessTerm(inventoryPlayer);
-		this.thisItem = (ItemWirelessCraftingTerminal) this.containerstack.getItem();
+		this.thisItem = (IWirelessCraftingTerminalItem) this.containerstack.getItem();
 		this.worldObj = player.worldObj;
 		this.craftingGrid = new WCTInventoryCrafting(this, 3, 3, containerstack);
 		this.inventoryPlayer = inventoryPlayer;
@@ -195,7 +195,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 		this.obj = getGuiObject(containerstack, player, worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		this.civ = (IPortableCell) this.obj;
 		//final IGridNode node = ((IGridNode) ((IGrid) this.obj.getTargetGrid()).getPivot()).getMachine().getGridNode(ForgeDirection.UNKNOWN);
-		final IGridNode node = this.obj.getActionableNode();
+		final IGridNode node = this.obj.getActionableNode(true);
 		this.networkNode = node;
 
 		this.prepareSync();

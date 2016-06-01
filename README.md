@@ -74,7 +74,13 @@ If you are only doing single file pull requests, GitHub supports using a quick w
 
 ## Wireless Crafting Terminal API
 
-* There is an API =D Info coming soon
+* The API is very simple
+
+To make your item a Wireless Crafting Terminal variant, register like normal with AE2 and implement
+`net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem`
+
+To open the WCT Gui from said item, use
+`WCTApi.instance().interact().openWirelessCraftingTerminalGui(EntityPlayer player);`
 
 ## Wireless Crafting Terminal Localization
 

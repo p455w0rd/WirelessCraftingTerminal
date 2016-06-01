@@ -14,12 +14,12 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetMagnet;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemWirelessCraftingTerminal;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 @SideOnly(Side.CLIENT)
@@ -50,7 +50,7 @@ public class KeybindHandler {
 				if (is == null) {
 					return;
 				}
-				ItemWirelessCraftingTerminal wirelessTerm = (ItemWirelessCraftingTerminal) is.getItem();
+				IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
 				if (wirelessTerm != null) {
 					if (!FMLClientHandler.instance().isGUIOpen(GuiWirelessCraftingTerminal.class)) {
 						NetworkHandler.instance.sendToServer(new PacketOpenGui(Reference.GUI_WCT));
