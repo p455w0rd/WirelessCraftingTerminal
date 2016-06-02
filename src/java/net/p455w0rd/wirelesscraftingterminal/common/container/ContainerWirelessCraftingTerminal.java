@@ -46,6 +46,7 @@ import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
 import appeng.api.implementations.guiobjects.IPortableCell;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
@@ -194,8 +195,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 
 		this.obj = getGuiObject(containerstack, player, worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 		this.civ = (IPortableCell) this.obj;
-		//final IGridNode node = ((IGridNode) ((IGrid) this.obj.getTargetGrid()).getPivot()).getMachine().getGridNode(ForgeDirection.UNKNOWN);
-		final IGridNode node = this.obj.getActionableNode(true);
+		final IGridNode node = ((IGridHost) this.obj).getGridNode(ForgeDirection.UNKNOWN);
 		this.networkNode = node;
 
 		this.prepareSync();

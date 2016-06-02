@@ -18,14 +18,20 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
+import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
+import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.FuzzyMode;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.ISecurityGrid;
@@ -86,6 +92,17 @@ public class PacketNEIRecipe extends WCTPacket
 
 		this.configureWrite( data );
 	}
+	
+	private WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+		if (it != null) {
+			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			if (wh != null) {
+				return new WirelessTerminalGuiObject(wh, it, player, w, x, y, z);
+			}
+		}
+
+		return null;
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
@@ -97,8 +114,13 @@ public class PacketNEIRecipe extends WCTPacket
 		if( con instanceof IContainerCraftingPacket )
 		{
 			final IContainerCraftingPacket cct = (IContainerCraftingPacket) con;
-			final IGridNode node = cct.getNetworkNode();
-			if( node != null )
+			IGridNode node = cct.getNetworkNode();
+			
+			if (node == null) {
+				WirelessTerminalGuiObject obj = getGuiObject(RandomUtils.getWirelessTerm(player.inventory), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+				node = obj.getActionableNode(true);
+			}
+			if ( node != null )
 			{
 				final IGrid grid = node.getGrid();
 				

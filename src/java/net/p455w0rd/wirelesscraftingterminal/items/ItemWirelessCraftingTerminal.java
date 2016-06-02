@@ -40,7 +40,7 @@ import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements IWirelessCraftingTerminalItem
 {
 
-	private static final String LINK_KEY_STRING = "key";
+	public static final String LINK_KEY_STRING = "key";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
 	private static final String POWER_NBT_KEY = "internalCurrentPower";
 	private static final String BOOSTER_SLOT_NBT = "BoosterSlot";
