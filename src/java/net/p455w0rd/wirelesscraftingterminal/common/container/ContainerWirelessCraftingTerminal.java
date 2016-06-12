@@ -1188,8 +1188,7 @@ public class ContainerWirelessCraftingTerminal extends Container implements ICon
 	}
 
 	public boolean isPowered() {
-		NBTTagCompound testnbt = this.containerstack.getTagCompound();
-		double pwr = testnbt.getDouble("internalCurrentPower");
+		double pwr = this.thisItem.getAECurrentPower(this.containerstack);
 		return (pwr > 0.0);
 	}
 
