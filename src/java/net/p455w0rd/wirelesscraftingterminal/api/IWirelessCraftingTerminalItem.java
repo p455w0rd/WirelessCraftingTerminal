@@ -10,4 +10,7 @@ public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHand
 	// checks if an Infinity Booster Caqrd is installed on the WCT
 	public boolean checkForBooster(final ItemStack wirelessTerminal);
 	
+	// checks if the Wireless Crafting Terminal is enabled on your item (need for ExtraCells Universal Terminal)
+	public boolean isWirelessCraftingEnabled(final ItemStack wirelessTerminal);
+	
 }
