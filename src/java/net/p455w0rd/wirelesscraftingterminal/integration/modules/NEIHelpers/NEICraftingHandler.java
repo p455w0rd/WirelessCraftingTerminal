@@ -3,6 +3,10 @@ package net.p455w0rd.wirelesscraftingterminal.integration.modules.NEIHelpers;
 import java.util.LinkedList;
 import java.util.List;
 
+import appeng.util.Platform;
+import codechicken.nei.PositionedStack;
+import codechicken.nei.api.IOverlayHandler;
+import codechicken.nei.recipe.IRecipeHandler;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,11 +17,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotCraftingM
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.SlotFakeCraftingMatrix;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
-import codechicken.nei.PositionedStack;
-import codechicken.nei.api.IOverlayHandler;
-import codechicken.nei.recipe.IRecipeHandler;
-
-import appeng.util.Platform;
 
 
 public class NEICraftingHandler implements IOverlayHandler

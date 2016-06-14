@@ -9,25 +9,6 @@ import javax.annotation.Nonnull;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
-import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
-import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
-import net.p455w0rd.wirelesscraftingterminal.common.container.CraftingCPURecord;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
-import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
@@ -43,6 +24,24 @@ import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.util.Platform;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ICrafting;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
+import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
+import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
+import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
+import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
+import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 
 public class ContainerCraftConfirm extends WCTBaseContainer

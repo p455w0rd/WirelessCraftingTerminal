@@ -1,6 +1,7 @@
 package net.p455w0rd.wirelesscraftingterminal.core.sync.packets;
 
 import java.io.IOException;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;

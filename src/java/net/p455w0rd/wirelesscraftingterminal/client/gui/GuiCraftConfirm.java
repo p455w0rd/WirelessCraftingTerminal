@@ -6,10 +6,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import com.google.common.base.Joiner;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.base.Joiner;
+
+import appeng.api.AEApi;
+import appeng.api.storage.ITerminalHost;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
+import appeng.core.localization.GuiText;
+import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -21,12 +29,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
-import appeng.api.AEApi;
-import appeng.api.storage.ITerminalHost;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.core.localization.GuiText;
-import appeng.util.Platform;
 
 public class GuiCraftConfirm extends WCTBaseGui {
 

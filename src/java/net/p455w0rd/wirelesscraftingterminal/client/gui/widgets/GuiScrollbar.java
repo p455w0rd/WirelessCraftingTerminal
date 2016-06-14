@@ -4,8 +4,8 @@ import org.lwjgl.opengl.GL11;
 
 import appeng.client.gui.widgets.IScrollSource;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.p455w0rd.wirelesscraftingterminal.client.gui.WCTBaseGui;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTerminal;
+import net.p455w0rd.wirelesscraftingterminal.client.gui.WCTBaseGui;
 
 public class GuiScrollbar implements IScrollSource
 {

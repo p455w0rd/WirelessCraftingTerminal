@@ -6,11 +6,11 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.minecraft.entity.player.InventoryPlayer;
-import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
 import appeng.api.networking.crafting.ICraftingCPU;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.storage.ITerminalHost;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.p455w0rd.wirelesscraftingterminal.common.container.guisync.GuiSync;
 
 
 public class ContainerCraftingStatus extends ContainerCraftingCPU

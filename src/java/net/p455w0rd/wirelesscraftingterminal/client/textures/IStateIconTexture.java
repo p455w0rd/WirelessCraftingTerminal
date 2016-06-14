@@ -1,6 +1,7 @@
 package net.p455w0rd.wirelesscraftingterminal.client.textures;
 
 import javax.annotation.Nonnull;
+
 import net.minecraft.util.ResourceLocation;
 
 /**

@@ -13,8 +13,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
-import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
+import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
 public class ItemInfinityBooster extends Item {
 

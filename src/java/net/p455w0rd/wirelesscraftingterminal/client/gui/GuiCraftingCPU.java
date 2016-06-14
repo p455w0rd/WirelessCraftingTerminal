@@ -7,19 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Joiner;
-
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
-import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingCPU;
-import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
+import com.google.common.base.Joiner;
+
 import appeng.api.AEApi;
 import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
@@ -32,6 +24,14 @@ import appeng.core.AEConfig;
 import appeng.core.localization.GuiText;
 import appeng.util.Platform;
 import appeng.util.ReadableNumberConverter;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
+import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftingCPU;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 
 
 public class GuiCraftingCPU extends WCTBaseGui implements ISortSource

@@ -2,15 +2,12 @@ package net.p455w0rd.wirelesscraftingterminal.core.sync.network;
 
 import java.lang.reflect.InvocationTargetException;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.player.EntityPlayer;
-
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacketHandlerBase;
-
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 
 public final class WCTServerPacketHandler extends WCTPacketHandlerBase implements IPacketHandler

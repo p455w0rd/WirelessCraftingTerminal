@@ -1,16 +1,14 @@
 package net.p455w0rd.wirelesscraftingterminal.core.sync.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetHandlerPlayServer;
-
-import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 
 public class NetworkHandler {
 

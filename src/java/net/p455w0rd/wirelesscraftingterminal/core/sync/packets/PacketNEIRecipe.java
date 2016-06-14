@@ -5,9 +5,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import appeng.api.AEApi;
+import appeng.api.config.Actionable;
+import appeng.api.config.FuzzyMode;
+import appeng.api.config.SecurityPermissions;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.energy.IEnergyGrid;
+import appeng.api.networking.security.ISecurityGrid;
+import appeng.api.networking.storage.IStorageGrid;
+import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
+import appeng.container.ContainerNull;
+import appeng.helpers.IContainerCraftingPacket;
+import appeng.items.storage.ItemViewCell;
+import appeng.util.InventoryAdaptor;
+import appeng.util.Platform;
+import appeng.util.item.AEItemStack;
+import appeng.util.prioitylist.IPartitionList;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -26,26 +44,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.config.FuzzyMode;
-import appeng.api.config.SecurityPermissions;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridHost;
-import appeng.api.networking.IGridNode;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.networking.storage.IStorageGrid;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.container.ContainerNull;
-import appeng.helpers.IContainerCraftingPacket;
-import appeng.items.storage.ItemViewCell;
-import appeng.util.InventoryAdaptor;
-import appeng.util.Platform;
-import appeng.util.item.AEItemStack;
-import appeng.util.prioitylist.IPartitionList;
 
 
 public class PacketNEIRecipe extends WCTPacket

@@ -2,10 +2,9 @@ package net.p455w0rd.wirelesscraftingterminal.client.me;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.util.StatCollector;
-
 import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.util.ItemSorters;
+import net.minecraft.util.StatCollector;
 
 
 public class ClientDCInternalInv implements Comparable<ClientDCInternalInv>

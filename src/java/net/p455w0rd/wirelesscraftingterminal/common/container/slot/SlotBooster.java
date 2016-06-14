@@ -1,13 +1,13 @@
 package net.p455w0rd.wirelesscraftingterminal.common.container.slot;
 
-import net.p455w0rd.wirelesscraftingterminal.items.ItemBoosterBGIcon;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemBoosterBGIcon;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemInfinityBooster;
 
 public class SlotBooster extends AppEngSlot
 {

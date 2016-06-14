@@ -10,14 +10,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Stopwatch;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
+
+import appeng.api.storage.data.IAEItemStack;
+import appeng.client.gui.widgets.ITooltip;
+import appeng.container.slot.SlotRestrictedInput;
+import appeng.helpers.InventoryAction;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -29,12 +35,12 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.client.gui.widgets.GuiScrollbar;
-import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
 import net.p455w0rd.wirelesscraftingterminal.client.me.InternalSlotME;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotDisconnected;
 import net.p455w0rd.wirelesscraftingterminal.client.me.SlotME;
+import net.p455w0rd.wirelesscraftingterminal.client.me.WCTRenderItem;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngCraftingSlot;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngSlot;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngSlot.hasCalculatedValidness;
@@ -51,13 +57,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.integration.abstraction.INEI;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-
-import appeng.api.storage.data.IAEItemStack;
-import appeng.client.gui.widgets.ITooltip;
-import appeng.container.slot.SlotRestrictedInput;
-import appeng.helpers.InventoryAction;
 
 public abstract class WCTBaseGui extends GuiContainer {
 	private static boolean switchingGuis;

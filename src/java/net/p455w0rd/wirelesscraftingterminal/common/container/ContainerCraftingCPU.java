@@ -2,6 +2,18 @@ package net.p455w0rd.wirelesscraftingterminal.common.container;
 
 import java.io.IOException;
 
+import appeng.api.AEApi;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.crafting.CraftingItemList;
+import appeng.api.networking.crafting.ICraftingCPU;
+import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.storage.IBaseMonitor;
+import appeng.api.storage.IMEMonitorHandlerReceiver;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
+import appeng.helpers.ICustomNameObject;
+import appeng.me.cluster.implementations.CraftingCPUCluster;
+import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -16,18 +28,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketMEInventoryUpdate;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import appeng.api.AEApi;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.crafting.CraftingItemList;
-import appeng.api.networking.crafting.ICraftingCPU;
-import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.storage.IBaseMonitor;
-import appeng.api.storage.IMEMonitorHandlerReceiver;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import appeng.helpers.ICustomNameObject;
-import appeng.me.cluster.implementations.CraftingCPUCluster;
-import appeng.util.Platform;
 
 
 public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject

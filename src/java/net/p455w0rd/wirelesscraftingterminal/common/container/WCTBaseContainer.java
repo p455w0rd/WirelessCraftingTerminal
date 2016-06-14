@@ -10,6 +10,26 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import appeng.api.AEApi;
+import appeng.api.config.Actionable;
+import appeng.api.config.SecurityPermissions;
+import appeng.api.implementations.guiobjects.IGuiItemObject;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.energy.IEnergyGrid;
+import appeng.api.networking.energy.IEnergySource;
+import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.ISecurityGrid;
+import appeng.api.parts.IPart;
+import appeng.api.storage.IMEInventoryHandler;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.client.me.InternalSlotME;
+import appeng.client.me.SlotME;
+import appeng.helpers.ICustomNameObject;
+import appeng.helpers.InventoryAction;
+import appeng.util.InventoryAdaptor;
+import appeng.util.Platform;
+import appeng.util.inv.AdaptorPlayerHand;
+import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -43,26 +63,6 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketInventoryAc
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.config.SecurityPermissions;
-import appeng.api.implementations.guiobjects.IGuiItemObject;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.energy.IEnergyGrid;
-import appeng.api.networking.energy.IEnergySource;
-import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.parts.IPart;
-import appeng.api.storage.IMEInventoryHandler;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.client.me.InternalSlotME;
-import appeng.client.me.SlotME;
-import appeng.helpers.ICustomNameObject;
-import appeng.helpers.InventoryAction;
-import appeng.util.InventoryAdaptor;
-import appeng.util.Platform;
-import appeng.util.inv.AdaptorPlayerHand;
-import appeng.util.item.AEItemStack;
 
 public abstract class WCTBaseContainer extends Container {
 

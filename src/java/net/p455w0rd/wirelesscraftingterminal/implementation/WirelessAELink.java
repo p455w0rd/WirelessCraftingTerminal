@@ -24,8 +24,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.MachineSource;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
+import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 
 /**
  * Provides wireless access to a ME network.

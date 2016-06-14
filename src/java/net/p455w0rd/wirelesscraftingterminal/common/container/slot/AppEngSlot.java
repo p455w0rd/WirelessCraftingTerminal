@@ -1,13 +1,13 @@
 package net.p455w0rd.wirelesscraftingterminal.common.container.slot;
 
+import appeng.tile.inventory.AppEngInternalInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerWirelessCraftingTerminal;
-import appeng.tile.inventory.AppEngInternalInventory;
+import net.p455w0rd.wirelesscraftingterminal.common.container.WCTBaseContainer;
 
 public class AppEngSlot extends Slot {
 

@@ -1,15 +1,20 @@
 package net.p455w0rd.wirelesscraftingterminal.common;
 
-import net.minecraft.creativetab.CreativeTabs;
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.Mod.*;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.network.NetworkRegistry;
-
 import java.io.File;
 
 import appeng.api.AEApi;
 import appeng.api.features.IWirelessTermHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraft.creativetab.CreativeTabs;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
 import net.p455w0rd.wirelesscraftingterminal.creativetab.CreativeTabWCT;
@@ -17,9 +22,9 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.AchievementHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.ConfigHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.RecipeHandler;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
+import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.proxy.CommonProxy;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
-import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 
 @Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = ""
 		+ "required-after:Forge@["

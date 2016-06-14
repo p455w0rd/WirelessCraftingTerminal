@@ -1,11 +1,10 @@
 package net.p455w0rd.wirelesscraftingterminal.core.sync;
 
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 public abstract class WCTPacket {
 

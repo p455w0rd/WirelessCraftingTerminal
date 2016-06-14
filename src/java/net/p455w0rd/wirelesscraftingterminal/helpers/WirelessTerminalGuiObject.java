@@ -1,10 +1,5 @@
 package net.p455w0rd.wirelesscraftingterminal.helpers;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import appeng.api.AEApi;
 import appeng.api.config.AccessRestriction;
 import appeng.api.config.Actionable;
@@ -31,6 +26,11 @@ import appeng.api.util.DimensionalCoord;
 import appeng.api.util.IConfigManager;
 import appeng.container.interfaces.IInventorySlotAware;
 import appeng.tile.networking.TileWireless;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 
 public class WirelessTerminalGuiObject implements IActionHost, IPortableCell, IInventorySlotAware, WCTIActionHost {
 

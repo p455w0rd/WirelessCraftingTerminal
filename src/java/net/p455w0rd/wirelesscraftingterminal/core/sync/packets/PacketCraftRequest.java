@@ -2,9 +2,12 @@ package net.p455w0rd.wirelesscraftingterminal.core.sync.packets;
 
 import java.util.concurrent.Future;
 
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.crafting.ICraftingGrid;
+import appeng.api.networking.crafting.ICraftingJob;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftAmount;
@@ -12,10 +15,6 @@ import net.p455w0rd.wirelesscraftingterminal.common.container.ContainerCraftConf
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridHost;
-import appeng.api.networking.crafting.ICraftingGrid;
-import appeng.api.networking.crafting.ICraftingJob;
 
 public class PacketCraftRequest extends WCTPacket {
 

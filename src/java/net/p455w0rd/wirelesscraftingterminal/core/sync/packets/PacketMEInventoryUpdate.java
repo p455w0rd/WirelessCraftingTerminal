@@ -11,9 +11,13 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.Nullable;
 
+import appeng.api.storage.data.IAEItemStack;
+import appeng.util.item.AEItemStack;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,12 +27,6 @@ import net.p455w0rd.wirelesscraftingterminal.client.gui.GuiWirelessCraftingTermi
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-import appeng.api.storage.data.IAEItemStack;
-import appeng.util.item.AEItemStack;
 
 
 public class PacketMEInventoryUpdate extends WCTPacket

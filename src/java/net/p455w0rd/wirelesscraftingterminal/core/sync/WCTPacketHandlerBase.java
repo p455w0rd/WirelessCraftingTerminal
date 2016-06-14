@@ -17,9 +17,9 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketNEIRecipe;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketOpenGui;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketPartialItem;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetJobBytes;
+import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetMagnet;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwapSlots;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSwitchGuis;
-import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketSetMagnet;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketUpdateCPUInfo;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.packets.PacketValueConfig;
 

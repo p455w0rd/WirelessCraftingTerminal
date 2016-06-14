@@ -8,10 +8,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.ItemStack;
-
-import cpw.mods.fml.relauncher.ReflectionHelper;
-
 import appeng.api.AEApi;
 import appeng.api.config.SearchBoxMode;
 import appeng.api.config.Settings;
@@ -27,6 +23,8 @@ import appeng.items.storage.ItemViewCell;
 import appeng.util.ItemSorters;
 import appeng.util.Platform;
 import appeng.util.prioitylist.IPartitionList;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.item.ItemStack;
 
 
 public class ItemRepo

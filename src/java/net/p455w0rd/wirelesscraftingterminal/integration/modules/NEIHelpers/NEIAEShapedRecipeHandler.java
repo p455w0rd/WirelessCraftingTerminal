@@ -4,6 +4,17 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import appeng.core.AEConfig;
+import appeng.util.Platform;
+import codechicken.nei.NEIClientUtils;
+import codechicken.nei.NEIServerUtils;
+import codechicken.nei.PositionedStack;
+import codechicken.nei.api.DefaultOverlayRenderer;
+import codechicken.nei.api.IOverlayHandler;
+import codechicken.nei.api.IRecipeOverlayRenderer;
+import codechicken.nei.api.IStackPositioner;
+import codechicken.nei.recipe.RecipeInfo;
+import codechicken.nei.recipe.TemplateRecipeHandler;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.inventory.Container;
@@ -14,18 +25,6 @@ import net.p455w0rd.wirelesscraftingterminal.api.exceptions.MissingIngredientErr
 import net.p455w0rd.wirelesscraftingterminal.api.exceptions.RegistrationError;
 import net.p455w0rd.wirelesscraftingterminal.api.recipes.IIngredient;
 import net.p455w0rd.wirelesscraftingterminal.api.recipes.game.ShapedRecipe;
-import codechicken.nei.NEIClientUtils;
-import codechicken.nei.NEIServerUtils;
-import codechicken.nei.PositionedStack;
-import codechicken.nei.api.DefaultOverlayRenderer;
-import codechicken.nei.api.IOverlayHandler;
-import codechicken.nei.api.IRecipeOverlayRenderer;
-import codechicken.nei.api.IStackPositioner;
-import codechicken.nei.recipe.RecipeInfo;
-import codechicken.nei.recipe.TemplateRecipeHandler;
-
-import appeng.core.AEConfig;
-import appeng.util.Platform;
 
 
 public class NEIAEShapedRecipeHandler extends TemplateRecipeHandler

@@ -1,5 +1,6 @@
 package net.p455w0rd.wirelesscraftingterminal.common.container.slot;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -13,8 +14,6 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 
 
 public class AppEngCraftingSlot extends AppEngSlot

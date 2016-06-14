@@ -1,11 +1,11 @@
 package net.p455w0rd.wirelesscraftingterminal.client.me;
 
+import appeng.items.misc.ItemEncodedPattern;
+import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.p455w0rd.wirelesscraftingterminal.common.container.slot.AppEngSlot;
-import appeng.items.misc.ItemEncodedPattern;
-import appeng.util.Platform;
 
 
 public class SlotDisconnected extends AppEngSlot
