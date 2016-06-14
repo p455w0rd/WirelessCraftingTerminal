@@ -91,6 +91,10 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 		}
 		return false;
 	}
+	
+	public boolean isWirelessCraftingEnabled(final ItemStack wirelessTerminal) {
+		return true;
+	}
 
 	@Override
 	public void onUpdate(final ItemStack is, final World w, final Entity e, int i, boolean f) {
