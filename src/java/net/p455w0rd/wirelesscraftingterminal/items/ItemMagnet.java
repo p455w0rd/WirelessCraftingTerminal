@@ -109,6 +109,8 @@ public class ItemMagnet extends Item {
 		list.add(color("aqua") + "==============================");
 		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
+			ItemStack itemStack = getItemStack();
+			
 			String info = LocaleHandler.MagnetDesc.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {
 				list.add(line.trim());
@@ -117,7 +119,7 @@ public class ItemMagnet extends Item {
 			list.add("");
 			list.add(color("italics") + "" + LocaleHandler.MagnetDesc2.getLocal());
 			
-			if (isActivated(getItemStack())) {
+			if (isActivated(itemStack)) {
 				String boundKey = Keyboard.getKeyName(KeybindHandler.openMagnetFilter.getKeyCode());
 				if (!boundKey.equals("NONE")) {
 					list.add(color("italics") + LocaleHandler.OrPress.getLocal() + " " + color("yellow") + color("bold") + "[" + boundKey + "]");
@@ -151,7 +153,7 @@ public class ItemMagnet extends Item {
 			list.add((!doesMagnetIgnoreNBT() ? " " + not : color("green")) + " " + ignoring + " " + nbtData);
 			list.add((!doesMagnetIgnoreMeta() ? " " + not : color("green")) + " " + ignoring + " " + metaData);
 
-			List<ItemStack> filteredItems = getFilteredItems(getItemStack());
+			List<ItemStack> filteredItems = getFilteredItems(itemStack);
 			
 			if (filteredItems != null) {
 				list.add("");
@@ -524,6 +526,8 @@ public class ItemMagnet extends Item {
 	}
 
 	protected boolean isActivated(ItemStack item) {
+		if (item == null)
+			return false;
 		return item.getItemDamage() != 0;
 	}
 
