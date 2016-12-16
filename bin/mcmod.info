@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ae2wct",
+  "name": "AE2 Wireless Crafting Terminal",
+  "description": "Adds a wireless version of the AE2 Crafting Terminal",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://p455w0rd.net/",
+  "updateUrl": "",
+  "authorList": ["TheRealp455w0rd"],
+  "credits": "TheRealp455w0rd",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": ["Applied Energistics 2"]
+}
+]

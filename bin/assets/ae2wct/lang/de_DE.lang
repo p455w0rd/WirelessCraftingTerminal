@@ -1,0 +1,77 @@
+//**************************//
+//WIRELESS CRAFTING TEMRINAL//
+//**************************//
+
+//Items
+item.wirelessCraftingTerminal.name=Drahtlose Fertigungskonsole
+item.infinityBoosterCard.name=Unendliche Drahtlosverstärkerkarte
+item.magnetCard.name=Magnetkarte
+itemGroup.ae2wct=§9AE2 Wireless Crafting Terminal
+
+//Tooltips
+gui.tooltips.ae2wct.PressShift=Infos via Shiftklick
+gui.tooltips.ae2wct.OnlyWorks=Funktioniert nur im Slot der drahtlosen Fertigungskonsole
+gui.tooltips.ae2wct.TitleDesc=Beschreibung
+gui.tooltips.ae2wct.InfinityBoosterDesc=Ermöglicht es, eine verbundene AE2 Drahtlosfertigungskonsole über Dimensionen hinweg in jeder Distanz zu nutzen.
+gui.tooltips.ae2wct.MagnetDesc=Eine Magnetkarte, die automagisch Items in das AE-Netzwerk insertiert
+gui.tooltips.ae2wct.MagnetDesc2=Rechtsklick, um den Filter zu setzen
+gui.tooltips.ae2wct.LinkStatus=Verbindungsstatus
+gui.tooltips.ae2wct.Installed=Installiert
+gui.tooltips.ae2wct.NotInstalled=Nicht installiert
+gui.tooltips.ae2wct.Active=Aktiv
+gui.tooltips.ae2wct.Inactive=Inaktiv
+gui.tooltips.ae2wct.Status=Status
+gui.tooltips.ae2wct.EmptyTrash=Lösche Müll
+gui.tooltips.ae2wct.EmptyTrashDesc=Leere den Müll-Slot
+gui.tooltips.ae2wct.MagnetFilterTitle=Magnetfilter
+gui.tooltips.ae2wct.FilterMode=Filter-Modus
+gui.tooltips.ae2wct.Whitelisting=Erlauben
+gui.tooltips.ae2wct.Blacklisting=Verbieten
+gui.tooltips.ae2wct.MagnetActiveDesc1=Zusätzliche Items im Inventar platzieren
+gui.tooltips.ae2wct.MagnetActiveDesc2=Zusätzliche Items auf dem Boden liegen lassen
+gui.tooltips.ae2wct.Not=Not
+gui.tooltips.ae2wct.Using=Using
+gui.tooltips.ae2wct.Ignore=Ignore
+gui.tooltips.ae2wct.Ignoring=Ignoring
+gui.tooltips.ae2wct.NBTData=NBT Data
+gui.tooltips.ae2wct.MetaData=Meta Data
+gui.tooltips.ae2wct.OreDict=Ore Dictionary
+gui.tooltips.ae2wct.FilteredItems=Filtered Items
+gui.tooltips.ae2wct.OrPress=or press
+gui.tooltips.ae2wct.Press=Press
+gui.tooltips.ae2wct.ToSwitchMode=to switch magnet mode
+
+//Labels
+gui.labels.ae2wct.WirelessTermLabel=Drahtloskonsole
+
+//Config Descriptions
+config.ae2wct.MaxPowerDesc=In der Drahtloskonsole maximal speicherbare Energie in AE
+config.ae2wct.InfinityBoosterCfgDesc=Erlaube das unendliche Drahtlosverstärkerupgrade
+config.ae2wct.EasyModeDesc=Aktiviere den "Einfachen Modus" (Einfachere Rezepte + Rezept für unendlichen Drahtlosverstärker)
+config.ae2wct.BoosterDropChance=Wahrscheinlichkeit, dass ein Wither eine unendliche Drahtlosverstärkerkarte dropt (in % - 100=immer)
+config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
+config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
+config.ae2wct.DoVersionCheck=Check for updates
+config.ae2wct.NewVersionAvailable=New version of Wireless Crafting Terminal is available!
+config.ae2wct.ClickString=["Click here to go to download page [",{"text":"Download","color":"green","hoverEvent":{"action":"show_text","value":{"text":"Click this to download the latest version","color":"green"}},"clickEvent":{"action":"open_url","value":"http://minecraft.curseforge.com/projects/wireless-crafting-terminal"}},"]"]
+
+//Achievements
+achievement.wctAchievement=Digitales Fertigen über WLAN
+achievement.wctAchievement.desc=Fertige eine drahtlose Fertigungskonsole
+achievement.boosterAchievement=Interdimensionales Fertigen
+achievement.boosterAchievement.desc=Erwerbe eine unendliche Drahtlosverstärkerkarte
+achievement.magnetAchievement=Digitales Staubsaugen!
+achievement.magnetAchievement.desc=Fertige eine Magnetkarte
+
+//Chat Messages
+chatmessages.ae2wct.NoNetworkPower=Netzwerk hat keine Energie!
+chatmessages.ae2wct.MagnetMode1=Magnetkarte deaktiviert
+chatmessages.ae2wct.MagnetMode2=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden im Inventar platziert
+chatmessages.ae2wct.MagnetMode3=Magnetkarte aktiviert - Items, die nicht im AE-Netzwerk gespeichert sind, werden auf dem Boden liegen gelassen
+chatmessages.ae2wct.InitializeMagnet=Vor dem Benutzen des Tastenkürzels muss zuerst mit der Magnetkarte in der Hand ein Rechtsklick ausgeführt werden!
+
+//Keybindings
+key.OpenTerminal=Öffne drahtlose Fertigungskonsole
+key.OpenMagnetFilter=Öffne Magnetkartenfilter-GUI
+key.SwitchMagnetMode=Aktiviere/Deaktiviere Magnetkarte
+key.categories.ae2wct=Wireless Crafting Terminal

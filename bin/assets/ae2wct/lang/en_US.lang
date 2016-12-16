@@ -1,0 +1,77 @@
+//**************************//
+//WIRELESS CRAFTING TEMRINAL//
+//**************************//
+
+//Items
+item.wirelessCraftingTerminal.name=Wireless Crafting Terminal
+item.infinityBoosterCard.name=Infinity Booster Card
+item.magnetCard.name=Magnet Card
+itemGroup.ae2wct=§9AE2 Wireless Crafting Terminal
+
+//Tooltips
+gui.tooltips.ae2wct.PressShift=Hold Shift for Info
+gui.tooltips.ae2wct.OnlyWorks=Only works when in Wireless Crafting Terminal slot!
+gui.tooltips.ae2wct.TitleDesc=Description
+gui.tooltips.ae2wct.InfinityBoosterDesc=Allows a linked AE2 Wireless Crafting Terminal to be used at any distance and across dimensions.
+gui.tooltips.ae2wct.MagnetDesc=A magnet that automagically inserts items into the AE network.
+gui.tooltips.ae2wct.MagnetDesc2=Right-click to set filter
+gui.tooltips.ae2wct.LinkStatus=Link Status
+gui.tooltips.ae2wct.Installed=Installed
+gui.tooltips.ae2wct.NotInstalled=Not Installed
+gui.tooltips.ae2wct.Active=Active
+gui.tooltips.ae2wct.Inactive=Inactive
+gui.tooltips.ae2wct.Status=Status
+gui.tooltips.ae2wct.EmptyTrash=Empty Trash
+gui.tooltips.ae2wct.EmptyTrashDesc=Delete contents of the Trash slot
+gui.tooltips.ae2wct.MagnetFilterTitle=Magnet Filter
+gui.tooltips.ae2wct.FilterMode=Filter Mode
+gui.tooltips.ae2wct.Whitelisting=Whitelisting
+gui.tooltips.ae2wct.Blacklisting=Blacklisting
+gui.tooltips.ae2wct.MagnetActiveDesc1=Extra items added to inventory
+gui.tooltips.ae2wct.MagnetActiveDesc2=Extra items left on ground
+gui.tooltips.ae2wct.Not=Not
+gui.tooltips.ae2wct.Using=Using
+gui.tooltips.ae2wct.Ignore=Ignore
+gui.tooltips.ae2wct.Ignoring=Ignoring
+gui.tooltips.ae2wct.NBTData=NBT Data
+gui.tooltips.ae2wct.MetaData=Meta Data
+gui.tooltips.ae2wct.OreDict=Ore Dictionary
+gui.tooltips.ae2wct.FilteredItems=Filtered Items
+gui.tooltips.ae2wct.OrPress=or press
+gui.tooltips.ae2wct.Press=Press
+gui.tooltips.ae2wct.ToSwitchMode=to switch magnet mode
+
+//Labels
+gui.labels.ae2wct.WirelessTermLabel=Wireless Term
+
+//Config Descriptions
+config.ae2wct.MaxPowerDesc=Maximum Power in AE units the wireless terminal can hold
+config.ae2wct.InfinityBoosterCfgDesc=Enable Infinite Range Booster Upgrade
+config.ae2wct.EasyModeDesc=Enable Easy Mode (Easier Recipes+Infinity Booster Recipe)
+config.ae2wct.BoosterDropChance=Chance that Wither will drop Infinity Booster Card (in %-100=always drop)
+config.ae2wct.DisableBoosterDrop=Enabled Booster Card drops in hard mode (true=enabled)
+config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
+config.ae2wct.DoVersionCheck=Check for updates
+config.ae2wct.NewVersionAvailable=New version of Wireless Crafting Terminal is available!
+config.ae2wct.ClickString=["Click here to go to download page [",{"text":"Download","color":"green","hoverEvent":{"action":"show_text","value":{"text":"Click this to download the latest version","color":"green"}},"clickEvent":{"action":"open_url","value":"http://minecraft.curseforge.com/projects/wireless-crafting-terminal"}},"]"]
+
+//Achievements
+achievement.wctAchievement=Digital Crafting Over WiFi
+achievement.wctAchievement.desc=Craft a Wireless Crafting Terminal
+achievement.boosterAchievement=Interdimensional Crafting Sack
+achievement.boosterAchievement.desc=Aquire an Infinity Booster Card
+achievement.magnetAchievement=Digital Hoover
+achievement.magnetAchievement.desc=Craft a Magnet Card
+
+//Chat Messages
+chatmessages.ae2wct.NoNetworkPower=Network has no power!
+chatmessages.ae2wct.MagnetMode1=Magnet Card Deactivated
+chatmessages.ae2wct.MagnetMode2=Magnet Card Activated - Items not stored in AE network will be placed in inventory
+chatmessages.ae2wct.MagnetMode3=Magnet Card Activated - Items not stored in AE network will be left on ground
+chatmessages.ae2wct.InitializeMagnet=You must first right-click with the Magnet Card in hand before using the keybind!
+
+//Keybindings
+key.OpenTerminal=Open Wireless Crafting Terminal
+key.OpenMagnetFilter=Open Magnet Card Filter GUI
+key.SwitchMagnetMode=Activate/Deactivate Magnet Card
+key.categories.ae2wct=Wireless Crafting Terminal

@@ -1,0 +1,75 @@
+//**************************//
+//WIRELESS CRAFTING TEMRINAL//
+//**************************//
+
+//Items
+item.wirelessCraftingTerminal.name=Terminal Inal?mbrico de Fabricaci?n
+item.infinityBoosterCard.name=Tarjeta de Acelerador de Infinito
+item.magnetCard.name=Tarjeta de im?n
+itemGroup.ae2wct=§9AE2 Terminal Inal?mbrico de Fabricaci?n
+
+//Tooltips
+gui.tooltips.ae2wct.PressShift=Presionada la Tecla May?s para Informaci?n
+gui.tooltips.ae2wct.OnlyWorks=S?lo funciona cuando en la ranura de la Terminal de trabajo inal?mbrica!
+gui.tooltips.ae2wct.TitleDesc=la Descripci?n
+gui.tooltips.ae2wct.InfinityBoosterDesc=Permite un vinculado AE2 elaboraci?n Terminal inal?mbrica ser utilizado en cualquier distancia y a trav?s de dimensiones.
+gui.tooltips.ae2wct.MagnetDesc=Un im?n que autom?ticamente inserta elementos en la red AE.
+gui.tooltips.ae2wct.MagnetDesc2=Haga clic en establecer filtro
+gui.tooltips.ae2wct.LinkStatus=El estado de enlace
+gui.tooltips.ae2wct.Installed=Instalar 
+gui.tooltips.ae2wct.NotInstalled=Instalado
+gui.tooltips.ae2wct.Active=Activo
+gui.tooltips.ae2wct.Inactive=Inactivo
+gui.tooltips.ae2wct.Status=Condici?n 
+gui.tooltips.ae2wct.EmptyTrash=Vaciar Papelera
+gui.tooltips.ae2wct.EmptyTrashDesc=Elimine el contenido de la papelera de la ranura
+gui.tooltips.ae2wct.MagnetFilterTitle=Filtro de im?n
+gui.tooltips.ae2wct.FilterMode=Modo de filtro
+gui.tooltips.ae2wct.Whitelisting=Lista Blanca
+gui.tooltips.ae2wct.Blacklisting=Lista Negra
+gui.tooltips.ae2wct.MagnetActiveDesc1=Art?culos extra a?adidos en el inventario
+gui.tooltips.ae2wct.MagnetActiveDesc2=Art?culos adicionales dejados en suelo
+gui.tooltips.ae2wct.Not=Not
+gui.tooltips.ae2wct.Using=Using
+gui.tooltips.ae2wct.Ignore=Ignore
+gui.tooltips.ae2wct.Ignoring=Ignoring
+gui.tooltips.ae2wct.NBTData=NBT Data
+gui.tooltips.ae2wct.MetaData=Meta Data
+gui.tooltips.ae2wct.OreDict=Ore Dictionary
+gui.tooltips.ae2wct.FilteredItems=Filtered Items
+gui.tooltips.ae2wct.OrPress=or press
+gui.tooltips.ae2wct.Press=Press
+gui.tooltips.ae2wct.ToSwitchMode=to switch magnet mode
+
+//Labels
+gui.labels.ae2wct.WirelessTermLabel=T?rmino Inal?mbrico
+
+//Config Descriptions
+config.ae2wct.MaxPowerDesc=Potencia m?xima en unidades AE que puede sostener el terminal inal?mbrico
+config.ae2wct.InfinityBoosterCfgDesc=Activar infinita gama Booster mejora
+config.ae2wct.EasyModeDesc=Activar el modo f?cil (Recetas m?s f?ciles y Infinity Booster receta)
+config.ae2wct.BoosterDropChance=Oportunidad que marchitar caer? infinito Booster tarjeta (en %-100 = caer siempre)
+config.ae2wct.DisableBoosterDrop=Activado Booster Card cae en modo dif?cil (true=permitir)
+config.ae2wct.MineTweakerOverride=Enable MineTweaker Override (true=disables all recipes)
+config.ae2wct.DoVersionCheck=Check for updates
+config.ae2wct.ClickString=["Click here to go to download page [",{"text":"Download","color":"green","hoverEvent":{"action":"show_text","value":{"text":"Click this to download the latest version","color":"green"}},"clickEvent":{"action":"open_url","value":"http://minecraft.curseforge.com/projects/wireless-crafting-terminal"}},"]"]
+
+//Achievements
+achievement.wctAchievement=Digital elaboraci?n sobre WLAN
+achievement.wctAchievement.desc=Un Wireless Terminal de elaboraci?n del arte
+achievement.boosterAchievement=Saco de fabricaci?n interdimensional
+achievement.boosterAchievement.desc=Adquirir una tarjeta de acelerador de infinito
+achievement.magnetAchievement=Aspiradora digital
+achievement.magnetAchievement.desc=Elaborar una tarjeta de im?n
+
+//Chat Messages
+chatmessages.ae2wct.NoNetworkPower=Red no tiene poder!
+chatmessages.ae2wct.MagnetMode1=Imanes tarjeta desactivada
+chatmessages.ae2wct.MagnetMode2=Tarjeta im?n activado - Art?culos no almacenados en red AE se colocar? en el inventario
+chatmessages.ae2wct.MagnetMode3=Tarjeta im?n activado - Art?culos no almacenados en red AE se quedar?n en la tierra
+
+//Keybindings
+key.OpenTerminal=Abierto Terminal Inal?mbrico de Fabricaci?n
+key.OpenMagnetFilter=Filtro tarjeta de im?n abierto GUI
+key.SwitchMagnetMode=Activar/desactivar tarjeta im?n
+key.categories.ae2wct=Terminal Inal?mbrico de Fabricaci?n

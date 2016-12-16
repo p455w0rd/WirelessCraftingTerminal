@@ -9,10 +9,6 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
-		maven {
-            name "ChickenBones"
-            url "http://chickenbones.net/maven/"
-        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
@@ -61,10 +57,18 @@ artifacts {
     archives jar
 }
 
+repositories {
+    maven {
+        name "ChickenBones"
+        url "http://chickenbones.net/maven/"
+    }
+}
+
 dependencies {
 	compile("appeng:appliedenergistics2:rv3-beta-5:dev") {
 		transitive = false
     }
+	compile "codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev"
 }
 
 sourceSets {

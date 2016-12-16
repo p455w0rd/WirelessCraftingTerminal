@@ -26,6 +26,7 @@ import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,7 +42,6 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTIActionHost;
 import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
@@ -51,11 +51,12 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
+import p455w0rdslib.util.EntityItemUtils;
 
 /**
  * Jotato's amazing magnet item from QuantumFlux adapted for use in the Wireless
  * Crafting Terminal
- * 
+ *
  * @author p455w0rd, Jotato
  *
  */
@@ -74,7 +75,7 @@ public class ItemMagnet extends Item {
 	public ItemMagnet() {
 		super();
 		setMaxStackSize(1);
-		this.distanceFromPlayer = 16;
+		distanceFromPlayer = 16;
 		canRepair = false;
 		setMaxDamage(0);
 		setTextureName(Reference.MODID + ":magnetCard");
@@ -87,7 +88,7 @@ public class ItemMagnet extends Item {
 	}
 
 	public void setItemStack(ItemStack is) {
-		this.thisItemStack = is;
+		thisItemStack = is;
 	}
 
 	@Override
@@ -102,7 +103,6 @@ public class ItemMagnet extends Item {
 		return null;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack is, EntityPlayer player, List list, boolean par4) {
@@ -110,7 +110,7 @@ public class ItemMagnet extends Item {
 		String shift = LocaleHandler.PressShift.getLocal().replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
 			ItemStack itemStack = getItemStack();
-			
+
 			String info = LocaleHandler.MagnetDesc.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {
 				list.add(line.trim());
@@ -118,7 +118,7 @@ public class ItemMagnet extends Item {
 
 			list.add("");
 			list.add(color("italics") + "" + LocaleHandler.MagnetDesc2.getLocal());
-			
+
 			if (isActivated(itemStack)) {
 				String boundKey = Keyboard.getKeyName(KeybindHandler.openMagnetFilter.getKeyCode());
 				if (!boundKey.equals("NONE")) {
@@ -148,13 +148,13 @@ public class ItemMagnet extends Item {
 			String nbtData = LocaleHandler.NBTData.getLocal();
 			String metaData = LocaleHandler.MetaData.getLocal();
 			String usingOreDict = LocaleHandler.Using.getLocal() + " " + LocaleHandler.OreDict.getLocal();
-			
+
 			list.add((!doesMagnetUseOreDict() ? " " + not : color("green")) + " " + usingOreDict);
 			list.add((!doesMagnetIgnoreNBT() ? " " + not : color("green")) + " " + ignoring + " " + nbtData);
 			list.add((!doesMagnetIgnoreMeta() ? " " + not : color("green")) + " " + ignoring + " " + metaData);
 
 			List<ItemStack> filteredItems = getFilteredItems(itemStack);
-			
+
 			if (filteredItems != null) {
 				list.add("");
 				list.add(color("gray") + LocaleHandler.FilteredItems.getLocal() + ":");
@@ -162,7 +162,7 @@ public class ItemMagnet extends Item {
 					list.add("  " + filteredItems.get(i).getDisplayName());
 				}
 			}
-			
+
 			list.add("");
 			String onlyWorks = LocaleHandler.OnlyWorks.getLocal();
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(onlyWorks, 27, "\n", false))) {
@@ -220,7 +220,6 @@ public class ItemMagnet extends Item {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void doMagnet(ItemStack item, World world, EntityPlayer player, ItemStack wirelessTerm) {
 		if (world.isRemote) {
 			return;
@@ -228,21 +227,29 @@ public class ItemMagnet extends Item {
 		if (getItemStack() == null) {
 			return;
 		}
-		if (!isActivated(item))
+		if (!isActivated(item)) {
 			return;
-		if (player == null)
+		}
+		if (player == null) {
 			return;
+		}
+		if (player.isSneaking()) {
+			return;
+		}
 
-		List<ItemStack> filteredList = getFilteredItems(this.getItemStack());
+		List<ItemStack> filteredList = getFilteredItems(getItemStack());
 		// items
-		Iterator iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
+		Iterator<Entity> iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
 
 			EntityItem itemToGet = (EntityItem) iterator.next();
 			if (itemToGet == null) {
 				return;
 			}
-			itemToGet.delayBeforeCanPickup = 75;
+			if (EntityItemUtils.getThrowerName(itemToGet) != null && EntityItemUtils.getThrowerName(itemToGet).equals(player.getCommandSenderName()) && !EntityItemUtils.canPickup(itemToGet)) {
+				continue;
+			}
+			//itemToGet.delayBeforeCanPickup = 75;
 
 			EntityItemPickupEvent pickupEvent = new EntityItemPickupEvent(player, itemToGet);
 			ItemPickupEvent itemPickupEvent = new ItemPickupEvent(player, itemToGet);
@@ -255,13 +262,13 @@ public class ItemMagnet extends Item {
 			MinecraftForge.EVENT_BUS.post(pickupEvent);
 			FMLCommonHandler.instance().bus().post(itemPickupEvent);
 
-			if (this.obj == null) {
-				this.obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-				this.civ = (IPortableCell) this.obj;
-				this.powerSrc = (IEnergySource) this.civ;
-				this.monitor = civ.getItemInventory();
-				this.cellInv = this.monitor;
-				this.mySrc = new WCTPlayerSource(player, (WCTIActionHost) this.obj);
+			if (obj == null) {
+				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+				civ = obj;
+				powerSrc = civ;
+				monitor = civ.getItemInventory();
+				cellInv = monitor;
+				mySrc = new WCTPlayerSource(player, obj);
 			}
 
 			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && Reference.WCT_BOOSTER_ENABLED);
@@ -272,7 +279,7 @@ public class ItemMagnet extends Item {
 				if (!itemToGet.isDead) {
 
 					// whitelist
-					if (getMode(this.getItemStack())) {
+					if (getMode(getItemStack())) {
 						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
 							itemToGet.setDead();
 							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
@@ -318,7 +325,7 @@ public class ItemMagnet extends Item {
 		}
 
 		// xp
-		iterator = getEntitiesInRange(EntityXPOrb.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, this.distanceFromPlayer).iterator();
+		iterator = getEntitiesInRange(EntityXPOrb.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
 			EntityXPOrb xpToGet = (EntityXPOrb) iterator.next();
 			if (xpToGet.isDead || xpToGet.isInvisible()) {
@@ -349,23 +356,23 @@ public class ItemMagnet extends Item {
 	}
 
 	private boolean doesMagnetIgnoreNBT() {
-		return RandomUtils.readBoolean(this.getItemStack(), "IgnoreNBT");
+		return RandomUtils.readBoolean(getItemStack(), "IgnoreNBT");
 	}
 
 	private boolean doesMagnetIgnoreMeta() {
-		return RandomUtils.readBoolean(this.getItemStack(), "IgnoreMeta");
+		return RandomUtils.readBoolean(getItemStack(), "IgnoreMeta");
 	}
 
 	private boolean doesMagnetUseOreDict() {
-		return RandomUtils.readBoolean(this.getItemStack(), "UseOreDict");
+		return RandomUtils.readBoolean(getItemStack(), "UseOreDict");
 	}
 
 	private boolean areOresEqual(ItemStack is1, ItemStack is2) {
 		int[] list1 = OreDictionary.getOreIDs(is1);
 		int[] list2 = OreDictionary.getOreIDs(is2);
-		for (int i = 0; i < list1.length; i++) {
-			for (int j = 0; j < list2.length; j++) {
-				if (list1[i] == list2[j]) {
+		for (int element : list1) {
+			for (int element2 : list2) {
+				if (element == element2) {
 					return true;
 				}
 			}
@@ -376,7 +383,7 @@ public class ItemMagnet extends Item {
 	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
 		if (is != null && itemList != null) {
 			for (int i = 0; i < itemList.size(); i++) {
-				ItemStack thisStack = (ItemStack) itemList.get(i);
+				ItemStack thisStack = itemList.get(i);
 				//use oredict
 				if (doesMagnetUseOreDict()) {
 					if (areOresEqual(is, thisStack)) {
@@ -421,7 +428,7 @@ public class ItemMagnet extends Item {
 		if (player.capabilities.isCreativeMode) {
 			return true;
 		}
-		final IGrid g = this.obj.getTargetGrid();
+		final IGrid g = obj.getTargetGrid();
 		if (g != null) {
 			if (requirePower) {
 				final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
@@ -462,7 +469,7 @@ public class ItemMagnet extends Item {
 	}
 
 	private void doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
-		ais = Platform.poweredInsert(this.powerSrc, this.cellInv, ais, this.mySrc);
+		ais = Platform.poweredInsert(powerSrc, cellInv, ais, mySrc);
 		if (ais != null) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
@@ -526,8 +533,9 @@ public class ItemMagnet extends Item {
 	}
 
 	protected boolean isActivated(ItemStack item) {
-		if (item == null)
+		if (item == null) {
 			return false;
+		}
 		return item.getItemDamage() != 0;
 	}
 

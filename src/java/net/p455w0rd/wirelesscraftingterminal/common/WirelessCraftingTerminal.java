@@ -26,13 +26,10 @@ import net.p455w0rd.wirelesscraftingterminal.items.ItemEnum;
 import net.p455w0rd.wirelesscraftingterminal.proxy.CommonProxy;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
-@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = ""
-		+ "required-after:Forge@["
-		+ net.minecraftforge.common.ForgeVersion.majorVersion + '.' // majorVersion
+@Mod(modid = Reference.MODID, acceptedMinecraftVersions = "[1.7.10]", name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "" + "required-after:Forge@[" + net.minecraftforge.common.ForgeVersion.majorVersion + '.' // majorVersion
 		+ net.minecraftforge.common.ForgeVersion.minorVersion + '.' // minorVersion
 		+ net.minecraftforge.common.ForgeVersion.revisionVersion + '.' // revisionVersion
-		+ net.minecraftforge.common.ForgeVersion.buildVersion + ",);"
-				+ "required-after:appliedenergistics2@[rv3-beta-1,);after:NotEnoughItems;")
+		+ net.minecraftforge.common.ForgeVersion.buildVersion + ",);" + "required-after:appliedenergistics2@[rv3-beta-1,);required-after:p455w0rdslib;after:NotEnoughItems;")
 
 public class WirelessCraftingTerminal {
 
