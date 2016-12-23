@@ -69,6 +69,7 @@ dependencies {
 		transitive = false
     }
 	compile "codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev"
+	compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
 }
 
 sourceSets {
@@ -83,6 +84,7 @@ sourceSets {
             include "assets/ae2wct/lang/*.lang",
                     "assets/ae2wct/textures/gui/*",
                     "assets/ae2wct/textures/items/*",
+					"assets/ae2wct/textures/cape/*",
 					"mcmod.info",
                     "pack.mcmeta"
         }

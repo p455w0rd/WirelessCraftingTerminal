@@ -1,10 +1,12 @@
 bin
 libs
+run
 *.class
 .gradle
-gradle
 .classpath
-
+build
+.project
+*.launch
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
