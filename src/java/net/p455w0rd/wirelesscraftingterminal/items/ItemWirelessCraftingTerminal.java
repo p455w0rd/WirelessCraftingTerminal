@@ -35,10 +35,10 @@ import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
 import net.p455w0rd.wirelesscraftingterminal.api.WCTApi;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
+import net.p455w0rd.wirelesscraftingterminal.integration.EnderIO;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
-public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements IWirelessCraftingTerminalItem
-{
+public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements IWirelessCraftingTerminalItem {
 
 	public static final String LINK_KEY_STRING = "key";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
@@ -60,6 +60,12 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 		return checkForBooster(is);
 	}
 
+	@Override
+	public boolean isBookEnchantable(final ItemStack itemstack1, final ItemStack itemstack2) {
+		return EnderIO.isSoulBound(itemstack2);
+	}
+
+	@Override
 	public boolean checkForBooster(final ItemStack wirelessTerminal) {
 		if (wirelessTerminal.hasTagCompound()) {
 			NBTTagList boosterNBTList = wirelessTerminal.getTagCompound().getTagList(BOOSTER_SLOT_NBT, 10);
@@ -91,7 +97,8 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 		}
 		return false;
 	}
-	
+
+	@Override
 	public boolean isWirelessCraftingEnabled(final ItemStack wirelessTerminal) {
 		return true;
 	}
@@ -102,8 +109,8 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 			return;
 		}
 		EntityPlayer p = (EntityPlayer) e;
-		if (this.entityPlayer == null) {
-			this.entityPlayer = p;
+		if (entityPlayer == null) {
+			entityPlayer = p;
 		}
 		ItemStack wirelessTerminal = null;
 		InventoryPlayer inv = p.inventory;
@@ -184,7 +191,9 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 		return out;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({
+			"unchecked", "rawtypes"
+	})
 	@Override
 	public void getCheckedSubItems(Item item, CreativeTabs creativeTab, List itemList) {
 		List itemList2 = itemList;
@@ -204,8 +213,9 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 		return true;
 	}
 
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({
+			"rawtypes", "unchecked"
+	})
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(ItemStack is, EntityPlayer player, List list, boolean displayMore) {
@@ -319,8 +329,8 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	@Override
 	public double extractAEPower(final ItemStack is, final double amt) {
 		int finalAmt = 0;
-		if (this.entityPlayer != null) {
-			finalAmt = (int) (this.entityPlayer.capabilities.isCreativeMode ? 0 : amt);
+		if (entityPlayer != null) {
+			finalAmt = (int) (entityPlayer.capabilities.isCreativeMode ? 0 : amt);
 		}
 		return getInternalBattery(is, batteryOperation.EXTRACT, finalAmt);
 	}
@@ -331,7 +341,7 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	}
 
 	private enum batteryOperation {
-		STORAGE, INJECT, EXTRACT
+			STORAGE, INJECT, EXTRACT
 	}
 
 	@Override
@@ -346,7 +356,7 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 
 	@Override
 	public boolean isRepairable() {
-		return false;
+		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -364,7 +374,7 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	public int getDamage(ItemStack stack) {
 		return 0;
 	}
-	
+
 	//RF Integration
 	@Override
 	public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
@@ -385,7 +395,7 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 			double currentAEPower = getAECurrentPower(container);
 			if ((int) currentAEPower < Reference.WCT_MAX_POWER) {
 				int leftOver = (int) PowerUnits.AE.convertTo(PowerUnits.RF, injectAEPower(container, PowerUnits.RF.convertTo(PowerUnits.AE, maxReceive)));
-				return (int) maxReceive - leftOver;
+				return maxReceive - leftOver;
 			}
 			else {
 				return 0;

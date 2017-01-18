@@ -21,9 +21,6 @@ import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.Platform;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.Entity;
@@ -37,12 +34,9 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTermHandler;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
-import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
 import net.p455w0rd.wirelesscraftingterminal.common.WCTGuiHandler;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
@@ -51,7 +45,6 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.KeybindHandler;
 import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
-import p455w0rdslib.util.EntityItemUtils;
 
 /**
  * Jotato's amazing magnet item from QuantumFlux adapted for use in the Wireless
@@ -63,12 +56,12 @@ import p455w0rdslib.util.EntityItemUtils;
 public class ItemMagnet extends Item {
 
 	private int distanceFromPlayer;
-	private WirelessTerminalGuiObject obj;
-	private IPortableCell civ;
-	private IEnergySource powerSrc;
-	private IMEMonitor<IAEItemStack> monitor;
-	private IMEInventoryHandler<IAEItemStack> cellInv;
-	private BaseActionSource mySrc;
+	public WirelessTerminalGuiObject obj;
+	public IPortableCell civ;
+	public IEnergySource powerSrc;
+	public IMEMonitor<IAEItemStack> monitor;
+	public IMEInventoryHandler<IAEItemStack> cellInv;
+	public BaseActionSource mySrc;
 	private ItemStack thisItemStack;
 	private int pickupTimer = 0;
 
@@ -237,90 +230,27 @@ public class ItemMagnet extends Item {
 			return;
 		}
 
-		List<ItemStack> filteredList = getFilteredItems(getItemStack());
+		//List<ItemStack> filteredList = getFilteredItems(getItemStack());
 		// items
-		Iterator<Entity> iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
+		Iterator<? extends Entity> iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
-
 			EntityItem itemToGet = (EntityItem) iterator.next();
-			if (itemToGet == null) {
-				return;
-			}
-			if (EntityItemUtils.getThrowerName(itemToGet) != null && EntityItemUtils.getThrowerName(itemToGet).equals(player.getCommandSenderName()) && !EntityItemUtils.canPickup(itemToGet)) {
+			if (itemToGet.func_145800_j() != null && itemToGet.func_145800_j().equals(player.getCommandSenderName())) {
 				continue;
 			}
-			//itemToGet.delayBeforeCanPickup = 75;
 
-			EntityItemPickupEvent pickupEvent = new EntityItemPickupEvent(player, itemToGet);
-			ItemPickupEvent itemPickupEvent = new ItemPickupEvent(player, itemToGet);
-			ItemStack itemStackToGet = itemToGet.getEntityItem();
-			if (itemStackToGet == null) {
-				return;
-			}
-			int stackSize = itemStackToGet.stackSize;
+			EntityPlayer closestPlayer = world.getClosestPlayerToEntity(itemToGet, distanceFromPlayer);
 
-			MinecraftForge.EVENT_BUS.post(pickupEvent);
-			FMLCommonHandler.instance().bus().post(itemPickupEvent);
-
-			if (obj == null) {
-				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-				civ = obj;
-				powerSrc = civ;
-				monitor = civ.getItemInventory();
-				cellInv = monitor;
-				mySrc = new WCTPlayerSource(player, obj);
+			if (closestPlayer != null && closestPlayer != player) {
+				continue;
 			}
 
-			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && Reference.WCT_BOOSTER_ENABLED);
-			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);
-			if ((ignoreRange && hasAxxess) || (obj.rangeCheck(false) && hasAxxess)) {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(itemStackToGet);
-				ais.setStackSize(stackSize);
-				if (!itemToGet.isDead) {
-
-					// whitelist
-					if (getMode(getItemStack())) {
-						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
-							itemToGet.setDead();
-							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
-							continue;
-						}
-						else {
-							if (item.getItemDamage() == 1) {
-								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
-									player.onItemPickup(itemToGet, stackSize);
-									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-								}
-							}
-							else {
-								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
-							}
-						}
-					}
-					// blacklist
-					else {
-						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() <= 0) {
-							itemToGet.setDead();
-							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
-							continue;
-						}
-						else {
-							if (item.getItemDamage() == 1) {
-								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
-									player.onItemPickup(itemToGet, stackSize);
-									world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-								}
-							}
-							else {
-								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
-							}
-						}
-					}
+			if (!world.isRemote) {
+				if (itemToGet.delayBeforeCanPickup > 0) {
+					itemToGet.delayBeforeCanPickup = 0;
 				}
-			}
-			// network isn't powered, WCT has no power, too far away with no booster installed..something is preventing use of WCT, so use niller cannix
-			else {
-				doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
+				itemToGet.motionX = itemToGet.motionY = itemToGet.motionZ = 0;
+				itemToGet.setPosition(player.posX - 0.2 + (world.rand.nextDouble() * 0.4), player.posY - 0.6, player.posZ - 0.2 + (world.rand.nextDouble() * 0.4));
 			}
 		}
 
@@ -341,7 +271,7 @@ public class ItemMagnet extends Item {
 		}
 	}
 
-	private void doVanillaPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
+	public void doVanillaPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
 		if (pickupTimer < 100) {
 			pickupTimer++;
 			return;
@@ -380,7 +310,7 @@ public class ItemMagnet extends Item {
 		return false;
 	}
 
-	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
+	public boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
 		if (is != null && itemList != null) {
 			for (int i = 0; i < itemList.size(); i++) {
 				ItemStack thisStack = itemList.get(i);
@@ -424,7 +354,7 @@ public class ItemMagnet extends Item {
 		return is1.getItemDamage() == is2.getItemDamage();
 	}
 
-	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
+	public boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
 		if (player.capabilities.isCreativeMode) {
 			return true;
 		}
@@ -445,7 +375,7 @@ public class ItemMagnet extends Item {
 		return false;
 	}
 
-	private List<ItemStack> getFilteredItems(ItemStack magnetItem) {
+	public List<ItemStack> getFilteredItems(ItemStack magnetItem) {
 		if (magnetItem == null) {
 			return null;
 		}
@@ -468,16 +398,18 @@ public class ItemMagnet extends Item {
 		return null;
 	}
 
-	private void doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
+	public boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
 		ais = Platform.poweredInsert(powerSrc, cellInv, ais, mySrc);
 		if (ais != null) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
 			world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+			return false;
 		}
+		return true;
 	}
 
-	private boolean isBoosterInstalled(ItemStack wirelessTerm) {
+	public boolean isBoosterInstalled(ItemStack wirelessTerm) {
 		if (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
 			if (wirelessTerm.hasTagCompound()) {
 				NBTTagList boosterNBTList = wirelessTerm.getTagCompound().getTagList("BoosterSlot", 10);
@@ -496,7 +428,7 @@ public class ItemMagnet extends Item {
 	}
 
 	// true=whitelist (default:whitelist)
-	private boolean getMode(ItemStack magnetItem) {
+	public boolean getMode(ItemStack magnetItem) {
 		if (magnetItem.getItem() instanceof ItemMagnet) {
 			if (magnetItem.hasTagCompound()) {
 				NBTTagCompound nbtTC = magnetItem.getTagCompound();
@@ -508,7 +440,7 @@ public class ItemMagnet extends Item {
 		return true;
 	}
 
-	private WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	public WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
@@ -519,8 +451,7 @@ public class ItemMagnet extends Item {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static List getEntitiesInRange(Class entityType, World world, int x, int y, int z, int distance) {
+	public static List<? extends Entity> getEntitiesInRange(Class<?> entityType, World world, int x, int y, int z, int distance) {
 		return world.getEntitiesWithinAABB(entityType, AxisAlignedBB.getBoundingBox(x - distance, y - distance, z - distance, x + distance, y + distance, z + distance));
 	}
 
@@ -532,7 +463,7 @@ public class ItemMagnet extends Item {
 		return new ItemStack(this, size);
 	}
 
-	protected boolean isActivated(ItemStack item) {
+	public boolean isActivated(ItemStack item) {
 		if (item == null) {
 			return false;
 		}

@@ -28,7 +28,7 @@ public class ClientProxy extends CommonProxy {
 
 	public ClientProxy() {
 		MinecraftForge.EVENT_BUS.register(this);
-		KeybindHandler.registerKeybinds();
+		KeybindHandler.registerKeybinds(); // whyyyy??? #SELFSLAP
 		FMLCommonHandler.instance().bus().register(new KeybindHandler());
 	}
 
@@ -40,25 +40,26 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 
+	@Override
 	public void registerRenderers() {
 		// No renderers...yet =]
 	}
-	
+
 	@SubscribeEvent
-    public void renderPlayer(RenderPlayerEvent.Specials.Pre event) {
+	public void renderPlayer(RenderPlayerEvent.Specials.Pre event) {
 		if (Reference.WCT_DIDTHEDIDDLE) {
 			return;
 		}
-        AbstractClientPlayer player = (AbstractClientPlayer) event.entityPlayer;
-        if (!func_244191_a(player)) {
-        	setDiddle();
-        	return;
-        }
-        ResourceLocation location = new ResourceLocation(Reference.MODID,new String(DatatypeConverter.parseBase64Binary("dGV4dHVyZXMvY2FwZS9wNDU1Y2FwZS5wbmc=")));
-        player.func_152121_a(MinecraftProfileTexture.Type.values()[1], location);
-       
-    }
-	
+		AbstractClientPlayer player = (AbstractClientPlayer) event.entityPlayer;
+		if (!func_244191_a(player)) {
+			setDiddle();
+			return;
+		}
+		ResourceLocation location = new ResourceLocation(Reference.MODID, new String(DatatypeConverter.parseBase64Binary("dGV4dHVyZXMvY2FwZS9wNDU1Y2FwZS5wbmc=")));
+		player.func_152121_a(MinecraftProfileTexture.Type.values()[1], location);
+
+	}
+
 	static List<String> playThatFunkayMusaXWhiteboi() {
 		try {
 			InputStream in = new URL(new String(DatatypeConverter.parseBase64Binary("aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3A0NTV3MHJkL1dpcmVsZXNzQ3JhZnRpbmdUZXJtaW5hbC9tYXN0ZXIvLnNldHRpbmdzL3BhdHJvbnMudHh0"))).openStream();
@@ -72,7 +73,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		return null;
 	}
-	
+
 	public static boolean func_244191_a(AbstractClientPlayer player) {
 		List<String> ae2serializable = playThatFunkayMusaXWhiteboi();
 		if (ae2serializable == null) {
@@ -90,7 +91,7 @@ public class ClientProxy extends CommonProxy {
 		setDiddle();
 		return false;
 	}
-	
+
 	private static void setDiddle() {
 		Reference.WCT_DIDTHEDIDDLE = true;
 	}

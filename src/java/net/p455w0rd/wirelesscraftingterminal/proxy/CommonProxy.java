@@ -1,7 +1,11 @@
 package net.p455w0rd.wirelesscraftingterminal.proxy;
 
+import java.util.List;
 import java.util.Random;
 
+import appeng.api.AEApi;
+import appeng.api.config.SecurityPermissions;
+import appeng.api.storage.data.IAEItemStack;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,16 +19,21 @@ import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.Achievement;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem;
+import net.p455w0rd.wirelesscraftingterminal.api.networking.security.WCTPlayerSource;
+import net.p455w0rd.wirelesscraftingterminal.common.utils.RandomUtils;
 import net.p455w0rd.wirelesscraftingterminal.common.utils.WCTLog;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.NetworkHandler;
@@ -44,6 +53,7 @@ public class CommonProxy {
 
 	public CommonProxy() {
 		MinecraftForge.EVENT_BUS.register(this);
+		FMLCommonHandler.instance().bus().register(this);
 		FMLCommonHandler.instance().bus().register(new ConfigHandler());
 	}
 
@@ -171,10 +181,93 @@ public class CommonProxy {
 	}
 
 	@SubscribeEvent
-	public void pickupEvent(PlayerEvent.ItemPickupEvent e) {
+	public void pickupEvent(EntityItemPickupEvent e) {
+		EntityPlayer player = e.entityPlayer;
+		if (player == null) {
+			return;
+		}
+		EntityItem itemEntity = e.item;
+		ItemStack stack = itemEntity.getEntityItem();
+		InventoryPlayer playerInv = player.inventory;
+		World world = player.getEntityWorld();
+		if (world.isRemote) {
+			return;
+		}
 		if (Reference.WCT_BOOSTER_ENABLED && !Reference.WCT_EASYMODE_ENABLED) {
-			if (e.pickedUp.getEntityItem().getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
-				AchievementHandler.triggerAch(boosterAch, e.player);
+			if (stack.getItem() == ItemEnum.BOOSTER_CARD.getItem()) {
+				AchievementHandler.triggerAch(boosterAch, player);
+			}
+		}
+		if (RandomUtils.getWirelessTerm(playerInv) != null) {
+			ItemStack WCTStack = RandomUtils.getWirelessTerm(playerInv);
+			if (RandomUtils.isMagnetInstalled(playerInv)) {
+				ItemStack magnetStack = RandomUtils.getMagnet(playerInv);
+				if (magnetStack.getItem() instanceof ItemMagnet) {
+					ItemMagnet magnet = (ItemMagnet) magnetStack.getItem();
+
+					magnet.obj = magnet.getGuiObject(WCTStack, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+					magnet.civ = magnet.obj;
+					magnet.powerSrc = magnet.civ;
+					magnet.monitor = magnet.civ.getItemInventory();
+					magnet.cellInv = magnet.monitor;
+					magnet.mySrc = new WCTPlayerSource(player, magnet.obj);
+
+					boolean ignoreRange = (magnet.isBoosterInstalled(WCTStack) && Reference.WCT_BOOSTER_ENABLED);
+					boolean hasAxxess = magnet.hasNetworkAccess(SecurityPermissions.INJECT, true, player, WCTStack);
+					if ((ignoreRange && hasAxxess) || (magnet.obj.rangeCheck(false) && hasAxxess)) {
+						if (magnet.isActivated(magnetStack)) {
+							List<ItemStack> filteredList = magnet.getFilteredItems(magnetStack);
+							IAEItemStack ais = AEApi.instance().storage().createItemStack(stack);
+							if (magnet.getMode(magnetStack)) { //whitelisting
+								if (filteredList != null && magnet.isItemFiltered(stack, filteredList) && filteredList.size() > 0) {
+									if (magnet.doInject(ais, stack.stackSize, player, itemEntity, stack, world)) {
+										stack = null;
+										itemEntity.setDead();
+										e.setCanceled(true);
+									}
+									//Platform.poweredInsert(magnet.powerSrc, magnet.cellInv, ais, magnet.mySrc);
+								}
+								else {
+									if (magnetStack.getItemDamage() == 1) {
+										if (player.inventory.addItemStackToInventory(stack)) {
+											player.onItemPickup(itemEntity, stack.stackSize);
+											world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+										}
+									}
+									else {
+										magnet.doVanillaPickup(itemEntity, player, stack, world, stack.stackSize);
+									}
+								}
+							}
+							else { //blacklisting
+								if (!magnet.isItemFiltered(stack, filteredList) || filteredList == null || filteredList.size() <= 0) {
+									if (magnet.doInject(ais, stack.stackSize, player, itemEntity, stack, world)) {
+										stack = null;
+										itemEntity.setDead();
+										e.setCanceled(true);
+									}
+									else {
+										player.inventory.addItemStackToInventory(stack);
+									}
+								}
+								else {
+									if (magnetStack.getItemDamage() == 1) {
+										if (player.inventory.addItemStackToInventory(stack)) {
+											player.onItemPickup(itemEntity, stack.stackSize);
+											world.playSoundAtEntity(player, "random.pop", 0.15F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+										}
+									}
+									else {
+										magnet.doVanillaPickup(itemEntity, player, stack, world, stack.stackSize);
+									}
+								}
+							}
+						}
+					}
+					else {
+						magnet.doVanillaPickup(itemEntity, player, stack, world, stack.stackSize);
+					}
+				}
 			}
 		}
 	}
