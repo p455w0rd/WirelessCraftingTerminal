@@ -45,30 +45,23 @@ import net.p455w0rd.wirelesscraftingterminal.core.sync.WCTPacket;
 import net.p455w0rd.wirelesscraftingterminal.core.sync.network.INetworkInfo;
 import net.p455w0rd.wirelesscraftingterminal.helpers.WirelessTerminalGuiObject;
 
-
-public class PacketNEIRecipe extends WCTPacket
-{
+public class PacketNEIRecipe extends WCTPacket {
 
 	private ItemStack[][] recipe;
 
 	// automatic.
-	public PacketNEIRecipe( final ByteBuf stream ) throws IOException
-	{
-		final ByteArrayInputStream bytes = new ByteArrayInputStream( stream.array() );
-		bytes.skip( stream.readerIndex() );
-		final NBTTagCompound comp = CompressedStreamTools.readCompressed( bytes );
-		if( comp != null )
-		{
-			this.recipe = new ItemStack[9][];
-			for( int x = 0; x < this.recipe.length; x++ )
-			{
-				final NBTTagList list = comp.getTagList( "#" + x, 10 );
-				if( list.tagCount() > 0 )
-				{
-					this.recipe[x] = new ItemStack[list.tagCount()];
-					for( int y = 0; y < list.tagCount(); y++ )
-					{
-						this.recipe[x][y] = ItemStack.loadItemStackFromNBT( list.getCompoundTagAt( y ) );
+	public PacketNEIRecipe(final ByteBuf stream) throws IOException {
+		final ByteArrayInputStream bytes = new ByteArrayInputStream(stream.array());
+		bytes.skip(stream.readerIndex());
+		final NBTTagCompound comp = CompressedStreamTools.readCompressed(bytes);
+		if (comp != null) {
+			recipe = new ItemStack[9][];
+			for (int x = 0; x < recipe.length; x++) {
+				final NBTTagList list = comp.getTagList("#" + x, 10);
+				if (list.tagCount() > 0) {
+					recipe[x] = new ItemStack[list.tagCount()];
+					for (int y = 0; y < list.tagCount(); y++) {
+						recipe[x][y] = ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(y));
 					}
 				}
 			}
@@ -76,21 +69,20 @@ public class PacketNEIRecipe extends WCTPacket
 	}
 
 	// api
-	public PacketNEIRecipe( final NBTTagCompound recipe ) throws IOException
-	{
+	public PacketNEIRecipe(final NBTTagCompound recipe) throws IOException {
 		final ByteBuf data = Unpooled.buffer();
 
 		final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		final DataOutputStream outputStream = new DataOutputStream( bytes );
+		final DataOutputStream outputStream = new DataOutputStream(bytes);
 
-		data.writeInt( this.getPacketID() );
+		data.writeInt(getPacketID());
 
-		CompressedStreamTools.writeCompressed( recipe, outputStream );
-		data.writeBytes( bytes.toByteArray() );
+		CompressedStreamTools.writeCompressed(recipe, outputStream);
+		data.writeBytes(bytes.toByteArray());
 
-		this.configureWrite( data );
+		configureWrite(data);
 	}
-	
+
 	private WirelessTerminalGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
@@ -102,117 +94,98 @@ public class PacketNEIRecipe extends WCTPacket
 		return null;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({
+			"rawtypes", "unchecked"
+	})
 	@Override
-	public void serverPacketData( final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player )
-	{
+	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		final EntityPlayerMP pmp = (EntityPlayerMP) player;
 		final Container con = pmp.openContainer;
 
-		if( con instanceof IContainerCraftingPacket )
-		{
+		if (con instanceof IContainerCraftingPacket) {
 			final IContainerCraftingPacket cct = (IContainerCraftingPacket) con;
 			IGridNode node = cct.getNetworkNode();
-			
+
 			if (node == null) {
 				WirelessTerminalGuiObject obj = getGuiObject(RandomUtils.getWirelessTerm(player.inventory), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
 				node = obj.getActionableNode(true);
 			}
-			if ( node != null )
-			{
+			if (node != null) {
 				final IGrid grid = node.getGrid();
-				
-				if( grid == null )
-				{
+
+				if (grid == null) {
 					return;
 				}
 
-				final IStorageGrid inv = grid.getCache( IStorageGrid.class );
-				final IEnergyGrid energy = grid.getCache( IEnergyGrid.class );
-				final ISecurityGrid security = grid.getCache( ISecurityGrid.class );
-				final IInventory craftMatrix = cct.getInventoryByName( "crafting" );
-				final IInventory playerInventory = cct.getInventoryByName( "container.inventory" );
+				final IStorageGrid inv = grid.getCache(IStorageGrid.class);
+				final IEnergyGrid energy = grid.getCache(IEnergyGrid.class);
+				final ISecurityGrid security = grid.getCache(ISecurityGrid.class);
+				final IInventory craftMatrix = cct.getInventoryByName("crafting");
+				final IInventory playerInventory = cct.getInventoryByName("container.inventory");
 
 				final Actionable realForFake = Actionable.MODULATE;
 
-				if( inv != null && this.recipe != null && security != null )
-				{
-					final InventoryCrafting testInv = new InventoryCrafting( new ContainerNull(), 3, 3 );
-					for( int x = 0; x < 9; x++ )
-					{
-						if( this.recipe[x] != null && this.recipe[x].length > 0 )
-						{
-							testInv.setInventorySlotContents( x, this.recipe[x][0] );
+				if (inv != null && recipe != null && security != null) {
+					final InventoryCrafting testInv = new InventoryCrafting(new ContainerNull(), 3, 3);
+					for (int x = 0; x < 9; x++) {
+						if (recipe[x] != null && recipe[x].length > 0) {
+							testInv.setInventorySlotContents(x, recipe[x][0]);
 						}
 					}
 
-					final IRecipe r = Platform.findMatchingRecipe( testInv, pmp.worldObj );
+					final IRecipe r = Platform.findMatchingRecipe(testInv, pmp.worldObj);
 
-					if( r != null && security.hasPermission( player, SecurityPermissions.EXTRACT ) )
-					{
-						final ItemStack is = r.getCraftingResult( testInv );
+					if (r != null && security.hasPermission(player, SecurityPermissions.EXTRACT)) {
+						final ItemStack is = r.getCraftingResult(testInv);
 
-						if( is != null )
-						{
+						if (is != null) {
 							final IMEMonitor<IAEItemStack> storage = inv.getItemInventory();
 							final IItemList all = storage.getStorageList();
 							final ItemStack[] nullStack = new ItemStack[0];
-							final IPartitionList<IAEItemStack> filter = ItemViewCell.createFilter( nullStack );
+							final IPartitionList<IAEItemStack> filter = ItemViewCell.createFilter(nullStack);
 
-							for( int x = 0; x < craftMatrix.getSizeInventory(); x++ )
-							{
-								final ItemStack patternItem = testInv.getStackInSlot( x );
+							for (int x = 0; x < craftMatrix.getSizeInventory(); x++) {
+								final ItemStack patternItem = testInv.getStackInSlot(x);
 
-								ItemStack currentItem = craftMatrix.getStackInSlot( x );
-								if( currentItem != null )
-								{
-									testInv.setInventorySlotContents( x, currentItem );
-									final ItemStack newItemStack = r.matches( testInv, pmp.worldObj ) ? r.getCraftingResult( testInv ) : null;
-									testInv.setInventorySlotContents( x, patternItem );
+								ItemStack currentItem = craftMatrix.getStackInSlot(x);
+								if (currentItem != null) {
+									testInv.setInventorySlotContents(x, currentItem);
+									final ItemStack newItemStack = r.matches(testInv, pmp.worldObj) ? r.getCraftingResult(testInv) : null;
+									testInv.setInventorySlotContents(x, patternItem);
 
-									if( newItemStack == null || !Platform.isSameItemPrecise( newItemStack, is ) )
-									{
-										final IAEItemStack in = AEItemStack.create( currentItem );
-										if( in != null )
-										{
-											final IAEItemStack out = Platform.poweredInsert( energy, storage, in, cct.getActionSource() );
-											if( out != null )
-											{
-												craftMatrix.setInventorySlotContents( x, out.getItemStack() );
+									if (newItemStack == null || !Platform.isSameItemPrecise(newItemStack, is)) {
+										final IAEItemStack in = AEItemStack.create(currentItem);
+										if (in != null) {
+											final IAEItemStack out = Platform.poweredInsert(energy, storage, in, cct.getActionSource());
+											if (out != null) {
+												craftMatrix.setInventorySlotContents(x, out.getItemStack());
 											}
-											else
-											{
-												craftMatrix.setInventorySlotContents( x, null );
+											else {
+												craftMatrix.setInventorySlotContents(x, null);
 											}
 
-											currentItem = craftMatrix.getStackInSlot( x );
+											currentItem = craftMatrix.getStackInSlot(x);
 										}
 									}
 								}
 
 								// True if we need to fetch an item for the recipe
-								if( patternItem != null && currentItem == null )
-								{
+								if (patternItem != null && currentItem == null) {
 									// Grab from network by recipe
-									ItemStack whichItem = Platform.extractItemsByRecipe( energy, cct.getActionSource(), storage, player.worldObj, r, is, testInv, patternItem, x, all, realForFake, filter );
+									ItemStack whichItem = Platform.extractItemsByRecipe(energy, cct.getActionSource(), storage, player.worldObj, r, is, testInv, patternItem, x, all, realForFake, filter);
 									//ItemStack whichItem = Platform.extractItemsByRecipe( energy, cct.getActionSource(), storage, player.worldObj, r, is, testInv, patternItem, x, all, realForFake, null );
 
 									// If that doesn't get it, grab exact items from network (?)
 									// TODO see if this code is necessary
-									
-									if( whichItem == null )
-									{
-										for( int y = 0; y < this.recipe[x].length; y++ )
-										{
-											final IAEItemStack request = AEItemStack.create( this.recipe[x][y] );
-											if( request != null )
-											{
-												if( filter == null || filter.isListed( request ) )
-												{
-													request.setStackSize( 1 );
-													final IAEItemStack out = Platform.poweredExtraction( energy, storage, request, cct.getActionSource() );
-													if( out != null )
-													{
+
+									if (whichItem == null) {
+										for (int y = 0; y < recipe[x].length; y++) {
+											final IAEItemStack request = AEItemStack.create(recipe[x][y]);
+											if (request != null) {
+												if (filter == null || filter.isListed(request)) {
+													request.setStackSize(1);
+													final IAEItemStack out = Platform.poweredExtraction(energy, storage, request, cct.getActionSource());
+													if (out != null) {
 														whichItem = out.getItemStack();
 														break;
 													}
@@ -220,18 +193,16 @@ public class PacketNEIRecipe extends WCTPacket
 											}
 										}
 									}
-									
 
 									// If that doesn't work, grab from the player's inventory
-									if( whichItem == null && playerInventory != null )
-									{
-										whichItem = this.extractItemFromPlayerInventory( player, realForFake, patternItem );
+									if (whichItem == null && playerInventory != null) {
+										whichItem = extractItemFromPlayerInventory(player, realForFake, patternItem);
 									}
 
-									craftMatrix.setInventorySlotContents( x, whichItem );
+									craftMatrix.setInventorySlotContents(x, whichItem);
 								}
 							}
-							con.onCraftMatrixChanged( craftMatrix );
+							con.onCraftMatrixChanged(craftMatrix);
 						}
 					}
 				}
@@ -247,20 +218,17 @@ public class PacketNEIRecipe extends WCTPacket
 	 * @param patternItem which {@link ItemStack} to extract
 	 * @return null or a found {@link ItemStack}
 	 */
-	private ItemStack extractItemFromPlayerInventory( final EntityPlayer player, final Actionable mode, final ItemStack patternItem )
-	{
-		final InventoryAdaptor ia = InventoryAdaptor.getAdaptor( player, ForgeDirection.UNKNOWN );
-		final AEItemStack request = AEItemStack.create( patternItem );
+	private ItemStack extractItemFromPlayerInventory(final EntityPlayer player, final Actionable mode, final ItemStack patternItem) {
+		final InventoryAdaptor ia = InventoryAdaptor.getAdaptor(player, ForgeDirection.UNKNOWN);
+		final AEItemStack request = AEItemStack.create(patternItem);
 		//final boolean isSimulated = mode == Actionable.SIMULATE;
 		final boolean checkFuzzy = request.isOre() || patternItem.getItemDamage() == OreDictionary.WILDCARD_VALUE || patternItem.hasTagCompound() || patternItem.isItemStackDamageable();
 
-		if( !checkFuzzy )
-		{
-			return ia.removeItems( 1, patternItem, null );
+		if (!checkFuzzy) {
+			return ia.removeItems(1, patternItem, null);
 		}
-		else
-		{
-			return ia.removeSimilarItems( 1, patternItem, FuzzyMode.IGNORE_ALL, null );
+		else {
+			return ia.removeSimilarItems(1, patternItem, FuzzyMode.IGNORE_ALL, null);
 		}
 	}
 }
