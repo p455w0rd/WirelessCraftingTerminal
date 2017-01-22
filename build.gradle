@@ -1,100 +1,94 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-    }
+	repositories {
+		jcenter()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+	}
+	dependencies {
+		classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
+	}
 }
 
-apply plugin: 'forge'
-targetCompatibility=7
-sourceCompatibility=7
+apply plugin: "net.minecraftforge.gradle.forge"
 
-version = minecraft_version + "-" + aeversion + "-" + wctbuild + "" + wctchannel
-group = wctgroup
-archivesBaseName = wctbasename
+version = "1.10.2-" + getVersion("VERSION")
+group = "p455w0rd"
+archivesBaseName = "WirelessCraftingTerminal"
+sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-    version = minecraft_version + "-" + forge_version
-    runDir = "run"
+	version = "1.10.2-12.18.3.2185"
+	runDir = "run"
 	
-    replaceIn "Reference.java"
-    replaceIn "package-info.java"
-	
-	replace "@version@", project.version
-}
-
-jar {
-    include "net/p455w0rd/wirelesscraftingterminal/**"
-	include "cofh/api/**"
-    include "assets/**"
-	include "ic2/**"
-    include "mcmod.info"
-    include "pack.mcmeta"
-}
-
-task deobfJar(type: Jar) { // Generate deobfuscated
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-task sourceJar(type: Jar) { // Generate sources
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-tasks.build.dependsOn('sourceJar', 'deobfJar')
-artifacts {
-    archives deobfJar
-    archives sourceJar
-    archives jar
+	mappings = "snapshot_20161111"
+	useDepAts = false
 }
 
 repositories {
-    maven {
-        name "ChickenBones"
-        url "http://chickenbones.net/maven/"
-    }
+	mavenCentral()
+	maven {
+		name = "progwml6"
+		url = "http://dvs1.progwml6.com/files/maven"
+	}
+	maven {
+		name = "tterrag"
+		url = "http://maven.tterrag.com"
+	}
+	maven {
+		url "http://mobiusstrip.eu/maven"
+	}
+	maven {
+		 name = "epoxide"
+		 url = "http://maven.epoxide.xyz"
+	 }
 }
-
 dependencies {
-	compile("appeng:appliedenergistics2:rv3-beta-5:dev") {
-		transitive = false
-    }
-	compile "codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev"
-	compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir "src/java/"
-			
-        }
-
-        resources {
-            srcDir "src/resources/"
-            include "assets/ae2wct/lang/*.lang",
-                    "assets/ae2wct/textures/gui/*",
-                    "assets/ae2wct/textures/items/*",
-					"assets/ae2wct/textures/cape/*",
-					"mcmod.info",
-                    "pack.mcmeta"
-        }
-    }
+	//compile ("appeng:appliedenergistics2:rv4-alpha-1:api"){
+	//	transitive = false
+	//}
+	//compile ("appeng:appliedenergistics2:rv4-alpha-7:dev"){
+	//	transitive = false
+	//}
+	compile "mezz.jei:jei_1.10.2:+"
+	//compile project(':appliedenergistics2')
+	compile "com.enderio:EnderIO:1.10.2-3.0.1.112_beta"
+	compile "com.enderio.core:EnderCore:1.10.2-0.4.1.55-beta"
+	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
+	compile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.50"
 }
 
 processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': minecraft_version
-    }
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
+
+	from (sourceSets.main.resources.srcDirs) {
+		include "mcmod.info"
+		expand "version": project.version, "mcversion": project.minecraft.version
+	}
+		
+	from (sourceSets.main.resources.srcDirs) {
+		exclude "mcmod.info"
+	}
 }
 
+String getVersion(String type) {
+	String major = "0";
+	String revision = "0";
+	String patch = "0";
+	String prefix = "public static final String $type = \"";
+	File file = file("src/main/java/p455w0rd/wct/Globals.java")
+	file.eachLine { String s ->
+		s = s.trim();
+		if (s.startsWith(prefix)) {
+			s = s.substring(prefix.length(), s.length() - 2);
+			String[] pts = s.split("\\.");
+
+			major = pts[0];
+			revision = pts[1];
+			patch = pts[2];
+		}
+	}
+	return "$major.$revision.$patch";
+}
