@@ -47,3 +47,5 @@ key.categories.wct=Wireless Crafting Terminal 2
 
 // GUI
 gui.title.magnet_filter=Magnet Filter
+gui.emptytrash=Empty Trash
+gui.emptytrash.desc=Delete contents of the Trash slot

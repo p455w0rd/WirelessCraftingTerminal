@@ -15,14 +15,49 @@
  */
 package p455w0rd.wct.init;
 
+import java.io.File;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import p455w0rd.wct.Globals;
+
 /**
  * @author p455w0rd
  *
  */
 public class ModConfig {
 
+	public static final Configuration CONFIG = new Configuration(new File(Globals.CONFIG_FILE));
+	private static final String DEF_CAT = "General";
+
 	public static boolean WCT_BOOSTER_ENABLED = true;
 	public static boolean WCT_MINETWEAKER_OVERRIDE = false;
+	public static boolean WCT_ENABLE_CONTROLLER_CHUNKLOADER = true;
+	public static int WCT_BOOSTER_DROPCHANCE = 5;
 	public static int WCT_MAX_POWER = 64000000;
+
+	@SubscribeEvent
+	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
+		if (e.getModID().equals(Globals.MODID)) {
+			init();
+		}
+	}
+
+	public static void init() {
+		if (CONFIG == null) {
+			MinecraftForge.EVENT_BUS.register(new ModConfig());
+		}
+		WCT_BOOSTER_ENABLED = CONFIG.getBoolean("EnableBooster", DEF_CAT, true, "Enable Infinity Booster Card");
+		WCT_MINETWEAKER_OVERRIDE = CONFIG.getBoolean("DisableRecipes", DEF_CAT, false, "TRUE=all recipes disabled-For CraftTweaker compat");
+		WCT_ENABLE_CONTROLLER_CHUNKLOADER = CONFIG.getBoolean("EnableControllerChunkLoading", DEF_CAT, true, "If true, AE2 controller will chunk load itself");
+		WCT_BOOSTER_DROPCHANCE = CONFIG.getInt("BoosterDropChance", DEF_CAT, 5, 1, 100, "Chance in percent (1-100) that booster card will drop upon killing a wither");
+		WCT_MAX_POWER = CONFIG.getInt("PowerCapacity", DEF_CAT, 16000000, 100000, 64000000, "How much energy the Wireless Crafting Terminal can store");
+
+		if (CONFIG.hasChanged()) {
+			CONFIG.save();
+		}
+	}
 
 }

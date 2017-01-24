@@ -49,7 +49,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.wct.Globals;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.handlers.GuiHandler;
@@ -70,7 +69,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 	private EntityPlayer entityPlayer;
 
 	public ItemWCT() {
-		super(Globals.WCT_MAX_POWER);
+		super(ModConfig.WCT_MAX_POWER);
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		GameRegistry.register(this);
@@ -94,7 +93,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 	public void getCheckedSubItems(Item item, CreativeTabs creativeTab, List<ItemStack> itemList) {
 		itemList.add(new ItemStack(item));
 		ItemStack is = new ItemStack(item);
-		injectAEPower(is, Globals.WCT_MAX_POWER);
+		injectAEPower(is, ModConfig.WCT_MAX_POWER);
 		itemList.add(is);
 	}
 
@@ -115,7 +114,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", TextFormatting.YELLOW + "" + TextFormatting.BOLD + "" + TextFormatting.ITALIC + "Shift" + TextFormatting.GRAY);
 		String pctTxtColor = TextFormatting.WHITE + "";
 		double aeCurrPower = getAECurrentPower(is);
-		double aeCurrPowerPct = (int) Math.floor(aeCurrPower / Globals.WCT_MAX_POWER * 1e4) / 1e2;
+		double aeCurrPowerPct = (int) Math.floor(aeCurrPower / ModConfig.WCT_MAX_POWER * 1e4) / 1e2;
 		if ((int) aeCurrPowerPct >= 75) {
 			pctTxtColor = TextFormatting.GREEN + "";
 		}

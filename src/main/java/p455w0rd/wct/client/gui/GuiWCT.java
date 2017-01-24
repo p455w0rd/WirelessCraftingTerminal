@@ -40,6 +40,7 @@ import p455w0rd.wct.client.me.InternalSlotME;
 import p455w0rd.wct.client.me.ItemRepo;
 import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.container.slot.AppEngSlot;
 import p455w0rd.wct.container.slot.OptionalSlotFake;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
@@ -119,6 +120,44 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		repo.updateView();
 		setScrollBar();
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+
+		final int i = Mouse.getEventDWheel();
+		if (i != 0 && isShiftKeyDown()) {
+			final int x = Mouse.getEventX() * width / mc.displayWidth;
+			final int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+			mouseWheelEvent(x, y, i / Math.abs(i));
+		}
+		else if (i != 0 && scrollBar != null) {
+
+			scrollBar.wheel(i);
+		}
+	}
+
+	private void mouseWheelEvent(final int x, final int y, final int wheel) {
+		final Slot slot = getSlot(x, y);
+		if (slot instanceof SlotME) {
+			final IAEItemStack item = ((SlotME) slot).getAEStack();
+			if (item != null) {
+				if (inventorySlots instanceof ContainerWCT) {
+					((ContainerWCT) inventorySlots).setTargetStack(item);
+				}
+				else {
+					((WCTBaseContainer) inventorySlots).setTargetStack(item);
+				}
+				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
+				final int times = Math.abs(wheel);
+				final int inventorySize = getInventorySlots().size();
+				for (int h = 0; h < times; h++) {
+					final PacketInventoryAction p = new PacketInventoryAction(direction, inventorySize, 0);
+					NetworkHandler.instance().sendToServer(p);
+				}
+			}
+		}
 	}
 
 	private void setScrollBar() {
@@ -499,7 +538,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-
+		
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;

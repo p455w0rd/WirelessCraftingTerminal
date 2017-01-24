@@ -62,12 +62,12 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
-import p455w0rd.wct.Globals;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
+import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
@@ -288,7 +288,7 @@ public class ItemMagnet extends ItemBase {
 				mySrc = new WCTPlayerSource(player, obj);
 			}
 
-			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && Globals.WCT_BOOSTER_ENABLED);
+			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && ModConfig.WCT_BOOSTER_ENABLED);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);
 			if ((ignoreRange && hasAxxess) || (obj.rangeCheck() && hasAxxess)) {
 				IAEItemStack ais = AEApi.instance().storage().createItemStack(itemStackToGet);

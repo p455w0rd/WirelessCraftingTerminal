@@ -37,7 +37,7 @@ public class ModCreativeTab extends CreativeTabs {
 	@Override
 	public ItemStack getIconItemStack() {
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((AERootPoweredItem) is.getItem()).injectAEPower(is, Globals.WCT_MAX_POWER);
+		((AERootPoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER);
 		return is;
 	}
 
@@ -46,10 +46,12 @@ public class ModCreativeTab extends CreativeTabs {
 
 		items.add(new ItemStack(ModItems.WCT));
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((AERootPoweredItem) is.getItem()).injectAEPower(is, Globals.WCT_MAX_POWER);
+		((AERootPoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER);
 		items.add(is);
 		items.add(new ItemStack(ModItems.MAGNET_CARD));
-		items.add(new ItemStack(ModItems.BOOSTER_CARD));
+		if (ModConfig.WCT_BOOSTER_ENABLED) {
+			items.add(new ItemStack(ModItems.BOOSTER_CARD));
+		}
 
 		super.displayAllRelevantItems(items);
 	}

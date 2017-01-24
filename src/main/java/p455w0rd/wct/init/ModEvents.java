@@ -24,6 +24,7 @@ import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -41,19 +42,22 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.wct.Globals;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.sync.packets.PacketConfigSync;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.util.WCTUtils;
-import p455w0rdslib.LibGlobals;
 import p455w0rdslib.capabilities.CapabilityChunkLoader;
 import p455w0rdslib.capabilities.CapabilityChunkLoader.ProviderTE;
 import p455w0rdslib.util.ChunkUtils;
@@ -71,9 +75,9 @@ public class ModEvents {
 
 	@SubscribeEvent
 	public void attachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
-		if (event.getObject() instanceof TileController) {
+		if (event.getObject() instanceof TileController && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
 			TileController controller = (TileController) event.getObject();
-			event.addCapability(new ResourceLocation(LibGlobals.MODID, "chunkloader"), new ProviderTE(controller));
+			event.addCapability(new ResourceLocation(Globals.MODID, "chunkloader"), new ProviderTE(controller));
 		}
 	}
 
@@ -81,7 +85,7 @@ public class ModEvents {
 	public void onPlace(BlockEvent.PlaceEvent e) {
 		World world = e.getWorld();
 		BlockPos pos = e.getPos();
-		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote) {
+		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
 			if (world.getTileEntity(pos) instanceof TileController) {
 				TileEntity tile = world.getTileEntity(pos);
 				if (tile.hasCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null)) {
@@ -95,7 +99,7 @@ public class ModEvents {
 	public void onBreak(BlockEvent.BreakEvent e) {
 		World world = e.getWorld();
 		BlockPos pos = e.getPos();
-		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote) {
+		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
 			if (world.getTileEntity(pos) instanceof TileController) {
 				TileEntity tile = world.getTileEntity(pos);
 				if (tile.hasCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null)) {
@@ -198,13 +202,20 @@ public class ModEvents {
 		if (event.getEntity() instanceof EntityDragon) {
 			event.getDrops().add(drop);
 		}
-		if (event.getEntity() instanceof EntityWither) {
+		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
-			double n = rand.nextDouble();
-			if (n <= 0.05) {
+			int n = rand.nextInt(100);
+			if (n < ModConfig.WCT_BOOSTER_DROPCHANCE) {
 				event.getDrops().add(drop);
 			}
 		}
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.SERVER)
+	public void onPlayerLogin(PlayerLoggedInEvent e) {
+		final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_BOOSTER_DROPCHANCE, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER);
+		NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 	}
 
 }

@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import appeng.util.Platform;
+import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
@@ -31,6 +32,7 @@ import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
@@ -42,11 +44,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Optional.Interface;
-import net.minecraftforge.fml.common.Optional.Method;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
+import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketJEIRecipe;
@@ -55,30 +56,30 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
  * @author p455w0rd
  *
  */
-@Interface(iface = "mezz.jei.api.IModPlugin", modid = JEI.MODID, striprefs = true)
 @JEIPlugin
 public class JEI implements IModPlugin {
 
 	public static final String MODID = "JEI";
 
 	@Override
-	@Method(modid = MODID)
 	public void register(@Nonnull IModRegistry registry) {
+		IJeiHelpers helpers = registry.getJeiHelpers();
+		IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
+		if (!ModConfig.WCT_BOOSTER_ENABLED) {
+			blackList.addIngredientToBlacklist(new ItemStack(ModItems.BOOSTER_CARD));
+		}
 		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
 		registry.addDescription(new ItemStack(ModItems.WCT), "jei.test.desc");
 	}
 
 	@Override
-	@Method(modid = MODID)
 	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
 	}
 
 	@Override
-	@Method(modid = MODID)
 	public void registerIngredients(IModIngredientRegistration registry) {
 	}
 
-	@Method(modid = MODID)
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
 	}

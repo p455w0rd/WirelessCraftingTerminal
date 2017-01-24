@@ -511,6 +511,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 			mouseWheelEvent(x, y, i / Math.abs(i));
 		}
 		else if (i != 0 && scrollBar != null) {
+
 			scrollBar.wheel(i);
 		}
 	}
@@ -520,7 +521,12 @@ public abstract class WCTBaseGui extends GuiContainer {
 		if (slot instanceof SlotME) {
 			final IAEItemStack item = ((SlotME) slot).getAEStack();
 			if (item != null) {
-				((WCTBaseContainer) inventorySlots).setTargetStack(item);
+				if (inventorySlots instanceof ContainerWCT) {
+					((ContainerWCT) inventorySlots).setTargetStack(item);
+				}
+				else {
+					((WCTBaseContainer) inventorySlots).setTargetStack(item);
+				}
 				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
 				final int times = Math.abs(wheel);
 				final int inventorySize = getInventorySlots().size();
