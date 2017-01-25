@@ -30,7 +30,9 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 public class ModRecipes {
 
 	public static void init() {
-
+		if (ModConfig.WCT_MINETWEAKER_OVERRIDE) {
+			return;
+		}
 		ApiDefinitions defs = Api.INSTANCE.definitions();
 		ApiMaterials materials = defs.materials();
 		ApiParts parts = defs.parts();

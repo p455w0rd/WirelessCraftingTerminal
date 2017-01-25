@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModEvents;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModRecipes;
@@ -36,6 +37,7 @@ public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
 		ModItems.init();
 		ModEvents.init();
+		ModConfig.init();
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
 	}
 
