@@ -3,11 +3,20 @@ package p455w0rd.wct.sync.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.*;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketThreadUtil;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import p455w0rd.wct.sync.*;
+import p455w0rd.wct.sync.PacketCallState;
+import p455w0rd.wct.sync.WCTPacket;
+import p455w0rd.wct.sync.WCTPacketHandlerBase;
 
 public class WCTClientPacketHandler extends WCTPacketHandlerBase implements IPacketHandler {
+
+	private static final WCTClientPacketHandler INSTANCE = new WCTClientPacketHandler();
+
+	public static final WCTClientPacketHandler instance() {
+		return INSTANCE;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

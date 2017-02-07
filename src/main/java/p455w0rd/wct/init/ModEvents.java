@@ -212,10 +212,11 @@ public class ModEvents {
 	}
 
 	@SubscribeEvent
-	@SideOnly(Side.SERVER)
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
-		final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_BOOSTER_DROPCHANCE, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER);
-		NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
+		if (e.player instanceof EntityPlayerMP) {
+			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_BOOSTER_DROPCHANCE, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER);
+			NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
+		}
 	}
 
 }

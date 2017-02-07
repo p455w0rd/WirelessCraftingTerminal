@@ -35,7 +35,7 @@ public class ContainerCraftAmount extends WCTBaseContainer {
 
 	public IGrid getGrid() {
 		final WCTIActionHost h = ((WCTIActionHost) getTarget());
-		return h.getActionableNode().getGrid();
+		return h.getActionableNode(true).getGrid();
 		//return obj2.getTargetGrid();
 	}
 

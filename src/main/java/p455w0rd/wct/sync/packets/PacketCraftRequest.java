@@ -2,12 +2,16 @@ package p455w0rd.wct.sync.packets;
 
 import java.util.concurrent.Future;
 
-import appeng.api.networking.*;
-import appeng.api.networking.crafting.*;
-import io.netty.buffer.*;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridHost;
+import appeng.api.networking.crafting.ICraftingGrid;
+import appeng.api.networking.crafting.ICraftingJob;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import p455w0rd.wct.container.*;
+import p455w0rd.wct.container.ContainerCraftAmount;
+import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;

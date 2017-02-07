@@ -34,6 +34,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -272,13 +273,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-
+		
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-
+		
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {
@@ -453,9 +454,10 @@ public abstract class WCTBaseGui extends GuiContainer {
 			for (int j = 0; j < 9; ++j) {
 				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
 					final List<Slot> slots = getInventorySlots();
+					InventoryPlayer playerInv = inventorySlots instanceof ContainerWCT ? ((ContainerWCT) inventorySlots).getPlayerInv() : ((WCTBaseContainer) inventorySlots).getPlayerInv();
 					for (final Slot s : slots) {
-						if (s.getSlotIndex() == j && s.inventory == ((WCTBaseContainer) inventorySlots).getPlayerInv()) {
-							if (!s.canTakeStack(((WCTBaseContainer) inventorySlots).getPlayerInv().player)) {
+						if (s.getSlotIndex() == j && s.inventory == playerInv) {
+							if (!s.canTakeStack(playerInv.player)) {
 								return false;
 							}
 						}
@@ -467,7 +469,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 					}
 					else {
 						for (final Slot s : slots) {
-							if (s.getSlotIndex() == j && s.inventory == ((WCTBaseContainer) inventorySlots).getPlayerInv()) {
+							if (s.getSlotIndex() == j && s.inventory == playerInv) {
 								NetworkHandler.instance().sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
 								return true;
 							}
