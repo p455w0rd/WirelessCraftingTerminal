@@ -17,6 +17,8 @@ package p455w0rd.wct.init;
 
 import java.util.Random;
 
+import org.lwjgl.input.Keyboard;
+
 import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -158,7 +160,7 @@ public class ModEvents {
 			return;
 		}
 		if (p.openContainer != null && p.openContainer instanceof ContainerPlayer) {
-			if (ModKeybindings.openTerminal.isPressed()) {
+			if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
 				ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
 				if (is == null) {
 					return;
@@ -170,7 +172,7 @@ public class ModEvents {
 					}
 				}
 			}
-			else if (ModKeybindings.openMagnetFilter.isPressed()) {
+			else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
 				//ensure player has a Wireless Crafting Terminal (with Magnet Card Installed) or Magnet Card in their inventory
 				//and that they have manually right=clicked it to initialize it
@@ -183,9 +185,9 @@ public class ModEvents {
 
 			}
 
-			else if (ModKeybindings.changeMagnetMode.isPressed()) {
+			else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-				if (magnetItem != null) {
+				if (magnetItem != null && WCTUtils.isMagnetInitialized(magnetItem)) {
 					NetworkHandler.instance().sendToServer(new PacketSetMagnet(magnetItem.getItemDamage()));
 				}
 			}
