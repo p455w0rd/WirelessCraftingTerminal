@@ -189,6 +189,18 @@ public class ModEvents {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
 				if (magnetItem != null && WCTUtils.isMagnetInitialized(magnetItem)) {
 					NetworkHandler.instance().sendToServer(new PacketSetMagnet(magnetItem.getItemDamage()));
+					switch (magnetItem.getItemDamage()) {
+					case 2:
+						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
+
+						break;
+					case 1:
+						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
+						break;
+					case 0:
+						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
+						break;
+					}
 				}
 			}
 			else {

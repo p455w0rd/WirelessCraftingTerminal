@@ -1,10 +1,9 @@
 package p455w0rd.wct.sync.packets;
 
-import io.netty.buffer.*;
-import net.minecraft.client.resources.I18n;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentString;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
@@ -38,16 +37,9 @@ public class PacketSetMagnet extends WCTPacket {
 
 			if (magnetItem.getItemDamage() == 2) {
 				WCTUtils.getWirelessTerm(player.inventory).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0).setShort("Damage", (short) 0);
-				player.addChatMessage(new TextComponentString(I18n.format("chatmessage.magnet_mode_1")));
 			}
 			else {
 				WCTUtils.getWirelessTerm(player.inventory).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0).setShort("Damage", (short) (magnetItem.getItemDamage() + 1));
-				if (magnetItem.getItemDamage() == 0) {
-					player.addChatMessage(new TextComponentString(I18n.format("chatmessage.magnet_mode_2")));
-				}
-				else {
-					player.addChatMessage(new TextComponentString(I18n.format("chatmessage.magnet_mode_3")));
-				}
 			}
 		}
 	}
