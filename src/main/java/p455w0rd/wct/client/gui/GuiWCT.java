@@ -31,6 +31,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional.Interface;
+import net.minecraftforge.fml.common.Optional.Method;
 import p455w0rd.wct.Globals;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
@@ -53,8 +55,10 @@ import p455w0rd.wct.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
+import yalter.mousetweaks.api.IMTModGuiContainer;
 
-public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost {
+@Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer", modid = "mousetweaks", striprefs = true)
+public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost, IMTModGuiContainer {
 
 	private float xSize_lo;
 	private float ySize_lo;
@@ -538,7 +542,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-		
+
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
@@ -736,6 +740,70 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	@Override
 	public Enum getSortDisplay() {
 		return configSrc.getSetting(Settings.VIEW_MODE);
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public int getAPIVersion() {
+		return 1;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public String getModName() {
+		return "WCT";
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public boolean isMouseTweaksDisabled() {
+		return true;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public boolean isWheelTweakDisabled() {
+		return false;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public boolean isCraftingOutputSlot(Object modContainer, Object slot) {
+		return false;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public Object getModContainer() {
+		return null;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public int getModSlotCount(Object modContainer) {
+		return 0;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public Object getModSlot(Object modContainer, int slotNumber) {
+		return null;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public Object getModSelectedSlot(Object modContainer, int slotCount) {
+		return null;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public void clickModSlot(Object modContainer, Object slot, int mouseButton, boolean shiftPressed) {
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public void disableRMBDragIfRequired(Object modContainer, Object firstSlot, boolean shouldClick) {
 	}
 
 }
