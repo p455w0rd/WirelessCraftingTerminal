@@ -35,10 +35,11 @@ import p455w0rd.wct.sync.network.NetworkHandler;
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent e) {
+		ModConfig.init();
 		ModItems.init();
 		NetworkHandler.init();
 		ModEvents.init();
-		ModConfig.init();
+
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
 	}
 
