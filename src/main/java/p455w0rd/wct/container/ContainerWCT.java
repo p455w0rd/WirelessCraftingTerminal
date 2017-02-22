@@ -726,10 +726,12 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 				if (sideLocal != sideRemote) {
 					clientCM.putSetting(set, sideLocal);
 					for (final IContainerListener crafter : listeners) {
-						try {
-							NetworkHandler.instance().sendTo(new PacketValueConfig(set.name(), sideLocal.name()), (EntityPlayerMP) crafter);
-						}
-						catch (final IOException e) {
+						if (crafter instanceof EntityPlayer) {
+							try {
+								NetworkHandler.instance().sendTo(new PacketValueConfig(set.name(), sideLocal.name()), (EntityPlayerMP) crafter);
+							}
+							catch (final IOException e) {
+							}
 						}
 					}
 				}
@@ -941,7 +943,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 	/*
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final WCTIActionHost host = this.getActionHost();
-	
+
 		if (host != null) {
 			final IGridNode gn = host.getActionableNode();
 			if (gn != null) {
@@ -953,7 +955,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 							return false;
 						}
 					}
-	
+
 					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
 					if (sg.hasPermission(this.player, perm) && Platform.isServer()) {
 						return true;
