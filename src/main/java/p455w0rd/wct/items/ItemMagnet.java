@@ -52,7 +52,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -225,15 +224,15 @@ public class ItemMagnet extends ItemBase {
 	public void switchMagnetMode(ItemStack item, EntityPlayer player) {
 		if (item.getItemDamage() == 0) {
 			item.setItemDamage(1);
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
+			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
 		}
 		else if (item.getItemDamage() == 1) {
 			item.setItemDamage(2);
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
+			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
 		}
 		else {
 			item.setItemDamage(0);
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
+			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
 		}
 	}
 
@@ -277,7 +276,7 @@ public class ItemMagnet extends ItemBase {
 			int stackSize = itemStackToGet.stackSize;
 
 			MinecraftForge.EVENT_BUS.post(pickupEvent);
-			MinecraftForge.EVENT_BUS.post(itemPickupEvent);
+			//MinecraftForge.EVENT_BUS.post(itemPickupEvent);
 
 			if (obj == null) {
 				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
@@ -298,8 +297,9 @@ public class ItemMagnet extends ItemBase {
 					// whitelist
 					if (getMode(getItemStack())) {
 						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
-							itemToGet.setDead();
-							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
+							if (doInject(ais, stackSize, player, itemToGet, itemStackToGet, world)) {
+								itemToGet.setDead();
+							}
 							continue;
 						}
 						else {
@@ -317,8 +317,9 @@ public class ItemMagnet extends ItemBase {
 					// blacklist
 					else {
 						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() <= 0) {
-							itemToGet.setDead();
-							doInject(ais, stackSize, player, itemToGet, itemStackToGet, world);
+							if (doInject(ais, stackSize, player, itemToGet, itemStackToGet, world)) {
+								itemToGet.setDead();
+							}
 							continue;
 						}
 						else {
@@ -485,13 +486,14 @@ public class ItemMagnet extends ItemBase {
 		return null;
 	}
 
-	private void doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
+	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
 		ais = Platform.poweredInsert(powerSrc, cellInv, ais, mySrc);
-		if (ais != null) {
+		if (ais != null && WCTUtils.getMagnet(player.inventory) != null && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
 			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
 		}
+		return ais == null;
 	}
 
 	private boolean isBoosterInstalled(ItemStack wirelessTerm) {
