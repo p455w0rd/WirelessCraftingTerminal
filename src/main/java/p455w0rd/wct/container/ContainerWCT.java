@@ -308,15 +308,16 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 
 	@Override
 	public void onCraftMatrixChanged(final IInventory iinv) {
-
 		final ContainerNull cn = new ContainerNull();
 		final InventoryCrafting ic = new InventoryCrafting(cn, 3, 3);
 
 		for (int x = 0; x < 9; x++) {
 			ic.setInventorySlotContents(x, craftMatrixSlot[x].getStack());
 		}
-		craftingSlot.putStack(CraftingManager.getInstance().findMatchingRecipe(ic, worldObj));
+
+		craftingSlot.putStack(CraftingManager.getInstance().findMatchingRecipe(ic, getPlayerInv().player.worldObj));
 		writeToNBT("crafting");
+
 	}
 
 	public void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id) {
@@ -943,7 +944,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 	/*
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final WCTIActionHost host = this.getActionHost();
-
+	
 		if (host != null) {
 			final IGridNode gn = host.getActionableNode();
 			if (gn != null) {
@@ -955,7 +956,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 							return false;
 						}
 					}
-
+	
 					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
 					if (sg.hasPermission(this.player, perm) && Platform.isServer()) {
 						return true;

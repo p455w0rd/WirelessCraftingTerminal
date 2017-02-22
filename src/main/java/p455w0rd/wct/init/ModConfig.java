@@ -29,14 +29,14 @@ import p455w0rd.wct.Globals;
  */
 public class ModConfig {
 
-	public static final Configuration CONFIG = new Configuration(new File(Globals.CONFIG_FILE));
+	public static Configuration CONFIG;
 	private static final String DEF_CAT = "General";
 
 	public static boolean WCT_BOOSTER_ENABLED = true;
 	public static boolean WCT_MINETWEAKER_OVERRIDE = false;
 	public static boolean WCT_ENABLE_CONTROLLER_CHUNKLOADER = true;
 	public static int WCT_BOOSTER_DROPCHANCE = 5;
-	public static int WCT_MAX_POWER = 64000000;
+	public static int WCT_MAX_POWER = 16000000;
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
@@ -47,6 +47,7 @@ public class ModConfig {
 
 	public static void init() {
 		if (CONFIG == null) {
+			CONFIG = new Configuration(new File(Globals.CONFIG_FILE));
 			MinecraftForge.EVENT_BUS.register(new ModConfig());
 		}
 		WCT_BOOSTER_ENABLED = CONFIG.getBoolean("EnableBooster", DEF_CAT, true, "Enable Infinity Booster Card");

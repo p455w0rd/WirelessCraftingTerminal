@@ -114,7 +114,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", TextFormatting.YELLOW + "" + TextFormatting.BOLD + "" + TextFormatting.ITALIC + "Shift" + TextFormatting.GRAY);
 		String pctTxtColor = TextFormatting.WHITE + "";
 		double aeCurrPower = getAECurrentPower(is);
-		double aeCurrPowerPct = (int) Math.floor(aeCurrPower / ModConfig.WCT_MAX_POWER * 1e4) / 1e2;
+		double aeCurrPowerPct = (int) Math.floor(aeCurrPower / getAEMaxPower(is) * 1e4) / 1e2;
 		if ((int) aeCurrPowerPct >= 75) {
 			pctTxtColor = TextFormatting.GREEN + "";
 		}
