@@ -1,20 +1,27 @@
 package p455w0rd.wct.container.slot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
-import appeng.api.storage.*;
-import appeng.api.storage.data.*;
+import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.IStorageMonitorable;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
 import appeng.container.ContainerNull;
-import appeng.helpers.*;
-import appeng.util.*;
+import appeng.helpers.IContainerCraftingPacket;
+import appeng.helpers.InventoryAction;
+import appeng.util.InventoryAdaptor;
+import appeng.util.Platform;
 import appeng.util.inv.AdaptorPlayerHand;
 import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.math.BlockPos;
 
@@ -62,21 +69,15 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 		int maxTimesToCraft = 0;
 
 		InventoryAdaptor ia = null;
-		if (action == InventoryAction.CRAFT_SHIFT) // craft into player
-													// inventory...
-		{
+		if (action == InventoryAction.CRAFT_SHIFT) {
 			ia = InventoryAdaptor.getAdaptor(who, null);
 			maxTimesToCraft = (int) Math.floor((double) getStack().getMaxStackSize() / (double) howManyPerCraft);
 		}
-		else if (action == InventoryAction.CRAFT_STACK) // craft into hand,
-														// full stack
-		{
+		else if (action == InventoryAction.CRAFT_STACK) {
 			ia = new AdaptorPlayerHand(who);
 			maxTimesToCraft = (int) Math.floor((double) getStack().getMaxStackSize() / (double) howManyPerCraft);
 		}
-		else
-		// pick up what was crafted...
-		{
+		else {
 			ia = new AdaptorPlayerHand(who);
 			maxTimesToCraft = 1;
 		}
@@ -111,13 +112,13 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 	}
 
 	@SuppressWarnings({
-			"rawtypes", "unchecked"
+			"rawtypes",
+			"unchecked"
 	})
 	private ItemStack craftItem(final EntityPlayer p, final ItemStack request, final IMEMonitor<IAEItemStack> inv, final IItemList all) {
-		// update crafting matrix...
 		ItemStack is = getStack();
 
-		if (is != null && Platform.itemComparisons().isSameItem(request, is)) {
+		if (is != null && Platform.itemComparisons().isEqualItem(request, is)) {
 			final ItemStack[] set = new ItemStack[getPattern().getSizeInventory()];
 
 			// add one of each item to the items on the board...
@@ -169,13 +170,10 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 
 				postCraft(p, inv, set, is);
 			}
-
-			// shouldn't be necessary...
 			p.openContainer.onCraftMatrixChanged(craftInv);
 
 			return is;
 		}
-
 		return null;
 	}
 
@@ -189,10 +187,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 
 	private void postCraft(final EntityPlayer p, final IMEMonitor<IAEItemStack> inv, final ItemStack[] set, final ItemStack result) {
 		final List<ItemStack> drops = new ArrayList<ItemStack>();
-
-		// add one of each item to the items on the board...
 		if (Platform.isServer()) {
-			// set new items onto the crafting table...
 			for (int x = 0; x < craftInv.getSizeInventory(); x++) {
 				if (craftInv.getStackInSlot(x) == null) {
 					craftInv.setInventorySlotContents(x, set[x]);

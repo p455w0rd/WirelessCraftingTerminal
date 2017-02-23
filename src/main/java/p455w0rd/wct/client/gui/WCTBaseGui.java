@@ -73,8 +73,9 @@ public abstract class WCTBaseGui extends GuiContainer {
 	private Stopwatch dbl_clickTimer = Stopwatch.createStarted();
 	private ItemStack dbl_whichItem;
 	private Slot bl_clicked;
-	protected boolean subGui;
+	public boolean subGui;
 	private final StackSizeRenderer stackSizeRenderer = new StackSizeRenderer();
+	public static String memoryText = "";
 
 	public WCTBaseGui(final Container container) {
 		super(container);
@@ -700,11 +701,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 		mc.getTextureManager().bindTexture(loc);
 	}
 
-	/*
-		public void func_146977_a(final Slot s) {
-			drawSlot(s);
-		}
-	*/
 	protected GuiScrollbar getScrollBar() {
 		return scrollBar;
 	}

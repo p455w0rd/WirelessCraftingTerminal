@@ -23,7 +23,9 @@ import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
@@ -50,6 +52,7 @@ import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
@@ -76,7 +79,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private GuiScrollbar scrollBar = null;
 	public static int craftingGridOffsetX = 80;
 	public static int craftingGridOffsetY;
-	private static String memoryText = "";
+
 	private final ItemRepo repo;
 	private final int offsetX = 8;
 	private final IConfigManager configSrc;
@@ -341,11 +344,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		final Enum<?> setting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
 		searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.JEI_AUTOSEARCH == setting);
 
-		if (isSubGui()) {
-			if (isSubGui()) {
-				searchField.setText(memoryText);
-				repo.setSearchString(memoryText);
-			}
+		if (memoryText != null) {
+			searchField.setText(memoryText);
+			repo.setSearchString(memoryText);
 			repo.updateView();
 			setScrollBar();
 		}
@@ -587,7 +588,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
-
+			if (ModKeybindings.openTerminal.getKeyCode() == key && GuiScreen.isCtrlKeyDown()) {
+				Minecraft.getMinecraft().thePlayer.closeScreen();
+			}
 			if (searchField.textboxKeyTyped(character, key)) {
 				repo.setSearchString(searchField.getText());
 				repo.updateView();

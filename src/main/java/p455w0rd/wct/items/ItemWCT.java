@@ -51,6 +51,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.util.WCTUtils;
@@ -78,6 +79,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(final ItemStack itemStackIn, final World world, final EntityPlayer player, EnumHand hand) {
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
+			WCTBaseGui.memoryText = "";
 			GuiHandler.open(GuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
 		}

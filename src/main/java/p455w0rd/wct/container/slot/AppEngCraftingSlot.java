@@ -1,13 +1,18 @@
 package p455w0rd.wct.container.slot;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.*;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.*;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.stats.AchievementList;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class AppEngCraftingSlot extends AppEngSlot {
 
@@ -100,32 +105,38 @@ public class AppEngCraftingSlot extends AppEngSlot {
 	}
 
 	@Override
-	public void onPickupFromSlot(final EntityPlayer par1EntityPlayer, final ItemStack par2ItemStack) {
-		FMLCommonHandler.instance().firePlayerCraftingEvent(par1EntityPlayer, par2ItemStack, craftMatrix);
-		this.onCrafting(par2ItemStack);
+	public void onPickupFromSlot(final EntityPlayer player, final ItemStack stack) {
+		net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, craftMatrix);
+		this.onCrafting(stack);
+		net.minecraftforge.common.ForgeHooks.setCraftingPlayer(player);
+		final InventoryCrafting ic = new InventoryCrafting(getContainer(), 3, 3);
 
-		for (int i = 0; i < craftMatrix.getSizeInventory(); ++i) {
+		for (int x = 0; x < craftMatrix.getSizeInventory(); x++) {
+			ic.setInventorySlotContents(x, craftMatrix.getStackInSlot(x));
+		}
+
+		final ItemStack[] aitemstack = CraftingManager.getInstance().getRemainingItems(ic, player.worldObj);
+
+		for (int x = 0; x < craftMatrix.getSizeInventory(); x++) {
+			craftMatrix.setInventorySlotContents(x, ic.getStackInSlot(x));
+		}
+
+		net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
+
+		for (int i = 0; i < aitemstack.length; ++i) {
 			final ItemStack itemstack1 = craftMatrix.getStackInSlot(i);
+			final ItemStack itemstack2 = aitemstack[i];
 
 			if (itemstack1 != null) {
 				craftMatrix.decrStackSize(i, 1);
+			}
 
-				if (itemstack1.getItem().hasContainerItem(itemstack1)) {
-					final ItemStack itemstack2 = itemstack1.getItem().getContainerItem(itemstack1);
-
-					if (itemstack2 != null && itemstack2.isItemStackDamageable() && itemstack2.getItemDamage() > itemstack2.getMaxDamage()) {
-						MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(thePlayer, itemstack2, null));
-						continue;
-					}
-
-					if (!itemstack1.getItem().hasContainerItem(itemstack1) || !thePlayer.inventory.addItemStackToInventory(itemstack2)) {
-						if (craftMatrix.getStackInSlot(i) == null) {
-							craftMatrix.setInventorySlotContents(i, itemstack2);
-						}
-						else {
-							thePlayer.dropItem(itemstack2, false);
-						}
-					}
+			if (itemstack2 != null) {
+				if (craftMatrix.getStackInSlot(i) == null) {
+					craftMatrix.setInventorySlotContents(i, itemstack2);
+				}
+				else if (!thePlayer.inventory.addItemStackToInventory(itemstack2)) {
+					thePlayer.dropItem(itemstack2, false);
 				}
 			}
 		}

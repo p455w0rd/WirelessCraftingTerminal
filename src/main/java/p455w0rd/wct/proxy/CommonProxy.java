@@ -39,7 +39,6 @@ public class CommonProxy {
 		ModItems.init();
 		NetworkHandler.init();
 		ModEvents.init();
-
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
 	}
 

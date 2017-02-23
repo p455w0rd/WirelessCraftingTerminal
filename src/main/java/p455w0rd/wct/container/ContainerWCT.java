@@ -281,6 +281,10 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 		thisItem.checkForBooster(containerstack);
 	}
 
+	public SlotTrash getTrashSlot() {
+		return trashSlot;
+	}
+
 	public void setCellInventory(final IMEInventoryHandler<IAEItemStack> cellInv) {
 		this.cellInv = cellInv;
 	}
@@ -333,6 +337,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 					updateHeld(player);
 				default:
 				}
+				return;
 			}
 
 			if (s instanceof SlotFake) {

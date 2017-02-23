@@ -159,7 +159,7 @@ public class ModEvents {
 		if (p.openContainer == null) {
 			return;
 		}
-		if (p.openContainer != null && p.openContainer instanceof ContainerPlayer) {
+		if (p.openContainer instanceof ContainerPlayer) {
 			if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
 				ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
 				if (is == null) {
@@ -184,7 +184,6 @@ public class ModEvents {
 				}
 
 			}
-
 			else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
 				if (magnetItem != null && WCTUtils.isMagnetInitialized(magnetItem)) {
@@ -192,7 +191,6 @@ public class ModEvents {
 					switch (magnetItem.getItemDamage()) {
 					case 2:
 						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
-
 						break;
 					case 1:
 						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
@@ -202,9 +200,6 @@ public class ModEvents {
 						break;
 					}
 				}
-			}
-			else {
-				return;
 			}
 		}
 	}
