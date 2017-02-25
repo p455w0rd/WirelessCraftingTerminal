@@ -50,22 +50,24 @@ public class GuiHandler implements IGuiHandler {
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
-		if (terminal != null) {
-			if (ID == GUI_WCT) {
-				return new ContainerWCT(player, player.inventory);
-			}
+		if (ID != GUI_MAGNET) {
+			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
+			if (terminal != null) {
+				if (ID == GUI_WCT) {
+					return new ContainerWCT(player, player.inventory);
+				}
 
-			if (ID == GUI_CRAFTING_STATUS) {
-				return new ContainerCraftingStatus(player.inventory, terminal);
-			}
+				if (ID == GUI_CRAFTING_STATUS) {
+					return new ContainerCraftingStatus(player.inventory, terminal);
+				}
 
-			if (ID == GUI_CRAFT_AMOUNT) {
-				return new ContainerCraftAmount(player.inventory, terminal);
-			}
+				if (ID == GUI_CRAFT_AMOUNT) {
+					return new ContainerCraftAmount(player.inventory, terminal);
+				}
 
-			if (ID == GUI_CRAFT_CONFIRM) {
-				return new ContainerCraftConfirm(player.inventory, terminal);
+				if (ID == GUI_CRAFT_CONFIRM) {
+					return new ContainerCraftConfirm(player.inventory, terminal);
+				}
 			}
 		}
 		if (ID == GUI_MAGNET) {
@@ -76,22 +78,24 @@ public class GuiHandler implements IGuiHandler {
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
-		if (terminal != null) {
-			if (ID == GUI_WCT) {
-				return new GuiWCT(new ContainerWCT(player, player.inventory));
-			}
+		if (ID != GUI_MAGNET) {
+			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
+			if (terminal != null) {
+				if (ID == GUI_WCT) {
+					return new GuiWCT(new ContainerWCT(player, player.inventory));
+				}
 
-			if (ID == GUI_CRAFTING_STATUS) {
-				return new GuiCraftingStatus(player.inventory, terminal);
-			}
+				if (ID == GUI_CRAFTING_STATUS) {
+					return new GuiCraftingStatus(player.inventory, terminal);
+				}
 
-			if (ID == GUI_CRAFT_AMOUNT) {
-				return new GuiCraftAmount(player.inventory, terminal);
-			}
+				if (ID == GUI_CRAFT_AMOUNT) {
+					return new GuiCraftAmount(player.inventory, terminal);
+				}
 
-			if (ID == GUI_CRAFT_CONFIRM) {
-				return new GuiCraftConfirm(player.inventory, terminal);
+				if (ID == GUI_CRAFT_CONFIRM) {
+					return new GuiCraftConfirm(player.inventory, terminal);
+				}
 			}
 		}
 		if (ID == GUI_MAGNET) {

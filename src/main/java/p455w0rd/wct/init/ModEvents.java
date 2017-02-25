@@ -21,7 +21,6 @@ import org.lwjgl.input.Keyboard;
 
 import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
@@ -35,7 +34,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -57,6 +55,7 @@ import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
+import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.util.WCTUtils;
@@ -174,31 +173,23 @@ public class ModEvents {
 			}
 			else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-				//ensure player has a Wireless Crafting Terminal (with Magnet Card Installed) or Magnet Card in their inventory
-				//and that they have manually right=clicked it to initialize it
-				if (WCTUtils.isMagnetInitialized(magnetItem)) {
+				if (magnetItem != null) {
+					if (!WCTUtils.isMagnetInitialized(magnetItem)) {
+						if (magnetItem.getTagCompound() == null) {
+							magnetItem.setTagCompound(new NBTTagCompound());
+						}
+						magnetItem.getTagCompound().setBoolean("Initialized", true);
+						NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+					}
 					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_MAGNET));
 				}
-				else { // TODO fix this shit
-					p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_init.desc")));
-				}
-
 			}
 			else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
 				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
 				if (magnetItem != null && WCTUtils.isMagnetInitialized(magnetItem)) {
+					((ItemMagnet) magnetItem.getItem()).switchMagnetMode(magnetItem, p);
+					((ItemMagnet) magnetItem.getItem()).displayMessage(magnetItem.getItemDamage());
 					NetworkHandler.instance().sendToServer(new PacketSetMagnet(magnetItem.getItemDamage()));
-					switch (magnetItem.getItemDamage()) {
-					case 2:
-						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
-						break;
-					case 1:
-						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
-						break;
-					case 0:
-						p.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
-						break;
-					}
 				}
 			}
 		}

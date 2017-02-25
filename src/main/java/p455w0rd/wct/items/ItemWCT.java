@@ -79,9 +79,11 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(final ItemStack itemStackIn, final World world, final EntityPlayer player, EnumHand hand) {
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND) {
-			WCTBaseGui.memoryText = "";
 			GuiHandler.open(GuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, itemStackIn);
+		}
+		if (world.isRemote) {
+			WCTBaseGui.memoryText = "";
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.FAIL, itemStackIn);
 	}

@@ -1,6 +1,7 @@
 package p455w0rd.wct.sync.packets;
 
-import io.netty.buffer.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -48,7 +49,7 @@ public class PacketMagnetFilter extends WCTPacket {
 			if (whichMode == 0) {
 				magnetItem.getTagCompound().setBoolean("Initialized", modeValue);
 			}
-			if (whichMode == 1) {
+			else if (whichMode == 1) {
 				magnetItem.getTagCompound().setBoolean("Whitelisting", modeValue);
 			}
 			else if (whichMode == 2) {

@@ -36,6 +36,7 @@ import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.Platform;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -52,6 +53,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -218,21 +220,40 @@ public class ItemMagnet extends ItemBase {
 			}
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
+		else {
+			if (player.isSneaking()) {
+				switchMagnetMode(item, player);
+				displayMessage(item.getItemDamage());
+			}
+		}
 		return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public void displayMessage(int mode) {
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		switch (mode) {
+		case 1:
+			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
+			break;
+		case 2:
+			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
+			break;
+		case 0:
+			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
+			break;
+		}
 	}
 
 	public void switchMagnetMode(ItemStack item, EntityPlayer player) {
 		if (item.getItemDamage() == 0) {
 			item.setItemDamage(1);
-			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
 		}
 		else if (item.getItemDamage() == 1) {
 			item.setItemDamage(2);
-			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
 		}
 		else {
 			item.setItemDamage(0);
-			//player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
 		}
 	}
 
