@@ -199,10 +199,10 @@ public class ModEvents {
 	public void onMobDrop(LivingDropsEvent event) {
 		ItemStack stack = new ItemStack(ModItems.BOOSTER_CARD);
 		EntityItem drop = new EntityItem(event.getEntityLiving().getEntityWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ, stack);
-		if (event.getEntity() instanceof EntityDragon) {
+		if (event.getEntity() instanceof EntityDragon && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_DRAGON_DROPS_BOOSTER) {
 			event.getDrops().add(drop);
 		}
-		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED) {
+		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
 			int n = rand.nextInt(100);
 			if (n < ModConfig.WCT_BOOSTER_DROPCHANCE) {
