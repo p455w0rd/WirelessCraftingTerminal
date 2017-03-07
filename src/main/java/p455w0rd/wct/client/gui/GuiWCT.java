@@ -58,10 +58,10 @@ import p455w0rd.wct.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
-import yalter.mousetweaks.api.IMTModGuiContainer;
+import yalter.mousetweaks.api.IMTModGuiContainer2;
 
 @Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer", modid = "mousetweaks", striprefs = true)
-public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost, IMTModGuiContainer {
+public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost, IMTModGuiContainer2 {
 
 	private float xSize_lo;
 	private float ySize_lo;
@@ -543,7 +543,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-
+		
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
@@ -747,66 +747,44 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 	@Method(modid = "mousetweaks")
 	@Override
-	public int getAPIVersion() {
-		return 1;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public String getModName() {
-		return "WCT";
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean isMouseTweaksDisabled() {
+	public boolean MT_isMouseTweaksDisabled() {
 		return true;
 	}
 
 	@Method(modid = "mousetweaks")
 	@Override
-	public boolean isWheelTweakDisabled() {
+	public boolean MT_isWheelTweakDisabled() {
 		return false;
 	}
 
 	@Method(modid = "mousetweaks")
 	@Override
-	public boolean isCraftingOutputSlot(Object modContainer, Object slot) {
+	public Container MT_getContainer() {
+		return null;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public Slot MT_getSlotUnderMouse() {
+		return null;
+	}
+
+	@Method(modid = "mousetweaks")
+	@Override
+	public boolean MT_isCraftingOutput(Slot slot) {
 		return false;
 	}
 
 	@Method(modid = "mousetweaks")
 	@Override
-	public Object getModContainer() {
-		return null;
+	public boolean MT_isIgnored(Slot slot) {
+		return false;
 	}
 
 	@Method(modid = "mousetweaks")
 	@Override
-	public int getModSlotCount(Object modContainer) {
-		return 0;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public Object getModSlot(Object modContainer, int slotNumber) {
-		return null;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public Object getModSelectedSlot(Object modContainer, int slotCount) {
-		return null;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public void clickModSlot(Object modContainer, Object slot, int mouseButton, boolean shiftPressed) {
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public void disableRMBDragIfRequired(Object modContainer, Object firstSlot, boolean shouldClick) {
+	public boolean MT_disableRMBDraggingFunctionality() {
+		return false;
 	}
 
 }

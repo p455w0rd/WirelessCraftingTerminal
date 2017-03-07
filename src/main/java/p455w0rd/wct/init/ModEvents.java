@@ -205,7 +205,7 @@ public class ModEvents {
 		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
 			int n = rand.nextInt(100);
-			if (n < ModConfig.WCT_BOOSTER_DROPCHANCE) {
+			if (n <= ModConfig.WCT_BOOSTER_DROPCHANCE) {
 				event.getDrops().add(drop);
 			}
 		}
