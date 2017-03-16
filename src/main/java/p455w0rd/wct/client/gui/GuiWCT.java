@@ -60,7 +60,7 @@ import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import yalter.mousetweaks.api.IMTModGuiContainer2;
 
-@Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer", modid = "mousetweaks", striprefs = true)
+@Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer2", modid = "mousetweaks", striprefs = true)
 public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost, IMTModGuiContainer2 {
 
 	private float xSize_lo;
@@ -543,7 +543,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-		
+
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
