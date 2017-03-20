@@ -22,6 +22,7 @@ import appeng.core.api.definitions.ApiParts;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 /**
  * @author p455w0rd
@@ -37,19 +38,41 @@ public class ModRecipes {
 		ApiMaterials materials = defs.materials();
 		ApiParts parts = defs.parts();
 		ItemStack wap = materials.wirelessReceiver().maybeStack(1).get();
+		ItemStack wt = defs.items().wirelessTerminal().maybeStack(1).get();
 		ItemStack fluixPearl = materials.fluixPearl().maybeStack(1).get();
-		ItemStack fluixCrystal = materials.fluixCrystal().maybeStack(1).get();
-		ItemStack singularity = materials.singularity().maybeStack(1).get();
+		ItemStack entangledSingularity = materials.qESingularity().maybeStack(1).get();
 		ItemStack craftingTerminal = parts.craftingTerminal().maybeStack(1).get();
-		ItemStack component64k = materials.cell64kPart().maybeStack(1).get();
 		ItemStack advancedCard = materials.advCard().maybeStack(1).get();
 		ItemStack annihilationPlane = parts.annihilationPlane().maybeStack(1).get();
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.WCT), new Object[] {
-				"aba", "cdc", "efe", Character.valueOf('a'), fluixPearl, Character.valueOf('b'), wap, Character.valueOf('c'), fluixCrystal, Character.valueOf('d'), craftingTerminal, Character.valueOf('e'), component64k, Character.valueOf('f'), singularity
+		GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(ModItems.WCT), new Object[] {
+				wt,
+				fluixPearl,
+				craftingTerminal
 		}));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.MAGNET_CARD), new Object[] {
-				"abc", "ded", "ddd", Character.valueOf('a'), "blockRedstone", Character.valueOf('b'), annihilationPlane, Character.valueOf('c'), "blockLapis", Character.valueOf('d'), "blockIron", Character.valueOf('e'), advancedCard
+				"abc",
+				"ded",
+				"ddd",
+				Character.valueOf('a'),
+				"blockRedstone",
+				Character.valueOf('b'),
+				annihilationPlane,
+				Character.valueOf('c'),
+				"blockLapis",
+				Character.valueOf('d'),
+				"blockIron",
+				Character.valueOf('e'),
+				advancedCard
+		}));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
+				"aba",
+				"   ",
+				"   ",
+				Character.valueOf('a'),
+				entangledSingularity,
+				Character.valueOf('b'),
+				wap
 		}));
 	}
 

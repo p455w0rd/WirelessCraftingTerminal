@@ -15,14 +15,11 @@
  */
 package p455w0rd.wct.init;
 
-import java.util.Random;
-
 import org.lwjgl.input.Keyboard;
 
 import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -202,6 +199,7 @@ public class ModEvents {
 		if (event.getEntity() instanceof EntityDragon && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_DRAGON_DROPS_BOOSTER) {
 			event.getDrops().add(drop);
 		}
+		/*
 		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
 			int n = rand.nextInt(100);
@@ -209,6 +207,7 @@ public class ModEvents {
 				event.getDrops().add(drop);
 			}
 		}
+		*/
 	}
 
 	@SubscribeEvent
