@@ -66,8 +66,8 @@ public class ModRecipes {
 				advancedCard
 		}));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
-				"aba",
-				"   ",
+				"a a",
+				" b ",
 				"   ",
 				Character.valueOf('a'),
 				entangledSingularity,

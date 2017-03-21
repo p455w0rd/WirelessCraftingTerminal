@@ -3,7 +3,8 @@ package p455w0rd.wct.container.slot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import p455w0rd.wct.util.WCTUtils;
 
 public class SlotTrash extends AppEngSlot {
@@ -108,5 +109,6 @@ public class SlotTrash extends AppEngSlot {
 		if (itemStack != null) {
 			itemStack = null;
 		}
+		writeNBT();
 	}
 }

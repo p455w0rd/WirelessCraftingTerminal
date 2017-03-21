@@ -29,6 +29,7 @@ public class PacketEmptyTrash extends WCTPacket {
 			if (player.openContainer instanceof ContainerWCT) {
 				ContainerWCT container = (ContainerWCT) player.openContainer;
 				container.getTrashSlot().clearStack();
+				//container.detectAndSendChanges();
 				/*
 				ItemStack wirelessTerm = WCTUtils.getWirelessTerm(player.inventory);
 				if (wirelessTerm.getTagCompound() != null) {
