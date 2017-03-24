@@ -1,15 +1,20 @@
 package p455w0rd.wct.container;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.oredict.OreDictionary;
 import p455w0rd.wct.container.slot.SlotMagnetFilter;
 import p455w0rd.wct.inventory.WCTInventoryMagnetFilter;
 import p455w0rd.wct.util.WCTUtils;
+import p455w0rdslib.util.MathUtils;
 
 public class ContainerMagnet extends Container {
 
@@ -234,7 +239,7 @@ public class ContainerMagnet extends Container {
 	public static void setSlotStack(Set slotSet, int stackSizeSelector, ItemStack stackToResize, int currentSlotStackSize) {
 		switch (stackSizeSelector) {
 		case 0:
-			stackToResize.stackSize = MathHelper.floor_float((float) stackToResize.stackSize / (float) slotSet.size());
+			stackToResize.stackSize = MathUtils.floor((float) stackToResize.stackSize / (float) slotSet.size());
 			break;
 		case 1:
 			stackToResize.stackSize = 1;

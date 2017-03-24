@@ -36,7 +36,6 @@ import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.Platform;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -231,16 +230,16 @@ public class ItemMagnet extends ItemBase {
 
 	@SideOnly(Side.CLIENT)
 	public void displayMessage(int mode) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = WCTUtils.player();
 		switch (mode) {
 		case 1:
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
+			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
 			break;
 		case 2:
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
+			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
 			break;
 		case 0:
-			player.addChatMessage(new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
+			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
 			break;
 		}
 	}
@@ -327,7 +326,7 @@ public class ItemMagnet extends ItemBase {
 							if (item.getItemDamage() == 1) {
 								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
 									player.onItemPickup(itemToGet, stackSize);
-									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
+									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 								}
 							}
 							else {
@@ -347,7 +346,7 @@ public class ItemMagnet extends ItemBase {
 							if (item.getItemDamage() == 1) {
 								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
 									player.onItemPickup(itemToGet, stackSize);
-									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
+									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 								}
 							}
 							else {
@@ -376,7 +375,7 @@ public class ItemMagnet extends ItemBase {
 			player.addExperience(xpAmount);
 			xpToGet.setDead();
 			xpToGet.setInvisible(true);
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
+			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 		}
 	}
 
@@ -389,7 +388,7 @@ public class ItemMagnet extends ItemBase {
 		if (itemToGet.getDistanceToEntity(player) <= 2.0F) {
 			if (player.inventory.addItemStackToInventory(itemStackToGet)) {
 				player.onItemPickup(itemToGet, stackSize);
-				world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
+				world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 			}
 		}
 	}
@@ -512,7 +511,7 @@ public class ItemMagnet extends ItemBase {
 		if (ais != null && WCTUtils.getMagnet(player.inventory) != null && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 2F));
+			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 		}
 		return ais == null;
 	}

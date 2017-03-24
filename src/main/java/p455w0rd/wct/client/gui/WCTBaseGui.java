@@ -25,7 +25,6 @@ import appeng.client.gui.widgets.ITooltip;
 import appeng.container.AEBaseContainer;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.helpers.InventoryAction;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -42,6 +41,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.me.InternalSlotME;
 import p455w0rd.wct.client.me.SlotDisconnected;
@@ -62,6 +62,7 @@ import p455w0rd.wct.container.slot.SlotSingleItem;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
+import p455w0rd.wct.util.WCTUtils;
 
 public abstract class WCTBaseGui extends GuiContainer {
 	protected static boolean switchingGuis;
@@ -202,13 +203,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 				final OptionalSlotFake fs = (OptionalSlotFake) slot;
 				if (fs.renderDisabled()) {
 					if (fs.isEnabled()) {
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 					}
 					else {
 						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.4F);
 						GL11.glEnable(GL11.GL_BLEND);
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 						GL11.glPopAttrib();
 					}
@@ -237,7 +238,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 	@Override
 	protected void mouseClickMove(final int x, final int y, final int c, final long d) {
 		final Slot slot = getSlot(x, y);
-		final ItemStack itemstack = mc.thePlayer.inventory.getItemStack();
+		final ItemStack itemstack = WCTUtils.player().inventory.getItemStack();
 
 		if (slot instanceof SlotFake && itemstack != null) {
 			drag_click.add(slot);
@@ -255,7 +256,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 	@Override
 	protected void handleMouseClick(final Slot slot, final int slotIdx, final int mouseButton, final ClickType clickType) {
-		final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		final EntityPlayer player = WCTUtils.player();
 
 		if (slot instanceof SlotFake) {
 			final InventoryAction action = clickType == ClickType.QUICK_CRAFT ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
@@ -428,7 +429,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 				final List<Slot> slots = getInventorySlots();
 				for (final Slot inventorySlot : slots) {
-					if (inventorySlot != null && inventorySlot.canTakeStack(mc.thePlayer) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.canAddItemToSlot(inventorySlot, dbl_whichItem, true)) {
+					if (inventorySlot != null && inventorySlot.canTakeStack(WCTUtils.player()) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.canAddItemToSlot(inventorySlot, dbl_whichItem, true)) {
 						handleMouseClick(inventorySlot, inventorySlot.slotNumber, 1, clickType);
 					}
 				}
@@ -451,14 +452,15 @@ public abstract class WCTBaseGui extends GuiContainer {
 			return false;
 		}
 
-		if (mc.thePlayer.inventory.getItemStack() == null && theSlot != null) {
+		if (WCTUtils.player().inventory.getItemStack() == null && theSlot != null) {
 			for (int j = 0; j < 9; ++j) {
 				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
 					final List<Slot> slots = getInventorySlots();
 					InventoryPlayer playerInv = inventorySlots instanceof ContainerWCT ? ((ContainerWCT) inventorySlots).getPlayerInv() : ((WCTBaseContainer) inventorySlots).getPlayerInv();
 					for (final Slot s : slots) {
 						if (s.getSlotIndex() == j && s.inventory == playerInv) {
-							if (!s.canTakeStack(playerInv.player)) {
+							//disable hotbar key-swapping WCT
+							if (!s.canTakeStack(WCTUtils.player(playerInv)) || (s.getStack() != null && s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
 								return false;
 							}
 						}
@@ -493,7 +495,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 		final List<Slot> slots = getInventorySlots();
 		for (final Slot slot : slots) {
 			// isPointInRegion
-			if (isPointInRegion(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mouseX, mouseY)) {
+			if (isPointInRegion(slot.xPos, slot.yPos, 16, 16, mouseX, mouseY)) {
 				return slot;
 			}
 		}
@@ -590,7 +592,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 				if (!isPowered()) {
 					GL11.glDisable(GL11.GL_LIGHTING);
-					drawRect(s.xDisplayPosition, s.yDisplayPosition, 16 + s.xDisplayPosition, 16 + s.yDisplayPosition, 0x66111111);
+					drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);
 					GL11.glEnable(GL11.GL_LIGHTING);
 				}
 
@@ -600,7 +602,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				super.drawSlot(new SlotSingleItem(s));
 				//super.drawSlot(s);
 
-				stackSizeRenderer.renderStackSize(fontRendererObj, ((SlotME) s).getAEStack(), s.getStack(), s.xDisplayPosition, s.yDisplayPosition);
+				stackSizeRenderer.renderStackSize(fontRendererObj, ((SlotME) s).getAEStack(), s.getStack(), s.xPos, s.yPos);
 			}
 			catch (final Exception err) {
 			}
@@ -626,8 +628,8 @@ public abstract class WCTBaseGui extends GuiContainer {
 							GlStateManager.enableTexture2D();
 							GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 							GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-							final float par1 = aes.xDisplayPosition;
-							final float par2 = aes.yDisplayPosition;
+							final float par1 = aes.xPos;
+							final float par2 = aes.yPos;
 							final float par3 = uv_x * 16;
 							final float par4 = uv_y * 16;
 
@@ -654,7 +656,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 						boolean isValid = s.isItemValid(is) || s instanceof SlotOutput || s instanceof AppEngCraftingSlot || s instanceof SlotDisabled || s instanceof SlotInaccessible || s instanceof SlotFake || s instanceof SlotRestrictedInput || s instanceof SlotDisconnected;
 						if (isValid && s instanceof SlotRestrictedInput) {
 							try {
-								isValid = ((SlotRestrictedInput) s).isValid(is, mc.theWorld);
+								isValid = ((SlotRestrictedInput) s).isValid(is, WCTUtils.world());
 							}
 							catch (final Exception err) {
 							}
@@ -667,7 +669,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 						itemRender.zLevel = 100.0F;
 
 						GL11.glDisable(GL11.GL_LIGHTING);
-						drawRect(s.xDisplayPosition, s.yDisplayPosition, 16 + s.xDisplayPosition, 16 + s.yDisplayPosition, 0x66ff6666);
+						drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66ff6666);
 						GL11.glEnable(GL11.GL_LIGHTING);
 
 						zLevel = 0.0F;

@@ -23,11 +23,11 @@ import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -53,11 +53,13 @@ import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModKeybindings;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
+import p455w0rd.wct.util.WCTUtils;
 import yalter.mousetweaks.api.IMTModGuiContainer2;
 
 @Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer2", modid = "mousetweaks", striprefs = true)
@@ -73,7 +75,8 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	protected static final int BUTTON_SEARCH_MODE_ID = 5;
 	protected static final long TOOLTIP_UPDATE_INTERVAL = 3000L;
 	private int currScreenWidth, currScreenHeight;
-	private static final String bgTexturePath = "gui/crafting.png";
+	private static final String BG_TEXTURE = "gui/crafting.png";
+	private static final String BG_TEXTURE_BAUBLES = "gui/crafting_baubles.png";
 	private final ContainerWCT containerWCT;
 	private boolean isFullScreen, init = true, reInit, wasResized = false;
 	private GuiScrollbar scrollBar = null;
@@ -312,7 +315,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		buttonList.clear();
 		buttonList.add(clearBtn = new GuiImgButton(guiLeft + 134, guiTop + ySize - 160, Settings.ACTIONS, ActionItems.STASH));
-		buttonList.add(trashBtn = new GuiTrashButton(guiLeft + 98, guiTop + ySize - 104));
+		buttonList.add(trashBtn = new GuiTrashButton(guiLeft + 116, guiTop + ySize - 104));
 		clearBtn.setHalfSize(true);
 		if (customSortOrder) {
 			buttonList.add(SortByBox = new GuiImgButton(guiLeft - 18, offset, Settings.SORT_BY, configSrc.getSetting(Settings.SORT_BY)));
@@ -356,16 +359,16 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		for (final Object s : inventorySlots.inventorySlots) {
 			if (s instanceof AppEngSlot) {
-				if (((Slot) s).xDisplayPosition < 197) {
+				if (((Slot) s).xPos < 197) {
 					repositionSlot((AppEngSlot) s);
 				}
 			}
 
 			if (s instanceof SlotCraftingMatrix || s instanceof SlotFakeCraftingMatrix) {
 				final Slot g = (Slot) s;
-				if (g.xDisplayPosition > 0 && g.yDisplayPosition > 0) {
-					craftingGridOffsetX = Math.min(craftingGridOffsetX, g.xDisplayPosition);
-					craftingGridOffsetY = Math.min(craftingGridOffsetY, g.yDisplayPosition);
+				if (g.xPos > 0 && g.yPos > 0) {
+					craftingGridOffsetX = Math.min(craftingGridOffsetX, g.xPos);
+					craftingGridOffsetY = Math.min(craftingGridOffsetY, g.yPos);
 				}
 			}
 		}
@@ -380,7 +383,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	}
 
 	protected void repositionSlot(final AppEngSlot s) {
-		s.yDisplayPosition = s.getY() + ySize - 78 - 5;
+		s.yPos = s.getY() + ySize - 78 - 5;
 	}
 
 	@Override
@@ -422,8 +425,8 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
-		if (!mc.thePlayer.isEntityAlive() || mc.thePlayer.isDead) {
-			mc.thePlayer.closeScreen();
+		if (!WCTUtils.player().isEntityAlive() || mc.player.isDead) {
+			WCTUtils.player().closeScreen();
 		}
 	}
 
@@ -491,13 +494,13 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 				final OptionalSlotFake fs = (OptionalSlotFake) slot;
 				if (fs.renderDisabled()) {
 					if (fs.isEnabled()) {
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 					}
 					else {
 						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.4F);
 						GL11.glEnable(GL11.GL_BLEND);
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 						GL11.glPopAttrib();
 					}
@@ -508,7 +511,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		this.bindTexture(bgTexturePath);
+		this.bindTexture(Baubles.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
 		final int x_width = 199;
 
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
@@ -522,7 +525,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
 			this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, mc.thePlayer);
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, WCTUtils.player());
 
 	}
 
@@ -583,13 +586,20 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	}
 
 	@Override
+	protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+		//if (slotIn != null && slotIn.getStack() != null && !(slotIn.getStack().getItem() instanceof IWirelessCraftingTerminalItem) && type != ClickType.SWAP) {
+		super.handleMouseClick(slotIn, slotId, mouseButton, type);
+		//}
+	}
+
+	@Override
 	protected void keyTyped(final char character, final int key) throws IOException {
 		if (!checkHotbarKeys(key)) {
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
 			if (ModKeybindings.openTerminal.getKeyCode() == key && GuiScreen.isCtrlKeyDown()) {
-				Minecraft.getMinecraft().thePlayer.closeScreen();
+				WCTUtils.player().closeScreen();
 			}
 			if (searchField.textboxKeyTyped(character, key)) {
 				repo.setSearchString(searchField.getText());
@@ -683,7 +693,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			}
 
 			if (myStack != null) {
-				final List<String> currentToolTip = stack.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
+				final List<String> currentToolTip = stack.getTooltip(WCTUtils.player(), mc.gameSettings.advancedItemTooltips);
 
 				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
 					currentToolTip.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize()));
@@ -696,7 +706,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 				drawTooltip(x, y, join(currentToolTip, "\n"));
 			}
 			else if (stack.stackSize > BigNumber) {
-				final List<String> var4 = stack.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
+				final List<String> var4 = stack.getTooltip(WCTUtils.player(), mc.gameSettings.advancedItemTooltips);
 				var4.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(stack.stackSize));
 				drawTooltip(x, y, join(var4, "\n"));
 				return;

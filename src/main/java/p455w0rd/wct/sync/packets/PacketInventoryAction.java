@@ -7,14 +7,20 @@ import appeng.client.ClientHelper;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
-import io.netty.buffer.*;
-import net.minecraft.entity.player.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.math.BlockPos;
-import p455w0rd.wct.container.*;
+import p455w0rd.wct.container.ContainerCraftAmount;
+import p455w0rd.wct.container.ContainerOpenContext;
+import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.wct.util.WCTUtils;
 
 public class PacketInventoryAction extends WCTPacket {
 
@@ -110,7 +116,7 @@ public class PacketInventoryAction extends WCTPacket {
 			int y = (int) player.posY;
 			int z = (int) player.posZ;
 
-			GuiHandler.open(GuiHandler.GUI_CRAFT_AMOUNT, player, player.worldObj, new BlockPos(x, y, z));
+			GuiHandler.open(GuiHandler.GUI_CRAFT_AMOUNT, player, WCTUtils.world(player), new BlockPos(x, y, z));
 
 			if (sender.openContainer instanceof ContainerCraftAmount) {
 				final ContainerCraftAmount cca = (ContainerCraftAmount) sender.openContainer;

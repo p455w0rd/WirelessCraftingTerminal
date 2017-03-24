@@ -13,6 +13,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.stats.AchievementList;
+import p455w0rd.wct.util.WCTUtils;
 
 public class AppEngCraftingSlot extends AppEngSlot {
 
@@ -60,7 +61,7 @@ public class AppEngCraftingSlot extends AppEngSlot {
 	 */
 	@Override
 	protected void onCrafting(final ItemStack par1ItemStack) {
-		par1ItemStack.onCrafting(thePlayer.worldObj, thePlayer, amountCrafted);
+		par1ItemStack.onCrafting(WCTUtils.world(thePlayer), thePlayer, amountCrafted);
 		amountCrafted = 0;
 
 		if (par1ItemStack.getItem() == Item.getItemFromBlock(Blocks.CRAFTING_TABLE)) {
@@ -115,7 +116,7 @@ public class AppEngCraftingSlot extends AppEngSlot {
 			ic.setInventorySlotContents(x, craftMatrix.getStackInSlot(x));
 		}
 
-		final ItemStack[] aitemstack = CraftingManager.getInstance().getRemainingItems(ic, player.worldObj);
+		final ItemStack[] aitemstack = CraftingManager.getInstance().getRemainingItems(ic, WCTUtils.world(player));
 
 		for (int x = 0; x < craftMatrix.getSizeInventory(); x++) {
 			craftMatrix.setInventorySlotContents(x, ic.getStackInSlot(x));

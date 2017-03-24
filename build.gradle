@@ -22,7 +22,7 @@ minecraft {
 	version = "1.10.2-12.18.3.2185"
 	runDir = "run"
 	
-	mappings = "snapshot_20161111"
+	mappings = "stable_29"
 	useDepAts = false
 }
 
@@ -43,6 +43,10 @@ repositories {
 		 name = "epoxide"
 		 url = "http://maven.epoxide.xyz"
 	 }
+	 maven {
+		name = "tehnut"
+		url = "http://tehnut.info/maven"
+	}
 }
 dependencies {
 	//compile ("appeng:appliedenergistics2:rv4-alpha-1:api"){
@@ -51,12 +55,13 @@ dependencies {
 	//compile ("appeng:appliedenergistics2:rv4-alpha-7:dev"){
 	//	transitive = false
 	//}
-	compile "mezz.jei:jei_1.10.2:+"
+	deobfCompile "mezz.jei:jei_1.10.2:+"
 	//compile project(':appliedenergistics2')
-	compile "com.enderio:EnderIO:1.10.2-3.0.1.112_beta"
-	compile "com.enderio.core:EnderCore:1.10.2-0.4.1.55-beta"
+	deobfCompile "com.enderio:EnderIO:1.10.2-3.0.1.112_beta"
+	deobfCompile "com.enderio.core:EnderCore:1.10.2-0.4.1.55-beta"
 	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-	compile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.50"
+	deobfCompile "net.darkhax.tesla:Tesla:1.10.2-1.2.1.50"
+	deobfCompile "mcp.mobius.waila:Hwyla:1.8.11-B25_1.10.2"
 }
 
 processResources {

@@ -24,6 +24,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.math.BlockPos;
+import p455w0rd.wct.util.WCTUtils;
 
 public class SlotCraftingTerm extends AppEngCraftingSlot {
 
@@ -100,7 +101,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 				if (extra != null) {
 					final List<ItemStack> drops = new ArrayList<ItemStack>();
 					drops.add(extra);
-					Platform.spawnDrops(who.worldObj, new BlockPos((int) who.posX, (int) who.posY, (int) who.posZ), drops);
+					Platform.spawnDrops(WCTUtils.world(who), new BlockPos((int) who.posX, (int) who.posY, (int) who.posZ), drops);
 					return;
 				}
 			}
@@ -128,7 +129,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 					ic.setInventorySlotContents(x, getPattern().getStackInSlot(x));
 				}
 
-				final IRecipe r = Platform.findMatchingRecipe(ic, p.worldObj);
+				final IRecipe r = Platform.findMatchingRecipe(ic, WCTUtils.world(p));
 
 				if (r == null) {
 					final Item target = request.getItem();
@@ -158,7 +159,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 				if (inv != null) {
 					for (int x = 0; x < getPattern().getSizeInventory(); x++) {
 						if (getPattern().getStackInSlot(x) != null) {
-							set[x] = Platform.extractItemsByRecipe(energySrc, mySrc, inv, p.worldObj, r, is, ic, getPattern().getStackInSlot(x), x, all, Actionable.MODULATE, null);
+							set[x] = Platform.extractItemsByRecipe(energySrc, mySrc, inv, WCTUtils.world(p), r, is, ic, getPattern().getStackInSlot(x), x, all, Actionable.MODULATE, null);
 							ic.setInventorySlotContents(x, set[x]);
 						}
 					}
@@ -203,7 +204,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 		}
 
 		if (drops.size() > 0) {
-			Platform.spawnDrops(p.worldObj, new BlockPos((int) p.posX, (int) p.posY, (int) p.posZ), drops);
+			Platform.spawnDrops(WCTUtils.world(p), new BlockPos((int) p.posX, (int) p.posY, (int) p.posZ), drops);
 		}
 	}
 

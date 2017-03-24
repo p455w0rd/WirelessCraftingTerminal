@@ -1,11 +1,14 @@
 package p455w0rd.wct.inventory;
 
-import appeng.tile.inventory.*;
+import appeng.tile.inventory.AppEngInternalInventory;
+import appeng.tile.inventory.IAEAppEngInventory;
+import appeng.tile.inventory.InvOperation;
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 
 public class WCTInventoryCrafting extends AppEngInternalInventory {
@@ -161,7 +164,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer player) {
 		return true;
 	}
 

@@ -18,7 +18,6 @@ package p455w0rd.wct.init;
 import org.lwjgl.input.Keyboard;
 
 import appeng.tile.networking.TileController;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -47,7 +47,9 @@ import p455w0rd.wct.Globals;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
+import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.NetworkHandler;
@@ -138,7 +140,7 @@ public class ModEvents {
 						if (magnetItem != null) {
 							((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
 							if (magnetItem.getItem() instanceof ItemMagnet) {
-								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, e.player.worldObj, e.player, wirelessTerm);
+								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
 								continue;
 							}
 						}
@@ -151,7 +153,7 @@ public class ModEvents {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onKeyInput(KeyInputEvent event) {
-		EntityPlayer p = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer p = WCTUtils.player();
 		if (p.openContainer == null) {
 			return;
 		}
@@ -215,6 +217,15 @@ public class ModEvents {
 		if (e.player instanceof EntityPlayerMP) {
 			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_BOOSTER_DROPCHANCE, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER);
 			NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onPlayerRenderPre(RenderPlayerEvent.Pre event) {
+		if (Baubles.isLoaded() && !BaubleRenderDispatcher.getRegistry().containsKey(event.getRenderer())) {
+			event.getRenderer().addLayer(new BaubleRenderDispatcher(event.getRenderer()));
+			BaubleRenderDispatcher.getRegistry().put(event.getRenderer(), null);
 		}
 	}
 

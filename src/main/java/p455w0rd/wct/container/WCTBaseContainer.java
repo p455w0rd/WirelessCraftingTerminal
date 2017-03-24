@@ -93,7 +93,7 @@ public abstract class WCTBaseContainer extends Container {
 		part = myPart;
 		obj = gio;
 		EntityPlayer player = ip.player;
-		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
 		mySrc = new WCTPlayerSource(ip.player, getActionHost());
 		prepareSync();
 	}
@@ -143,7 +143,7 @@ public abstract class WCTBaseContainer extends Container {
 		obj = anchor instanceof IGuiItemObject ? (IGuiItemObject) anchor : null;
 
 		EntityPlayer player = ip.player;
-		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
 
 		if (tileEntity == null && part == null && obj == null) {
 			throw new IllegalArgumentException("Must have a valid anchor, instead " + anchor + " in " + ip);
@@ -587,7 +587,7 @@ public abstract class WCTBaseContainer extends Container {
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		if (isValidContainer()) {
 			if (tileEntity instanceof IInventory) {
-				return ((IInventory) tileEntity).isUseableByPlayer(entityplayer);
+				return ((IInventory) tileEntity).isUsableByPlayer(entityplayer);
 			}
 			return true;
 		}

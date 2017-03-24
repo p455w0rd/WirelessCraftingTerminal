@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
 import p455w0rd.wct.container.slot.SlotInaccessible;
+import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftAmount extends WCTBaseContainer {
 
@@ -40,7 +41,7 @@ public class ContainerCraftAmount extends WCTBaseContainer {
 	}
 
 	public World getWorld() {
-		return getPlayerInv().player.worldObj;
+		return WCTUtils.world(WCTUtils.player(getPlayerInv()));
 	}
 
 	public BaseActionSource getActionSrc() {

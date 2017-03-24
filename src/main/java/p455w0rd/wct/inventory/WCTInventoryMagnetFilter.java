@@ -3,8 +3,10 @@ package p455w0rd.wct.inventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
-import net.minecraft.util.text.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import p455w0rd.wct.container.ContainerMagnet;
 
 public class WCTInventoryMagnetFilter implements IInventory {
@@ -79,7 +81,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+	public boolean isUsableByPlayer(EntityPlayer entityplayer) {
 		return true;
 	}
 

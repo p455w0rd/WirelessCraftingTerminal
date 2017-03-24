@@ -35,7 +35,7 @@ public class SlotSingleItem extends Slot {
 	private final Slot delegate;
 
 	public SlotSingleItem(Slot delegate) {
-		super(delegate.inventory, delegate.getSlotIndex(), delegate.xDisplayPosition, delegate.yDisplayPosition);
+		super(delegate.inventory, delegate.getSlotIndex(), delegate.xPos, delegate.yPos);
 		this.delegate = delegate;
 	}
 

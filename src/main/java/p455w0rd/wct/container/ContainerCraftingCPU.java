@@ -40,7 +40,7 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 
 	public ContainerCraftingCPU(final InventoryPlayer ip, final Object te) {
 		super(ip, te);
-		obj = getGuiObject(WCTUtils.getWirelessTerm(ip), ip.player, ip.player.worldObj, (int) ip.player.posX, (int) ip.player.posY, (int) ip.player.posZ);
+		obj = getGuiObject(WCTUtils.getWirelessTerm(ip), ip.player, WCTUtils.world(ip.player), (int) ip.player.posX, (int) ip.player.posY, (int) ip.player.posZ);
 
 		if (obj == null || (getNetwork() == null && Platform.isServer())) {
 			setValidContainer(false);

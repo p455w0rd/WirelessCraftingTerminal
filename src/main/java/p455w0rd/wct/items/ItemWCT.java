@@ -30,6 +30,7 @@ import appeng.core.localization.GuiText;
 import appeng.items.tools.powered.powersink.AERootPoweredItem;
 import appeng.util.ConfigManager;
 import appeng.util.Platform;
+import baubles.api.BaubleType;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
@@ -46,21 +47,27 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.wct.api.IBaubleItem;
+import p455w0rd.wct.api.IBaubleRender;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.WCTBaseGui;
+import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
  *
  */
-public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWirelessCraftingTerminalItem {
+@Optional.Interface(iface = "baubles.api.IBauble", modid = Baubles.API_MODID)
+public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
 	private static final String name = "wct";
 	public static final String LINK_KEY_STRING = "key";
@@ -299,6 +306,17 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 			return;
 		}
 		checkForBooster(wirelessTerminal);
+	}
+
+	@Optional.Method(modid = Baubles.API_MODID)
+	@Override
+	public BaubleType getBaubleType(ItemStack itemstack) {
+		return BaubleType.HEAD;
+	}
+
+	@Override
+	public IBaubleRender getRender() {
+		return RenderLayerWCT.getInstance();
 	}
 
 }

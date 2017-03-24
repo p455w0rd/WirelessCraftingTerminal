@@ -1,27 +1,41 @@
 package p455w0rd.wct.sync.packets;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import appeng.api.AEApi;
-import appeng.api.config.*;
-import appeng.api.networking.*;
+import appeng.api.config.Actionable;
+import appeng.api.config.FuzzyMode;
+import appeng.api.config.SecurityPermissions;
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.data.*;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
 import appeng.container.ContainerNull;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.items.storage.ItemViewCell;
-import appeng.util.*;
+import appeng.util.InventoryAdaptor;
+import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
 import appeng.util.prioritylist.IPartitionList;
-import io.netty.buffer.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
@@ -89,7 +103,7 @@ public class PacketJEIRecipe extends WCTPacket {
 			final IContainerCraftingPacket cct = (IContainerCraftingPacket) con;
 			IGridNode node = cct.getNetworkNode();
 			if (node == null) {
-				WCTGuiObject obj = getGuiObject(WCTUtils.getWirelessTerm(player.inventory), player, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+				WCTGuiObject obj = getGuiObject(WCTUtils.getWirelessTerm(player.inventory), player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
 				node = obj.getActionableNode(true);
 			}
 
@@ -115,7 +129,7 @@ public class PacketJEIRecipe extends WCTPacket {
 						}
 					}
 
-					final IRecipe r = Platform.findMatchingRecipe(testInv, pmp.worldObj);
+					final IRecipe r = Platform.findMatchingRecipe(testInv, WCTUtils.world(pmp));
 
 					if (r != null && security.hasPermission(player, SecurityPermissions.EXTRACT)) {
 						final ItemStack is = r.getCraftingResult(testInv);
@@ -132,7 +146,7 @@ public class PacketJEIRecipe extends WCTPacket {
 								ItemStack currentItem = craftMatrix.getStackInSlot(x);
 								if (currentItem != null) {
 									testInv.setInventorySlotContents(x, currentItem);
-									final ItemStack newItemStack = r.matches(testInv, pmp.worldObj) ? r.getCraftingResult(testInv) : null;
+									final ItemStack newItemStack = r.matches(testInv, WCTUtils.world(pmp)) ? r.getCraftingResult(testInv) : null;
 									testInv.setInventorySlotContents(x, patternItem);
 
 									if (newItemStack == null || !Platform.itemComparisons().isSameItem(newItemStack, is)) {
@@ -154,7 +168,7 @@ public class PacketJEIRecipe extends WCTPacket {
 								// True if we need to fetch an item for the recipe
 								if (patternItem != null && currentItem == null) {
 									// Grab from network by recipe
-									ItemStack whichItem = Platform.extractItemsByRecipe(energy, cct.getActionSource(), storage, player.worldObj, r, is, testInv, patternItem, x, all, realForFake, filter);
+									ItemStack whichItem = Platform.extractItemsByRecipe(energy, cct.getActionSource(), storage, WCTUtils.world(player), r, is, testInv, patternItem, x, all, realForFake, filter);
 
 									// If that doesn't get it, grab exact items from network (?)
 									// TODO see if this code is necessary

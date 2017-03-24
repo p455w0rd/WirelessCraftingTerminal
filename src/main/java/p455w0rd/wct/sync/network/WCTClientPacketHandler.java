@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import p455w0rd.wct.sync.PacketCallState;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.WCTPacketHandlerBase;
+import p455w0rd.wct.util.WCTUtils;
 
 public class WCTClientPacketHandler extends WCTPacketHandlerBase implements IPacketHandler {
 
@@ -31,7 +32,7 @@ public class WCTClientPacketHandler extends WCTPacketHandlerBase implements IPac
 
 				@Override
 				public void call(final WCTPacket appEngPacket) {
-					appEngPacket.clientPacketData(manager, appEngPacket, Minecraft.getMinecraft().thePlayer);
+					appEngPacket.clientPacketData(manager, appEngPacket, WCTUtils.player());
 				}
 			};
 

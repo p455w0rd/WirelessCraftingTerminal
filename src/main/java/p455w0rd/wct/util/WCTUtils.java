@@ -15,14 +15,19 @@
  */
 package p455w0rd.wct.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
 
 /**
@@ -36,18 +41,23 @@ public class WCTUtils {
 			return playerInv.player.getHeldItemMainhand();
 		}
 		ItemStack wirelessTerm = null;
-		int invSize = playerInv.getSizeInventory();
-		if (invSize <= 0) {
-			return null;
+		if (Baubles.isLoaded()) {
+			wirelessTerm = Baubles.getWCTBauble(playerInv.player);
 		}
-		for (int i = 0; i < invSize; ++i) {
-			ItemStack item = playerInv.getStackInSlot(i);
-			if (item == null) {
-				continue;
+		if (wirelessTerm == null) {
+			int invSize = playerInv.getSizeInventory();
+			if (invSize <= 0) {
+				return null;
 			}
-			if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
-				wirelessTerm = item;
-				break;
+			for (int i = 0; i < invSize; ++i) {
+				ItemStack item = playerInv.getStackInSlot(i);
+				if (item == null) {
+					continue;
+				}
+				if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
+					wirelessTerm = item;
+					break;
+				}
 			}
 		}
 		return wirelessTerm;
@@ -152,6 +162,28 @@ public class WCTUtils {
 		case "gray":
 			return TextFormatting.GRAY.toString();
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static EntityPlayer player() {
+		return Minecraft.getMinecraft().player;
+	}
+
+	public static EntityPlayer player(InventoryPlayer playerInv) {
+		return playerInv.player;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static World world() {
+		return Minecraft.getMinecraft().world;
+	}
+
+	public static World world(EntityPlayer player) {
+		return player.getEntityWorld();
+	}
+
+	public static void chatMessage(EntityPlayer player, ITextComponent message) {
+		player.sendMessage(message);
 	}
 
 }

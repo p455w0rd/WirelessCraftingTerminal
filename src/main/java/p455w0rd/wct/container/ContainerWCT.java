@@ -73,6 +73,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
@@ -97,6 +99,7 @@ import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.inventory.WCTInventoryBooster;
 import p455w0rd.wct.inventory.WCTInventoryCrafting;
 import p455w0rd.wct.inventory.WCTInventoryMagnet;
@@ -184,7 +187,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 		trashInventory = new WCTInventoryTrash(WCTUtils.getWirelessTerm(inventoryPlayer));
 		containerstack = WCTUtils.getWirelessTerm(inventoryPlayer);
 		thisItem = (IWirelessCraftingTerminalItem) containerstack.getItem();
-		worldObj = player.worldObj;
+		worldObj = WCTUtils.world(player);
 		craftingGrid = new WCTInventoryCrafting(this, 3, 3, containerstack);
 		this.inventoryPlayer = inventoryPlayer;
 		this.player = player;
@@ -264,16 +267,33 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 		}
 		lastCraftingSlotNumber = craftMatrixSlot[8].slotNumber;
 
-		craftingSlot = new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, craftingGrid, craftingGrid, output, 174, -58, this);
+		craftingSlot = new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, craftingGrid, craftingGrid, output, Baubles.isLoaded() ? 142 : 174, -58, this);
 		// Add crafting result slot
 		addSlotToContainer(craftingSlot);
 
 		magnetSlot = new SlotMagnet(magnetInventory, 152, -20);
 		addSlotToContainer(magnetSlot);
 
-		trashSlot = new SlotTrash(trashInventory, 80, -20, player);
+		trashSlot = new SlotTrash(trashInventory, 98, -22, player);
 		trashSlot.setContainer(this);
 		addSlotToContainer(trashSlot);
+
+		addSlotToContainer(new AppEngSlot(inventoryPlayer, 40, 80, -22) {
+			@Override
+			public boolean isItemValid(ItemStack stack) {
+				return super.isItemValid(stack);
+			}
+
+			@Override
+			@SideOnly(Side.CLIENT)
+			public String getSlotTexture() {
+				return "minecraft:items/empty_armor_slot_shield";
+			}
+		});
+
+		if (Baubles.isLoaded()) {
+			Baubles.addBaubleSlots(this, player);
+		}
 
 		updateCraftingMatrix();
 
@@ -294,11 +314,19 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 	}
 
 	@Override
-	protected Slot addSlotToContainer(final Slot newSlot) {
+	public Slot addSlotToContainer(final Slot newSlot) {
 		if (newSlot instanceof AppEngSlot) {
 			final AppEngSlot s = (AppEngSlot) newSlot;
 			s.setContainer(this);
 			return super.addSlotToContainer(newSlot);
+		}
+		else if (Baubles.isLoaded()) {
+			if (Baubles.isBaubleSlot(newSlot)) {
+				return super.addSlotToContainer(newSlot);
+			}
+			else {
+				throw new IllegalArgumentException("Invalid Slot [" + newSlot + "] for WCT Container instead of SlotBauble.");
+			}
 		}
 		else {
 			throw new IllegalArgumentException("Invalid Slot [" + newSlot + "] for WCT Container instead of AppEngSlot.");
@@ -319,7 +347,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 			ic.setInventorySlotContents(x, craftMatrixSlot[x].getStack());
 		}
 
-		craftingSlot.putStack(CraftingManager.getInstance().findMatchingRecipe(ic, getPlayerInv().player.worldObj));
+		craftingSlot.putStack(CraftingManager.getInstance().findMatchingRecipe(ic, WCTUtils.world(getPlayerInv().player)));
 		writeToNBT("crafting");
 
 	}
@@ -787,20 +815,20 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 		if (!isInRange()) {
 			if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
 				if (isValidContainer()) {
-					getPlayerInv().player.addChatMessage(PlayerMessages.OutOfRange.get());
+					WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.OutOfRange.get());
 				}
 				setValidContainer(false);
 			}
 			if (!networkIsPowered()) {
 				if (isValidContainer()) {
-					getPlayerInv().player.addChatMessage(new TextComponentString("No Power"));
+					WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
 				}
 				setValidContainer(false);
 			}
 		}
 		else if (!hasAccess(SecurityPermissions.CRAFT, true) || !hasAccess(SecurityPermissions.EXTRACT, true) || !hasAccess(SecurityPermissions.INJECT, true)) {
 			if (isValidContainer()) {
-				getPlayerInv().player.addChatMessage(PlayerMessages.CommunicationError.get());
+				WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.CommunicationError.get());
 			}
 			setValidContainer(false);
 		}
@@ -833,7 +861,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 		}
 		boolean hasStack = getSlotFromInventory(magnetInventory, MAGNET_INDEX).getHasStack();
 		if (hasStack) {
-			Item magnetSlotContents = getSlotFromInventory(magnetInventory, MAGNET_INDEX).getStack().getItem();
+			//Item magnetSlotContents = getSlotFromInventory(magnetInventory, MAGNET_INDEX).getStack().getItem();
 			//if (magnetSlotContents instanceof ItemMagnet) {
 			//	return true;
 			//}
@@ -949,7 +977,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 	/*
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final WCTIActionHost host = this.getActionHost();
-	
+
 		if (host != null) {
 			final IGridNode gn = host.getActionableNode();
 			if (gn != null) {
@@ -961,7 +989,7 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 							return false;
 						}
 					}
-	
+
 					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
 					if (sg.hasPermission(this.player, perm) && Platform.isServer()) {
 						return true;
@@ -1347,11 +1375,13 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 
 				// target slots in the container...
 				for (final Object inventorySlot : inventorySlots) {
-					final AppEngSlot cs = (AppEngSlot) inventorySlot;
+					if (inventorySlot instanceof AppEngSlot) {
+						final AppEngSlot cs = (AppEngSlot) inventorySlot;
 
-					if (!(cs.isPlayerSide()) && !(cs instanceof SlotFake) && !(cs instanceof AppEngCraftingSlot)) {
-						if (cs.isItemValid(tis)) {
-							selectedSlots.add(cs);
+						if (!(cs.isPlayerSide()) && !(cs instanceof SlotFake) && !(cs instanceof AppEngCraftingSlot)) {
+							if (cs.isItemValid(tis)) {
+								selectedSlots.add(cs);
+							}
 						}
 					}
 				}
@@ -1359,11 +1389,13 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 			else {
 				// target slots in the container...
 				for (final Object inventorySlot : inventorySlots) {
-					final AppEngSlot cs = (AppEngSlot) inventorySlot;
+					if (inventorySlot instanceof AppEngSlot) {
+						final AppEngSlot cs = (AppEngSlot) inventorySlot;
 
-					if ((cs.isPlayerSide()) && !(cs instanceof SlotFake) && !(cs instanceof AppEngCraftingSlot)) {
-						if (cs.isItemValid(tis)) {
-							selectedSlots.add(cs);
+						if ((cs.isPlayerSide()) && !(cs instanceof SlotFake) && !(cs instanceof AppEngCraftingSlot)) {
+							if (cs.isItemValid(tis)) {
+								selectedSlots.add(cs);
+							}
 						}
 					}
 				}
@@ -1376,18 +1408,20 @@ public class ContainerWCT extends Container implements IConfigManagerHost, IConf
 				if (tis != null) {
 					// target slots in the container...
 					for (final Object inventorySlot : inventorySlots) {
-						final AppEngSlot cs = (AppEngSlot) inventorySlot;
-						final ItemStack destination = cs.getStack();
+						if (inventorySlot instanceof AppEngSlot) {
+							final AppEngSlot cs = (AppEngSlot) inventorySlot;
+							final ItemStack destination = cs.getStack();
 
-						if (!(cs.isPlayerSide()) && cs instanceof SlotFake) {
-							if (Platform.itemComparisons().isSameItem(destination, tis)) {
-								return null;
-							}
-							else if (destination == null) {
-								cs.putStack(tis.copy());
-								cs.onSlotChanged();
-								updateSlot(cs);
-								return null;
+							if (!(cs.isPlayerSide()) && cs instanceof SlotFake) {
+								if (Platform.itemComparisons().isSameItem(destination, tis)) {
+									return null;
+								}
+								else if (destination == null) {
+									cs.putStack(tis.copy());
+									cs.onSlotChanged();
+									updateSlot(cs);
+									return null;
+								}
 							}
 						}
 					}

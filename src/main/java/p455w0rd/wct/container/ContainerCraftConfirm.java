@@ -41,6 +41,7 @@ import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketSetJobBytes;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketUpdateCPUInfo;
+import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftConfirm extends WCTBaseContainer {
 
@@ -241,7 +242,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 				}
 			}
 			catch (final Throwable e) {
-				getPlayerInv().player.addChatMessage(new TextComponentString("Error: " + e.toString()));
+				WCTUtils.chatMessage(WCTUtils.player(getPlayerInv()), new TextComponentString("Error: " + e.toString()));
 				setValidContainer(false);
 				result = null;
 			}
@@ -296,7 +297,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 				//final TileEntity te = this.getOpenContext().getTile();
 				//Platform.openGUI( this.getInventoryPlayer().player, te, this.getOpenContext().getSide(), originalGui );
 				EntityPlayerMP player = (EntityPlayerMP) getInventoryPlayer().player;
-				World world = player.worldObj;
+				World world = WCTUtils.world(player);
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
@@ -328,7 +329,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	}
 
 	public World getWorld() {
-		return getPlayerInv().player.worldObj;
+		return WCTUtils.world(WCTUtils.player(getPlayerInv()));
 	}
 
 	public boolean isAutoStart() {

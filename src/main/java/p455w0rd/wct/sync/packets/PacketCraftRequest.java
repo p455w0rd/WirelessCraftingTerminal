@@ -15,6 +15,7 @@ import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.wct.util.WCTUtils;
 
 public class PacketCraftRequest extends WCTPacket {
 
@@ -61,7 +62,7 @@ public class PacketCraftRequest extends WCTPacket {
 					int y = (int) player.posY;
 					int z = (int) player.posZ;
 
-					GuiHandler.open(GuiHandler.GUI_CRAFT_CONFIRM, player, player.worldObj, new BlockPos(x, y, z));
+					GuiHandler.open(GuiHandler.GUI_CRAFT_CONFIRM, player, WCTUtils.world(player), new BlockPos(x, y, z));
 
 					if (player.openContainer instanceof ContainerCraftConfirm) {
 						final ContainerCraftConfirm ccc = (ContainerCraftConfirm) player.openContainer;
