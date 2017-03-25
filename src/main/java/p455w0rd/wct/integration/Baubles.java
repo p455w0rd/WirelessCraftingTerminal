@@ -24,16 +24,40 @@ public class Baubles {
 	}
 
 	public static ItemStack getWCTBauble(EntityPlayer player) {
-		IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
-		for (int i = 0; i < baubles.getSlots(); i++) {
-			if (baubles.getStackInSlot(i) == null) {
-				continue;
-			}
-			if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
-				return baubles.getStackInSlot(i);
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				if (baubles.getStackInSlot(i) == null) {
+					continue;
+				}
+				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
+					return baubles.getStackInSlot(i);
+				}
 			}
 		}
 		return null;
+	}
+
+	public static int getWCTBaubleSlotIndex(EntityPlayer player) {
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				if (baubles.getStackInSlot(i) == null) {
+					continue;
+				}
+				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	public static void setBaublesItemStack(EntityPlayer player, int slot, ItemStack stack) {
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+			baubles.setStackInSlot(slot, stack);
+		}
 	}
 
 	public static void addBaubleSlots(ContainerWCT container, EntityPlayer player) {

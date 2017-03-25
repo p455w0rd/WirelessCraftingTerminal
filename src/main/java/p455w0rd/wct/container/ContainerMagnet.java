@@ -11,6 +11,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.container.slot.SlotMagnetFilter;
 import p455w0rd.wct.inventory.WCTInventoryMagnetFilter;
 import p455w0rd.wct.util.WCTUtils;
@@ -50,6 +51,11 @@ public class ContainerMagnet extends Container {
 				addSlotToContainer(new SlotMagnetFilter(magnetInventory, j + i * 9, j * 18 + 8, 58 + i * 18));
 			}
 		}
+	}
+
+	@Override
+	public void onContainerClosed(EntityPlayer playerIn) {
+		GuiWCT.setSwitchingGuis(false);
 	}
 
 	private boolean isInHotbar(int slotNum) {

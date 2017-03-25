@@ -24,7 +24,6 @@ import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.ClickType;
@@ -36,6 +35,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.common.Optional.Method;
 import p455w0rd.wct.Globals;
+import p455w0rd.wct.client.gui.widgets.GuiMagnetButton;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.client.gui.widgets.GuiTrashButton;
@@ -87,6 +87,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private final int offsetX = 8;
 	private final IConfigManager configSrc;
 	private GuiTabButton craftingStatusBtn;
+	private GuiMagnetButton magnetGUIButton;
 	private MEGuiTextField searchField;
 	private int perRow = 9;
 	private boolean customSortOrder = true;
@@ -184,6 +185,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	protected void actionPerformed(final GuiButton btn) {
 		if (btn == craftingStatusBtn) {
 			NetworkHandler.instance().sendToServer(new PacketSwitchGuis(GuiHandler.GUI_CRAFTING_STATUS));
+			return;
 		}
 
 		if (btn instanceof GuiImgButton) {
@@ -246,6 +248,10 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					}
 				}
 			}
+			return;
+		}
+		if (btn == magnetGUIButton) {
+			NetworkHandler.instance().sendToServer(new PacketSwitchGuis(GuiHandler.GUI_MAGNET));
 		}
 	}
 
@@ -342,6 +348,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		searchField.setEnabled(true);
 
 		buttonList.add(craftingStatusBtn = new GuiTabButton(guiLeft + 169, guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
+		buttonList.add(magnetGUIButton = new GuiMagnetButton(guiLeft + 157, guiTop + ySize - 115));
 		craftingStatusBtn.setHideEdge(13);
 
 		final Enum<?> setting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
@@ -425,6 +432,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
+		magnetGUIButton.visible = WCTUtils.isMagnetInstalled(WCTUtils.player().inventory);
 		if (!WCTUtils.player().isEntityAlive() || mc.player.isDead) {
 			WCTUtils.player().closeScreen();
 		}
@@ -546,7 +554,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-
+		
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
@@ -598,8 +606,15 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
-			if (ModKeybindings.openTerminal.getKeyCode() == key && GuiScreen.isCtrlKeyDown()) {
-				WCTUtils.player().closeScreen();
+			if (ModKeybindings.openTerminal.getKeyCode() == key) {
+				if (AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE) == SearchBoxMode.MANUAL_SEARCH) {
+					WCTUtils.player().closeScreen();
+				}
+				else {
+					if (isCtrlKeyDown()) {
+						WCTUtils.player().closeScreen();
+					}
+				}
 			}
 			if (searchField.textboxKeyTyped(character, key)) {
 				repo.setSearchString(searchField.getText());

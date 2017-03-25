@@ -22,7 +22,7 @@ import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ContainerPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -36,7 +36,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -46,8 +45,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.Globals;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
-import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
+import p455w0rd.wct.container.ContainerMagnet;
+import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
@@ -56,7 +56,6 @@ import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
-import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.capabilities.CapabilityChunkLoader;
 import p455w0rdslib.capabilities.CapabilityChunkLoader.ProviderTE;
@@ -111,14 +110,14 @@ public class ModEvents {
 
 	@SubscribeEvent
 	public void tickEvent(TickEvent.PlayerTickEvent e) {
-		ItemStack wirelessTerm = null;
 		EntityPlayer player = e.player;
 		IInventory playerInv = player.inventory;
-
+		ItemStack wirelessTerm = WCTUtils.getWirelessTerm((InventoryPlayer) playerInv);
 		int invSize = playerInv.getSizeInventory();
 		if (invSize <= 0) {
 			return;
 		}
+		/*
 		for (int i = 0; i < invSize; ++i) {
 			ItemStack item = playerInv.getStackInSlot(i);
 			if (item == null) {
@@ -130,24 +129,25 @@ public class ModEvents {
 			if (wirelessTerm == null) {
 				continue;
 			}
-			if (wirelessTerm.hasTagCompound()) {
-				NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
-				NBTTagList tagList = nbtTC.getTagList("MagnetSlot", 10);
-				if (tagList != null) {
-					NBTTagCompound magCompound = tagList.getCompoundTagAt(0);
-					if (magCompound != null) {
-						ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magCompound);
-						if (magnetItem != null) {
-							((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
-							if (magnetItem.getItem() instanceof ItemMagnet) {
-								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
-								continue;
-							}
+			*/
+		if (wirelessTerm != null && wirelessTerm.hasTagCompound()) {
+			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
+			NBTTagList tagList = nbtTC.getTagList("MagnetSlot", 10);
+			if (tagList != null) {
+				NBTTagCompound magCompound = tagList.getCompoundTagAt(0);
+				if (magCompound != null) {
+					ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magCompound);
+					if (magnetItem != null) {
+						((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
+						if (magnetItem.getItem() instanceof ItemMagnet) {
+							((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
+							//continue;
 						}
 					}
 				}
 			}
 		}
+		//}
 	}
 
 	@SubscribeEvent
@@ -157,41 +157,50 @@ public class ModEvents {
 		if (p.openContainer == null) {
 			return;
 		}
-		if (p.openContainer instanceof ContainerPlayer) {
-			if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
-				ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
-				if (is == null) {
-					return;
-				}
-				IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
-				if (wirelessTerm != null && wirelessTerm.isWirelessCraftingEnabled(is)) {
-					if (!FMLClientHandler.instance().isGUIOpen(GuiWCT.class)) {
-						NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_WCT));
-					}
-				}
+		//if (p.openContainer instanceof ContainerPlayer) {
+		if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
+			ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
+			if (is == null) {
+				return;
 			}
-			else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
-				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-				if (magnetItem != null) {
-					if (!WCTUtils.isMagnetInitialized(magnetItem)) {
-						if (magnetItem.getTagCompound() == null) {
-							magnetItem.setTagCompound(new NBTTagCompound());
-						}
-						magnetItem.getTagCompound().setBoolean("Initialized", true);
-						NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
-					}
-					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_MAGNET));
+			IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
+			if (wirelessTerm != null && wirelessTerm.isWirelessCraftingEnabled(is)) {
+				//if (!FMLClientHandler.instance().isGUIOpen(GuiWCT.class)) {
+				if (!(p.openContainer instanceof ContainerWCT)) {
+					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_WCT));
 				}
-			}
-			else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
-				ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-				if (magnetItem != null && WCTUtils.isMagnetInitialized(magnetItem)) {
-					((ItemMagnet) magnetItem.getItem()).switchMagnetMode(magnetItem, p);
-					((ItemMagnet) magnetItem.getItem()).displayMessage(magnetItem.getItemDamage());
-					NetworkHandler.instance().sendToServer(new PacketSetMagnet(magnetItem.getItemDamage()));
+				else {
+					p.closeScreen();
 				}
 			}
 		}
+		else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
+			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
+			if (magnetItem != null) {
+				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
+					if (magnetItem.getTagCompound() == null) {
+						magnetItem.setTagCompound(new NBTTagCompound());
+					}
+					NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+				}
+				if (!(p.openContainer instanceof ContainerMagnet)) {
+					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_MAGNET));
+				}
+			}
+		}
+		else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
+			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
+			if (magnetItem != null) {
+				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
+					if (!magnetItem.hasTagCompound()) {
+						magnetItem.setTagCompound(new NBTTagCompound());
+					}
+					NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+				}
+				ItemMagnet.switchMagnetMode(magnetItem, p);
+			}
+		}
+		//}
 	}
 
 	@SubscribeEvent

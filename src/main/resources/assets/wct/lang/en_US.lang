@@ -49,3 +49,7 @@ key.categories.wct=Wireless Crafting Terminal 2
 gui.title.magnet_filter=Magnet Filter
 gui.emptytrash=Empty Trash
 gui.emptytrash.desc=Delete contents of the Trash slot
+gui.openmagnetgui=Open Magnet Filter GUI
+gui.openmagnetgui.desc=Opens the Magnet Card filter GUI to configure filterable items
+
+name.HEAD=Bauble: Head

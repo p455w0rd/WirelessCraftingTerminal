@@ -82,6 +82,7 @@ public class GuiHandler implements IGuiHandler {
 			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
+					GuiWCT.setSwitchingGuis(false);
 					return new GuiWCT(new ContainerWCT(player, player.inventory));
 				}
 
@@ -99,7 +100,7 @@ public class GuiHandler implements IGuiHandler {
 			}
 		}
 		if (ID == GUI_MAGNET) {
-			return new GuiMagnet(new ContainerMagnet(player, player.inventory));
+			return new GuiMagnet(new ContainerMagnet(player, player.inventory), WCTUtils.getMagnet(player.inventory));
 		}
 		return null;
 	}

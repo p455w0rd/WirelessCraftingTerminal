@@ -103,13 +103,14 @@ public class WCTUtils {
 
 	public static boolean isMagnetInitialized(ItemStack magnetItem) {
 		if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
-			if (magnetItem.hasTagCompound()) {
-				if (magnetItem.getTagCompound().hasKey("Initialized")) {
-					return magnetItem.getTagCompound().getBoolean("Initialized");
-				}
+			if (!magnetItem.hasTagCompound()) {
+				magnetItem.setTagCompound(new NBTTagCompound());
+			}
+			if (!magnetItem.getTagCompound().hasKey("Initialized")) {
+				magnetItem.getTagCompound().setBoolean("Initialized", true);
 			}
 		}
-		return false;
+		return magnetItem.getTagCompound().getBoolean("Initialized");
 	}
 
 	public static boolean isMagnetInstalled(InventoryPlayer ip) {

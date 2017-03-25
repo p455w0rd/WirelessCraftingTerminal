@@ -71,6 +71,7 @@ import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
+import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.util.EntityItemUtils;
 import p455w0rdslib.util.ItemUtils;
@@ -148,10 +149,10 @@ public class ItemMagnet extends ItemBase {
 
 			list.add("");
 			list.add(I18n.format("tooltip.status.desc") + ": " + (isActivated(is) ? color("green") + I18n.format("tooltip.active.desc") : color("red") + I18n.format("tooltip.active.desc")));
-			if (is.getItemDamage() == 1) {
+			if (getDamageUnsafe(is) == 1) {
 				list.add(color("white") + "  " + I18n.format("tooltip.magnet_active_1.desc"));
 			}
-			else if (is.getItemDamage() == 2) {
+			else if (getDamageUnsafe(is) == 2) {
 				list.add(color("white") + "  " + I18n.format("tooltip.magnet_active_2.desc"));
 			}
 
@@ -205,12 +206,9 @@ public class ItemMagnet extends ItemBase {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(final ItemStack item, final World world, final EntityPlayer player, EnumHand hand) {
 		if (!world.isRemote) {
-			if (player.isSneaking()) {
-				switchMagnetMode(item, player);
-			}
-			else {
+			if (!player.isSneaking()) {
 				if (!WCTUtils.isMagnetInitialized(item)) {
-					NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+					item.getTagCompound().setBoolean("Initialized", true);
 				}
 				int x = (int) player.posX;
 				int y = (int) player.posY;
@@ -220,16 +218,30 @@ public class ItemMagnet extends ItemBase {
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		else {
+			/*
 			if (player.isSneaking()) {
-				switchMagnetMode(item, player);
-				displayMessage(item.getItemDamage());
+				if (hand == EnumHand.MAIN_HAND) {
+					switchMagnetMode(item, player, false);
+					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+				}
 			}
+			else {
+			*/
+			if (!WCTUtils.isMagnetInitialized(item)) {
+				NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true, item));
+			}
+			int x = (int) player.posX;
+			int y = (int) player.posY;
+			int z = (int) player.posZ;
+			GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
+			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+			//}
 		}
-		return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+		//return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void displayMessage(int mode) {
+	public static void displayMessage(int mode) {
 		EntityPlayer player = WCTUtils.player();
 		switch (mode) {
 		case 1:
@@ -244,16 +256,42 @@ public class ItemMagnet extends ItemBase {
 		}
 	}
 
-	public void switchMagnetMode(ItemStack item, EntityPlayer player) {
-		if (item.getItemDamage() == 0) {
-			item.setItemDamage(1);
+	public static void switchMagnetMode(ItemStack item, EntityPlayer player) {
+		switchMagnetMode(item, player, true);
+	}
+
+	public static void switchMagnetMode(ItemStack item, EntityPlayer player, boolean sync) {
+		if (player.getEntityWorld().isRemote) {
+			int newMode = 0;
+			if (getDamageUnsafe(item) == 0) {
+				newMode = 1;
+			}
+			else if (getDamageUnsafe(item) == 1) {
+				newMode = 2;
+			}
+			else {
+				newMode = 0;
+			}
+			setDamageUnsafe(item, newMode);
+			displayMessage(newMode);
+			if (sync) {
+				NetworkHandler.instance().sendToServer(new PacketSetMagnet(newMode));
+			}
 		}
-		else if (item.getItemDamage() == 1) {
-			item.setItemDamage(2);
+	}
+
+	private static int getDamageUnsafe(ItemStack stack) {
+		if (!stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+			if (!stack.getTagCompound().hasKey("MagnetMode")) {
+				stack.getTagCompound().setInteger("MagnetMode", 0);
+			}
 		}
-		else {
-			item.setItemDamage(0);
-		}
+		return stack.getTagCompound().getInteger("MagnetMode");
+	}
+
+	private static void setDamageUnsafe(ItemStack stack, int damage) {
+		stack.getTagCompound().setInteger("MagnetMode", damage);
 	}
 
 	public void doMagnet(ItemStack item, World world, EntityPlayer player, ItemStack wirelessTerm) {
@@ -574,7 +612,7 @@ public class ItemMagnet extends ItemBase {
 		if (item == null) {
 			return false;
 		}
-		return item.getItemDamage() != 0;
+		return getDamageUnsafe(item) != 0;
 	}
 
 	@Override
@@ -588,6 +626,10 @@ public class ItemMagnet extends ItemBase {
 		for (int i = 0; i < 3; i++) {
 			ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(getRegistryName(), "inventory"));
 		}
+	}
+
+	public static enum MagnetMode {
+			INACTIVE, ACTIVE_KEEP, ACTIVE_LEAVE
 	}
 
 }

@@ -5,6 +5,8 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
@@ -19,25 +21,33 @@ public class PacketMagnetFilter extends WCTPacket {
 	// 4 = use oredict
 	int whichMode;
 	boolean modeValue;
+	ItemStack stack;
 
 	public PacketMagnetFilter(final ByteBuf stream) {
 		whichMode = stream.readInt();
 		modeValue = stream.readBoolean();
+		stack = ByteBufUtils.readItemStack(stream);
 	}
 
 	public PacketMagnetFilter(final int mode, final boolean modeVal) {
+		this(mode, modeVal, null);
+	}
+
+	public PacketMagnetFilter(final int mode, final boolean modeVal, ItemStack stackIn) {
 		modeValue = modeVal;
 		whichMode = mode;
+		stack = stackIn;
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(getPacketID());
 		data.writeInt(whichMode);
 		data.writeBoolean(modeValue);
+		ByteBufUtils.writeItemStack(data, stack);
 		configureWrite(data);
 	}
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		ItemStack magnetItem = WCTUtils.getMagnet(player.inventory);
+		ItemStack magnetItem = stack == null ? WCTUtils.getMagnet(player.inventory) : stack;
 
 		if (!(magnetItem.getItem() instanceof ItemMagnet)) {
 			return;
@@ -64,6 +74,18 @@ public class PacketMagnetFilter extends WCTPacket {
 			else {
 				return;
 			}
+
+			if (WCTUtils.isMagnetInstalled(player.inventory)) {
+				ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
+				NBTTagCompound newNBT = wct.getTagCompound();
+				NBTTagList magnetNBTForm = wct.getTagCompound().getTagList("MagnetSlot", 10);
+				if (magnetNBTForm.getCompoundTagAt(0) != null) {
+					magnetNBTForm.set(0, magnetItem.serializeNBT());
+				}
+				newNBT.setTag("MagnetSlot", magnetNBTForm);
+				//wct.writeToNBT(newNBT);
+			}
+			//player.getServer().saveAllWorlds(true);
 		}
 	}
 }
