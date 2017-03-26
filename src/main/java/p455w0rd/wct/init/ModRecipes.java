@@ -65,15 +65,18 @@ public class ModRecipes {
 				Character.valueOf('e'),
 				advancedCard
 		}));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
-				"a a",
-				" b ",
-				"   ",
-				Character.valueOf('a'),
-				entangledSingularity,
-				Character.valueOf('b'),
-				wap
-		}));
+
+		if (!ModConfig.WCT_DISABLE_BOOSTER_RECIPE) {
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
+					"a a",
+					" b ",
+					"   ",
+					Character.valueOf('a'),
+					entangledSingularity,
+					Character.valueOf('b'),
+					wap
+			}));
+		}
 	}
 
 }

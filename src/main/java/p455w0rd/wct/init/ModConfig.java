@@ -39,6 +39,7 @@ public class ModConfig {
 	public static boolean WCT_DRAGON_DROPS_BOOSTER = true;
 	public static int WCT_BOOSTER_DROPCHANCE = 5;
 	public static int WCT_MAX_POWER = 16000000;
+	public static boolean WCT_DISABLE_BOOSTER_RECIPE = false;
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
@@ -59,6 +60,7 @@ public class ModConfig {
 		WCT_MAX_POWER = CONFIG.getInt("PowerCapacity", DEF_CAT, 16000000, 100000, 64000000, "How much energy the Wireless Crafting Terminal can store");
 		//WCT_WITHER_DROPS_BOOSTER = CONFIG.getBoolean("WitherDropsBooster", DEF_CAT, true, "Should Withers drop Infinity Booster Card?");
 		WCT_DRAGON_DROPS_BOOSTER = CONFIG.getBoolean("DragonDropsBooster", DEF_CAT, true, "Should Dragons drop Infinity Booster Card?");
+		WCT_DISABLE_BOOSTER_RECIPE = CONFIG.getBoolean("DisableBoosterRecipe", DEF_CAT, true, "Should Infinity Booster Card Recipe be disable?");
 
 		if (CONFIG.hasChanged()) {
 			CONFIG.save();
