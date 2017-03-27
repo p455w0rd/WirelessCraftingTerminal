@@ -1,5 +1,8 @@
 # Wireless Crafting Terminal (Beta)
 
+[![CurseForge](http://cf.way2muchnoise.eu/full_wireless-crafting-terminal_downloads.svg)](https://minecraft.curseforge.com/projects/wireless-crafting-terminal)
+[![Latest Version](http://cf.way2muchnoise.eu/versions/For%20MC_wireless-crafting-terminal_all.svg)](https://minecraft.curseforge.com/projects/wireless-crafting-terminal/files/latest)
+
 ## Table of Contents
 
 * [About](#about)
