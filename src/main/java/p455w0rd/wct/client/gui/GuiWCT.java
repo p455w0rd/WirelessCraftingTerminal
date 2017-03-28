@@ -554,7 +554,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-		
+
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
@@ -607,7 +607,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 				return;
 			}
 			if (ModKeybindings.openTerminal.getKeyCode() == key) {
-				if (AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE) == SearchBoxMode.MANUAL_SEARCH) {
+				if (AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE) == SearchBoxMode.MANUAL_SEARCH && !searchField.isFocused()) {
 					WCTUtils.player().closeScreen();
 				}
 				else {
