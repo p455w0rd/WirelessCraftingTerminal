@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -314,9 +315,16 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		return BaubleType.HEAD;
 	}
 
+	@Optional.Method(modid = Baubles.API_MODID)
 	@Override
 	public IBaubleRender getRender() {
 		return RenderLayerWCT.getInstance();
+	}
+
+	@Optional.Method(modid = Baubles.API_MODID)
+	@Override
+	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
+		return false;
 	}
 
 }
