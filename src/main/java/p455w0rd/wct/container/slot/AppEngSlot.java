@@ -2,9 +2,12 @@ package p455w0rd.wct.container.slot;
 
 import appeng.tile.inventory.AppEngInternalInventory;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import p455w0rd.wct.container.*;
+import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.WCTBaseContainer;
 
 public class AppEngSlot extends Slot {
 
@@ -190,7 +193,7 @@ public class AppEngSlot extends Slot {
 		return myContainer;
 	}
 
-	public void setContainer(final Container myContainer) {
+	public AppEngSlot setContainer(final Container myContainer) {
 		if (this.myContainer instanceof ContainerWCT) {
 			this.myContainer = myContainer;
 		}
@@ -200,9 +203,10 @@ public class AppEngSlot extends Slot {
 		else {
 			this.myContainer = myContainer;
 		}
+		return this;
 	}
 
 	public enum hasCalculatedValidness {
-		NotAvailable, Valid, Invalid
+			NotAvailable, Valid, Invalid
 	}
 }

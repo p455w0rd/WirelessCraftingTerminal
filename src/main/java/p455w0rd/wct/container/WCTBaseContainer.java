@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,35 +12,29 @@ import java.util.LinkedList;
 import java.util.List;
 
 import appeng.api.AEApi;
-import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
-import appeng.api.implementations.guiobjects.IGuiItemObject;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
 import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.parts.IPart;
 import appeng.api.storage.IMEInventoryHandler;
+import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IItemList;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
-import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
-import appeng.util.inv.AdaptorPlayerHand;
 import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
@@ -50,7 +45,6 @@ import p455w0rd.wct.container.guisync.GuiSync;
 import p455w0rd.wct.container.guisync.SyncData;
 import p455w0rd.wct.container.slot.AppEngSlot;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotCraftingTerm;
 import p455w0rd.wct.container.slot.SlotDisabled;
 import p455w0rd.wct.container.slot.SlotFake;
 import p455w0rd.wct.container.slot.SlotInaccessible;
@@ -59,46 +53,40 @@ import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
+import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketPartialItem;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
-import p455w0rd.wct.util.WCTUtils;
 
 public abstract class WCTBaseContainer extends Container {
 
-	private final InventoryPlayer invPlayer;
-	private final BaseActionSource mySrc;
-	private final HashSet<Integer> locked = new HashSet<Integer>();
-	private final TileEntity tileEntity;
-	private final IPart part;
-	public final IGuiItemObject obj;
-	public final WCTGuiObject obj2;
-	private final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
-	private final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
+	protected final InventoryPlayer inventoryPlayer;
+	protected final BaseActionSource mySrc;
+	protected final HashSet<Integer> locked = new HashSet<Integer>();
+	public final WCTGuiObject obj;
+	protected final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
+	protected final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
 	private boolean isContainerValid = true;
-	private String customName;
-	private ContainerOpenContext openContext;
-	private IMEInventoryHandler<IAEItemStack> cellInv;
-	private IEnergySource powerSrc;
-	private boolean sentCustomName;
-	private int ticksSinceCheck = 900;
-	private IAEItemStack clientRequestedTargetItem = null;
+	protected String customName;
+	protected ContainerOpenContext openContext;
+	protected IMEInventoryHandler<IAEItemStack> cellInv;
+	protected IEnergySource powerSrc;
+	protected boolean sentCustomName;
+	protected int ticksSinceCheck = 900;
+	protected IAEItemStack clientRequestedTargetItem = null;
+	protected IMEMonitor<IAEItemStack> monitor;
 
-	public WCTBaseContainer(final InventoryPlayer ip, final TileEntity myTile, final IPart myPart) {
-		this(ip, myTile, myPart, null);
-	}
+	public WCTBaseContainer(final InventoryPlayer ip, final Object anchor) {
+		inventoryPlayer = ip;
+		obj = anchor instanceof WCTGuiObject ? (WCTGuiObject) anchor : null;
 
-	public WCTBaseContainer(final InventoryPlayer ip, final TileEntity myTile, final IPart myPart, final IGuiItemObject gio) {
-		invPlayer = ip;
-		tileEntity = myTile;
-		part = myPart;
-		obj = gio;
-		EntityPlayer player = ip.player;
-		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
-		mySrc = new WCTPlayerSource(ip.player, getActionHost());
+		if (obj == null) {
+			setValidContainer(false);
+		}
+		mySrc = new WCTPlayerSource(ip.player, getActionHost(anchor));
 		prepareSync();
 	}
 
-	protected WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	protected static WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
@@ -109,23 +97,14 @@ public abstract class WCTBaseContainer extends Container {
 		return null;
 	}
 
-	protected WCTIActionHost getActionHost() {
-		if (obj instanceof WCTIActionHost) {
-			return (WCTIActionHost) obj;
+	protected static WCTIActionHost getActionHost(Object object) {
+		if (object instanceof WCTIActionHost) {
+			return (WCTIActionHost) object;
 		}
-
-		if (tileEntity instanceof WCTIActionHost) {
-			return (WCTIActionHost) tileEntity;
-		}
-
-		if (part instanceof WCTIActionHost) {
-			return (WCTIActionHost) part;
-		}
-
 		return null;
 	}
 
-	private void prepareSync() {
+	public void prepareSync() {
 		for (final Field f : this.getClass().getFields()) {
 			if (f.isAnnotationPresent(GuiSync.class)) {
 				final GuiSync annotation = f.getAnnotation(GuiSync.class);
@@ -136,22 +115,30 @@ public abstract class WCTBaseContainer extends Container {
 		}
 	}
 
-	public WCTBaseContainer(final InventoryPlayer ip, final Object anchor) {
-		invPlayer = ip;
-		tileEntity = anchor instanceof TileEntity ? (TileEntity) anchor : null;
-		part = anchor instanceof IPart ? (IPart) anchor : null;
-		obj = anchor instanceof IGuiItemObject ? (IGuiItemObject) anchor : null;
+	protected void queueInventory(final IContainerListener c) {
+		if (Platform.isServer() && c instanceof EntityPlayerMP && monitor != null) {
+			try {
+				PacketMEInventoryUpdate piu = new PacketMEInventoryUpdate();
+				final IItemList<IAEItemStack> monitorCache = monitor.getStorageList();
 
-		EntityPlayer player = ip.player;
-		obj2 = getGuiObject(WCTUtils.getWirelessTerm(ip), player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
+				for (final IAEItemStack send : monitorCache) {
+					try {
+						piu.appendItem(send);
+					}
+					catch (final BufferOverflowException boe) {
+						NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
 
-		if (tileEntity == null && part == null && obj == null) {
-			throw new IllegalArgumentException("Must have a valid anchor, instead " + anchor + " in " + ip);
+						piu = new PacketMEInventoryUpdate();
+						piu.appendItem(send);
+					}
+				}
+				if (piu != null && c != null) {
+					NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
+				}
+			}
+			catch (final IOException e) {
+			}
 		}
-
-		mySrc = new WCTPlayerSource(ip.player, getActionHost());
-
-		prepareSync();
 	}
 
 	public void postPartial(final PacketPartialItem packetPartialItem) {
@@ -259,7 +246,7 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
-		final IGrid grid = obj2.getTargetGrid();
+		final IGrid grid = obj.getTargetGrid();
 		if (grid != null) {
 			final IEnergyGrid eg = grid.getCache(IEnergyGrid.class);
 			if (!eg.isNetworkPowered()) {
@@ -278,24 +265,14 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	public Object getTarget() {
-		if (tileEntity != null) {
-			return tileEntity;
-		}
-		if (part != null) {
-			return part;
-		}
-		if (obj2 != null) {
-			return obj2;
+		if (obj != null) {
+			return obj;
 		}
 		return null;
 	}
 
 	public InventoryPlayer getPlayerInv() {
 		return getInventoryPlayer();
-	}
-
-	public TileEntity getTileEntity() {
-		return tileEntity;
 	}
 
 	public final void updateFullProgressBar(final int idx, final long value) {
@@ -340,13 +317,9 @@ public abstract class WCTBaseContainer extends Container {
 	@Override
 	protected Slot addSlotToContainer(final Slot newSlot) {
 		if (newSlot instanceof AppEngSlot) {
-			final AppEngSlot s = (AppEngSlot) newSlot;
-			s.setContainer(this);
-			return super.addSlotToContainer(newSlot);
+			((AppEngSlot) newSlot).setContainer(this);
 		}
-		else {
-			throw new IllegalArgumentException("Invalid Slot [" + newSlot + "]for AE Container instead of AppEngSlot.");
-		}
+		return super.addSlotToContainer(newSlot);
 	}
 
 	@Override
@@ -586,9 +559,6 @@ public abstract class WCTBaseContainer extends Container {
 	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		if (isValidContainer()) {
-			if (tileEntity instanceof IInventory) {
-				return ((IInventory) tileEntity).isUsableByPlayer(entityplayer);
-			}
 			return true;
 		}
 		return false;
@@ -599,304 +569,7 @@ public abstract class WCTBaseContainer extends Container {
 		return ((AppEngSlot) s).isDraggable();
 	}
 
-	public void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id) {
-		if (slot >= 0 && slot < inventorySlots.size()) {
-			final Slot s = getSlot(slot);
-
-			if (s instanceof SlotCraftingTerm) {
-				switch (action) {
-				case CRAFT_SHIFT:
-				case CRAFT_ITEM:
-				case CRAFT_STACK:
-					((SlotCraftingTerm) s).doClick(action, player);
-					updateHeld(player);
-				default:
-				}
-			}
-
-			if (s instanceof SlotFake) {
-				final ItemStack hand = player.inventory.getItemStack();
-
-				switch (action) {
-				case PICKUP_OR_SET_DOWN:
-
-					if (hand == null) {
-						s.putStack(null);
-					}
-					else {
-						s.putStack(hand.copy());
-					}
-
-					break;
-				case PLACE_SINGLE:
-
-					if (hand != null) {
-						final ItemStack is = hand.copy();
-						is.stackSize = 1;
-						s.putStack(is);
-					}
-
-					break;
-				case SPLIT_OR_PLACE_SINGLE:
-
-					ItemStack is = s.getStack();
-					if (is != null) {
-						if (hand == null) {
-							is.stackSize--;
-						}
-						else if (hand.isItemEqual(is)) {
-							is.stackSize = Math.min(is.getMaxStackSize(), is.stackSize + 1);
-						}
-						else {
-							is = hand.copy();
-							is.stackSize = 1;
-						}
-
-						s.putStack(is);
-					}
-					else if (hand != null) {
-						is = hand.copy();
-						is.stackSize = 1;
-						s.putStack(is);
-					}
-
-					break;
-				case CREATIVE_DUPLICATE:
-				case MOVE_REGION:
-				case SHIFT_CLICK:
-				default:
-					break;
-				}
-			}
-
-			if (action == InventoryAction.MOVE_REGION) {
-				final List<Slot> from = new LinkedList<Slot>();
-
-				for (final Object j : inventorySlots) {
-					if (j instanceof Slot && j.getClass() == s.getClass()) {
-						from.add((Slot) j);
-					}
-				}
-
-				for (final Slot fr : from) {
-					transferStackInSlot(player, fr.slotNumber);
-				}
-			}
-
-			return;
-		}
-
-		// get target item.
-		final IAEItemStack slotItem = clientRequestedTargetItem;
-
-		switch (action) {
-		case SHIFT_CLICK:
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			if (slotItem != null) {
-				IAEItemStack ais = slotItem.copy();
-				ItemStack myItem = ais.getItemStack();
-
-				ais.setStackSize(myItem.getMaxStackSize());
-
-				final InventoryAdaptor adp = InventoryAdaptor.getAdaptor(player, EnumFacing.UP);
-				myItem.stackSize = (int) ais.getStackSize();
-				myItem = adp.simulateAdd(myItem);
-
-				if (myItem != null) {
-					ais.setStackSize(ais.getStackSize() - myItem.stackSize);
-				}
-
-				ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-				if (ais != null) {
-					adp.addItems(ais.getItemStack());
-				}
-			}
-			break;
-		case ROLL_DOWN:
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			final int releaseQty = 1;
-			final ItemStack isg = player.inventory.getItemStack();
-
-			if (isg != null && releaseQty > 0) {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(isg);
-				ais.setStackSize(1);
-				final IAEItemStack extracted = ais.copy();
-
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
-				if (ais == null) {
-					final InventoryAdaptor ia = new AdaptorPlayerHand(player);
-
-					final ItemStack fail = ia.removeItems(1, extracted.getItemStack(), null);
-					if (fail == null) {
-						getCellInventory().extractItems(extracted, Actionable.MODULATE, getActionSource());
-					}
-
-					updateHeld(player);
-				}
-			}
-
-			break;
-		case ROLL_UP:
-		case PICKUP_SINGLE:
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			if (slotItem != null) {
-				int liftQty = 1;
-				final ItemStack item = player.inventory.getItemStack();
-
-				if (item != null) {
-					if (item.stackSize >= item.getMaxStackSize()) {
-						liftQty = 0;
-					}
-					if (!Platform.itemComparisons().isSameItem(slotItem.getItemStack(), item)) {
-						liftQty = 0;
-					}
-				}
-
-				if (liftQty > 0) {
-					IAEItemStack ais = slotItem.copy();
-					ais.setStackSize(1);
-					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-					if (ais != null) {
-						final InventoryAdaptor ia = new AdaptorPlayerHand(player);
-
-						final ItemStack fail = ia.addItems(ais.getItemStack());
-						if (fail != null) {
-							getCellInventory().injectItems(ais, Actionable.MODULATE, getActionSource());
-						}
-
-						updateHeld(player);
-					}
-				}
-			}
-			break;
-		case PICKUP_OR_SET_DOWN:
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			if (player.inventory.getItemStack() == null) {
-				if (slotItem != null) {
-					IAEItemStack ais = slotItem.copy();
-					ais.setStackSize(ais.getItemStack().getMaxStackSize());
-					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-					if (ais != null) {
-						player.inventory.setItemStack(ais.getItemStack());
-					}
-					else {
-						player.inventory.setItemStack(null);
-					}
-					updateHeld(player);
-				}
-			}
-			else {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
-				if (ais != null) {
-					player.inventory.setItemStack(ais.getItemStack());
-				}
-				else {
-					player.inventory.setItemStack(null);
-				}
-				updateHeld(player);
-			}
-
-			break;
-		case SPLIT_OR_PLACE_SINGLE:
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			if (player.inventory.getItemStack() == null) {
-				if (slotItem != null) {
-					IAEItemStack ais = slotItem.copy();
-					final long maxSize = ais.getItemStack().getMaxStackSize();
-					ais.setStackSize(maxSize);
-					ais = getCellInventory().extractItems(ais, Actionable.SIMULATE, getActionSource());
-
-					if (ais != null) {
-						final long stackSize = Math.min(maxSize, ais.getStackSize());
-						ais.setStackSize((stackSize + 1) >> 1);
-						ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-					}
-
-					if (ais != null) {
-						player.inventory.setItemStack(ais.getItemStack());
-					}
-					else {
-						player.inventory.setItemStack(null);
-					}
-					updateHeld(player);
-				}
-			}
-			else {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
-				ais.setStackSize(1);
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
-				if (ais == null) {
-					final ItemStack is = player.inventory.getItemStack();
-					is.stackSize--;
-					if (is.stackSize <= 0) {
-						player.inventory.setItemStack(null);
-					}
-					updateHeld(player);
-				}
-			}
-
-			break;
-		case CREATIVE_DUPLICATE:
-			if (player.capabilities.isCreativeMode && slotItem != null) {
-				final ItemStack is = slotItem.getItemStack();
-				is.stackSize = is.getMaxStackSize();
-				player.inventory.setItemStack(is);
-				updateHeld(player);
-			}
-			break;
-		case MOVE_REGION:
-
-			if (getPowerSource() == null || getCellInventory() == null) {
-				return;
-			}
-
-			if (slotItem != null) {
-				final int playerInv = 9 * 4;
-				for (int slotNum = 0; slotNum < playerInv; slotNum++) {
-					IAEItemStack ais = slotItem.copy();
-					ItemStack myItem = ais.getItemStack();
-
-					ais.setStackSize(myItem.getMaxStackSize());
-
-					final InventoryAdaptor adp = InventoryAdaptor.getAdaptor(player, EnumFacing.UP);
-					myItem.stackSize = (int) ais.getStackSize();
-					myItem = adp.simulateAdd(myItem);
-
-					if (myItem != null) {
-						ais.setStackSize(ais.getStackSize() - myItem.stackSize);
-					}
-
-					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-					if (ais != null) {
-						adp.addItems(ais.getItemStack());
-					}
-					else {
-						return;
-					}
-				}
-			}
-
-			break;
-		default:
-			break;
-		}
-	}
+	public abstract void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id);
 
 	protected void updateHeld(final EntityPlayerMP p) {
 		if (Platform.isServer()) {
@@ -929,14 +602,6 @@ public abstract class WCTBaseContainer extends Container {
 			sentCustomName = true;
 			if (Platform.isServer()) {
 				ICustomNameObject name = null;
-
-				if (part instanceof ICustomNameObject) {
-					name = (ICustomNameObject) part;
-				}
-
-				if (tileEntity instanceof ICustomNameObject) {
-					name = (ICustomNameObject) tileEntity;
-				}
 
 				if (obj instanceof ICustomNameObject) {
 					name = (ICustomNameObject) obj;
@@ -1061,7 +726,7 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	public InventoryPlayer getInventoryPlayer() {
-		return invPlayer;
+		return inventoryPlayer;
 	}
 
 	public boolean isValidContainer() {

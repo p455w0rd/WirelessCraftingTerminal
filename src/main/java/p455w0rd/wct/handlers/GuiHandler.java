@@ -17,7 +17,6 @@ package p455w0rd.wct.handlers;
 
 import appeng.api.AEApi;
 import appeng.api.storage.ITerminalHost;
-import appeng.helpers.WirelessTerminalGuiObject;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -34,6 +33,7 @@ import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -54,7 +54,7 @@ public class GuiHandler implements IGuiHandler {
 			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
-					return new ContainerWCT(player, player.inventory);
+					return new ContainerWCT(player, terminal);
 				}
 
 				if (ID == GUI_CRAFTING_STATUS) {
@@ -83,7 +83,7 @@ public class GuiHandler implements IGuiHandler {
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
 					GuiWCT.setSwitchingGuis(false);
-					return new GuiWCT(new ContainerWCT(player, player.inventory));
+					return new GuiWCT(new ContainerWCT(player, terminal));
 				}
 
 				if (ID == GUI_CRAFTING_STATUS) {
@@ -110,7 +110,7 @@ public class GuiHandler implements IGuiHandler {
 		int y = pos.getY();
 		int z = pos.getZ();
 		final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getWirelessTerm(player.inventory));
-		final WirelessTerminalGuiObject terminal = wh == null ? null : new WirelessTerminalGuiObject(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
+		final WCTGuiObject terminal = wh == null ? null : new WCTGuiObject(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
 		return terminal;
 	}
 

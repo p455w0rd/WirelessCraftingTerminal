@@ -7,7 +7,9 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.security.BaseActionSource;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.helpers.InventoryAction;
 import appeng.tile.inventory.AppEngInternalInventory;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.world.World;
@@ -58,5 +60,9 @@ public class ContainerCraftAmount extends WCTBaseContainer {
 
 	public void setItemToCraft(@Nonnull final IAEItemStack itemToCreate) {
 		this.itemToCreate = itemToCreate;
+	}
+
+	@Override
+	public void doAction(EntityPlayerMP player, InventoryAction action, int slot, long id) {
 	}
 }

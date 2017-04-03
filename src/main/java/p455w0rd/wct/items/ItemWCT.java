@@ -324,7 +324,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 	@Optional.Method(modid = Baubles.API_MODID)
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
-		return false;
+		return true;
 	}
 
 }

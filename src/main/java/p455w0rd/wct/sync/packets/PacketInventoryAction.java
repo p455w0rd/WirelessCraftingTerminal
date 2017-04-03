@@ -102,7 +102,7 @@ public class PacketInventoryAction extends WCTPacket {
 			context = ((ContainerWCT) baseContainer).getOpenContext();
 		}
 
-		if (sender.openContainer instanceof WCTBaseContainer) {
+		else if (sender.openContainer instanceof WCTBaseContainer) {
 			baseContainer = sender.openContainer;
 			context = ((WCTBaseContainer) baseContainer).getOpenContext();
 		}
@@ -142,10 +142,13 @@ public class PacketInventoryAction extends WCTPacket {
 		else {
 			if (baseContainer instanceof ContainerWCT) {
 				((ContainerWCT) baseContainer).doAction(sender, action, slot, id);
+				((ContainerWCT) baseContainer).detectAndSendChanges();
 			}
-			if (baseContainer instanceof WCTBaseContainer) {
+			else if (baseContainer instanceof WCTBaseContainer) {
 				((WCTBaseContainer) baseContainer).doAction(sender, action, slot, id);
+				((WCTBaseContainer) baseContainer).detectAndSendChanges();
 			}
+
 		}
 	}
 

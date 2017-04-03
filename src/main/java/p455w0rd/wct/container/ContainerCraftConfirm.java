@@ -23,6 +23,7 @@ import appeng.api.storage.IMEInventory;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -281,7 +282,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	public void startJob() {
 		int originalGui = 0;
 
-		final WCTIActionHost ah = getActionHost();
+		final WCTIActionHost ah = getActionHost(obj);
 		if (ah instanceof WCTGuiObject) {
 			originalGui = GuiHandler.GUI_WCT;
 		}
@@ -402,5 +403,9 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 
 	public void setJob(final Future<ICraftingJob> job) {
 		this.job = job;
+	}
+
+	@Override
+	public void doAction(EntityPlayerMP player, InventoryAction action, int slot, long id) {
 	}
 }

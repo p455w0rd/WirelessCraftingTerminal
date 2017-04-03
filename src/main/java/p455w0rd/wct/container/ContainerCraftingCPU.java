@@ -12,52 +12,30 @@ import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.helpers.ICustomNameObject;
+import appeng.helpers.InventoryAction;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IContainerListener;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.container.guisync.GuiSync;
-import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
-import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject {
 
 	private final IItemList<IAEItemStack> list = AEApi.instance().storage().createItemList();
 	private CraftingCPUCluster monitor = null;
 	private String cpuName = null;
-	private final WCTGuiObject obj;
 
 	@GuiSync(0)
 	public long eta = -1;
 
 	public ContainerCraftingCPU(final InventoryPlayer ip, final Object te) {
 		super(ip, te);
-		obj = getGuiObject(WCTUtils.getWirelessTerm(ip), ip.player, WCTUtils.world(ip.player), (int) ip.player.posX, (int) ip.player.posY, (int) ip.player.posZ);
 
-		if (obj == null || (getNetwork() == null && Platform.isServer())) {
-			setValidContainer(false);
-		}
-
-	}
-
-	@Override
-	protected WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
-		if (it != null) {
-			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
-			if (wh != null) {
-				return new WCTGuiObject(wh, it, player, w, x, y, z);
-			}
-		}
-
-		return null;
 	}
 
 	protected void setCPU(final ICraftingCPU c) {
@@ -212,5 +190,9 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 
 	IGrid getNetwork() {
 		return obj.getTargetGrid();
+	}
+
+	@Override
+	public void doAction(EntityPlayerMP player, InventoryAction action, int slot, long id) {
 	}
 }

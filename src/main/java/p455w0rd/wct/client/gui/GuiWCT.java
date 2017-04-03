@@ -243,7 +243,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 				if (s != null) {
 					if (s.getHasStack()) {
-						containerWCT.trashSlot.clearStack();
+						containerWCT.getTrashSlot().clearStack();
 						NetworkHandler.instance().sendToServer(new PacketEmptyTrash());
 					}
 				}

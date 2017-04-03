@@ -19,7 +19,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 	private final ItemStack invItem;
 	private IAEAppEngInventory te;
 	private final int size;
-	private boolean enableClientEvents = false;
+	private boolean enableClientEvents = true;
 
 	public WCTInventoryCrafting(Container container, int rows, int cols, ItemStack is) {
 		super((IAEAppEngInventory) container, rows * cols);

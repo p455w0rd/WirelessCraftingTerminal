@@ -46,7 +46,7 @@ public class PacketCraftRequest extends WCTPacket {
 			final ContainerCraftAmount cca = (ContainerCraftAmount) player.openContainer;
 			final Object target = cca.getTarget();
 			if (target instanceof IGridHost) {
-				final IGrid g = cca.obj2.getTargetGrid();
+				final IGrid g = cca.obj.getTargetGrid();
 				if (g == null || cca.getItemToCraft() == null) {
 					return;
 				}

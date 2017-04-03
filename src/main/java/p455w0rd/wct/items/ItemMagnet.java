@@ -55,10 +55,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
@@ -323,18 +319,12 @@ public class ItemMagnet extends ItemBase {
 			if (EntityItemUtils.getThrowerName(itemToGet) != null && EntityItemUtils.getThrowerName(itemToGet).equals(player.getName()) && !EntityItemUtils.canPickup(itemToGet)) {
 				continue;
 			}
-			//itemToGet.delayBeforeCanPickup = 75;
 
-			EntityItemPickupEvent pickupEvent = new EntityItemPickupEvent(player, itemToGet);
-			ItemPickupEvent itemPickupEvent = new ItemPickupEvent(player, itemToGet);
 			ItemStack itemStackToGet = itemToGet.getEntityItem();
 			if (itemStackToGet == null) {
 				return;
 			}
 			int stackSize = itemStackToGet.stackSize;
-
-			MinecraftForge.EVENT_BUS.post(pickupEvent);
-			//MinecraftForge.EVENT_BUS.post(itemPickupEvent);
 
 			if (obj == null) {
 				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
@@ -362,7 +352,7 @@ public class ItemMagnet extends ItemBase {
 						}
 						else {
 							if (item.getItemDamage() == 1) {
-								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
+								if (stackSize <= 0) {
 									player.onItemPickup(itemToGet, stackSize);
 									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 								}
@@ -382,7 +372,7 @@ public class ItemMagnet extends ItemBase {
 						}
 						else {
 							if (item.getItemDamage() == 1) {
-								if (pickupEvent.getResult() == Result.ALLOW || itemPickupEvent.getResult() == Result.ALLOW || stackSize <= 0 || player.inventory.addItemStackToInventory(itemStackToGet)) {
+								if (stackSize <= 0) {
 									player.onItemPickup(itemToGet, stackSize);
 									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
 								}

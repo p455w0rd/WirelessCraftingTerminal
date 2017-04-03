@@ -275,13 +275,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-		
+
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-		
+
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {
@@ -430,7 +430,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				final List<Slot> slots = getInventorySlots();
 				for (final Slot inventorySlot : slots) {
 					if (inventorySlot != null && inventorySlot.canTakeStack(WCTUtils.player()) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.canAddItemToSlot(inventorySlot, dbl_whichItem, true)) {
-						handleMouseClick(inventorySlot, inventorySlot.slotNumber, 1, clickType);
+						super.handleMouseClick(inventorySlot, inventorySlot.slotNumber, 1, clickType);
 					}
 				}
 			}

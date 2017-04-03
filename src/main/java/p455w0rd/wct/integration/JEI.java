@@ -39,6 +39,7 @@ import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -68,7 +69,7 @@ public class JEI implements IModPlugin {
 		if (!ModConfig.WCT_BOOSTER_ENABLED) {
 			blackList.addIngredientToBlacklist(new ItemStack(ModItems.BOOSTER_CARD));
 		}
-		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
+		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<ContainerWCT>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
 		registry.addDescription(new ItemStack(ModItems.WCT), "jei.test.desc");
 	}
 
@@ -126,7 +127,7 @@ public class JEI implements IModPlugin {
 				}
 
 				for (final Slot slot : container.inventorySlots) {
-					if (slot instanceof SlotCraftingMatrix || slot instanceof SlotFakeCraftingMatrix) {
+					if (slot instanceof SlotCraftingMatrix || slot instanceof SlotFakeCraftingMatrix || slot.inventory instanceof InventoryCrafting) {
 						if (slot.getSlotIndex() == slotIndex) {
 							final NBTTagList tags = new NBTTagList();
 							final List<ItemStack> list = new LinkedList<ItemStack>();

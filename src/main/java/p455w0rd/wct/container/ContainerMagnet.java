@@ -55,7 +55,9 @@ public class ContainerMagnet extends Container {
 
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
-		GuiWCT.setSwitchingGuis(false);
+		if (playerIn.getEntityWorld().isRemote) {
+			GuiWCT.setSwitchingGuis(false);
+		}
 	}
 
 	private boolean isInHotbar(int slotNum) {
