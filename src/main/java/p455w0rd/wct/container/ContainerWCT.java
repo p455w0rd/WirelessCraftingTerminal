@@ -1,7 +1,5 @@
 package p455w0rd.wct.container;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,7 +21,6 @@ import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.ITerminalHost;
@@ -36,7 +33,6 @@ import appeng.container.ContainerNull;
 import appeng.core.AEConfig;
 import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IContainerCraftingPacket;
-import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
 import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.tile.inventory.IAEAppEngInventory;
@@ -58,7 +54,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
@@ -95,7 +90,6 @@ import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
-import p455w0rd.wct.sync.packets.PacketPartialItem;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import p455w0rd.wct.util.WCTUtils;
 
@@ -245,7 +239,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 		}
 		getResultSlot().putStack(CraftingManager.getInstance().findMatchingRecipe(ic, WCTUtils.world(getPlayerInv().player)));
-		writeToNBT("crafting");
+		writeToNBT();
 
 	}
 
@@ -553,10 +547,15 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		if (!containerstack.hasTagCompound()) {
 			containerstack.setTagCompound(new NBTTagCompound());
 		}
-		NBTTagCompound stack = containerstack.getTagCompound();
-		readMatrixNBT(stack);
-		for (int i = 0; i < 9; i++) {
-			craftingGrid.setInventorySlotContents(i, craftMatrixInventory[i]);
+		NBTTagCompound nbtTagCompound = containerstack.getTagCompound();
+		NBTTagList tagList = nbtTagCompound.getTagList("CraftingMatrix", 10);
+		craftMatrixInventory = new ItemStack[9];
+		for (int i = 0; i < tagList.tagCount(); ++i) {
+			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
+			int slot = tagCompound.getByte("Slot");
+			if (slot >= 0 && slot < craftingGrid.getSizeInventory()) {
+				craftingGrid.setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(tagCompound));
+			}
 		}
 	}
 
@@ -598,14 +597,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void detectAndSendChanges() {
-
-		//if (Platform.isSameItem(this.civ.getItemStack(), this.getPlayerInv().getCurrentItem())) {
-		//	this.getPlayerInv().setInventorySlotContents(this.getPlayerInv().currentItem, this.civ.getItemStack());
-		//}
-		//else {
-		//this.setValidContainer(false);
-		//}
-
 		if (obj != null) {
 			if (containerstack != obj.getItemStack()) {
 				if (containerstack != null) {
@@ -636,70 +627,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 			ticks = 0;
 		}
-		/*
-				if (Platform.isServer()) {
-					if (monitor != civ.getItemInventory()) {
-						setValidContainer(false);
-					}
 
-					for (final Settings set : serverCM.getSettings()) {
-						final Enum<?> sideLocal = serverCM.getSetting(set);
-						final Enum<?> sideRemote = clientCM.getSetting(set);
-
-						if (sideLocal != sideRemote) {
-							clientCM.putSetting(set, sideLocal);
-							for (final IContainerListener crafter : listeners) {
-								if (crafter instanceof EntityPlayer) {
-									try {
-										NetworkHandler.instance().sendTo(new PacketValueConfig(set.name(), sideLocal.name()), (EntityPlayerMP) crafter);
-									}
-									catch (final IOException e) {
-									}
-								}
-							}
-						}
-					}
-
-					if (!items.isEmpty()) {
-						try {
-							final IItemList<IAEItemStack> monitorCache = monitor.getStorageList();
-
-							final PacketMEInventoryUpdate piu = new PacketMEInventoryUpdate();
-
-							for (final IAEItemStack is : items) {
-								final IAEItemStack send = monitorCache.findPrecise(is);
-								if (send == null) {
-									is.setStackSize(0);
-									piu.appendItem(is);
-								}
-								else {
-									piu.appendItem(send);
-								}
-							}
-
-							if (!piu.isEmpty()) {
-								items.resetStatus();
-
-								for (final IContainerListener c : listeners) {
-									if (c instanceof EntityPlayer) {
-										NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
-									}
-								}
-							}
-						}
-						catch (final IOException e) {
-						}
-					}
-
-					if (Platform.isServer()) {
-						for (final IContainerListener crafter : listeners) {
-							for (final SyncData sd : syncData.values()) {
-								sd.tick(crafter);
-							}
-						}
-					}
-				}
-		*/
 		if (Platform.isServer()) {
 			if (monitor != host.getItemInventory()) {
 				setValidContainer(false);
@@ -755,7 +683,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					//
 				}
 			}
-			//this.updatePowerStatus();
 
 			super.detectAndSendChanges();
 		}
@@ -786,7 +713,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	public boolean isBoosterInstalled() {
 		for (Slot slot : inventorySlots) {
-			if (slot.getHasStack() && slot.getStack().getItem() == ModItems.BOOSTER_CARD) {
+			if (slot instanceof SlotBooster && slot.getHasStack() && slot.getStack().getItem() == ModItems.BOOSTER_CARD) {
 				return true;
 			}
 		}
@@ -804,7 +731,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	public boolean isMagnetInstalled() {
 		for (Slot slot : inventorySlots) {
-			if (slot.getHasStack() && slot.getStack().getItem() == ModItems.MAGNET_CARD) {
+			if (slot instanceof SlotMagnet && slot.getHasStack() && slot.getStack().getItem() == ModItems.MAGNET_CARD) {
 				return true;
 			}
 		}
@@ -830,68 +757,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	@Override
-	public BaseActionSource getActionSource() {
-		return mySrc;
-	}
-
-	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		if (isValidContainer()) {
 			return true;
 		}
 		return false;
-	}
-
-	private void sendCustomName() {
-		if (!sentCustomName) {
-			sentCustomName = true;
-			if (Platform.isServer()) {
-				ICustomNameObject name = null;
-				if (obj instanceof ICustomNameObject) {
-					name = (ICustomNameObject) obj;
-				}
-
-				if (this instanceof ICustomNameObject) {
-					name = (ICustomNameObject) this;
-				}
-
-				if (name != null) {
-					if (name.hasCustomName()) {
-						setCustomName(name.getCustomName());
-					}
-
-					if (getCustomName() != null) {
-						try {
-							NetworkHandler.instance().sendTo(new PacketValueConfig("CustomName", getCustomName()), (EntityPlayerMP) getInventoryPlayer().player);
-						}
-						catch (final IOException e) {
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void stringSync(final int idx, final String value) {
-		if (syncData.containsKey(idx)) {
-			syncData.get(idx).update(value);
-		}
-	}
-
-	@Override
-	public void verifyPermissions(final SecurityPermissions security, final boolean requirePower) {
-		if (Platform.isClient()) {
-			return;
-		}
-
-		ticksSinceCheck++;
-		if (ticksSinceCheck < 20) {
-			return;
-		}
-
-		ticksSinceCheck = 0;
-		setValidContainer(isValidContainer() && hasAccess(security, requirePower));
 	}
 
 	protected boolean isInRange() {
@@ -911,146 +781,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 		}
 		return false;
-	}
-
-	@Override
-	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
-		final IGrid grid = obj.getTargetGrid();
-		if (grid != null) {
-			final IEnergyGrid eg = grid.getCache(IEnergyGrid.class);
-			if (!eg.isNetworkPowered()) {
-				return false;
-			}
-		}
-		final ISecurityGrid sg = grid.getCache(ISecurityGrid.class);
-		if (sg.hasPermission(getInventoryPlayer().player, perm)) {
-			return true;
-		}
-		return false;
-	}
-
-	/*
-	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
-		final WCTIActionHost host = this.getActionHost();
-		if (host != null) {
-			final IGridNode gn = host.getActionableNode();
-			if (gn != null) {
-				final IGrid g = gn.getGrid();
-				if (g != null) {
-					if (requirePower) {
-						final IEnergyGrid eg = g.getCache(IEnergyGrid.class);
-						if (!eg.isNetworkPowered() && Platform.isServer()) {
-							return false;
-						}
-					}
-					final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
-					if (sg.hasPermission(this.player, perm) && Platform.isServer()) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-	*/
-	@Override
-	public void lockPlayerInventorySlot(final int idx) {
-		locked.add(idx);
-	}
-
-	@Override
-	public boolean isValidForSlot(final Slot s, final ItemStack i) {
-		return true;
-	}
-
-	@Override
-	public void postPartial(final PacketPartialItem packetPartialItem) {
-		dataChunks.add(packetPartialItem);
-		if (packetPartialItem.getPageCount() == dataChunks.size()) {
-			parsePartials();
-		}
-	}
-
-	private void parsePartials() {
-		int total = 0;
-		for (final PacketPartialItem ppi : dataChunks) {
-			total += ppi.getSize();
-		}
-
-		final byte[] buffer = new byte[total];
-		int cursor = 0;
-
-		for (final PacketPartialItem ppi : dataChunks) {
-			cursor = ppi.write(buffer, cursor);
-		}
-
-		try {
-			final NBTTagCompound data = CompressedStreamTools.readCompressed(new ByteArrayInputStream(buffer));
-			if (data != null) {
-				setTargetStack(AEApi.instance().storage().createItemStack(ItemStack.loadItemStackFromNBT(data)));
-			}
-		}
-		catch (final IOException e) {
-		}
-
-		dataChunks.clear();
-	}
-
-	@Override
-	public IAEItemStack getTargetStack() {
-		return clientRequestedTargetItem;
-	}
-
-	@Override
-	public void setTargetStack(final IAEItemStack stack) {
-		// client doesn't need to re-send, makes for lower overhead rapid
-		// packets.
-		if (Platform.isClient()) {
-			final ItemStack a = stack == null ? null : stack.getItemStack();
-			final ItemStack b = clientRequestedTargetItem == null ? null : clientRequestedTargetItem.getItemStack();
-
-			if (Platform.itemComparisons().isSameItem(a, b)) {
-				return;
-			}
-
-			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			final NBTTagCompound item = new NBTTagCompound();
-
-			if (stack != null) {
-				stack.writeToNBT(item);
-			}
-
-			try {
-				CompressedStreamTools.writeCompressed(item, stream);
-
-				final int maxChunkSize = 30000;
-				final List<byte[]> miniPackets = new LinkedList<byte[]>();
-
-				final byte[] data = stream.toByteArray();
-
-				final ByteArrayInputStream bis = new ByteArrayInputStream(data, 0, stream.size());
-				while (bis.available() > 0) {
-					final int nextBLock = bis.available() > maxChunkSize ? maxChunkSize : bis.available();
-					final byte[] nextSegment = new byte[nextBLock];
-					bis.read(nextSegment);
-					miniPackets.add(nextSegment);
-				}
-				bis.close();
-				stream.close();
-
-				int page = 0;
-				for (final byte[] packet : miniPackets) {
-					final PacketPartialItem ppi = new PacketPartialItem(page, miniPackets.size(), packet);
-					page++;
-					NetworkHandler.instance().sendToServer(ppi);
-				}
-			}
-			catch (final IOException e) {
-				return;
-			}
-		}
-
-		clientRequestedTargetItem = stack == null ? null : stack.copy();
 	}
 
 	@Override
@@ -1136,71 +866,14 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		this.powerMultiplier = powerMultiplier;
 	}
 
-	@Override
-	public Object getTarget() {
-		if (obj != null) {
-			return obj;
-		}
-		return null;
-	}
-
-	@Override
-	public ContainerOpenContext getOpenContext() {
-		return openContext;
-	}
-
-	@Override
-	public void setOpenContext(final ContainerOpenContext openContext) {
-		this.openContext = openContext;
-	}
-
-	/**
-	 * Fetches crafting matrix ItemStacks
-	 *
-	 * @param nbtTagCompound
-	 * @author p455w0rd
-	 */
-	private void readMatrixNBT(NBTTagCompound nbtTagCompound) {
-		// Read in the ItemStacks in the inventory from NBT
-		NBTTagList tagList = nbtTagCompound.getTagList("CraftingMatrix", 10);
-		craftMatrixInventory = new ItemStack[9];
-		for (int i = 0; i < tagList.tagCount(); ++i) {
-			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
-			int slot = tagCompound.getByte("Slot");
-			if (slot >= 0 && slot < craftMatrixInventory.length) {
-				craftMatrixInventory[slot] = ItemStack.loadItemStackFromNBT(tagCompound);
-			}
-		}
-	}
-
-	/**
-	 * Initiates external NBT saving methods that store inventory contents
-	 */
-	public void writeToNBT(String which) {
+	public void writeToNBT() {
 		if (!containerstack.hasTagCompound()) {
 			containerstack.setTagCompound(new NBTTagCompound());
 		}
-		switch (which) {
-		case "booster":
-			boosterInventory.writeNBT(containerstack.getTagCompound());
-			break;
-		case "crafting":
-			craftingGrid.writeNBT(containerstack.getTagCompound());
-			break;
-		case "magnet":
-			magnetInventory.writeNBT(containerstack.getTagCompound());
-			break;
-		case "trash":
-			trashInventory.writeNBT(containerstack.getTagCompound());
-			break;
-		case "all":
-		default:
-			boosterInventory.writeNBT(containerstack.getTagCompound());
-			craftingGrid.writeNBT(containerstack.getTagCompound());
-			magnetInventory.writeNBT(containerstack.getTagCompound());
-			trashInventory.writeNBT(containerstack.getTagCompound());
-			break;
-		}
+		boosterInventory.writeNBT(containerstack.getTagCompound());
+		magnetInventory.writeNBT(containerstack.getTagCompound());
+		trashInventory.writeNBT(containerstack.getTagCompound());
+		craftingGrid.writeNBT(containerstack.getTagCompound());
 	}
 
 	@Override
@@ -1553,21 +1226,10 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			return super.slotClick(slot, dragType, clickTypeIn, player);
 		}
 		catch (IndexOutOfBoundsException e) {
-			//When clicking super fast, for some reason, MC tried to access this inv size (max index + 1)
 		}
 		return null;
 	}
 
-	/*
-		public final void updateFullProgressBar(final int idx, final long value) {
-			if (syncData.containsKey(idx)) {
-				syncData.get(idx).update(value);
-				return;
-			}
-
-			updateProgressBar(idx, (int) value);
-		}
-	*/
 	/**
 	 * Handles shift-clicking of items whose maxStackSize is 1
 	 */

@@ -179,7 +179,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 		return !(stack.getItem() instanceof IWirelessCraftingTerminalItem);
 	}
 
-	public void writeNBT(NBTTagCompound nbtTagCompound) {
+	public NBTTagCompound writeNBT(NBTTagCompound nbtTagCompound) {
 		// Write the ItemStacks in the inventory to NBT
 		NBTTagList tagList = new NBTTagList();
 		for (int currentIndex = 0; currentIndex < stackList.length; ++currentIndex) {
@@ -191,6 +191,7 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 			}
 		}
 		nbtTagCompound.setTag("CraftingMatrix", tagList);
+		return nbtTagCompound;
 	}
 
 }
