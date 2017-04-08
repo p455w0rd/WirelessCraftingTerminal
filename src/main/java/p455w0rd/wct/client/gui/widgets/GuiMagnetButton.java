@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import p455w0rd.wct.Globals;
+import p455w0rd.wct.init.ModGlobals;
 
 /**
  * @author p455w0rd
@@ -33,7 +33,7 @@ public class GuiMagnetButton extends GuiButton implements ITooltip {
 			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 			GlStateManager.scale(0.025F, 0.025F, 0.025F);
 			//GL11.glScalef(0.5f, 0.5f, 0.5f);
-			mc.getTextureManager().bindTexture(new ResourceLocation(Globals.MODID, "textures/gui/magnet_button.png"));
+			mc.getTextureManager().bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/magnet_button.png"));
 			hovered = par2 >= xPosition && par3 >= yPosition && par2 < xPosition + width && par3 < yPosition + height;
 			drawTexturedModalRect(0, 0, 0, 0, 256, 256);
 			mouseDragged(mc, par2, par3);

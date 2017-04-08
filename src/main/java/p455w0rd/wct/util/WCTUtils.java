@@ -114,11 +114,13 @@ public class WCTUtils {
 	}
 
 	public static boolean isMagnetInstalled(InventoryPlayer ip) {
-		NBTTagCompound magnetNBTForm = getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
-		if (magnetNBTForm != null) {
-			ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
-			if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
-				return true;
+		if (getWirelessTerm(ip) != null && getWirelessTerm(ip).hasTagCompound() && getWirelessTerm(ip).getTagCompound().hasKey("MagnetSlot")) {
+			NBTTagCompound magnetNBTForm = getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
+			if (magnetNBTForm != null) {
+				ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
+				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+					return true;
+				}
 			}
 		}
 		return false;

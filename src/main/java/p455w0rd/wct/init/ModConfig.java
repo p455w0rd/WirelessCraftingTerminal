@@ -21,7 +21,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import p455w0rd.wct.Globals;
 
 /**
  * @author p455w0rd
@@ -43,14 +42,14 @@ public class ModConfig {
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
-		if (e.getModID().equals(Globals.MODID)) {
+		if (e.getModID().equals(ModGlobals.MODID)) {
 			init();
 		}
 	}
 
 	public static void init() {
 		if (CONFIG == null) {
-			CONFIG = new Configuration(new File(Globals.CONFIG_FILE));
+			CONFIG = new Configuration(new File(ModGlobals.CONFIG_FILE));
 			MinecraftForge.EVENT_BUS.register(new ModConfig());
 		}
 		WCT_BOOSTER_ENABLED = CONFIG.getBoolean("EnableBooster", DEF_CAT, true, "Enable Infinity Booster Card");

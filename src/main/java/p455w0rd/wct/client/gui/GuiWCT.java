@@ -34,7 +34,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.common.Optional.Method;
-import p455w0rd.wct.Globals;
 import p455w0rd.wct.client.gui.widgets.GuiMagnetButton;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
@@ -52,6 +51,7 @@ import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.sync.network.NetworkHandler;
@@ -432,9 +432,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
-		magnetGUIButton.visible = WCTUtils.isMagnetInstalled(WCTUtils.player().inventory);
-		if (!WCTUtils.player().isEntityAlive() || mc.player.isDead) {
-			WCTUtils.player().closeScreen();
+		magnetGUIButton.visible = WCTUtils.isMagnetInstalled(mc.player.inventory);
+		if (!mc.player.isEntityAlive() || mc.player.isDead) {
+			mc.player.closeScreen();
 		}
 	}
 
@@ -554,7 +554,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-
+		
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
@@ -634,7 +634,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 	@Override
 	public void bindTexture(final String file) {
-		final ResourceLocation loc = new ResourceLocation(Globals.MODID, "textures/" + file);
+		final ResourceLocation loc = new ResourceLocation(ModGlobals.MODID, "textures/" + file);
 		mc.getTextureManager().bindTexture(loc);
 	}
 

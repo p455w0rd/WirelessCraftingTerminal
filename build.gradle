@@ -83,7 +83,7 @@ String getVersion(String type) {
 	String revision = "0";
 	String patch = "0";
 	String prefix = "public static final String $type = \"";
-	File file = file("src/main/java/p455w0rd/wct/Globals.java")
+	File file = file("src/main/java/p455w0rd/wct/init/ModGlobals.java")
 	file.eachLine { String s ->
 		s = s.trim();
 		if (s.startsWith(prefix)) {

@@ -1,29 +1,63 @@
 package p455w0rd.wct.inventory;
 
+import appeng.tile.inventory.AppEngInternalInventory;
+import appeng.tile.inventory.IAEAppEngInventory;
+import appeng.tile.inventory.InvOperation;
+import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
-public class WCTInventoryTrash implements IInventory {
+public class WCTInventoryTrash extends AppEngInternalInventory {
 
 	private String name = "TrashSlot";
 	private final ItemStack invItem;
 	private ItemStack[] inventory;
+	private IAEAppEngInventory aeInv;
+	private boolean enableClientEvents = true;
 
-	public WCTInventoryTrash(ItemStack stack) {
-		super();
+	public WCTInventoryTrash(Container container, ItemStack stack) {
+		super((IAEAppEngInventory) container, 1);
 		inventory = new ItemStack[1];
 		invItem = stack;
-		if (stack != null) {
-			if (!invItem.hasTagCompound()) {
-				invItem.setTagCompound(new NBTTagCompound());
+		setTileEntity((IAEAppEngInventory) container);
+	}
+
+	@Override
+	protected boolean eventsEnabled() {
+		return Platform.isServer() || isEnableClientEvents();
+	}
+
+	private boolean isEnableClientEvents() {
+		return enableClientEvents;
+	}
+
+	@Override
+	public void setEnableClientEvents(final boolean enableClientEvents) {
+		this.enableClientEvents = enableClientEvents;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		for (int x = 0; x < getSizeInventory(); x++) {
+			if (getStackInSlot(x) != null) {
+				return false;
 			}
-			readFromNBT(invItem.getTagCompound());
 		}
+		return true;
+	}
+
+	private IAEAppEngInventory getTileEntity() {
+		return aeInv;
+	}
+
+	@Override
+	public void setTileEntity(final IAEAppEngInventory aeInv) {
+		this.aeInv = aeInv;
 	}
 
 	@Override
@@ -33,7 +67,7 @@ public class WCTInventoryTrash implements IInventory {
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return inventory[slot];
+		return slot >= getSizeInventory() ? null : inventory[slot];
 	}
 
 	@Override
@@ -52,24 +86,27 @@ public class WCTInventoryTrash implements IInventory {
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amount) {
-		ItemStack stack = getStackInSlot(slot);
-		if (stack != null) {
-			if (stack.stackSize > amount) {
-				stack = stack.splitStack(amount);
-				markDirty();
+	public ItemStack decrStackSize(final int slot, final int qty) {
+		if (inventory[slot] != null) {
+			final ItemStack split = getStackInSlot(slot);
+			ItemStack ns = null;
+			if (qty >= split.stackSize) {
+				ns = inventory[slot];
+				inventory[slot] = null;
 			}
 			else {
-				setInventorySlotContents(slot, null);
+				ns = split.splitStack(qty);
 			}
+			this.markDirty();
+			return ns;
 		}
-		return stack;
+		return null;
 	}
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
 		inventory[slot] = stack;
-
+		//eventHandler.onCraftMatrixChanged(this);
 		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
 			stack.stackSize = getInventoryStackLimit();
 		}
@@ -83,6 +120,14 @@ public class WCTInventoryTrash implements IInventory {
 
 	@Override
 	public void markDirty() {
+		if (getTileEntity() != null && eventsEnabled()) {
+			getTileEntity().onChangeInventory(this, -1, InvOperation.markDirty, null, null);
+		}
+		for (int i = 0; i < getSizeInventory(); ++i) {
+			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0) {
+				inventory[i] = null;
+			}
+		}
 		writeNBT(invItem.getTagCompound());
 	}
 
@@ -91,29 +136,19 @@ public class WCTInventoryTrash implements IInventory {
 		return true;
 	}
 
-	public void readFromNBT(NBTTagCompound nbtTagCompound) {
-		NBTTagList tagList = nbtTagCompound.getTagList(name, 10);
-		inventory = new ItemStack[getSizeInventory()];
-		for (int i = 0; i < tagList.tagCount(); ++i) {
-			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
-			int slot = tagCompound.getInteger("Slot");
-			if (slot >= 0 && slot < inventory.length) {
-				inventory[slot] = ItemStack.loadItemStackFromNBT(tagCompound);
-			}
-		}
-	}
-
-	public void writeNBT(NBTTagCompound nbtTagCompound) {
+	public NBTTagCompound writeNBT(NBTTagCompound nbtTagCompound) {
+		// Write the ItemStacks in the inventory to NBT
 		NBTTagList tagList = new NBTTagList();
 		for (int currentIndex = 0; currentIndex < inventory.length; ++currentIndex) {
 			if (inventory[currentIndex] != null) {
 				NBTTagCompound tagCompound = new NBTTagCompound();
-				tagCompound.setInteger("Slot", currentIndex);
+				tagCompound.setByte("Slot", (byte) currentIndex);
 				inventory[currentIndex].writeToNBT(tagCompound);
 				tagList.appendTag(tagCompound);
 			}
 		}
-		nbtTagCompound.setTag(name, tagList);
+		nbtTagCompound.setTag("CraftingMatrix", tagList);
+		return nbtTagCompound;
 	}
 
 	@Override

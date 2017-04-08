@@ -22,6 +22,7 @@ import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.core.Api;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
@@ -315,7 +316,7 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	@Override
-	protected Slot addSlotToContainer(final Slot newSlot) {
+	public Slot addSlotToContainer(final Slot newSlot) {
 		if (newSlot instanceof AppEngSlot) {
 			((AppEngSlot) newSlot).setContainer(this);
 		}
@@ -585,7 +586,7 @@ public abstract class WCTBaseContainer extends Container {
 		if (getPowerSource() == null || getCellInventory() == null) {
 			return input;
 		}
-		final IAEItemStack ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), AEApi.instance().storage().createItemStack(input), getActionSource());
+		final IAEItemStack ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), AEApi.instance().storage().createItemStack(input), getActionSource());
 		if (ais == null) {
 			return null;
 		}

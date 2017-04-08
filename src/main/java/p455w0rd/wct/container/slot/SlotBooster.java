@@ -4,7 +4,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.*;
-import p455w0rd.wct.Globals;
+import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.items.ItemInfinityBooster;
 
 public class SlotBooster extends AppEngSlot {
@@ -27,7 +27,7 @@ public class SlotBooster extends AppEngSlot {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public ResourceLocation getBackgroundLocation() {
-		return new ResourceLocation(Globals.MODID, "textures/gui/booster_slot.png");
+		return new ResourceLocation(ModGlobals.MODID, "textures/gui/booster_slot.png");
 	}
 
 }

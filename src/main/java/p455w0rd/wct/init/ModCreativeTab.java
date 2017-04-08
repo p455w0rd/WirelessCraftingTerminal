@@ -21,7 +21,6 @@ import appeng.items.tools.powered.powersink.AERootPoweredItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import p455w0rd.wct.Globals;
 
 /**
  * @author p455w0rd
@@ -30,7 +29,7 @@ import p455w0rd.wct.Globals;
 public class ModCreativeTab extends CreativeTabs {
 
 	public ModCreativeTab() {
-		super(Globals.MODID);
+		super(ModGlobals.MODID);
 		//setBackgroundImageName(Globals.MODID + ".png");
 	}
 

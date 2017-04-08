@@ -17,13 +17,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import p455w0rd.wct.Globals;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.client.gui.widgets.WCTGuiButton;
 import p455w0rd.wct.client.gui.widgets.WCTGuiCheckBox;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.items.ItemWCT;
@@ -270,7 +270,7 @@ public class GuiMagnet extends GuiContainer {
 	}
 
 	public void bindTexture(final String file) {
-		final ResourceLocation loc = new ResourceLocation(Globals.MODID, "textures/gui/" + file);
+		final ResourceLocation loc = new ResourceLocation(ModGlobals.MODID, "textures/gui/" + file);
 		mc.getTextureManager().bindTexture(loc);
 	}
 

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -55,7 +56,7 @@ public class ContainerMagnet extends Container {
 
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
-		if (playerIn.getEntityWorld().isRemote) {
+		if (Platform.isClient()) {
 			GuiWCT.setSwitchingGuis(false);
 		}
 	}

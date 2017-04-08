@@ -26,16 +26,13 @@ import com.google.common.base.Splitter;
 
 import appeng.api.AEApi;
 import appeng.api.config.SecurityPermissions;
-import appeng.api.implementations.guiobjects.IPortableCell;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.BaseActionSource;
 import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.storage.IMEInventoryHandler;
-import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
-import appeng.util.Platform;
+import appeng.core.Api;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -80,10 +77,10 @@ public class ItemMagnet extends ItemBase {
 
 	private int distanceFromPlayer;
 	private WCTGuiObject obj;
-	private IPortableCell civ;
+	//private IPortableCell civ;
 	private IEnergySource powerSrc;
-	private IMEMonitor<IAEItemStack> monitor;
-	private IMEInventoryHandler<IAEItemStack> cellInv;
+	//private IMEMonitor<IAEItemStack> monitor;
+	//private IMEInventoryHandler<IAEItemStack> cellInv;
 	private BaseActionSource mySrc;
 	private ItemStack thisItemStack;
 	private int pickupTimer = 0;
@@ -328,10 +325,10 @@ public class ItemMagnet extends ItemBase {
 
 			if (obj == null) {
 				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-				civ = obj;
-				powerSrc = civ;
-				monitor = civ.getItemInventory();
-				cellInv = monitor;
+				//civ = obj;
+				powerSrc = obj;
+				//monitor = obj.getItemInventory();
+				//cellInv = monitor;
 				mySrc = new WCTPlayerSource(player, obj);
 			}
 
@@ -535,7 +532,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
-		ais = Platform.poweredInsert(powerSrc, cellInv, ais, mySrc);
+		ais = Api.INSTANCE.storage().poweredInsert(powerSrc, obj.getItemInventory(), ais, mySrc);
 		if (ais != null && WCTUtils.getMagnet(player.inventory) != null && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);

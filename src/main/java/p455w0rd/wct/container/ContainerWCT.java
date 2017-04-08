@@ -31,6 +31,7 @@ import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
 import appeng.container.ContainerNull;
 import appeng.core.AEConfig;
+import appeng.core.Api;
 import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.helpers.InventoryAction;
@@ -100,9 +101,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	public final WCTInventoryBooster boosterInventory;
 	public final WCTInventoryMagnet magnetInventory;
 	public final WCTInventoryTrash trashInventory;
-	public ItemStack[] craftMatrixInventory;
+	//public ItemStack[] craftMatrixInventory;
 	public ItemStack craftItem;
-	//public static int CRAFTING_SLOT_X_POS = 80, CRAFTING_SLOT_Y_POS = 83;
 	private double powerMultiplier = 0.5;
 	private int ticks = 0;
 	private final IItemList<IAEItemStack> items = AEApi.instance().storage().createItemList();
@@ -126,10 +126,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		customName = "WCTContainer";
 		boosterInventory = new WCTInventoryBooster(containerstack);
 		magnetInventory = new WCTInventoryMagnet(containerstack);
-		trashInventory = new WCTInventoryTrash(containerstack);
+		trashInventory = new WCTInventoryTrash(this, containerstack);
 		craftingGrid = new WCTInventoryCrafting(this, 3, 3, containerstack);
 		host = hostIn;
-
 		if (Platform.isServer()) {
 			serverCM = obj.getConfigManager();
 			monitor = obj.getItemInventory();
@@ -171,6 +170,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		for (int i = 0; i < 4; ++i) {
 			addSlotToContainer(new SlotArmor(player, inventoryPlayer, 39 - i, (int) 8.5, (i * 18) - 76, EntityEquipmentSlot.values()[6 - (i + 2)]));
 		}
+
 		// Add crafting grid slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
@@ -216,15 +216,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	@Override
-	public Slot addSlotToContainer(final Slot newSlot) {
-		if (newSlot instanceof AppEngSlot) {
-			final AppEngSlot s = (AppEngSlot) newSlot;
-			s.setContainer(this);
-		}
-		return super.addSlotToContainer(newSlot);
-	}
-
-	@Override
 	public boolean canDragIntoSlot(final Slot s) {
 		return ((AppEngSlot) s).isDraggable();
 	}
@@ -240,7 +231,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 		getResultSlot().putStack(CraftingManager.getInstance().findMatchingRecipe(ic, WCTUtils.world(getPlayerInv().player)));
 		writeToNBT();
-
 	}
 
 	public SlotCraftingTerm getResultSlot() {
@@ -318,16 +308,15 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			if (action == InventoryAction.MOVE_REGION) {
 				final List<Slot> from = new LinkedList<Slot>();
 				for (final Object j : inventorySlots) {
-					if (j instanceof Slot && j.getClass() == s.getClass()) {
+					if (j instanceof SlotCraftingMatrix) {// && j.getClass() == s.getClass()) {
 						from.add((Slot) j);
 					}
 				}
 				for (final Slot fr : from) {
 					transferStackInSlot(player, fr.slotNumber);
 				}
+				return;
 			}
-
-			return;
 		}
 
 		// get target item.
@@ -353,7 +342,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					ais.setStackSize(ais.getStackSize() - myItem.stackSize);
 				}
 
-				ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					adp.addItems(ais.getItemStack());
 				}
@@ -372,7 +361,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				ais.setStackSize(1);
 				final IAEItemStack extracted = ais.copy();
 
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final InventoryAdaptor ia = new AdaptorPlayerHand(player);
 
@@ -408,7 +397,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (liftQty > 0) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(1);
-					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						final InventoryAdaptor ia = new AdaptorPlayerHand(player);
 
@@ -431,7 +420,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (slotItem != null) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(ais.getItemStack().getMaxStackSize());
-					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						player.inventory.setItemStack(ais.getItemStack());
 					}
@@ -444,7 +433,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 			else {
 				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					player.inventory.setItemStack(ais.getItemStack());
 				}
@@ -470,7 +459,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					if (ais != null) {
 						final long stackSize = Math.min(maxSize, ais.getStackSize());
 						ais.setStackSize((stackSize + 1) >> 1);
-						ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+						ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					}
 
 					if (ais != null) {
@@ -485,7 +474,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			else {
 				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
 				ais.setStackSize(1);
-				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final ItemStack is = player.inventory.getItemStack();
 					is.stackSize--;
@@ -540,7 +529,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			break;
 		default:
 			break;
+
 		}
+
 	}
 
 	private void updateCraftingMatrix() {
@@ -548,15 +539,25 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			containerstack.setTagCompound(new NBTTagCompound());
 		}
 		NBTTagCompound nbtTagCompound = containerstack.getTagCompound();
-		NBTTagList tagList = nbtTagCompound.getTagList("CraftingMatrix", 10);
-		craftMatrixInventory = new ItemStack[9];
-		for (int i = 0; i < tagList.tagCount(); ++i) {
-			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
+		NBTTagList matrixTagList = nbtTagCompound.getTagList("CraftingMatrix", 10);
+		//NBTTagList trashTagList = nbtTagCompound.getTagList("TrashSlot", 10);
+
+		for (int i = 0; i < matrixTagList.tagCount(); ++i) {
+			NBTTagCompound tagCompound = matrixTagList.getCompoundTagAt(i);
 			int slot = tagCompound.getByte("Slot");
 			if (slot >= 0 && slot < craftingGrid.getSizeInventory()) {
 				craftingGrid.setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(tagCompound));
 			}
 		}
+		/*
+				for (int i = 0; i < trashTagList.tagCount(); ++i) {
+					NBTTagCompound tagCompound = trashTagList.getCompoundTagAt(i);
+					int slot = tagCompound.getByte("Slot");
+					if (slot >= 0 && slot < trashInventory.getSizeInventory()) {
+						trashInventory.setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(tagCompound));
+					}
+				}
+		*/
 	}
 
 	@Override
@@ -872,7 +873,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 		boosterInventory.writeNBT(containerstack.getTagCompound());
 		magnetInventory.writeNBT(containerstack.getTagCompound());
-		trashInventory.writeNBT(containerstack.getTagCompound());
+		//trashInventory.writeNBT(containerstack.getTagCompound());
 		craftingGrid.writeNBT(containerstack.getTagCompound());
 	}
 
@@ -1117,6 +1118,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 
 		updateSlot(clickSlot);
+		detectAndSendChanges();
 		return null;
 	}
 
@@ -1191,14 +1193,15 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	private void updateSlot(final Slot clickSlot) {
-		detectAndSendChanges();
+		//detectAndSendChanges();
+		writeToNBT();
 	}
 
 	private ItemStack shiftStoreItem(final ItemStack input) {
 		if (getPowerSource() == null || obj == null) {
 			return input;
 		}
-		final IAEItemStack ais = Platform.poweredInsert(getPowerSource(), obj, AEApi.instance().storage().createItemStack(input), getActionSource());
+		final IAEItemStack ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), obj, AEApi.instance().storage().createItemStack(input), getActionSource());
 		if (ais == null) {
 			return null;
 		}
@@ -1219,11 +1222,17 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public ItemStack slotClick(int slot, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+
+		//craftingGrid.markDirty();
+		//trashInventory.markDirty();
+
 		try {
 			if (slot >= 0 && getSlot(slot) != null && getSlot(slot).getStack() == containerstack) {
 				return null;
 			}
-			return super.slotClick(slot, dragType, clickTypeIn, player);
+			ItemStack returnStack = super.slotClick(slot, dragType, clickTypeIn, player);
+			writeToNBT();
+			return returnStack;
 		}
 		catch (IndexOutOfBoundsException e) {
 		}

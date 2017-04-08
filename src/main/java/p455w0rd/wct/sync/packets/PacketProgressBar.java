@@ -1,9 +1,11 @@
 package p455w0rd.wct.sync.packets;
 
-import io.netty.buffer.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import p455w0rd.wct.container.*;
+import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -49,7 +51,7 @@ public class PacketProgressBar extends WCTPacket {
 		if (c instanceof ContainerWCT) {
 			((ContainerWCT) c).updateFullProgressBar(id, value);
 		}
-		if (c instanceof WCTBaseContainer) {
+		else if (c instanceof WCTBaseContainer) {
 			((WCTBaseContainer) c).updateFullProgressBar(id, value);
 		}
 	}

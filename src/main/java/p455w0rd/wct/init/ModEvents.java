@@ -42,7 +42,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.wct.Globals;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
@@ -76,7 +75,7 @@ public class ModEvents {
 	public void attachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
 		if (event.getObject() instanceof TileController && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
 			TileController controller = (TileController) event.getObject();
-			event.addCapability(new ResourceLocation(Globals.MODID, "chunkloader"), new ProviderTE(controller));
+			event.addCapability(new ResourceLocation(ModGlobals.MODID, "chunkloader"), new ProviderTE(controller));
 		}
 	}
 

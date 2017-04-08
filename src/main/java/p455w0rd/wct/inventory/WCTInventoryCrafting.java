@@ -144,13 +144,6 @@ public class WCTInventoryCrafting extends AppEngInternalInventory {
 	}
 
 	@Override
-	public void markDirty(final int slotIndex) {
-		if (getTileEntity() != null && eventsEnabled()) {
-			getTileEntity().onChangeInventory(this, slotIndex, InvOperation.markDirty, null, null);
-		}
-	}
-
-	@Override
 	public void markDirty() {
 		if (getTileEntity() != null && eventsEnabled()) {
 			getTileEntity().onChangeInventory(this, -1, InvOperation.markDirty, null, null);

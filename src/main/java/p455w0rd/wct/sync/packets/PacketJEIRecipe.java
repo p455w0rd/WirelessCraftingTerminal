@@ -18,6 +18,7 @@ import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.container.ContainerNull;
+import appeng.core.Api;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.items.storage.ItemViewCell;
 import appeng.util.InventoryAdaptor;
@@ -152,7 +153,7 @@ public class PacketJEIRecipe extends WCTPacket {
 									if (newItemStack == null || !Platform.itemComparisons().isSameItem(newItemStack, is)) {
 										final IAEItemStack in = AEItemStack.create(currentItem);
 										if (in != null) {
-											final IAEItemStack out = realForFake == Actionable.SIMULATE ? null : Platform.poweredInsert(energy, storage, in, cct.getActionSource());
+											final IAEItemStack out = realForFake == Actionable.SIMULATE ? null : Api.INSTANCE.storage().poweredInsert(energy, storage, in, cct.getActionSource());
 											if (out != null) {
 												craftMatrix.setInventorySlotContents(x, out.getItemStack());
 											}
@@ -178,7 +179,7 @@ public class PacketJEIRecipe extends WCTPacket {
 											if (request != null) {
 												if (filter == null || filter.isListed(request)) {
 													request.setStackSize(1);
-													final IAEItemStack out = Platform.poweredExtraction(energy, storage, request, cct.getActionSource());
+													final IAEItemStack out = Api.INSTANCE.storage().poweredExtraction(energy, storage, request, cct.getActionSource());
 													if (out != null) {
 														whichItem = out.getItemStack();
 														break;
