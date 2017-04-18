@@ -223,7 +223,7 @@ public class ModEvents {
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
 		if (e.player instanceof EntityPlayerMP) {
-			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_BOOSTER_DROPCHANCE, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER);
+			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER, ModConfig.WCT_DRAGON_DROPS_BOOSTER);
 			NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
