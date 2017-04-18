@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IBaubleRender;
-import p455w0rd.wct.integration.Baubles;
+import p455w0rd.wct.init.ModGlobals.Mods;
 
 /**
  * Credit to EnderIO
@@ -27,7 +27,7 @@ public class RenderLayerWCT implements IBaubleRender {
 
 	@Override
 	public void doRenderLayer(RenderPlayer renderPlayer, ItemStack piece, AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale) {
-		if (!Baubles.isLoaded()) {
+		if (!Mods.BAUBLES.isLoaded()) {
 			return;
 		}
 		GlStateManager.pushMatrix();

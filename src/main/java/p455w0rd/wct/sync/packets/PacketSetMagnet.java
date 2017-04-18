@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
@@ -59,7 +60,7 @@ public class PacketSetMagnet extends WCTPacket {
 		*/
 		if (WCTUtils.isMagnetInstalled(player.inventory)) {
 			ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
-			if (Baubles.isLoaded()) {
+			if (Mods.BAUBLES.isLoaded()) {
 				wct = Baubles.getWCTBauble(player) != null ? Baubles.getWCTBauble(player) : wct;
 			}
 			NBTTagList magnetNBTForm = wct.getTagCompound().getTagList("MagnetSlot", 10);
@@ -67,7 +68,7 @@ public class PacketSetMagnet extends WCTPacket {
 				ItemStack.loadItemStackFromNBT(magnetNBTForm.getCompoundTagAt(0)).getTagCompound().setInteger("MagnetMode", magnetDamage);
 				magnetNBTForm.set(0, magnetItem.serializeNBT());
 			}
-			if (Baubles.isLoaded()) {
+			if (Mods.BAUBLES.isLoaded()) {
 				if (Baubles.getWCTBauble(player) != null) {
 					int slotIndex = Baubles.getWCTBaubleSlotIndex(player);
 					Baubles.setBaublesItemStack(player, slotIndex, wct);

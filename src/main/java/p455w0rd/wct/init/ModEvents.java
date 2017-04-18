@@ -48,7 +48,7 @@ import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
-import p455w0rd.wct.integration.Baubles;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.NetworkHandler;
@@ -231,7 +231,7 @@ public class ModEvents {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onPlayerRenderPre(RenderPlayerEvent.Pre event) {
-		if (Baubles.isLoaded() && !BaubleRenderDispatcher.getRegistry().containsKey(event.getRenderer())) {
+		if (Mods.BAUBLES.isLoaded() && !BaubleRenderDispatcher.getRegistry().containsKey(event.getRenderer())) {
 			event.getRenderer().addLayer(new BaubleRenderDispatcher(event.getRenderer()));
 			BaubleRenderDispatcher.getRegistry().put(event.getRenderer(), null);
 		}

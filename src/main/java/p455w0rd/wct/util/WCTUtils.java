@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
 
@@ -41,7 +42,7 @@ public class WCTUtils {
 			return playerInv.player.getHeldItemMainhand();
 		}
 		ItemStack wirelessTerm = null;
-		if (Baubles.isLoaded()) {
+		if (Mods.BAUBLES.isLoaded()) {
 			wirelessTerm = Baubles.getWCTBauble(playerInv.player);
 		}
 		if (wirelessTerm == null) {

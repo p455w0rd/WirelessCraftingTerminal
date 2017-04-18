@@ -6,7 +6,6 @@ import baubles.common.container.SlotBauble;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Loader;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
 
@@ -15,13 +14,6 @@ import p455w0rd.wct.container.ContainerWCT;
  *
  */
 public class Baubles {
-
-	public static final String MODID = "Baubles";
-	public static final String API_MODID = "Baubles|API";
-
-	public static boolean isLoaded() {
-		return Loader.isModLoaded(MODID);
-	}
 
 	public static ItemStack getWCTBauble(EntityPlayer player) {
 		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {

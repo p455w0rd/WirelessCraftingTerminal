@@ -60,14 +60,13 @@ import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
-import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
  *
  */
-@Optional.Interface(iface = "baubles.api.IBauble", modid = Baubles.API_MODID)
+@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API")
 public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
 	private static final String name = "wct";
@@ -309,19 +308,19 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		checkForBooster(wirelessTerminal);
 	}
 
-	@Optional.Method(modid = Baubles.API_MODID)
+	@Optional.Method(modid = "Baubles|API")
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
 		return BaubleType.HEAD;
 	}
 
-	@Optional.Method(modid = Baubles.API_MODID)
+	@Optional.Method(modid = "Baubles|API")
 	@Override
 	public IBaubleRender getRender() {
 		return RenderLayerWCT.getInstance();
 	}
 
-	@Optional.Method(modid = Baubles.API_MODID)
+	@Optional.Method(modid = "Baubles|API")
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
 		return true;

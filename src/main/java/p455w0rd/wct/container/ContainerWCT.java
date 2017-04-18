@@ -81,6 +81,7 @@ import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.inventory.WCTInventoryBooster;
@@ -179,7 +180,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 
 		// Add crafting result slot
-		addSlotToContainer(new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, craftingGrid, craftingGrid, output, Baubles.isLoaded() ? 142 : 174, -58, this));
+		addSlotToContainer(new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, craftingGrid, craftingGrid, output, Mods.BAUBLES.isLoaded() ? 142 : 174, -58, this));
 		addSlotToContainer(new SlotMagnet(magnetInventory, 152, -20));
 		addSlotToContainer(new SlotTrash(trashInventory, 98, -22, player).setContainer(this));
 		addSlotToContainer(new AppEngSlot(inventoryPlayer, 40, 80, -22) {
@@ -195,7 +196,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 		});
 
-		if (Baubles.isLoaded()) {
+		if (Mods.BAUBLES.isLoaded()) {
 			Baubles.addBaubleSlots(this, player);
 		}
 

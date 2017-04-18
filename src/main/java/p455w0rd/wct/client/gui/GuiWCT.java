@@ -52,8 +52,8 @@ import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModKeybindings;
-import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
@@ -519,7 +519,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		this.bindTexture(Baubles.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
+		this.bindTexture(Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
 		final int x_width = 199;
 
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
@@ -554,7 +554,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-		
+
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;
