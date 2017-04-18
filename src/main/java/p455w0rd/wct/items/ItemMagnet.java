@@ -35,10 +35,12 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.core.Api;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -325,10 +327,7 @@ public class ItemMagnet extends ItemBase {
 
 			if (obj == null) {
 				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-				//civ = obj;
 				powerSrc = obj;
-				//monitor = obj.getItemInventory();
-				//cellInv = monitor;
 				mySrc = new WCTPlayerSource(player, obj);
 			}
 
@@ -347,16 +346,8 @@ public class ItemMagnet extends ItemBase {
 							}
 							continue;
 						}
-						else {
-							if (item.getItemDamage() == 1) {
-								if (stackSize <= 0) {
-									player.onItemPickup(itemToGet, stackSize);
-									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
-								}
-							}
-							else {
-								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
-							}
+						else if (getDamageUnsafe(item) == 1) {
+							doInventoryPickup(itemToGet, player, itemStackToGet, world, stackSize);
 						}
 					}
 					// blacklist
@@ -367,23 +358,11 @@ public class ItemMagnet extends ItemBase {
 							}
 							continue;
 						}
-						else {
-							if (item.getItemDamage() == 1) {
-								if (stackSize <= 0) {
-									player.onItemPickup(itemToGet, stackSize);
-									world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
-								}
-							}
-							else {
-								doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
-							}
+						else if (getDamageUnsafe(item) == 1) {
+							doInventoryPickup(itemToGet, player, itemStackToGet, world, stackSize);
 						}
 					}
 				}
-			}
-			// network isn't powered, WCT has no power, too far away with no booster installed..something is preventing use of WCT, so use niller cannix
-			else {
-				doVanillaPickup(itemToGet, player, itemStackToGet, world, stackSize);
 			}
 		}
 
@@ -394,23 +373,33 @@ public class ItemMagnet extends ItemBase {
 			if (xpToGet.isDead || xpToGet.isInvisible()) {
 				continue;
 			}
+			//if (MinecraftForge.EVENT_BUS.post(new PlayerPickupXpEvent(player, xpToGet))) {
 			int xpAmount = xpToGet.xpValue;
-			xpToGet.xpValue = 0;
-			player.xpCooldown = 0;
-			player.addExperience(xpAmount);
 			xpToGet.setDead();
-			xpToGet.setInvisible(true);
-			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
+			world.playSound((EntityPlayer) null, xpToGet.posX, xpToGet.posY, xpToGet.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH, SoundCategory.PLAYERS, 0.1F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
+			//player.onItemPickup(xpToGet, 1);
+			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, player);
+			if (itemstack != null && itemstack.isItemDamaged()) {
+				int i = Math.min(xpToDurability(xpAmount), itemstack.getItemDamage());
+				xpAmount -= durabilityToXp(i);
+				itemstack.setItemDamage(itemstack.getItemDamage() - i);
+			}
+			if (xpAmount > 0) {
+				player.addExperience(xpAmount);
+			}
 		}
 	}
 
-	private void doVanillaPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
-		if (pickupTimer < 100) {
-			pickupTimer++;
-			return;
-		}
-		pickupTimer = 0;
-		if (itemToGet.getDistanceToEntity(player) <= 2.0F) {
+	private int durabilityToXp(int durability) {
+		return durability / 2;
+	}
+
+	private int xpToDurability(int xp) {
+		return xp * 2;
+	}
+
+	private void doInventoryPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
+		if (itemToGet.getDistanceToEntity(player) <= distanceFromPlayer) {
 			if (player.inventory.addItemStackToInventory(itemStackToGet)) {
 				player.onItemPickup(itemToGet, stackSize);
 				world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
@@ -450,7 +439,6 @@ public class ItemMagnet extends ItemBase {
 				//use oredict
 				if (doesMagnetUseOreDict()) {
 					if (areOresEqual(is, thisStack)) {
-						//if (OreDictionary.itemMatches(is, thisStack, false)) {
 						return true;
 					}
 				}
