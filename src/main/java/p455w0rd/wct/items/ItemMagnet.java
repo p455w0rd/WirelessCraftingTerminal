@@ -210,27 +210,26 @@ public class ItemMagnet extends ItemBase {
 				int z = (int) player.posZ;
 				GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
 			}
+			else {
+				switchMagnetMode(item, player, false);
+			}
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		else {
-			/*
-			if (player.isSneaking()) {
-				if (hand == EnumHand.MAIN_HAND) {
-					switchMagnetMode(item, player, false);
-					return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
-				}
-			}
-			else {
-			*/
 			if (!WCTUtils.isMagnetInitialized(item)) {
 				NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true, item));
 			}
-			int x = (int) player.posX;
-			int y = (int) player.posY;
-			int z = (int) player.posZ;
-			GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
-			//}
+			if (player.isSneaking()) {
+				switchMagnetMode(item, player, false);
+				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+			}
+			else {
+				int x = (int) player.posX;
+				int y = (int) player.posY;
+				int z = (int) player.posZ;
+				GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
+				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+			}
 		}
 		//return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
 	}
@@ -272,6 +271,19 @@ public class ItemMagnet extends ItemBase {
 			if (sync) {
 				NetworkHandler.instance().sendToServer(new PacketSetMagnet(newMode));
 			}
+		}
+		else {
+			int newMode = 0;
+			if (getDamageUnsafe(item) == 0) {
+				newMode = 1;
+			}
+			else if (getDamageUnsafe(item) == 1) {
+				newMode = 2;
+			}
+			else {
+				newMode = 0;
+			}
+			setDamageUnsafe(item, newMode);
 		}
 	}
 
