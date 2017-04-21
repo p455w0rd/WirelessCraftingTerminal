@@ -8,6 +8,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.slot.SlotAEBauble;
+import p455w0rd.wct.inventory.WCTBaublesInventory;
 
 /**
  * @author p455w0rd
@@ -45,6 +47,13 @@ public class Baubles {
 		return -1;
 	}
 
+	public static IBaublesItemHandler getBaubles(EntityPlayer player) {
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			return player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+		}
+		return null;
+	}
+
 	public static void setBaublesItemStack(EntityPlayer player, int slot, ItemStack stack) {
 		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
 			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
@@ -54,13 +63,10 @@ public class Baubles {
 
 	public static void addBaubleSlots(ContainerWCT container, EntityPlayer player) {
 		IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
-		container.addSlotToContainer(new SlotBauble(player, baubles, 0, 178, 97));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 1, 178, 97 + 1 * 18));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 2, 178, 97 + 2 * 18));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 3, 178, 97 + 3 * 18));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 4, 178, 97 + 4 * 18));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 5, 178, 97 + 5 * 18));
-		container.addSlotToContainer(new SlotBauble(player, baubles, 6, 178, 97 + 6 * 18));
+		WCTBaublesInventory inventory = new WCTBaublesInventory(player);
+		for (int i = 0; i < 7; i++) {
+			container.addSlotToContainer(new SlotAEBauble(inventory, i, 178, -62 + i * 18));
+		}
 	}
 
 	public static boolean isBaubleSlot(Slot slot) {
