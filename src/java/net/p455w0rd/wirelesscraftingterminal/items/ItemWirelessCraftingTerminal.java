@@ -159,7 +159,9 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 
 	@Override
 	public boolean canHandle(final ItemStack is) {
-		return true;
+		if(is.getUnlocalizedName().equals("item.wirelessCraftingTerminal"))
+			return true;
+		return false;
 	}
 
 	@Override
