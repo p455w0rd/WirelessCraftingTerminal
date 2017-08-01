@@ -40,6 +40,8 @@ import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.common.Optional.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -87,8 +89,10 @@ import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationRegistry;
 import net.p455w0rd.wirelesscraftingterminal.integration.IntegrationType;
 import net.p455w0rd.wirelesscraftingterminal.integration.abstraction.INEI;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
+import yalter.mousetweaks.api.IMTModGuiContainer;
 
-public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSource, IConfigManagerHost {
+@Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer", modid = "MouseTweaks", striprefs = true)
+public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSource, IConfigManagerHost, IMTModGuiContainer {
 
 	private float xSize_lo;
 	private float ySize_lo;
@@ -144,42 +148,42 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	public GuiWirelessCraftingTerminal(Container container) {
 		super(container);
 		GuiWirelessCraftingTerminal.INSTANCE = this;
-		this.xSize = GUI_WIDTH;
-		this.ySize = GUI_HEIGHT;
-		this.standardSize = this.xSize;
-		this.setReservedSpace(73);
-		this.containerWCT = (ContainerWirelessCraftingTerminal) container;
-		this.scrollBar = new GuiScrollbar();
-		this.subGui = switchingGuis;
+		xSize = GUI_WIDTH;
+		ySize = GUI_HEIGHT;
+		standardSize = xSize;
+		setReservedSpace(73);
+		containerWCT = (ContainerWirelessCraftingTerminal) container;
+		scrollBar = new GuiScrollbar();
+		subGui = switchingGuis;
 		switchingGuis = false;
 		this.setScrollBar(scrollBar);
-		this.repo = new ItemRepo(scrollBar, this);
-		this.configSrc = ((IConfigurableObject) this.inventorySlots).getConfigManager();
-		this.devicePowered = containerWCT.isPowered();
-		((ContainerWirelessCraftingTerminal) this.inventorySlots).setGui(this);
+		repo = new ItemRepo(scrollBar, this);
+		configSrc = ((IConfigurableObject) inventorySlots).getConfigManager();
+		devicePowered = containerWCT.isPowered();
+		((ContainerWirelessCraftingTerminal) inventorySlots).setGui(this);
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
 		for (final IAEItemStack is : list) {
-			this.repo.postUpdate(is);
+			repo.postUpdate(is);
 		}
-		this.repo.updateView();
+		repo.updateView();
 		this.setScrollBar();
 	}
 
 	private void setScrollBar() {
-		this.getScrollBar().setTop( 18 ).setLeft( 174 ).setHeight( this.rows * 18 - 2 );
-		this.getScrollBar().setRange( 0, ( this.repo.size() + this.perRow - 1 ) / this.perRow - this.rows, Math.max( 1, this.rows / 6 ) );
+		getScrollBar().setTop(18).setLeft(174).setHeight(rows * 18 - 2);
+		getScrollBar().setRange(0, (repo.size() + perRow - 1) / perRow - rows, Math.max(1, rows / 6));
 	}
-	
+
 	protected void setScrollBar(final GuiScrollbar myScrollBar) {
-		this.scrollBar = myScrollBar;
+		scrollBar = myScrollBar;
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void actionPerformed(final GuiButton btn) {
-		if (btn == this.craftingStatusBtn) {
+		if (btn == craftingStatusBtn) {
 			NetworkHandler.instance.sendToServer(new PacketSwitchGuis(Reference.GUI_CRAFTING_STATUS));
 		}
 
@@ -191,11 +195,10 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				final Enum cv = iBtn.getCurrentValue();
 				final Enum next = Platform.rotateEnum(cv, backwards, iBtn.getSetting().getPossibleValues());
 
-				if( btn == this.terminalStyleBox )
-				{
-					AEConfig.instance.settings.putSetting( iBtn.getSetting(), next );
+				if (btn == terminalStyleBox) {
+					AEConfig.instance.settings.putSetting(iBtn.getSetting(), next);
 				}
-				if (btn == this.searchBoxSettings) {
+				if (btn == searchBoxSettings) {
 					AEConfig.instance.settings.putSetting(iBtn.getSetting(), next);
 				}
 				else {
@@ -210,12 +213,12 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				iBtn.set(next);
 
 				if (next.getClass() == SearchBoxMode.class || next.getClass() == TerminalStyle.class) {
-					this.reinitalize();
+					reinitalize();
 				}
 			}
-			if (this.clearBtn == btn) {
+			if (clearBtn == btn) {
 				Slot s = null;
-				final Container c = this.inventorySlots;
+				final Container c = inventorySlots;
 				for (final Object j : c.inventorySlots) {
 					if (j instanceof SlotCraftingMatrix) {
 						s = (Slot) j;
@@ -229,9 +232,9 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 		}
 		if (btn instanceof GuiTrashButton) {
-			if (this.trashBtn == btn) {
+			if (trashBtn == btn) {
 				Slot s = null;
-				final Container c = this.inventorySlots;
+				final Container c = inventorySlots;
 				for (final Object j : c.inventorySlots) {
 					if (j instanceof SlotTrash) {
 						s = (Slot) j;
@@ -249,8 +252,8 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	}
 
 	private void reinitalize() {
-		this.buttonList.clear();
-		this.initGui();
+		buttonList.clear();
+		initGui();
 	}
 
 	protected static String join(final Collection<String> toolTip, final String delimiter) {
@@ -270,76 +273,74 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	}
 
 	public boolean isSubGui() {
-		return this.subGui;
+		return subGui;
 	}
 
 	int getReservedSpace() {
-		return this.reservedSpace;
+		return reservedSpace;
 	}
 
 	void setReservedSpace(final int reservedSpace) {
 		this.reservedSpace = reservedSpace;
 	}
-	
-	public int getStandardSize()
-	{
-		return this.standardSize;
+
+	public int getStandardSize() {
+		return standardSize;
 	}
 
-	void setStandardSize( final int standardSize )
-	{
+	void setStandardSize(final int standardSize) {
 		this.standardSize = standardSize;
 	}
 
 	/**
 	 * Initializes the GUI
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({
+			"rawtypes"
+	})
 	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
-		this.maxRows = this.getMaxRows();
-		this.perRow = AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) != TerminalStyle.FULL ? 9 : 9 + ( ( this.width - this.standardSize ) / 18 );
-		this.isNEIEnabled = Loader.isModLoaded("NotEnoughItems");
+		maxRows = getMaxRows();
+		perRow = AEConfig.instance.getConfigManager().getSetting(Settings.TERMINAL_STYLE) != TerminalStyle.FULL ? 9 : 9 + ((width - standardSize) / 18);
+		isNEIEnabled = Loader.isModLoaded("NotEnoughItems");
 		int top = isNEIEnabled ? 22 : 0;
 		final int magicNumber = 114 + 1;
-		final int extraSpace = this.height - magicNumber - 0 - top - this.reservedSpace;
-		this.rows = (int) Math.floor(extraSpace / 18);
-		if (this.rows > this.maxRows) {
-			top += (this.rows - this.maxRows) * 18 / 2;
-			this.rows = this.maxRows;
+		final int extraSpace = height - magicNumber - 0 - top - reservedSpace;
+		rows = (int) Math.floor(extraSpace / 18);
+		if (rows > maxRows) {
+			top += (rows - maxRows) * 18 / 2;
+			rows = maxRows;
 		}
 
 		if (isNEIEnabled) {
-			this.rows--;
+			rows--;
 		}
 
-		if (this.rows < 3) {
-			this.rows = 3;
+		if (rows < 3) {
+			rows = 3;
 		}
 
-		this.getMeSlots().clear();
-		for (int y = 0; y < this.rows; y++) {
-			for (int x = 0; x < this.perRow; x++) {
-				this.getMeSlots().add(new InternalSlotME(this.repo, x + y * this.perRow, this.offsetX + x * 18, 18 + y * 18));
+		getMeSlots().clear();
+		for (int y = 0; y < rows; y++) {
+			for (int x = 0; x < perRow; x++) {
+				getMeSlots().add(new InternalSlotME(repo, x + y * perRow, offsetX + x * 18, 18 + y * 18));
 			}
 		}
-		if( AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) != TerminalStyle.FULL )
-		{
-			this.xSize = this.standardSize + ( ( this.perRow - 9 ) * 18 );
+		if (AEConfig.instance.getConfigManager().getSetting(Settings.TERMINAL_STYLE) != TerminalStyle.FULL) {
+			xSize = standardSize + ((perRow - 9) * 18);
 		}
-		else
-		{
-			this.xSize = this.standardSize;
+		else {
+			xSize = standardSize;
 		}
 		super.initGui();
 
-		this.ySize = magicNumber + this.rows * 18 + this.reservedSpace;
-		final int unusedSpace = this.height - this.ySize;
-		this.guiTop = (int) Math.floor(unusedSpace / (unusedSpace < 0 ? 3.8f : 2.0f));
-		int offset = this.guiTop + 8;
+		ySize = magicNumber + rows * 18 + reservedSpace;
+		final int unusedSpace = height - ySize;
+		guiTop = (int) Math.floor(unusedSpace / (unusedSpace < 0 ? 3.8f : 2.0f));
+		int offset = guiTop + 8;
 
-		final List<Slot> slots = this.getInventorySlots();
+		final List<Slot> slots = getInventorySlots();
 		final Iterator<Slot> i = slots.iterator();
 		while (i.hasNext()) {
 			if (i.next() instanceof SlotME) {
@@ -347,60 +348,60 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 		}
 
-		for (final InternalSlotME me : this.meSlots) {
+		for (final InternalSlotME me : meSlots) {
 			slots.add(new SlotME(me));
 		}
 
-		this.buttonList.clear();
-		this.buttonList.add(this.clearBtn = new GuiImgButton(this.guiLeft + 134, this.guiTop + this.ySize - 160, Settings.ACTIONS, ActionItems.STASH));
-		this.buttonList.add(this.trashBtn = new GuiTrashButton(this.guiLeft + 98, this.guiTop + this.ySize - 104));
-		this.clearBtn.setHalfSize(true);
-		if (this.customSortOrder) {
-			this.buttonList.add(this.SortByBox = new GuiImgButton(this.guiLeft - 18, offset, Settings.SORT_BY, this.configSrc.getSetting(Settings.SORT_BY)));
+		buttonList.clear();
+		buttonList.add(clearBtn = new GuiImgButton(guiLeft + 134, guiTop + ySize - 160, Settings.ACTIONS, ActionItems.STASH));
+		buttonList.add(trashBtn = new GuiTrashButton(guiLeft + 98, guiTop + ySize - 104));
+		clearBtn.setHalfSize(true);
+		if (customSortOrder) {
+			buttonList.add(SortByBox = new GuiImgButton(guiLeft - 18, offset, Settings.SORT_BY, configSrc.getSetting(Settings.SORT_BY)));
 			offset += 20;
 		}
 
-		this.buttonList.add(this.ViewBox = new GuiImgButton(this.guiLeft - 18, offset, Settings.VIEW_MODE, this.configSrc.getSetting(Settings.VIEW_MODE)));
+		buttonList.add(ViewBox = new GuiImgButton(guiLeft - 18, offset, Settings.VIEW_MODE, configSrc.getSetting(Settings.VIEW_MODE)));
 		offset += 20;
 
-		this.buttonList.add(this.SortDirBox = new GuiImgButton(this.guiLeft - 18, offset, Settings.SORT_DIRECTION, this.configSrc.getSetting(Settings.SORT_DIRECTION)));
+		buttonList.add(SortDirBox = new GuiImgButton(guiLeft - 18, offset, Settings.SORT_DIRECTION, configSrc.getSetting(Settings.SORT_DIRECTION)));
 		offset += 20;
 
-		this.buttonList.add(this.searchBoxSettings = new GuiImgButton(this.guiLeft - 18, offset, Settings.SEARCH_MODE, AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE)));
+		buttonList.add(searchBoxSettings = new GuiImgButton(guiLeft - 18, offset, Settings.SEARCH_MODE, AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE)));
 		offset += 20;
-		
-		this.buttonList.add( this.terminalStyleBox = new GuiImgButton( this.guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance.settings.getSetting( Settings.TERMINAL_STYLE ) ) );
 
-		this.searchField = new MEGuiTextField(this.fontRendererObj, SEARCH_X, SEARCH_Y, SEARCH_WIDTH, SEARCH_HEIGHT);
+		buttonList.add(terminalStyleBox = new GuiImgButton(guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance.settings.getSetting(Settings.TERMINAL_STYLE)));
 
-		this.searchField.setEnableBackgroundDrawing(false);
-		this.searchField.setMaxStringLength(25);
-		this.searchField.setTextColor(0xFFFFFF);
-		this.searchField.setVisible(true);
-		this.searchField.setEnabled(true);
+		searchField = new MEGuiTextField(fontRendererObj, SEARCH_X, SEARCH_Y, SEARCH_WIDTH, SEARCH_HEIGHT);
 
-		this.buttonList.add(this.craftingStatusBtn = new GuiTabButton(this.guiLeft + 169, this.guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
-		this.craftingStatusBtn.setHideEdge(13);
+		searchField.setEnableBackgroundDrawing(false);
+		searchField.setMaxStringLength(25);
+		searchField.setTextColor(0xFFFFFF);
+		searchField.setVisible(true);
+		searchField.setEnabled(true);
+
+		buttonList.add(craftingStatusBtn = new GuiTabButton(guiLeft + 169, guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
+		craftingStatusBtn.setHideEdge(13);
 
 		final Enum setting = AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE);
-		this.searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.NEI_AUTOSEARCH == setting);
+		searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.NEI_AUTOSEARCH == setting);
 
-		if (this.isSubGui()) {
-			if (this.isSubGui()) {
-				this.searchField.setText(memoryText);
-				this.repo.setSearchString(memoryText);
+		if (isSubGui()) {
+			if (isSubGui()) {
+				searchField.setText(memoryText);
+				repo.setSearchString(memoryText);
 			}
-			this.repo.updateView();
+			repo.updateView();
 			this.setScrollBar();
 		}
 
 		craftingGridOffsetX = Integer.MAX_VALUE;
 		craftingGridOffsetY = Integer.MAX_VALUE;
 
-		for (final Object s : this.inventorySlots.inventorySlots) {
+		for (final Object s : inventorySlots.inventorySlots) {
 			if (s instanceof AppEngSlot) {
 				if (((Slot) s).xDisplayPosition < 197) {
-					this.repositionSlot((AppEngSlot) s);
+					repositionSlot((AppEngSlot) s);
 				}
 			}
 
@@ -416,81 +417,81 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	@SuppressWarnings("unchecked")
 	private List<Slot> getInventorySlots() {
-		return this.inventorySlots.inventorySlots;
+		return inventorySlots.inventorySlots;
 	}
 
 	int getMaxRows() {
-		return AEConfig.instance.getConfigManager().getSetting( Settings.TERMINAL_STYLE ) == TerminalStyle.SMALL ? 6 : Integer.MAX_VALUE;
+		return AEConfig.instance.getConfigManager().getSetting(Settings.TERMINAL_STYLE) == TerminalStyle.SMALL ? 6 : Integer.MAX_VALUE;
 	}
 
 	protected void repositionSlot(final AppEngSlot s) {
-		s.yDisplayPosition = s.getY() + this.ySize - 78 - 5;
+		s.yDisplayPosition = s.getY() + ySize - 78 - 5;
 	}
 
 	/**
 	 * Called every tick. It is used in this instance to detect screen size
 	 * changes to automatically update the gui height.
-	 * 
+	 *
 	 * reInit variable is used to call initGui() on the next tick. It has to be
 	 * called this way to update correctly.
-	 * 
+	 *
 	 * @author p455w0rd
 	 */
 	@Override
 	public void updateScreen() {
-		this.devicePowered = containerWCT.isPowered();
-		this.repo.setPower(devicePowered);
+		devicePowered = containerWCT.isPowered();
+		repo.setPower(devicePowered);
 
 		super.updateScreen();
-		if (this.init) {
-			this.currScreenWidth = this.mc.displayWidth;
-			this.currScreenHeight = this.mc.displayHeight;
-			this.isFullScreen = this.mc.isFullScreen();
-			this.reInit = true;
-			this.init = false;
+		if (init) {
+			currScreenWidth = mc.displayWidth;
+			currScreenHeight = mc.displayHeight;
+			isFullScreen = mc.isFullScreen();
+			reInit = true;
+			init = false;
 		}
 		++screenResTicks;
 		if (screenResTicks == 20) {
-			this.wasTextboxFocused = this.searchField.isFocused();
+			wasTextboxFocused = searchField.isFocused();
 			screenResTicks = 0;
 		}
-		if (this.reInit) {
+		if (reInit) {
 			if (tick != 1) {
 				tick++;
 			}
 			else {
-				this.initGui();
+				initGui();
 				this.setScrollBar();
-				if (this.wasResized == true) {
-					this.searchField.setFocused(this.wasTextboxFocused);
-					this.searchField.setText(this.repo.getSearchString());
-					this.wasTextboxFocused = false;
-					this.wasResized = false;
+				if (wasResized == true) {
+					searchField.setFocused(wasTextboxFocused);
+					searchField.setText(repo.getSearchString());
+					wasTextboxFocused = false;
+					wasResized = false;
 				}
-				this.reInit = false;
+				reInit = false;
 				tick = 0;
 			}
 		}
 		if (hasScreenResChanged()) {
-			this.reInit = true;
-			this.wasResized = true;
+			reInit = true;
+			wasResized = true;
 		}
-		if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {
-			this.mc.thePlayer.closeScreen();
+		if (!mc.thePlayer.isEntityAlive() || mc.thePlayer.isDead) {
+			mc.thePlayer.closeScreen();
 		}
 	}
 
 	/**
 	 * Detects if the window has been resized
-	 * 
+	 *
 	 * @return True if window has been resized
 	 * @author p455w0rd
 	 */
 	private boolean hasScreenResChanged() {
-		if ((this.currScreenWidth != this.mc.displayWidth) || (this.currScreenHeight != this.mc.displayHeight) || (this.isFullScreen != this.mc.isFullScreen())) {
-			this.currScreenWidth = this.mc.displayWidth;
-			this.currScreenHeight = this.mc.displayHeight;
-			this.isFullScreen = this.mc.isFullScreen();
+		if ((currScreenWidth != mc.displayWidth) || (currScreenHeight != mc.displayHeight) || (isFullScreen != mc.isFullScreen())) {
+			currScreenWidth = mc.displayWidth;
+			currScreenHeight = mc.displayHeight;
+			isFullScreen = mc.isFullScreen();
 			return true;
 		}
 		return false;
@@ -499,17 +500,18 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	/**
 	 * Draws the screen and tooltips.
 	 */
+	@Override
 	public void drawScreen(int mouseX, int mouseY, float btn) {
 		super.drawScreen(mouseX, mouseY, btn);
-		this.xSize_lo = (float) mouseX;
-		this.ySize_lo = (float) mouseY;
+		xSize_lo = mouseX;
+		ySize_lo = mouseY;
 
 		final boolean hasClicked = Mouse.isButtonDown(0);
-		if (hasClicked && this.scrollBar != null) {
-			this.scrollBar.click(this, mouseX - this.guiLeft, mouseY - this.guiTop);
+		if (hasClicked && scrollBar != null) {
+			scrollBar.click(this, mouseX - guiLeft, mouseY - guiTop);
 		}
 
-		for (final Object c : this.buttonList) {
+		for (final Object c : buttonList) {
 			if (c instanceof ITooltip) {
 				final ITooltip tooltip = (ITooltip) c;
 				final int x = tooltip.xPos();
@@ -523,7 +525,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 						final String msg = tooltip.getMessage();
 						if (msg != null) {
-							this.drawTooltip(x + 11, y + 4, 0, msg);
+							drawTooltip(x + 11, y + 4, 0, msg);
 						}
 					}
 				}
@@ -545,7 +547,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			int var7;
 
 			for (var6 = 0; var6 < var4.length; ++var6) {
-				var7 = this.fontRendererObj.getStringWidth(var4[var6]);
+				var7 = fontRendererObj.getStringWidth(var4[var6]);
 
 				if (var7 > var5) {
 					var5 = var7;
@@ -560,28 +562,28 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				var9 += 2 + (var4.length - 1) * 10;
 			}
 
-			if (this.guiTop + var7 + var9 + 6 > this.height) {
-				var7 = this.height - var9 - this.guiTop - 6;
+			if (guiTop + var7 + var9 + 6 > height) {
+				var7 = height - var9 - guiTop - 6;
 			}
 
 			if (forceWidth > 0) {
 				var5 = forceWidth;
 			}
 
-			this.zLevel = 300.0F;
+			zLevel = 300.0F;
 			itemRender.zLevel = 300.0F;
 			final int var10 = -267386864;
-			this.drawGradientRect(var6 - 3, var7 - 4, var6 + var5 + 3, var7 - 3, var10, var10);
-			this.drawGradientRect(var6 - 3, var7 + var9 + 3, var6 + var5 + 3, var7 + var9 + 4, var10, var10);
-			this.drawGradientRect(var6 - 3, var7 - 3, var6 + var5 + 3, var7 + var9 + 3, var10, var10);
-			this.drawGradientRect(var6 - 4, var7 - 3, var6 - 3, var7 + var9 + 3, var10, var10);
-			this.drawGradientRect(var6 + var5 + 3, var7 - 3, var6 + var5 + 4, var7 + var9 + 3, var10, var10);
+			drawGradientRect(var6 - 3, var7 - 4, var6 + var5 + 3, var7 - 3, var10, var10);
+			drawGradientRect(var6 - 3, var7 + var9 + 3, var6 + var5 + 3, var7 + var9 + 4, var10, var10);
+			drawGradientRect(var6 - 3, var7 - 3, var6 + var5 + 3, var7 + var9 + 3, var10, var10);
+			drawGradientRect(var6 - 4, var7 - 3, var6 - 3, var7 + var9 + 3, var10, var10);
+			drawGradientRect(var6 + var5 + 3, var7 - 3, var6 + var5 + 4, var7 + var9 + 3, var10, var10);
 			final int var11 = 1347420415;
 			final int var12 = (var11 & 16711422) >> 1 | var11 & -16777216;
-			this.drawGradientRect(var6 - 3, var7 - 3 + 1, var6 - 3 + 1, var7 + var9 + 3 - 1, var11, var12);
-			this.drawGradientRect(var6 + var5 + 2, var7 - 3 + 1, var6 + var5 + 3, var7 + var9 + 3 - 1, var11, var12);
-			this.drawGradientRect(var6 - 3, var7 - 3, var6 + var5 + 3, var7 - 3 + 1, var11, var11);
-			this.drawGradientRect(var6 - 3, var7 + var9 + 2, var6 + var5 + 3, var7 + var9 + 3, var12, var12);
+			drawGradientRect(var6 - 3, var7 - 3 + 1, var6 - 3 + 1, var7 + var9 + 3 - 1, var11, var12);
+			drawGradientRect(var6 + var5 + 2, var7 - 3 + 1, var6 + var5 + 3, var7 + var9 + 3 - 1, var11, var12);
+			drawGradientRect(var6 - 3, var7 - 3, var6 + var5 + 3, var7 - 3 + 1, var11, var11);
+			drawGradientRect(var6 - 3, var7 + var9 + 2, var6 + var5 + 3, var7 + var9 + 3, var12, var12);
 
 			for (int var13 = 0; var13 < var4.length; ++var13) {
 				String var14 = var4[var13];
@@ -593,7 +595,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 					var14 = "\u00a77" + var14;
 				}
 
-				this.fontRendererObj.drawStringWithShadow(var14, var6, var7, -1);
+				fontRendererObj.drawStringWithShadow(var14, var6, var7, -1);
 
 				if (var13 == 0) {
 					var7 += 2;
@@ -602,7 +604,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 				var7 += 10;
 			}
 
-			this.zLevel = 0.0F;
+			zLevel = 0.0F;
 			itemRender.zLevel = 0.0F;
 		}
 		GL11.glPopAttrib();
@@ -610,7 +612,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	public void bindTexture(final String base, final String file) {
 		final ResourceLocation loc = new ResourceLocation(base, "textures/" + file);
-		this.mc.getTextureManager().bindTexture(loc);
+		mc.getTextureManager().bindTexture(loc);
 	}
 
 	/**
@@ -618,22 +620,22 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	 */
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		final int ox = this.guiLeft; // (width - xSize) / 2;
-		final int oy = this.guiTop; // (height - ySize) / 2;
+		final int ox = guiLeft; // (width - xSize) / 2;
+		final int oy = guiTop; // (height - ySize) / 2;
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-		if (this.scrollBar != null) {
-			this.scrollBar.draw(this);
+		if (scrollBar != null) {
+			scrollBar.draw(this);
 		}
-		this.drawFG(ox, oy, mouseX, mouseY);
+		drawFG(ox, oy, mouseX, mouseY);
 	}
 
 	public void drawFG(int offsetX, int offsetY, int mouseX, int mouseY) {
 		String s = LocaleHandler.WirelessTermLabel.getLocal();
-		this.mc.fontRenderer.drawString(s, 7, 5, 4210752);
-		this.mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, this.ySize - 172 + 3, 4210752);
-		if (this.searchField != null) {
-			this.searchField.drawTextBox();
+		mc.fontRenderer.drawString(s, 7, 5, 4210752);
+		mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, ySize - 172 + 3, 4210752);
+		if (searchField != null) {
+			searchField.drawTextBox();
 		}
 	}
 
@@ -642,24 +644,24 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	 */
 	@Override
 	protected void drawGuiContainerBackgroundLayer(final float f, final int x, final int y) {
-		final int ox = this.guiLeft; // (width - xSize) / 2;
-		final int oy = this.guiTop; // (height - ySize) / 2;
+		final int ox = guiLeft; // (width - xSize) / 2;
+		final int oy = guiTop; // (height - ySize) / 2;
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.drawBG(ox, oy, x, y);
+		drawBG(ox, oy, x, y);
 
-		final List<Slot> slots = this.getInventorySlots();
+		final List<Slot> slots = getInventorySlots();
 		for (final Slot slot : slots) {
 			if (slot instanceof OptionalSlotFake) {
 				final OptionalSlotFake fs = (OptionalSlotFake) slot;
 				if (fs.renderDisabled()) {
 					if (fs.isEnabled()) {
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 					}
 					else {
 						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.4F);
 						GL11.glEnable(GL11.GL_BLEND);
-						this.drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
+						drawTexturedModalRect(ox + fs.xDisplayPosition - 1, oy + fs.yDisplayPosition - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 						GL11.glPopAttrib();
 					}
@@ -672,20 +674,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		this.bindTexture(bgTexturePath);
 		final int x_width = 199;
 
-		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, x_width, 18 );
-		
-		for( int x = 0; x < this.rows; x++ )
-		{
-			this.drawTexturedModalRect( offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18 );
+		drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
+
+		for (int x = 0; x < rows; x++) {
+			drawTexturedModalRect(offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18);
 		}
-		
-		this.drawTexturedModalRect( offsetX, offsetY + 16 + this.rows * 18 + this.lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + this.reservedSpace - this.lowerTextureOffset );
+
+		drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
 
 		if (Reference.WCT_BOOSTER_ENABLED) {
-			this.drawTexturedModalRect(this.guiLeft + 132, (this.guiTop + this.rows * 18) + 83, 237, 237, 19, 19);
+			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
-		GuiInventory.func_147046_a(this.guiLeft + 51, (this.guiTop + this.rows * 18) + 94, 32, (float) (this.guiLeft + 51) - this.xSize_lo, (float) ((this.guiTop + this.rows * 18) + 50) - this.ySize_lo, this.mc.thePlayer);
-		
+		GuiInventory.func_147046_a(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, mc.thePlayer);
+
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -695,22 +696,22 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		final Enum searchMode = AEConfig.instance.settings.getSetting(Settings.SEARCH_MODE);
 
 		if (searchMode != SearchBoxMode.AUTOSEARCH && searchMode != SearchBoxMode.NEI_AUTOSEARCH) {
-			this.searchField.mouseClicked(xCoord - this.guiLeft, yCoord - this.guiTop, btn);
+			searchField.mouseClicked(xCoord - guiLeft, yCoord - guiTop, btn);
 		}
 
-		if (btn == 1 && this.searchField.isMouseIn(xCoord - this.guiLeft, yCoord - this.guiTop)) {
-			this.searchField.setText("");
-			this.repo.setSearchString("");
-			this.repo.updateView();
+		if (btn == 1 && searchField.isMouseIn(xCoord - guiLeft, yCoord - guiTop)) {
+			searchField.setText("");
+			repo.setSearchString("");
+			repo.updateView();
 			this.setScrollBar();
 		}
 
-		this.drag_click.clear();
+		drag_click.clear();
 
 		if (btn == 1) {
-			for (final Object o : this.buttonList) {
+			for (final Object o : buttonList) {
 				final GuiButton guibutton = (GuiButton) o;
-				if (guibutton.mousePressed(this.mc, xCoord, yCoord)) {
+				if (guibutton.mousePressed(mc, xCoord, yCoord)) {
 					super.mouseClicked(xCoord, yCoord, 0);
 					return;
 				}
@@ -722,13 +723,13 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	@Override
 	protected void mouseClickMove(final int x, final int y, final int c, final long d) {
-		final Slot slot = this.getSlot(x, y);
-		final ItemStack itemstack = this.mc.thePlayer.inventory.getItemStack();
+		final Slot slot = getSlot(x, y);
+		final ItemStack itemstack = mc.thePlayer.inventory.getItemStack();
 
 		if (slot instanceof SlotFake && itemstack != null) {
-			this.drag_click.add(slot);
-			if (this.drag_click.size() > 1) {
-				for (final Slot dr : this.drag_click) {
+			drag_click.add(slot);
+			if (drag_click.size() > 1) {
+				for (final Slot dr : drag_click) {
 					final PacketInventoryAction p = new PacketInventoryAction(c == 0 ? InventoryAction.PICKUP_OR_SET_DOWN : InventoryAction.PLACE_SINGLE, dr.slotNumber, 0);
 					NetworkHandler.instance.sendToServer(p);
 				}
@@ -746,7 +747,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		if (slot instanceof SlotFake) {
 			final InventoryAction action = ctrlDown == 1 ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
 
-			if (this.drag_click.size() > 1) {
+			if (drag_click.size() > 1) {
 				return;
 			}
 
@@ -776,19 +777,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			if (this.enableSpaceClicking()) {
+			if (enableSpaceClicking()) {
 				IAEItemStack stack = null;
 				if (slot instanceof SlotME) {
 					stack = ((SlotME) slot).getAEStack();
 				}
 
-				int slotNum = this.getInventorySlots().size();
+				int slotNum = getInventorySlots().size();
 
 				if (!(slot instanceof SlotME) && slot != null) {
 					slotNum = slot.slotNumber;
 				}
 
-				((ContainerWirelessCraftingTerminal) this.inventorySlots).setTargetStack(stack);
+				((ContainerWirelessCraftingTerminal) inventorySlots).setTargetStack(stack);
 				final PacketInventoryAction p = new PacketInventoryAction(InventoryAction.MOVE_REGION, slotNum, 0);
 				NetworkHandler.instance.sendToServer(p);
 				return;
@@ -866,40 +867,40 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 
 			if (action != null) {
-				((ContainerWirelessCraftingTerminal) this.inventorySlots).setTargetStack(stack);
-				final PacketInventoryAction p = new PacketInventoryAction(action, this.getInventorySlots().size(), 0);
+				((ContainerWirelessCraftingTerminal) inventorySlots).setTargetStack(stack);
+				final PacketInventoryAction p = new PacketInventoryAction(action, getInventorySlots().size(), 0);
 				NetworkHandler.instance.sendToServer(p);
 			}
 
 			return;
 		}
 
-		if (!this.disableShiftClick && isShiftKeyDown()) {
-			this.disableShiftClick = true;
+		if (!disableShiftClick && isShiftKeyDown()) {
+			disableShiftClick = true;
 
-			if (this.dbl_whichItem == null || this.bl_clicked != slot || this.dbl_clickTimer.elapsed(TimeUnit.MILLISECONDS) > 150) {
+			if (dbl_whichItem == null || bl_clicked != slot || dbl_clickTimer.elapsed(TimeUnit.MILLISECONDS) > 150) {
 				// some simple double click logic.
-				this.bl_clicked = slot;
-				this.dbl_clickTimer = Stopwatch.createStarted();
+				bl_clicked = slot;
+				dbl_clickTimer = Stopwatch.createStarted();
 				if (slot != null) {
-					this.dbl_whichItem = slot.getHasStack() ? slot.getStack().copy() : null;
+					dbl_whichItem = slot.getHasStack() ? slot.getStack().copy() : null;
 				}
 				else {
-					this.dbl_whichItem = null;
+					dbl_whichItem = null;
 				}
 			}
-			else if (this.dbl_whichItem != null) {
+			else if (dbl_whichItem != null) {
 				// a replica of the weird broken vanilla feature.
 
-				final List<Slot> slots = this.getInventorySlots();
+				final List<Slot> slots = getInventorySlots();
 				for (final Slot inventorySlot : slots) {
-					if (inventorySlot != null && inventorySlot.canTakeStack(this.mc.thePlayer) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.func_94527_a(inventorySlot, this.dbl_whichItem, true)) {
-						this.handleMouseClick(inventorySlot, inventorySlot.slotNumber, ctrlDown, 1);
+					if (inventorySlot != null && inventorySlot.canTakeStack(mc.thePlayer) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.func_94527_a(inventorySlot, dbl_whichItem, true)) {
+						handleMouseClick(inventorySlot, inventorySlot.slotNumber, ctrlDown, 1);
 					}
 				}
 			}
 
-			this.disableShiftClick = false;
+			disableShiftClick = false;
 		}
 
 		super.handleMouseClick(slot, slotIdx, ctrlDown, key);
@@ -916,25 +917,25 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			return false;
 		}
 
-		if (this.mc.thePlayer.inventory.getItemStack() == null && theSlot != null) {
+		if (mc.thePlayer.inventory.getItemStack() == null && theSlot != null) {
 			for (int j = 0; j < 9; ++j) {
-				if (keyCode == this.mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
-					final List<Slot> slots = this.getInventorySlots();
+				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
+					final List<Slot> slots = getInventorySlots();
 					for (final Slot s : slots) {
-						if (s.getSlotIndex() == j && s.inventory == ((ContainerWirelessCraftingTerminal) this.inventorySlots).getPlayerInv()) {
-							if (!s.canTakeStack(((ContainerWirelessCraftingTerminal) this.inventorySlots).getPlayerInv().player)) {
+						if (s.getSlotIndex() == j && s.inventory == ((ContainerWirelessCraftingTerminal) inventorySlots).getPlayerInv()) {
+							if (!s.canTakeStack(((ContainerWirelessCraftingTerminal) inventorySlots).getPlayerInv().player)) {
 								return false;
 							}
 						}
 					}
 
 					if (theSlot.getSlotStackLimit() == 64) {
-						this.handleMouseClick(theSlot, theSlot.slotNumber, j, 2);
+						handleMouseClick(theSlot, theSlot.slotNumber, j, 2);
 						return true;
 					}
 					else {
 						for (final Slot s : slots) {
-							if (s.getSlotIndex() == j && s.inventory == ((ContainerWirelessCraftingTerminal) this.inventorySlots).getPlayerInv()) {
+							if (s.getSlotIndex() == j && s.inventory == ((ContainerWirelessCraftingTerminal) inventorySlots).getPlayerInv()) {
 								NetworkHandler.instance.sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
 								return true;
 							}
@@ -950,19 +951,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
-		this.subGui = true; // in case the gui is reopened later ( i'm looking
-							// at you NEI )
+		subGui = true; // in case the gui is reopened later ( i'm looking
+						// at you NEI )
 		Keyboard.enableRepeatEvents(false);
-		if (this.searchField.getText() != null) {
-			memoryText = this.searchField.getText();
+		if (searchField.getText() != null) {
+			memoryText = searchField.getText();
 		}
 	}
 
 	protected Slot getSlot(final int mouseX, final int mouseY) {
-		final List<Slot> slots = this.getInventorySlots();
+		final List<Slot> slots = getInventorySlots();
 		for (final Slot slot : slots) {
 			// isPointInRegion
-			if (this.func_146978_c(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mouseX, mouseY)) {
+			if (func_146978_c(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mouseX, mouseY)) {
 				return slot;
 			}
 		}
@@ -976,24 +977,24 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 		final int i = Mouse.getEventDWheel();
 		if (i != 0 && isShiftKeyDown()) {
-			final int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
-			final int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-			this.mouseWheelEvent(x, y, i / Math.abs(i));
+			final int x = Mouse.getEventX() * width / mc.displayWidth;
+			final int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+			mouseWheelEvent(x, y, i / Math.abs(i));
 		}
-		else if (i != 0 && this.scrollBar != null) {
-			this.scrollBar.wheel(i);
+		else if (i != 0 && scrollBar != null) {
+			scrollBar.wheel(i);
 		}
 	}
 
 	private void mouseWheelEvent(final int x, final int y, final int wheel) {
-		final Slot slot = this.getSlot(x, y);
+		final Slot slot = getSlot(x, y);
 		if (slot instanceof SlotME) {
 			final IAEItemStack item = ((SlotME) slot).getAEStack();
 			if (item != null) {
-				((ContainerWirelessCraftingTerminal) this.inventorySlots).setTargetStack(item);
+				((ContainerWirelessCraftingTerminal) inventorySlots).setTargetStack(item);
 				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
 				final int times = Math.abs(wheel);
-				final int inventorySize = this.getInventorySlots().size();
+				final int inventorySize = getInventorySlots().size();
 				for (int h = 0; h < times; h++) {
 					final PacketInventoryAction p = new PacketInventoryAction(direction, inventorySize, 0);
 					NetworkHandler.instance.sendToServer(p);
@@ -1007,7 +1008,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	}
 
 	protected void drawItem(final int x, final int y, final ItemStack is) {
-		this.zLevel = 100.0F;
+		zLevel = 100.0F;
 		itemRender.zLevel = 100.0F;
 
 		GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
@@ -1015,52 +1016,52 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		RenderHelper.enableGUIStandardItemLighting();
-		itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, is, x, y);
+		itemRender.renderItemAndEffectIntoGUI(fontRendererObj, mc.renderEngine, is, x, y);
 		GL11.glPopAttrib();
 
 		itemRender.zLevel = 0.0F;
-		this.zLevel = 0.0F;
+		zLevel = 0.0F;
 	}
 
 	protected String getGuiDisplayName(final String in) {
-		return this.hasCustomInventoryName() ? this.getInventoryName() : in;
+		return hasCustomInventoryName() ? getInventoryName() : in;
 	}
 
 	private boolean hasCustomInventoryName() {
-		if (this.inventorySlots instanceof ContainerWirelessCraftingTerminal) {
-			return ((ContainerWirelessCraftingTerminal) this.inventorySlots).getCustomName() != null;
+		if (inventorySlots instanceof ContainerWirelessCraftingTerminal) {
+			return ((ContainerWirelessCraftingTerminal) inventorySlots).getCustomName() != null;
 		}
 		return false;
 	}
 
 	private String getInventoryName() {
-		return ((ContainerWirelessCraftingTerminal) this.inventorySlots).getCustomName();
+		return ((ContainerWirelessCraftingTerminal) inventorySlots).getCustomName();
 	}
 
 	private void drawSlot(final Slot s) {
 		if (s instanceof SlotME) {
-			final RenderItem pIR = this.setItemRender(this.aeRenderItem);
+			final RenderItem pIR = setItemRender(aeRenderItem);
 			try {
-				this.zLevel = 100.0F;
+				zLevel = 100.0F;
 				itemRender.zLevel = 100.0F;
 
-				if (!this.isPowered()) {
+				if (!isPowered()) {
 					GL11.glDisable(GL11.GL_LIGHTING);
 					drawRect(s.xDisplayPosition, s.yDisplayPosition, 16 + s.xDisplayPosition, 16 + s.yDisplayPosition, 0x66111111);
 					GL11.glEnable(GL11.GL_LIGHTING);
 				}
 
-				this.zLevel = 0.0F;
+				zLevel = 0.0F;
 				itemRender.zLevel = 0.0F;
 
-				this.aeRenderItem.setAeStack(((SlotME) s).getAEStack());
+				aeRenderItem.setAeStack(((SlotME) s).getAEStack());
 
-				this.safeDrawSlot(s);
+				safeDrawSlot(s);
 			}
 			catch (final Exception err) {
 				WCTLog.warning("WCT prevented crash while drawing slot: " + err.toString());
 			}
-			this.setItemRender(pIR);
+			setItemRender(pIR);
 			return;
 		}
 		else {
@@ -1093,11 +1094,11 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 							final float f1 = 0.00390625F;
 							final float f = 0.00390625F;
 							final float par6 = 16;
-							tessellator.addVertexWithUV(par1 + 0, par2 + par6, this.zLevel, (par3 + 0) * f, (par4 + par6) * f1);
+							tessellator.addVertexWithUV(par1 + 0, par2 + par6, zLevel, (par3 + 0) * f, (par4 + par6) * f1);
 							final float par5 = 16;
-							tessellator.addVertexWithUV(par1 + par5, par2 + par6, this.zLevel, (par3 + par5) * f, (par4 + par6) * f1);
-							tessellator.addVertexWithUV(par1 + par5, par2 + 0, this.zLevel, (par3 + par5) * f, (par4 + 0) * f1);
-							tessellator.addVertexWithUV(par1 + 0, par2 + 0, this.zLevel, (par3 + 0) * f, (par4 + 0) * f1);
+							tessellator.addVertexWithUV(par1 + par5, par2 + par6, zLevel, (par3 + par5) * f, (par4 + par6) * f1);
+							tessellator.addVertexWithUV(par1 + par5, par2 + 0, zLevel, (par3 + par5) * f, (par4 + 0) * f1);
+							tessellator.addVertexWithUV(par1 + 0, par2 + 0, zLevel, (par3 + 0) * f, (par4 + 0) * f1);
 							tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, 1.0f);
 							tessellator.draw();
 						}
@@ -1112,7 +1113,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 						boolean isValid = s.isItemValid(is) || s instanceof SlotOutput || s instanceof AppEngCraftingSlot || s instanceof SlotDisabled || s instanceof SlotInaccessible || s instanceof SlotFake || s instanceof SlotRestrictedInput || s instanceof SlotDisconnected;
 						if (isValid && s instanceof SlotRestrictedInput) {
 							try {
-								isValid = ((SlotRestrictedInput) s).isValid(is, this.mc.theWorld);
+								isValid = ((SlotRestrictedInput) s).isValid(is, mc.theWorld);
 							}
 							catch (final Exception err) {
 								WCTLog.debug(err.getMessage());
@@ -1122,24 +1123,24 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 					}
 
 					if (((AppEngSlot) s).getIsValid() == hasCalculatedValidness.Invalid) {
-						this.zLevel = 100.0F;
+						zLevel = 100.0F;
 						itemRender.zLevel = 100.0F;
 
 						GL11.glDisable(GL11.GL_LIGHTING);
 						drawRect(s.xDisplayPosition, s.yDisplayPosition, 16 + s.xDisplayPosition, 16 + s.yDisplayPosition, 0x66ff6666);
 						GL11.glEnable(GL11.GL_LIGHTING);
 
-						this.zLevel = 0.0F;
+						zLevel = 0.0F;
 						itemRender.zLevel = 0.0F;
 					}
 				}
 
 				if (s instanceof AppEngSlot) {
 					((AppEngSlot) s).setDisplay(true);
-					this.safeDrawSlot(s);
+					safeDrawSlot(s);
 				}
 				else {
-					this.safeDrawSlot(s);
+					safeDrawSlot(s);
 				}
 
 				return;
@@ -1149,7 +1150,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 		}
 		// do the usual for non-ME Slots.
-		this.safeDrawSlot(s);
+		safeDrawSlot(s);
 	}
 
 	private RenderItem setItemRender(final RenderItem item) {
@@ -1165,14 +1166,14 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	@Override
 	protected void keyTyped(final char character, final int key) {
-		if (!this.checkHotbarKeys(key)) {
-			if (character == ' ' && this.searchField.getText().isEmpty()) {
+		if (!checkHotbarKeys(key)) {
+			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
 
-			if (this.searchField.textboxKeyTyped(character, key)) {
-				this.repo.setSearchString(this.searchField.getText());
-				this.repo.updateView();
+			if (searchField.textboxKeyTyped(character, key)) {
+				repo.setSearchString(searchField.getText());
+				repo.updateView();
 				this.setScrollBar();
 			}
 			else {
@@ -1182,7 +1183,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 	}
 
 	protected boolean isPowered() {
-		return this.repo.hasPower();
+		return repo.hasPower();
 	}
 
 	private void safeDrawSlot(final Slot s) {
@@ -1195,19 +1196,19 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	public void bindTexture(final String file) {
 		final ResourceLocation loc = new ResourceLocation(Reference.MODID, "textures/" + file);
-		this.mc.getTextureManager().bindTexture(loc);
+		mc.getTextureManager().bindTexture(loc);
 	}
 
 	public void func_146977_a(final Slot s) {
-		this.drawSlot(s);
+		drawSlot(s);
 	}
 
 	protected GuiScrollbar getScrollBar() {
-		return this.scrollBar;
+		return scrollBar;
 	}
 
 	protected List<InternalSlotME> getMeSlots() {
-		return this.meSlots;
+		return meSlots;
 	}
 
 	public static final synchronized boolean isSwitchingGuis() {
@@ -1220,7 +1221,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 
 	public List<String> handleItemTooltip(final ItemStack stack, final int mouseX, final int mouseY, final List<String> currentToolTip) {
 		if (stack != null) {
-			final Slot s = this.getSlot(mouseX, mouseY);
+			final Slot s = getSlot(mouseX, mouseY);
 			if (s instanceof SlotME) {
 				final int BigNumber = AEConfig.instance.useTerminalUseLargeFont() ? 999 : 9999;
 
@@ -1262,10 +1263,13 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		return currentToolTip;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({
+			"unchecked",
+			"rawtypes"
+	})
 	@Override
 	protected void renderToolTip(final ItemStack stack, final int x, final int y) {
-		final Slot s = this.getSlot(x, y);
+		final Slot s = getSlot(x, y);
 		if (s instanceof SlotME && stack != null) {
 			final int BigNumber = AEConfig.instance.useTerminalUseLargeFont() ? 999 : 9999;
 
@@ -1279,7 +1283,7 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 			}
 
 			if (myStack != null) {
-				final List<String> currentToolTip = stack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+				final List<String> currentToolTip = stack.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
 
 				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
 					currentToolTip.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize()));
@@ -1289,12 +1293,12 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 					currentToolTip.add("Items Requestable: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable()));
 				}
 
-				this.drawTooltip(x, y, 0, join(currentToolTip, "\n"));
+				drawTooltip(x, y, 0, join(currentToolTip, "\n"));
 			}
 			else if (stack.stackSize > BigNumber) {
-				final List var4 = stack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+				final List var4 = stack.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips);
 				var4.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(stack.stackSize));
-				this.drawTooltip(x, y, 0, join(var4, "\n"));
+				drawTooltip(x, y, 0, join(var4, "\n"));
 				return;
 			}
 		}
@@ -1302,48 +1306,110 @@ public class GuiWirelessCraftingTerminal extends GuiContainer implements ISortSo
 		// super.drawItemStackTooltip( stack, x, y );
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
-		if (this.SortByBox != null) {
-			this.SortByBox.set(this.configSrc.getSetting(Settings.SORT_BY));
+		if (SortByBox != null) {
+			SortByBox.set(configSrc.getSetting(Settings.SORT_BY));
 		}
 
-		if (this.SortDirBox != null) {
-			this.SortDirBox.set(this.configSrc.getSetting(Settings.SORT_DIRECTION));
+		if (SortDirBox != null) {
+			SortDirBox.set(configSrc.getSetting(Settings.SORT_DIRECTION));
 		}
 
-		if (this.ViewBox != null) {
-			this.ViewBox.set(this.configSrc.getSetting(Settings.VIEW_MODE));
+		if (ViewBox != null) {
+			ViewBox.set(configSrc.getSetting(Settings.VIEW_MODE));
 		}
 
-		this.repo.updateView();
+		repo.updateView();
 	}
 
 	public boolean isCustomSortOrder() {
-		return this.customSortOrder;
+		return customSortOrder;
 	}
 
 	void setCustomSortOrder(final boolean customSortOrder) {
 		this.customSortOrder = customSortOrder;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortBy() {
-		return this.configSrc.getSetting(Settings.SORT_BY);
+		return configSrc.getSetting(Settings.SORT_BY);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDir() {
-		return this.configSrc.getSetting(Settings.SORT_DIRECTION);
+		return configSrc.getSetting(Settings.SORT_DIRECTION);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enum getSortDisplay() {
-		return this.configSrc.getSetting(Settings.VIEW_MODE);
+		return configSrc.getSetting(Settings.VIEW_MODE);
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public int getAPIVersion() {
+		return 1;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public String getModName() {
+		return Reference.NAME;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public boolean isMouseTweaksDisabled() {
+		return true;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public boolean isWheelTweakDisabled() {
+		return true;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public boolean isCraftingOutputSlot(Object modContainer, Object slot) {
+		return false;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public Object getModContainer() {
+		return inventorySlots;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public int getModSlotCount(Object modContainer) {
+		return inventorySlots.inventorySlots.size();
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public Object getModSelectedSlot(Object modContainer, int slotCount) {
+		return null;
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public Object getModSlot(Object modContainer, int slotNumber) {
+		return inventorySlots.getSlot(slotNumber);
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public void clickModSlot(Object modContainer, Object slot, int mouseButton, boolean shiftPressed) {
+
+	}
+
+	@Override
+	@Method(modid = "MouseTweaks")
+	public void disableRMBDragIfRequired(Object modContainer, Object firstSlot, boolean shouldClick) {
+
 	}
 
 }

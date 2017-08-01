@@ -14,15 +14,22 @@ import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
 import appeng.api.util.IConfigManager;
-import appeng.items.tools.powered.powersink.AERootPoweredItem;
+import appeng.integration.IntegrationType;
+import appeng.items.tools.powered.powersink.AEBasePoweredItem;
+import appeng.transformer.annotations.Integration.Interface;
+import appeng.transformer.annotations.Integration.InterfaceList;
+import appeng.transformer.annotations.Integration.Method;
 import appeng.util.ConfigManager;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import ic2.api.item.IElectricItemManager;
+import ic2.api.item.ISpecialElectricItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -38,7 +45,11 @@ import net.p455w0rd.wirelesscraftingterminal.handlers.LocaleHandler;
 import net.p455w0rd.wirelesscraftingterminal.integration.EnderIO;
 import net.p455w0rd.wirelesscraftingterminal.reference.Reference;
 
-public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements IWirelessCraftingTerminalItem {
+@InterfaceList(value = {
+		@Interface(iface = "ic2.api.item.ISpecialElectricItem", iname = IntegrationType.IC2),
+		@Interface(iface = "ic2.api.item.IElectricItemManager", iname = IntegrationType.IC2)
+})
+public class ItemWirelessCraftingTerminal extends AEBasePoweredItem implements IWirelessCraftingTerminalItem, IElectricItemManager, ISpecialElectricItem {
 
 	public static final String LINK_KEY_STRING = "key";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
@@ -159,9 +170,7 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 
 	@Override
 	public boolean canHandle(final ItemStack is) {
-		if(is.getUnlocalizedName().equals("item.wirelessCraftingTerminal"))
-			return true;
-		return false;
+		return true;
 	}
 
 	@Override
@@ -194,7 +203,8 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	}
 
 	@SuppressWarnings({
-			"unchecked", "rawtypes"
+			"unchecked",
+			"rawtypes"
 	})
 	@Override
 	public void getCheckedSubItems(Item item, CreativeTabs creativeTab, List itemList) {
@@ -216,7 +226,8 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	}
 
 	@SuppressWarnings({
-			"rawtypes", "unchecked"
+			"rawtypes",
+			"unchecked"
 	})
 	@SideOnly(Side.CLIENT)
 	@Override
@@ -431,6 +442,105 @@ public class ItemWirelessCraftingTerminal extends AERootPoweredItem implements I
 	@Override
 	public int getMaxEnergyStored(ItemStack container) {
 		return (int) PowerUnits.AE.convertTo(PowerUnits.RF, getAEMaxPower(container));
+	}
+
+	//IC2
+
+	private double injectExtPower(final PowerUnits input, final ItemStack is, final double amount, final boolean simulate) {
+		if (simulate) {
+			final int requiredEU = (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(is) - getAECurrentPower(is));
+			if (amount < requiredEU) {
+				return 0;
+			}
+			return amount - requiredEU;
+		}
+		else {
+			final double powerRemainder = injectAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount));
+			return PowerUnits.AE.convertTo(PowerUnits.EU, powerRemainder);
+		}
+	}
+
+	@Override
+	public double charge(final ItemStack is, final double amount, final int tier, final boolean ignoreTransferLimit, final boolean simulate) {
+		double addedAmt = amount;
+		final double limit = getTransferLimit(is);
+
+		if (!ignoreTransferLimit && amount > limit) {
+			addedAmt = limit;
+		}
+
+		return addedAmt - ((int) injectExtPower(PowerUnits.EU, is, addedAmt, simulate));
+	}
+
+	@Override
+	public double discharge(final ItemStack itemStack, final double amount, final int tier, final boolean ignoreTransferLimit, final boolean externally, final boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	public double getCharge(final ItemStack is) {
+		return (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAECurrentPower(is));
+	}
+
+	@Override
+	public boolean canUse(final ItemStack is, final double amount) {
+		return getCharge(is) > amount;
+	}
+
+	@Override
+	public boolean use(final ItemStack is, final double amount, final EntityLivingBase entity) {
+		if (canUse(is, amount)) {
+			// use the power..
+			extractAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount));
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void chargeFromArmor(final ItemStack itemStack, final EntityLivingBase entity) {
+		// wtf?
+	}
+
+	@Override
+	public String getToolTip(final ItemStack itemStack) {
+		return null;
+	}
+
+	@Override
+	public boolean canProvideEnergy(final ItemStack itemStack) {
+		return false;
+	}
+
+	@Override
+	public Item getChargedItem(final ItemStack itemStack) {
+		return itemStack.getItem();
+	}
+
+	@Override
+	public Item getEmptyItem(final ItemStack itemStack) {
+		return itemStack.getItem();
+	}
+
+	@Override
+	public double getMaxCharge(final ItemStack itemStack) {
+		return PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(itemStack));
+	}
+
+	@Override
+	public int getTier(final ItemStack itemStack) {
+		return 1;
+	}
+
+	@Override
+	public double getTransferLimit(final ItemStack itemStack) {
+		return Math.max(32, getMaxCharge(itemStack) / 200);
+	}
+
+	@Override
+	@Method(iname = IntegrationType.IC2)
+	public IElectricItemManager getManager(final ItemStack itemStack) {
+		return this;
 	}
 
 }
