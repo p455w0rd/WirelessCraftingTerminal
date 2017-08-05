@@ -320,7 +320,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 					((ContainerWCT) inventorySlots).setTargetStack(stack);
 				}
 				else {
-					((AEBaseContainer) inventorySlots).setTargetStack(stack);
+					((WCTBaseContainer) inventorySlots).setTargetStack(stack);
 				}
 				final PacketInventoryAction p = new PacketInventoryAction(InventoryAction.MOVE_REGION, slotNum, 0);
 				NetworkHandler.instance().sendToServer(p);

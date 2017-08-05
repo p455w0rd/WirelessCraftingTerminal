@@ -24,6 +24,7 @@ import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.ClickType;
@@ -32,6 +33,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.Optional.Interface;
 import net.minecraftforge.fml.common.Optional.Method;
 import p455w0rd.wct.client.gui.widgets.GuiMagnetButton;
@@ -46,6 +48,8 @@ import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.container.slot.AppEngSlot;
 import p455w0rd.wct.container.slot.OptionalSlotFake;
+import p455w0rd.wct.container.slot.SlotAEBauble;
+import p455w0rd.wct.container.slot.SlotBooster;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotTrash;
@@ -53,6 +57,7 @@ import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
@@ -602,6 +607,16 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 	@Override
 	protected void keyTyped(final char character, final int key) throws IOException {
+		Slot slot = null;
+		try {
+			slot = ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, this, "theSlot", "field_147006_u", "f");
+		}
+		catch (final Throwable t) {
+		}
+		if (slot != null && ((slot instanceof SlotBooster && slot.getHasStack() && slot.getStack().getItem() == ModItems.BOOSTER_CARD) || (slot instanceof SlotAEBauble && slot.getHasStack() && slot.getStack().getItem() == ModItems.WCT))) {
+			//System.out.println("");
+			return;
+		}
 		if (!checkHotbarKeys(key)) {
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;

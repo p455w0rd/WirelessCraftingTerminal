@@ -15,15 +15,13 @@
  */
 package p455w0rd.wct.api;
 
-import appeng.api.implementations.items.IAEItemPowerStorage;
-import cofh.api.energy.IEnergyContainerItem;
 import net.minecraft.item.ItemStack;
 
 /**
  * @author p455w0rd
  *
  */
-public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHandler, IAEItemPowerStorage, IEnergyContainerItem {
+public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHandler {
 
 	// checks if an Infinity Booster Caqrd is installed on the WCT
 	public boolean checkForBooster(final ItemStack wirelessTerminal);

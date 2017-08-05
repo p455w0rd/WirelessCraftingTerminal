@@ -80,6 +80,7 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		super(ModConfig.WCT_MAX_POWER);
 		setRegistryName(name);
 		setUnlocalizedName(name);
+		setMaxStackSize(1);
 		GameRegistry.register(this);
 	}
 
@@ -209,7 +210,10 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public boolean canHandle(ItemStack is) {
-		return true;
+		if (is.getItem().getRegistryName().toString().equals(getRegistryName().toString())) {
+			return true;
+		}
+		return false;
 	}
 
 	private double injectPower(PowerUnits inputUnit, final ItemStack is, final double amount, final boolean simulate) {
@@ -308,19 +312,19 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		checkForBooster(wirelessTerminal);
 	}
 
-	@Optional.Method(modid = "Baubles|API")
+	//@Optional.Method(modid = "Baubles|API")
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
 		return BaubleType.HEAD;
 	}
 
-	@Optional.Method(modid = "Baubles|API")
+	//@Optional.Method(modid = "Baubles|API")
 	@Override
 	public IBaubleRender getRender() {
 		return RenderLayerWCT.getInstance();
 	}
 
-	@Optional.Method(modid = "Baubles|API")
+	//@Optional.Method(modid = "Baubles|API")
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
 		return true;

@@ -61,7 +61,7 @@ import p455w0rd.wct.sync.packets.PacketValueConfig;
 public abstract class WCTBaseContainer extends Container {
 
 	protected final InventoryPlayer inventoryPlayer;
-	protected final BaseActionSource mySrc;
+	protected BaseActionSource mySrc;
 	protected final HashSet<Integer> locked = new HashSet<Integer>();
 	public final WCTGuiObject obj;
 	protected final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
@@ -83,7 +83,9 @@ public abstract class WCTBaseContainer extends Container {
 		if (obj == null) {
 			setValidContainer(false);
 		}
-		mySrc = new WCTPlayerSource(ip.player, getActionHost(anchor));
+		else {
+			mySrc = new WCTPlayerSource(ip.player, getActionHost(obj));
+		}
 		prepareSync();
 	}
 

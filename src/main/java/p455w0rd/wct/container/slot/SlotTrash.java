@@ -94,14 +94,19 @@ public class SlotTrash extends AppEngSlot {
 	}
 
 	public void writeNBT() {
-		NBTTagCompound nbtTagCompound = WCTUtils.getWirelessTerm(entityPlayer.inventory).getTagCompound();
+		ItemStack terminal = WCTUtils.getWirelessTerm(entityPlayer.inventory);
+		NBTTagCompound nbtTagCompound = terminal != null ? terminal.getTagCompound() : null;
+		if (nbtTagCompound == null) {
+			nbtTagCompound = new NBTTagCompound();
+		}
 		NBTTagList tagList = new NBTTagList();
+		nbtTagCompound.setTag(name, tagList);
 		if (itemStack != null) {
 			NBTTagCompound tagCompound = new NBTTagCompound();
 			itemStack.writeToNBT(tagCompound);
 			tagList.appendTag(tagCompound);
 		}
-		nbtTagCompound.setTag(name, tagList);
+
 	}
 
 	@Override

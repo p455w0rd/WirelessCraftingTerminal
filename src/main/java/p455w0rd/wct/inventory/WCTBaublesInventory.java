@@ -1,11 +1,15 @@
 package p455w0rd.wct.inventory;
 
+import java.util.Locale;
+
+import baubles.api.IBauble;
 import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.integration.Baubles;
 
@@ -25,7 +29,7 @@ public class WCTBaublesInventory implements IInventory {
 
 	@Override
 	public String getName() {
-		return Mods.BAUBLES.getId();
+		return ModGlobals.MODID + ":" + Mods.BAUBLES.getId().toLowerCase(Locale.US) + "_inventory";
 	}
 
 	@Override
@@ -35,7 +39,7 @@ public class WCTBaublesInventory implements IInventory {
 
 	@Override
 	public ITextComponent getDisplayName() {
-		return new TextComponentString(getName());
+		return new TextComponentTranslation(getName());
 	}
 
 	@Override
@@ -90,7 +94,8 @@ public class WCTBaublesInventory implements IInventory {
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return baubles.isItemValidForSlot(index, stack, player);
+		return stack.getItem() instanceof IBauble;
+		//return baubles.isItemValidForSlot(index, stack, player);
 	}
 
 	@Override
