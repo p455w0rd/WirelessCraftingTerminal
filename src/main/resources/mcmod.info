@@ -1,0 +1,10 @@
+[{
+    "modid": "wct",
+    "name": "Wireless Crafting Terminal 2",
+    "description": "Adds a wireless version of the AE2 crafting terminal",
+    "version": "${version}",
+    "mcversion": "1.10.2",
+	"url": "",
+    "authorList": ["TheRealp455w0rd"],
+    "logoFile": ""
+}]

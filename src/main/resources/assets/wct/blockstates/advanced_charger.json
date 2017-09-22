@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "normal": {
+            "model": "appliedenergistics2:charger"
+        },
+		"inventory": {
+            "model": "appliedenergistics2:charger"
+        }
+    }
+}

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>WirelessCraftingTerminal</name>
-	<comment/>
-	<projects>
-		<project>Minecraft</project>
-		<project>RemoteSystemsTempFiles</project>
-	</projects>
+	<name>WirelessCraftingTerminal 2 - 1.12</name>
+	<comment></comment>
+	<projects/>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
