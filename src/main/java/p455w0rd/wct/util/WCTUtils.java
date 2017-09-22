@@ -76,7 +76,7 @@ public class WCTUtils {
 			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
 			if (nbtTC.hasKey("MagnetSlot")) {
 				NBTTagList magnetSlot = nbtTC.getTagList("MagnetSlot", 10);
-				ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetSlot.getCompoundTagAt(0));
+				ItemStack magnetItem = new ItemStack(magnetSlot.getCompoundTagAt(0));
 				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
 					return magnetItem;
 				}
@@ -118,7 +118,7 @@ public class WCTUtils {
 		if (getWirelessTerm(ip) != null && getWirelessTerm(ip).hasTagCompound() && getWirelessTerm(ip).getTagCompound().hasKey("MagnetSlot")) {
 			NBTTagCompound magnetNBTForm = getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
 			if (magnetNBTForm != null) {
-				ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
+				ItemStack magnetItem = new ItemStack(magnetNBTForm);
 				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
 					return true;
 				}

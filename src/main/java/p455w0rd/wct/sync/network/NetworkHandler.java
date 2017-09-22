@@ -1,14 +1,11 @@
 package p455w0rd.wct.sync.network;
 
-import appeng.core.worlddata.WorldData;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import p455w0rd.wct.sync.WCTPacket;
@@ -70,22 +67,23 @@ public class NetworkHandler {
 		getEventChannel().sendToServer(message.getProxy());
 	}
 
-	@SubscribeEvent
-	public void onPlayerLogin(PlayerLoggedInEvent e) {
-		if (e.player instanceof EntityPlayerMP) {
-			WorldData.instance().dimensionData().sendToPlayer(null);
+	/*
+		@SubscribeEvent
+		public void onPlayerLogin(PlayerLoggedInEvent e) {
+			if (e.player instanceof EntityPlayerMP) {
+				WorldData.instance().dimensionData().sendToPlayer(null);
+			}
 		}
-	}
-
-	@SubscribeEvent
-	public void newConnection(final ServerConnectionFromClientEvent ev) {
-		WorldData.instance().dimensionData().sendToPlayer(ev.getManager());
-	}
-
+	
+		@SubscribeEvent
+		public void newConnection(final ServerConnectionFromClientEvent ev) {
+			WorldData.instance().dimensionData().sendToPlayer(ev.getManager());
+		}
+	*/
 	@SubscribeEvent
 	public void serverPacket(final ServerCustomPacketEvent ev) {
 		final NetHandlerPlayServer srv = (NetHandlerPlayServer) ev.getPacket().handler();
-		WCTServerPacketHandler.instance().onPacketData(null, ev.getHandler(), ev.getPacket(), srv.playerEntity);
+		WCTServerPacketHandler.instance().onPacketData(null, ev.getHandler(), ev.getPacket(), srv.player);
 	}
 
 	@SubscribeEvent

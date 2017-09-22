@@ -59,12 +59,12 @@ public class WCTInventoryMagnetFilter implements IInventory {
 	public ItemStack decrStackSize(int slot, int amount) {
 		ItemStack stack = getStackInSlot(slot);
 		if (stack != null) {
-			if (stack.stackSize > amount) {
+			if (stack.getCount() > amount) {
 				stack = stack.splitStack(amount);
 				markDirty();
 			}
 			else {
-				setInventorySlotContents(slot, null);
+				setInventorySlotContents(slot, ItemStack.EMPTY);
 			}
 		}
 		return stack;
@@ -74,8 +74,8 @@ public class WCTInventoryMagnetFilter implements IInventory {
 	public void setInventorySlotContents(int slot, ItemStack stack) {
 		inventory[slot] = stack;
 
-		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
-			stack.stackSize = getInventoryStackLimit();
+		if (!stack.isEmpty() && stack.getCount() > getInventoryStackLimit()) {
+			stack.setCount(getInventoryStackLimit());
 		}
 		markDirty();
 	}
@@ -103,7 +103,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
 			int slot = tagCompound.getInteger("Slot");
 			if (slot >= 0 && slot < inventory.length) {
-				inventory[slot] = ItemStack.loadItemStackFromNBT(tagCompound);
+				inventory[slot] = new ItemStack(tagCompound);
 			}
 		}
 	}
@@ -128,7 +128,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -155,5 +155,18 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public void clear() {
+		for (int i = 0; i < inventory.length; i++) {
+			setInventorySlotContents(i, ItemStack.EMPTY);
+		}
+	}
+
+	@Override
+	public boolean isEmpty() {
+		for (int i = 0; i < inventory.length; i++) {
+			if (!getStackInSlot(i).isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

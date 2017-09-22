@@ -60,7 +60,7 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
 @JEIPlugin
 public class JEI implements IModPlugin {
 
-	public static final String MODID = "JEI";
+	public static final String MODID = "jei";
 
 	@Override
 	public void register(@Nonnull IModRegistry registry) {
@@ -100,11 +100,6 @@ public class JEI implements IModPlugin {
 		@Override
 		public Class<T> getContainerClass() {
 			return containerClass;
-		}
-
-		@Override
-		public String getRecipeCategoryUid() {
-			return VanillaRecipeCategoryUid.CRAFTING;
 		}
 
 		@Nullable

@@ -65,7 +65,7 @@ public class PacketSetMagnet extends WCTPacket {
 			}
 			NBTTagList magnetNBTForm = wct.getTagCompound().getTagList("MagnetSlot", 10);
 			if (magnetNBTForm.getCompoundTagAt(0) != null) {
-				ItemStack.loadItemStackFromNBT(magnetNBTForm.getCompoundTagAt(0)).getTagCompound().setInteger("MagnetMode", magnetDamage);
+				new ItemStack(magnetNBTForm.getCompoundTagAt(0)).getTagCompound().setInteger("MagnetMode", magnetDamage);
 				magnetNBTForm.set(0, magnetItem.serializeNBT());
 			}
 			if (Mods.BAUBLES.isLoaded()) {

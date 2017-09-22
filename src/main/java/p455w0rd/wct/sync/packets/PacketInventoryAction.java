@@ -12,6 +12,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerOpenContext;
@@ -155,11 +156,12 @@ public class PacketInventoryAction extends WCTPacket {
 	@Override
 	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
 		if (action == InventoryAction.UPDATE_HAND) {
+			ClientHelper ch = new ClientHelper();
 			if (slotItem == null) {
-				ClientHelper.proxy.getPlayers().get(0).inventory.setItemStack(null);
+				ch.getPlayers().get(0).inventory.setItemStack(ItemStack.EMPTY);
 			}
 			else {
-				ClientHelper.proxy.getPlayers().get(0).inventory.setItemStack(slotItem.getItemStack());
+				ch.getPlayers().get(0).inventory.setItemStack(slotItem.getItemStack());
 			}
 		}
 	}

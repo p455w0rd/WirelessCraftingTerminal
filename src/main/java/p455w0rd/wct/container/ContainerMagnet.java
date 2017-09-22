@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -94,26 +96,26 @@ public class ContainerMagnet extends Container {
 			return null;
 		}
 		InventoryPlayer inventoryplayer = player.inventory;
-		ItemStack itemstack3;
-		ItemStack stack = null;
+		ItemStack itemstack3 = ItemStack.EMPTY;
+		ItemStack stack = ItemStack.EMPTY;
 		int sizeOrID;
 		if (slotNum == -999 || clickTypeIn == ClickType.THROW) {
 
-			if (inventoryplayer.getItemStack() != null) {
+			if (!inventoryplayer.getItemStack().isEmpty()) {
 				if (dragType == 0) {
 					player.dropItem(inventoryplayer.getItemStack(), true);
-					inventoryplayer.setItemStack((ItemStack) null);
+					inventoryplayer.setItemStack(ItemStack.EMPTY);
 				}
 
 				if (dragType == 1) {
 					player.dropItem(inventoryplayer.getItemStack().splitStack(1), true);
 
-					if (inventoryplayer.getItemStack().stackSize == 0) {
-						inventoryplayer.setItemStack((ItemStack) null);
+					if (inventoryplayer.getItemStack().getCount() == 0) {
+						inventoryplayer.setItemStack(ItemStack.EMPTY);
 					}
 				}
 			}
-			return null;
+			return ItemStack.EMPTY;
 		}
 
 		//Click+drag stack
@@ -127,7 +129,7 @@ public class ContainerMagnet extends Container {
 			if ((currentDistributeState != 1 || distributeState != 2) && currentDistributeState != distributeState) {
 				resetDistributionVariables();
 			}
-			else if (inventoryplayer.getItemStack() == null) {
+			else if (inventoryplayer.getItemStack().isEmpty()) {
 				resetDistributionVariables();
 			}
 			else if (distributeState == 0) {
@@ -144,41 +146,41 @@ public class ContainerMagnet extends Container {
 			else if (distributeState == 1) {
 				Slot slot = inventorySlots.get(slotNum);
 
-				if (slot != null && stackFitsInSlot(slot, inventoryplayer.getItemStack(), true) && slot.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().stackSize > distributeSlotSet.size() && canDragIntoSlot(slot)) {
+				if (slot != null && stackFitsInSlot(slot, inventoryplayer.getItemStack(), true) && slot.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().getCount() > distributeSlotSet.size() && canDragIntoSlot(slot)) {
 					distributeSlotSet.add(slot);
 				}
 			}
 			else if (distributeState == 2) {
 				if (!distributeSlotSet.isEmpty()) {
 					itemstack3 = inventoryplayer.getItemStack().copy();
-					sizeOrID = inventoryplayer.getItemStack().stackSize;
+					sizeOrID = inventoryplayer.getItemStack().getCount();
 					Iterator<Slot> iterator = distributeSlotSet.iterator();
 
 					while (iterator.hasNext()) {
 						Slot slot1 = iterator.next();
 
-						if (slot1 != null && stackFitsInSlot(slot1, inventoryplayer.getItemStack(), true) && slot1.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().stackSize >= distributeSlotSet.size() && canDragIntoSlot(slot1)) {
+						if (slot1 != null && stackFitsInSlot(slot1, inventoryplayer.getItemStack(), true) && slot1.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().getCount() >= distributeSlotSet.size() && canDragIntoSlot(slot1)) {
 							ItemStack itemstack1 = itemstack3.copy();
-							int j1 = slot1.getHasStack() ? slot1.getStack().stackSize : 0;
+							int j1 = slot1.getHasStack() ? slot1.getStack().getCount() : 0;
 							setSlotStack(distributeSlotSet, pressedKeyInRange, itemstack1, j1);
 
-							if (itemstack1.stackSize > itemstack1.getMaxStackSize()) {
-								itemstack1.stackSize = itemstack1.getMaxStackSize();
+							if (itemstack1.getCount() > itemstack1.getMaxStackSize()) {
+								itemstack1.setCount(itemstack1.getMaxStackSize());
 							}
 
-							if (itemstack1.stackSize > slot1.getSlotStackLimit()) {
-								itemstack1.stackSize = slot1.getSlotStackLimit();
+							if (itemstack1.getCount() > slot1.getSlotStackLimit()) {
+								itemstack1.setCount(slot1.getSlotStackLimit());
 							}
 
-							sizeOrID -= itemstack1.stackSize - j1;
+							sizeOrID -= itemstack1.getCount() - j1;
 							slot1.putStack(itemstack1);
 						}
 					}
 
-					itemstack3.stackSize = sizeOrID;
+					itemstack3.setCount(sizeOrID);
 
-					if (itemstack3.stackSize <= 0) {
-						itemstack3 = null;
+					if (itemstack3.getCount() <= 0) {
+						itemstack3 = ItemStack.EMPTY;
 					}
 
 					inventoryplayer.setItemStack(itemstack3);
@@ -200,27 +202,27 @@ public class ContainerMagnet extends Container {
 			SlotMagnetFilter slot = (SlotMagnetFilter) getSlot(slotNum);
 
 			ItemStack stackSlot = slot.getStack();
-			if (alreadyFiltered(player.inventory.getItemStack()) && player.inventory.getItemStack() != null) {
-				return null;
+			if (alreadyFiltered(player.inventory.getItemStack()) && !player.inventory.getItemStack().isEmpty()) {
+				return ItemStack.EMPTY;
 			}
-			if (stackSlot != null) {
+			if (!stackSlot.isEmpty()) {
 				stack = stackSlot.copy();
 			}
 
 			if (dragType == 2) {
-				fillPhantomSlot(slot, null, clickTypeIn);
+				fillPhantomSlot(slot, ItemStack.EMPTY, clickTypeIn);
 			}
 			else if (dragType == 0 || dragType == 1) {
 				InventoryPlayer playerInv = player.inventory;
 
 				ItemStack stackHeld = playerInv.getItemStack();
 
-				if (stackSlot == null) {
-					if (stackHeld != null && slot.isItemValid(stackHeld)) {
+				if (stackSlot.isEmpty()) {
+					if (!stackHeld.isEmpty() && slot.isItemValid(stackHeld)) {
 						fillPhantomSlot(slot, stackHeld, clickTypeIn);
 					}
 				}
-				else if (stackHeld == null) {
+				else if (stackHeld.isEmpty()) {
 					adjustPhantomSlot(slot, dragType, clickTypeIn);
 				}
 				else if (slot.isItemValid(stackHeld)) {
@@ -245,24 +247,24 @@ public class ContainerMagnet extends Container {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static void setSlotStack(Set slotSet, int stackSizeSelector, ItemStack stackToResize, int currentSlotStackSize) {
+	public static void setSlotStack(Set slotSet, int stackSizeSelector, @Nonnull ItemStack stackToResize, int currentSlotStackSize) {
 		switch (stackSizeSelector) {
 		case 0:
-			stackToResize.stackSize = MathUtils.floor((float) stackToResize.stackSize / (float) slotSet.size());
+			stackToResize.setCount(MathUtils.floor((float) stackToResize.getCount() / (float) slotSet.size()));
 			break;
 		case 1:
-			stackToResize.stackSize = 1;
+			stackToResize.setCount(1);
 		}
 
-		stackToResize.stackSize += currentSlotStackSize;
+		stackToResize.grow(currentSlotStackSize);
 	}
 
-	public static boolean stackFitsInSlot(Slot slot, ItemStack itemStack, boolean sizeMatters) {
+	public static boolean stackFitsInSlot(Slot slot, @Nonnull ItemStack itemStack, boolean sizeMatters) {
 		boolean flag1 = slot == null || !slot.getHasStack();
 
-		if (slot != null && slot.getHasStack() && itemStack != null && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack)) {
-			int i = sizeMatters ? 0 : itemStack.stackSize;
-			flag1 |= slot.getStack().stackSize + i <= itemStack.getMaxStackSize();
+		if (slot != null && slot.getHasStack() && !itemStack.isEmpty() && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack)) {
+			int i = sizeMatters ? 0 : itemStack.getCount();
+			flag1 |= slot.getStack().getCount() + i <= itemStack.getMaxStackSize();
 		}
 
 		return flag1;
@@ -291,12 +293,12 @@ public class ContainerMagnet extends Container {
 			return;
 		}
 		for (int i = 0; i < invSize; i++) {
-			if (magnetInventory.getStackInSlot(i) == null) {
+			if (magnetInventory.getStackInSlot(i).isEmpty()) {
 				for (int j = 0; j < invSize; j++) {
 					if (j <= i) {
 						continue;
 					}
-					if (magnetInventory.getStackInSlot(j) != null) {
+					if (!magnetInventory.getStackInSlot(j).isEmpty()) {
 						magnetInventory.setInventorySlotContents(i, magnetInventory.getStackInSlot(j));
 						magnetInventory.decrStackSize(j, 1);
 						break;
@@ -306,22 +308,22 @@ public class ContainerMagnet extends Container {
 		}
 	}
 
-	private void fillPhantomSlot(SlotMagnetFilter slot, ItemStack stackHeld, ClickType clickType) {
+	private void fillPhantomSlot(SlotMagnetFilter slot, @Nonnull ItemStack stackHeld, ClickType clickType) {
 		if (!slot.canAdjustPhantom()) {
 			return;
 		}
-		if (stackHeld == null) {
-			slot.putStack(null);
+		if (stackHeld.isEmpty()) {
+			slot.putStack(ItemStack.EMPTY);
 			return;
 		}
 
-		int stackSize = clickType == ClickType.QUICK_MOVE ? stackHeld.stackSize : 1;
+		int stackSize = clickType == ClickType.QUICK_MOVE ? stackHeld.getCount() : 1;
 		if (stackSize > slot.getSlotStackLimit()) {
 			stackSize = slot.getSlotStackLimit();
 		}
 		ItemStack phantomStack = stackHeld.copy();
 		WCTUtils.removeTimerTags(phantomStack);
-		phantomStack.stackSize = stackSize;
+		phantomStack.setCount(stackSize);
 
 		slot.putStack(phantomStack);
 		arrangeSlots();
@@ -334,20 +336,20 @@ public class ContainerMagnet extends Container {
 		ItemStack stackSlot = slot.getStack();
 		int stackSize;
 		if (clickType == ClickType.QUICK_CRAFT) {
-			stackSize = mouseButton == 0 ? (stackSlot.stackSize + 1) / 2 : stackSlot.stackSize * 2;
+			stackSize = mouseButton == 0 ? (stackSlot.getCount() + 1) / 2 : stackSlot.getCount() * 2;
 		}
 		else {
-			stackSize = mouseButton == 0 ? stackSlot.stackSize - 1 : stackSlot.stackSize + 1;
+			stackSize = mouseButton == 0 ? stackSlot.getCount() - 1 : stackSlot.getCount() + 1;
 		}
 
 		if (stackSize > slot.getSlotStackLimit()) {
 			stackSize = slot.getSlotStackLimit();
 		}
 
-		stackSlot.stackSize = stackSize;
+		stackSlot.setCount(stackSize);
 
-		if (stackSlot.stackSize <= 0) {
-			stackSlot = null;
+		if (stackSlot.getCount() <= 0) {
+			stackSlot = ItemStack.EMPTY;
 		}
 
 		slot.putStack(stackSlot);
@@ -357,47 +359,47 @@ public class ContainerMagnet extends Container {
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int slotIndex) {
 		Slot slot = inventorySlots.get(slotIndex);
-		if (slot == null || slot.getStack() == null) {
-			return null;
+		if (slot == null || slot.getStack().isEmpty()) {
+			return ItemStack.EMPTY;
 		}
 		ItemStack stack = slot.getStack();
 		if (isInHotbar(slotIndex)) {
 			if (!mergePhantomStack(stack)) {
 				if (!mergeItemStack(stack, PLAYER_INV_START, PLAYER_INV_END + 1, false)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			}
 			else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
 		else if (isInPlayerInventory(slotIndex)) {
 			if (!mergePhantomStack(stack)) {
 				if (!mergeItemStack(stack, HOTBAR_START, HOTBAR_END + 1, false)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			}
 			else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
 		else {
-			return null;
+			return ItemStack.EMPTY;
 		}
-		if (stack.stackSize == 0) {
-			slot.putStack((ItemStack) null);
+		if (stack.getCount() == 0) {
+			slot.putStack(ItemStack.EMPTY);
 		}
 		else {
 			slot.onSlotChanged();
 		}
-		slot.onPickupFromSlot(p, stack);
+		slot.onTake(p, stack);
 		return stack;
 	}
 
-	protected boolean mergePhantomStack(ItemStack stack) {
+	protected boolean mergePhantomStack(@Nonnull ItemStack stack) {
 		if (!alreadyFiltered(stack)) {
 			for (int i = FILTERS_START; i <= FILTERS_END; i++) {
-				if (getSlot(i).getStack() != null) {
+				if (!getSlot(i).getStack().isEmpty()) {
 					continue;
 				}
 				else {
@@ -409,12 +411,12 @@ public class ContainerMagnet extends Container {
 		return false;
 	}
 
-	public boolean isIdenticalItem(ItemStack lhs, ItemStack rhs) {
+	public boolean isIdenticalItem(@Nonnull ItemStack lhs, @Nonnull ItemStack rhs) {
 		if (lhs == rhs) {
 			return true;
 		}
 
-		if (lhs == null || rhs == null) {
+		if (lhs.isEmpty() || rhs.isEmpty()) {
 			return false;
 		}
 
@@ -432,14 +434,14 @@ public class ContainerMagnet extends Container {
 	}
 
 	@Override
-	protected boolean mergeItemStack(ItemStack stack, int start, int end, boolean backwards) {
+	protected boolean mergeItemStack(@Nonnull ItemStack stack, int start, int end, boolean backwards) {
 		boolean flag1 = false;
 		int k = (backwards ? end - 1 : start);
 		Slot slot;
-		ItemStack itemstack1;
+		ItemStack itemstack1 = ItemStack.EMPTY;
 
 		if (stack.isStackable()) {
-			while (stack.stackSize > 0 && (!backwards && k < end || backwards && k >= start)) {
+			while (stack.getCount() > 0 && (!backwards && k < end || backwards && k >= start)) {
 				slot = inventorySlots.get(k);
 				itemstack1 = slot.getStack();
 
@@ -448,18 +450,18 @@ public class ContainerMagnet extends Container {
 					continue;
 				}
 
-				if (itemstack1 != null && itemstack1.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(stack, itemstack1)) {
-					int l = itemstack1.stackSize + stack.stackSize;
+				if (!itemstack1.isEmpty() && itemstack1.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(stack, itemstack1)) {
+					int l = itemstack1.getCount() + stack.getCount();
 
 					if (l <= stack.getMaxStackSize() && l <= slot.getSlotStackLimit()) {
-						stack.stackSize = 0;
-						itemstack1.stackSize = l;
+						stack.setCount(0);
+						itemstack1.setCount(l);
 						magnetInventory.markDirty();
 						flag1 = true;
 					}
-					else if (itemstack1.stackSize < stack.getMaxStackSize() && l < slot.getSlotStackLimit()) {
-						stack.stackSize -= stack.getMaxStackSize() - itemstack1.stackSize;
-						itemstack1.stackSize = stack.getMaxStackSize();
+					else if (itemstack1.getCount() < stack.getMaxStackSize() && l < slot.getSlotStackLimit()) {
+						stack.shrink(stack.getMaxStackSize() - itemstack1.getCount());
+						itemstack1.setCount(stack.getMaxStackSize());
 						magnetInventory.markDirty();
 						flag1 = true;
 					}
@@ -468,7 +470,7 @@ public class ContainerMagnet extends Container {
 				k += (backwards ? -1 : 1);
 			}
 		}
-		if (stack.stackSize > 0) {
+		if (stack.getCount() > 0) {
 			k = (backwards ? end - 1 : start);
 			while (!backwards && k < end || backwards && k >= start) {
 				slot = inventorySlots.get(k);
@@ -479,18 +481,18 @@ public class ContainerMagnet extends Container {
 					continue;
 				}
 
-				if (itemstack1 == null) {
-					int l = stack.stackSize;
+				if (itemstack1.isEmpty()) {
+					int l = stack.getCount();
 					if (l <= slot.getSlotStackLimit()) {
 						slot.putStack(stack.copy());
-						stack.stackSize = 0;
+						stack.setCount(0);
 						magnetInventory.markDirty();
 						flag1 = true;
 						break;
 					}
 					else {
 						putStackInSlot(k, new ItemStack(stack.getItem(), slot.getSlotStackLimit(), stack.getItemDamage()));
-						stack.stackSize -= slot.getSlotStackLimit();
+						stack.shrink(slot.getSlotStackLimit());
 						magnetInventory.markDirty();
 						flag1 = true;
 					}

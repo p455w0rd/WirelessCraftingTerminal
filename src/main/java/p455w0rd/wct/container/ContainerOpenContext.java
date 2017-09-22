@@ -1,8 +1,8 @@
 package p455w0rd.wct.container;
 
 import appeng.api.parts.IPart;
+import appeng.api.util.AEPartLocation;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -13,7 +13,7 @@ public class ContainerOpenContext {
 	private int x;
 	private int y;
 	private int z;
-	private EnumFacing side;
+	private AEPartLocation side;
 
 	public ContainerOpenContext(final Object myItem) {
 		final boolean isWorld = myItem instanceof IPart || myItem instanceof TileEntity;
@@ -27,11 +27,11 @@ public class ContainerOpenContext {
 		return getWorld().getTileEntity(new BlockPos(getX(), getY(), getZ()));
 	}
 
-	public EnumFacing getSide() {
+	public AEPartLocation getSide() {
 		return side;
 	}
 
-	public void setSide(final EnumFacing side) {
+	public void setSide(final AEPartLocation side) {
 		this.side = side;
 	}
 
