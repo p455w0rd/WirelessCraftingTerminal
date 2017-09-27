@@ -10,6 +10,8 @@ import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotAEBauble;
 import p455w0rd.wct.inventory.WCTBaublesInventory;
+import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.sync.packets.PacketBaubleSync;
 
 /**
  * @author p455w0rd
@@ -71,6 +73,12 @@ public class Baubles {
 
 	public static boolean isBaubleSlot(Slot slot) {
 		return slot instanceof SlotBauble;
+	}
+
+	public static void doForcedSync(EntityPlayer player, ItemStack stack) {
+		int slot = getWCTBaubleSlotIndex(player);
+		//NetworkHandler.instance().sendToDimension(new PacketBaubleSync(slot, stack), player.getEntityWorld().provider.getDimension());
+		NetworkHandler.instance().sendToServer(new PacketBaubleSync(slot, stack));
 	}
 
 }

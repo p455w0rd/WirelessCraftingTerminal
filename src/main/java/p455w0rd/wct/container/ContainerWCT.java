@@ -430,6 +430,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					}
 				}
 			}
+
 			break;
 		case PICKUP_OR_SET_DOWN:
 			if (getPowerSource() == null || getCellInventory() == null) {
@@ -551,7 +552,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			break;
 
 		}
-
+		//detectAndSendChanges();
+		//writeToNBT();
+		//updateCraftingMatrix();
 	}
 
 	private void updateCraftingMatrix() {
@@ -582,12 +585,12 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void saveChanges() {
-		// :P
+		writeToNBT();
 	}
 
 	@Override
-	public void onChangeInventory(final IInventory inv, final int slot, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack) {
-		// <3
+	public void onChangeInventory(final IInventory inv, final int slotIn, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack) {
+
 	}
 
 	@Override
@@ -893,8 +896,14 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 		boosterInventory.writeNBT(containerstack.getTagCompound());
 		magnetInventory.writeNBT(containerstack.getTagCompound());
-		//trashInventory.writeNBT(containerstack.getTagCompound());
+		trashInventory.writeNBT(containerstack.getTagCompound());
 		craftingGrid.writeNBT(containerstack.getTagCompound());
+
+		if (Mods.BAUBLES.isLoaded()) {
+			if (!Platform.isClient()) {
+				Baubles.doForcedSync(inventoryPlayer.player, containerstack);
+			}
+		}
 	}
 
 	@Override

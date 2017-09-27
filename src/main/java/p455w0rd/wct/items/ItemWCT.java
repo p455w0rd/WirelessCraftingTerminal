@@ -44,10 +44,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -82,6 +87,57 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		setUnlocalizedName(name);
 		setMaxStackSize(1);
 		GameRegistry.register(this);
+	}
+
+	@Override
+	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
+		return new ICapabilityProvider() {
+
+			@Override
+			public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+				return capability == CapabilityEnergy.ENERGY; // || stack.hasCapability(capability, facing);
+			}
+
+			@Override
+			public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+				return capability != CapabilityEnergy.ENERGY ? null : CapabilityEnergy.ENERGY.cast(new IEnergyStorage() {
+
+					ItemWCT item = (ItemWCT) stack.getItem();
+
+					@Override
+					public int receiveEnergy(int maxReceive, boolean simulate) {
+						return item.receiveEnergy(stack, maxReceive, simulate);
+					}
+
+					@Override
+					public int extractEnergy(int maxExtract, boolean simulate) {
+						return 0;
+					}
+
+					@Override
+					public int getEnergyStored() {
+						return item.getEnergyStored(stack);
+					}
+
+					@Override
+					public int getMaxEnergyStored() {
+						return item.getMaxEnergyStored(stack);
+					}
+
+					@Override
+					public boolean canExtract() {
+						return false;
+					}
+
+					@Override
+					public boolean canReceive() {
+						return true;
+					}
+
+				});
+			}
+
+		};
 	}
 
 	@Override
