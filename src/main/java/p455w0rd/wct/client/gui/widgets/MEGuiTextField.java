@@ -2,6 +2,10 @@ package p455w0rd.wct.client.gui.widgets;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 /**
  * A modified version of the Minecraft text field.
@@ -18,6 +22,7 @@ public class MEGuiTextField extends GuiTextField {
 	private final int _yPos;
 	private final int _width;
 	private final int _height;
+	private int selectionColor = 0xFF00FF00;
 
 	/**
 	 * Uses the values to instantiate a padded version of a text field.
@@ -30,7 +35,7 @@ public class MEGuiTextField extends GuiTextField {
 	 * @param height absolute height
 	 */
 	public MEGuiTextField(final FontRenderer fontRenderer, final int xPos, final int yPos, final int width, final int height) {
-		super(0, fontRenderer, xPos, yPos, width, height - 2 * PADDING);
+		super(0, fontRenderer, xPos + PADDING, yPos + PADDING, width - 2 * PADDING - fontRenderer.getCharWidth('_'), height - 2 * PADDING);
 
 		_xPos = xPos;
 		_yPos = yPos;
@@ -63,5 +68,63 @@ public class MEGuiTextField extends GuiTextField {
 		final boolean withinYRange = _yPos <= yCoord && yCoord < _yPos + _height;
 
 		return withinXRange && withinYRange;
+	}
+
+	public void selectAll() {
+		setCursorPosition(0);
+		setSelectionPos(getMaxStringLength());
+	}
+
+	public void setSelectionColor(int color) {
+		selectionColor = color;
+	}
+
+	@Override
+	public void drawSelectionBox(int startX, int startY, int endX, int endY) {
+		if (startX < endX) {
+			int i = startX;
+			startX = endX;
+			endX = i;
+		}
+
+		startX += 1;
+		endX -= 1;
+
+		if (startY < endY) {
+			int j = startY;
+			startY = endY;
+			endY = j;
+		}
+
+		startY -= PADDING;
+
+		if (endX > x + width) {
+			endX = x + width;
+		}
+
+		if (startX > x + width) {
+			startX = x + width;
+		}
+
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+
+		float red = (selectionColor >> 16 & 255) / 255.0F;
+		float blue = (selectionColor >> 8 & 255) / 255.0F;
+		float green = (selectionColor & 255) / 255.0F;
+		float alpha = (selectionColor >> 24 & 255) / 255.0F;
+
+		GlStateManager.color(red, green, blue, alpha);
+		GlStateManager.disableTexture2D();
+		GlStateManager.enableColorLogic();
+		GlStateManager.colorLogicOp(GlStateManager.LogicOp.OR_REVERSE);
+		bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
+		bufferbuilder.pos(startX, endY, 0.0D).endVertex();
+		bufferbuilder.pos(endX, endY, 0.0D).endVertex();
+		bufferbuilder.pos(endX, startY, 0.0D).endVertex();
+		bufferbuilder.pos(startX, startY, 0.0D).endVertex();
+		tessellator.draw();
+		GlStateManager.disableColorLogic();
+		GlStateManager.enableTexture2D();
 	}
 }

@@ -90,15 +90,6 @@ public class AppEngSlot extends Slot {
 		if (isSlotEnabled()) {
 			ItemHandlerUtil.setStackInSlot(itemHandler, index, stack);
 			onSlotChanged();
-
-			if (getContainer() != null) {
-				if (getContainer() instanceof WCTBaseContainer) {
-					((WCTBaseContainer) getContainer()).onSlotChange(this);
-				}
-				else if (getContainer() instanceof ContainerWCT) {
-					((ContainerWCT) getContainer()).onSlotChange(this);
-				}
-			}
 		}
 	}
 

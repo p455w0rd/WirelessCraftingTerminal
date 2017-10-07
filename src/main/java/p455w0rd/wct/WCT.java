@@ -15,8 +15,11 @@
  */
 package p455w0rd.wct;
 
-import net.minecraftforge.fml.common.*;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.proxy.CommonProxy;
 
@@ -24,7 +27,7 @@ import p455w0rd.wct.proxy.CommonProxy;
  * @author p455w0rd
  *
  */
-@Mod(modid = ModGlobals.MODID, name = ModGlobals.NAME, version = ModGlobals.VERSION, dependencies = ModGlobals.DEP_LIST, acceptedMinecraftVersions = "[1.10.2]")
+@Mod(modid = ModGlobals.MODID, name = ModGlobals.NAME, version = ModGlobals.VERSION, dependencies = ModGlobals.DEP_LIST, acceptedMinecraftVersions = "[1.12]")
 public class WCT {
 
 	@SidedProxy(clientSide = ModGlobals.CLIENT_PROXY, serverSide = ModGlobals.SERVER_PROXY)

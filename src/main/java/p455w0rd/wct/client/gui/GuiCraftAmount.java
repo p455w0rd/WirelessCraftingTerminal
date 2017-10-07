@@ -96,7 +96,7 @@ public class GuiCraftAmount extends WCTBaseGui {
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		next.displayString = isShiftKeyDown() ? GuiText.Start.getLocal() : GuiText.Next.getLocal();
 
-		this.bindTexture("appliedenergistics2", "guis/craftAmt.png");
+		this.bindTexture("appliedenergistics2", "guis/craft_amt.png");
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, xSize, ySize);
 
 		try {

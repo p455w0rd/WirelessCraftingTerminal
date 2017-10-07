@@ -16,7 +16,7 @@ import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
-import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
@@ -63,7 +63,7 @@ import p455w0rd.wct.sync.packets.PacketValueConfig;
 public abstract class WCTBaseContainer extends Container {
 
 	protected final InventoryPlayer inventoryPlayer;
-	protected BaseActionSource mySrc;
+	protected IActionSource mySrc;
 	protected final HashSet<Integer> locked = new HashSet<Integer>();
 	public final WCTGuiObject obj;
 	protected final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
@@ -92,7 +92,7 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	protected static WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
-		if (it != null) {
+		if (!it.isEmpty()) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
 				return new WCTGuiObject(wh, it, player, w, x, y, z);
@@ -185,10 +185,18 @@ public abstract class WCTBaseContainer extends Container {
 	public void setTargetStack(final IAEItemStack stack) {
 		// client doesn't need to re-send, makes for lower overhead rapid packets.
 		if (Platform.isClient()) {
-			final ItemStack a = stack == null ? null : stack.getItemStack();
-			final ItemStack b = clientRequestedTargetItem == null ? null : clientRequestedTargetItem.getItemStack();
-
+			/*
+			final ItemStack a = stack == null ? ItemStack.EMPTY : stack.createItemStack();
+			final ItemStack b = clientRequestedTargetItem == null ? ItemStack.EMPTY : clientRequestedTargetItem.createItemStack();
+			
 			if (Platform.itemComparisons().isSameItem(a, b)) {
+				return;
+			}
+			*/
+			if (stack == null && clientRequestedTargetItem == null) {
+				return;
+			}
+			if (stack != null && stack.isSameType(clientRequestedTargetItem)) {
 				return;
 			}
 
@@ -232,7 +240,7 @@ public abstract class WCTBaseContainer extends Container {
 		clientRequestedTargetItem = stack == null ? null : stack.copy();
 	}
 
-	public BaseActionSource getActionSource() {
+	public IActionSource getActionSource() {
 		return mySrc;
 	}
 
@@ -301,10 +309,10 @@ public abstract class WCTBaseContainer extends Container {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (locked.contains(j + i * 9 + 9)) {
-					addSlotToContainer(new SlotDisabled(ih, j + i * 9 + 9, 8 + j * 18 + offsetX, offsetY + i * 18));
+					addSlotToContainer(new SlotDisabled(ih, j + i * 9 + 9, j * 18 + offsetX, offsetY + i * 18));
 				}
 				else {
-					addSlotToContainer(new SlotPlayerInv(ih, j + i * 9 + 9, 8 + j * 18 + offsetX, offsetY + i * 18));
+					addSlotToContainer(new SlotPlayerInv(ih, j + i * 9 + 9, j * 18 + offsetX, offsetY + i * 18));
 				}
 			}
 		}
@@ -312,12 +320,16 @@ public abstract class WCTBaseContainer extends Container {
 		// bind player hotbar
 		for (int i = 0; i < 9; i++) {
 			if (locked.contains(i)) {
-				addSlotToContainer(new SlotDisabled(ih, i, 8 + i * 18 + offsetX, 58 + offsetY));
+				addSlotToContainer(new SlotDisabled(ih, i, i * 18 + offsetX, offsetY + 58));
 			}
 			else {
-				addSlotToContainer(new SlotPlayerHotBar(ih, i, 8 + i * 18 + offsetX, 58 + offsetY));
+				addSlotToContainer(new SlotPlayerHotBar(ih, i, i * 18 + offsetX, offsetY + 58));
 			}
 		}
+	}
+
+	public IItemHandler getInventoryByName(final String name) {
+		return null;
 	}
 
 	@Override
@@ -343,7 +355,7 @@ public abstract class WCTBaseContainer extends Container {
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int idx) {
 		if (Platform.isClient()) {
-			return null;
+			return ItemStack.EMPTY;
 		}
 
 		boolean hasMETiles = false;
@@ -355,19 +367,19 @@ public abstract class WCTBaseContainer extends Container {
 		}
 
 		if (hasMETiles && Platform.isClient()) {
-			return null;
+			return ItemStack.EMPTY;
 		}
 
 		final AppEngSlot clickSlot = (AppEngSlot) inventorySlots.get(idx); // require AE SLots!
 
 		if (clickSlot instanceof SlotDisabled || clickSlot instanceof SlotInaccessible) {
-			return null;
+			return ItemStack.EMPTY;
 		}
 		if (clickSlot != null && clickSlot.getHasStack()) {
 			ItemStack tis = clickSlot.getStack();
 
-			if (tis == null) {
-				return null;
+			if (tis.isEmpty()) {
+				return ItemStack.EMPTY;
 			}
 
 			final List<Slot> selectedSlots = new ArrayList<Slot>();
@@ -406,7 +418,7 @@ public abstract class WCTBaseContainer extends Container {
 			 * Handle Fake Slot Shift clicking.
 			 */
 			if (selectedSlots.isEmpty() && clickSlot.isPlayerSide()) {
-				if (tis != null) {
+				if (!tis.isEmpty()) {
 					// target slots in the container...
 					for (final Object inventorySlot : inventorySlots) {
 						final AppEngSlot cs = (AppEngSlot) inventorySlot;
@@ -414,20 +426,20 @@ public abstract class WCTBaseContainer extends Container {
 
 						if (!(cs.isPlayerSide()) && cs instanceof SlotFake) {
 							if (Platform.itemComparisons().isSameItem(destination, tis)) {
-								return null;
+								return ItemStack.EMPTY;
 							}
-							else if (destination == null) {
+							else if (destination.isEmpty()) {
 								cs.putStack(tis.copy());
 								cs.onSlotChanged();
 								updateSlot(cs);
-								return null;
+								return ItemStack.EMPTY;
 							}
 						}
 					}
 				}
 			}
 
-			if (tis != null) {
+			if (!tis.isEmpty()) {
 				// find partials..
 				for (final Slot d : selectedSlots) {
 					if (d instanceof SlotDisabled || d instanceof SlotME) {
@@ -455,7 +467,7 @@ public abstract class WCTBaseContainer extends Container {
 								tis.shrink(placeAble);
 
 								if (tis.getCount() <= 0) {
-									clickSlot.putStack(null);
+									clickSlot.putStack(ItemStack.EMPTY);
 									d.onSlotChanged();
 
 									// if ( hasMETiles ) updateClient();
@@ -498,7 +510,7 @@ public abstract class WCTBaseContainer extends Container {
 								tis.shrink(placeAble);
 
 								if (tis.getCount() <= 0) {
-									clickSlot.putStack(null);
+									clickSlot.putStack(ItemStack.EMPTY);
 									d.onSlotChanged();
 
 									// if ( worldEntity != null )
@@ -507,7 +519,7 @@ public abstract class WCTBaseContainer extends Container {
 
 									updateSlot(clickSlot);
 									updateSlot(d);
-									return null;
+									return ItemStack.EMPTY;
 								}
 								else {
 									updateSlot(d);
@@ -529,7 +541,7 @@ public abstract class WCTBaseContainer extends Container {
 							d.putStack(tmp);
 
 							if (tis.getCount() <= 0) {
-								clickSlot.putStack(null);
+								clickSlot.putStack(ItemStack.EMPTY);
 								d.onSlotChanged();
 
 								// if ( worldEntity != null )
@@ -538,7 +550,7 @@ public abstract class WCTBaseContainer extends Container {
 
 								updateSlot(clickSlot);
 								updateSlot(d);
-								return null;
+								return ItemStack.EMPTY;
 							}
 							else {
 								updateSlot(d);
@@ -548,11 +560,11 @@ public abstract class WCTBaseContainer extends Container {
 				}
 			}
 
-			clickSlot.putStack(tis != null ? tis.copy() : null);
+			clickSlot.putStack(!tis.isEmpty() ? tis.copy() : ItemStack.EMPTY);
 		}
 
 		updateSlot(clickSlot);
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -593,9 +605,9 @@ public abstract class WCTBaseContainer extends Container {
 		}
 		final IAEItemStack ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), AEApi.instance().storage().createItemStack(input), getActionSource());
 		if (ais == null) {
-			return null;
+			return ItemStack.EMPTY;
 		}
-		return ais.getItemStack();
+		return ais.createItemStack();
 	}
 
 	private void updateSlot(final Slot clickSlot) {
@@ -647,36 +659,36 @@ public abstract class WCTBaseContainer extends Container {
 		final ItemStack isB = b.getStack();
 
 		// something to do?
-		if (isA == null && isB == null) {
+		if (isA.isEmpty() && isB.isEmpty()) {
 			return;
 		}
 
 		// can take?
 
-		if (isA != null && !a.canTakeStack(getInventoryPlayer().player)) {
+		if (!isA.isEmpty() && !a.canTakeStack(getInventoryPlayer().player)) {
 			return;
 		}
 
-		if (isB != null && !b.canTakeStack(getInventoryPlayer().player)) {
+		if (!isB.isEmpty() && !b.canTakeStack(getInventoryPlayer().player)) {
 			return;
 		}
 
 		// swap valid?
 
-		if (isB != null && !a.isItemValid(isB)) {
+		if (!isB.isEmpty() && !a.isItemValid(isB)) {
 			return;
 		}
 
-		if (isA != null && !b.isItemValid(isA)) {
+		if (!isA.isEmpty() && !b.isItemValid(isA)) {
 			return;
 		}
 
-		ItemStack testA = isB == null ? null : isB.copy();
-		ItemStack testB = isA == null ? null : isA.copy();
+		ItemStack testA = isB.isEmpty() ? ItemStack.EMPTY : isB.copy();
+		ItemStack testB = isA.isEmpty() ? ItemStack.EMPTY : isA.copy();
 
 		// can put some back?
-		if (testA != null && testA.getCount() > a.getSlotStackLimit()) {
-			if (testB != null) {
+		if (!testA.isEmpty() && testA.getCount() > a.getSlotStackLimit()) {
+			if (!testB.isEmpty()) {
 				return;
 			}
 
@@ -687,8 +699,8 @@ public abstract class WCTBaseContainer extends Container {
 			testB.setCount(totalA - testA.getCount());
 		}
 
-		if (testB != null && testB.getCount() > b.getSlotStackLimit()) {
-			if (testA != null) {
+		if (!testB.isEmpty() && testB.getCount() > b.getSlotStackLimit()) {
+			if (!testA.isEmpty()) {
 				return;
 			}
 
@@ -704,10 +716,6 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	public void onUpdate(final String field, final Object oldValue, final Object newValue) {
-
-	}
-
-	public void onSlotChange(final Slot s) {
 
 	}
 

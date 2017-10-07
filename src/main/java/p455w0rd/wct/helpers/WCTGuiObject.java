@@ -12,8 +12,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IMachineSet;
-import appeng.api.networking.security.BaseActionSource;
-import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
@@ -33,7 +32,7 @@ import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.util.WCTUtils;
 
-public class WCTGuiObject implements IActionHost, IPortableCell, IInventorySlotAware, WCTIActionHost {
+public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIActionHost {
 
 	private final ItemStack effectiveItem;
 	private final IWirelessTermHandler wth;
@@ -176,7 +175,7 @@ public class WCTGuiObject implements IActionHost, IPortableCell, IInventorySlotA
 	}
 
 	@Override
-	public IAEItemStack injectItems(final IAEItemStack input, final Actionable type, final BaseActionSource src) {
+	public IAEItemStack injectItems(final IAEItemStack input, final Actionable type, final IActionSource src) {
 		if (itemStorage != null) {
 			return itemStorage.injectItems(input, type, src);
 		}
@@ -184,7 +183,7 @@ public class WCTGuiObject implements IActionHost, IPortableCell, IInventorySlotA
 	}
 
 	@Override
-	public IAEItemStack extractItems(final IAEItemStack request, final Actionable mode, final BaseActionSource src) {
+	public IAEItemStack extractItems(final IAEItemStack request, final Actionable mode, final IActionSource src) {
 		if (itemStorage != null) {
 			return itemStorage.extractItems(request, mode, src);
 		}
@@ -220,19 +219,12 @@ public class WCTGuiObject implements IActionHost, IPortableCell, IInventorySlotA
 		return wth.getConfigManager(effectiveItem);
 	}
 
-	@Override
 	public IGridNode getGridNode(final AEPartLocation dir) {
 		return this.getActionableNode();
 	}
 
-	@Override
 	public AECableType getCableConnectionType(final AEPartLocation dir) {
 		return AECableType.NONE;
-	}
-
-	@Override
-	public void securityBreak() {
-
 	}
 
 	@Override

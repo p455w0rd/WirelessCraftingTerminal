@@ -2,6 +2,7 @@ package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,11 +10,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Joiner;
@@ -24,7 +25,10 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.container.AEBaseContainer;
 import appeng.container.slot.SlotRestrictedInput;
+import appeng.core.AEConfig;
+import appeng.core.localization.ButtonToolTips;
 import appeng.helpers.InventoryAction;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -32,6 +36,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -40,7 +45,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.me.InternalSlotME;
@@ -58,7 +62,10 @@ import p455w0rd.wct.container.slot.SlotDisabled;
 import p455w0rd.wct.container.slot.SlotFake;
 import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.container.slot.SlotOutput;
+import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotSingleItem;
+import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.integration.JEI;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
@@ -127,23 +134,41 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, final float partialTicks) {
+		super.drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
+		renderHoveredToolTip(mouseX, mouseY);
+		drawButtonTooltip(mouseX, mouseY);
+	}
 
+	protected void drawButtonTooltip(int mouseX, int mouseY) {
 		for (final Object c : buttonList) {
 			if (c instanceof ITooltip) {
-				final ITooltip tooltip = (ITooltip) c;
-				final int x = tooltip.xPos(); // ((GuiImgButton) c).xPosition;
-				int y = tooltip.yPos(); // ((GuiImgButton) c).yPosition;
+				final ITooltip tooltipButton = (ITooltip) c;
+				final int x = tooltipButton.xPos(); // ((GuiImgButton) c).xPosition;
+				int y = tooltipButton.yPos(); // ((GuiImgButton) c).yPosition;
 
-				if (x < mouseX && x + tooltip.getWidth() > mouseX && tooltip.isVisible()) {
-					if (y < mouseY && y + tooltip.getHeight() > mouseY) {
+				if (x < mouseX && x + tooltipButton.getWidth() > mouseX && tooltipButton.isVisible()) {
+					if (y < mouseY && y + tooltipButton.getHeight() > mouseY) {
 						if (y < 15) {
 							y = 15;
 						}
 
-						final String msg = tooltip.getMessage();
+						final String msg = tooltipButton.getMessage();
 						if (msg != null) {
-							this.drawTooltip(x + 11, y + 4, msg);
+							String[] lines = msg.split("\n");
+							int tooltipWidth = 0;
+							for (String line : lines) {
+								if (fontRenderer.getStringWidth(line) > tooltipWidth) {
+									tooltipWidth = fontRenderer.getStringWidth(line);
+								}
+							}
+							tooltipWidth += 12;
+							if (Mods.JEI.isLoaded() && JEI.isIngrediantOverlayActive() && (x + tooltipWidth > (xSize + guiLeft))) {
+								drawTooltip(x - 5 - tooltipWidth, y + 4, msg);
+							}
+							else {
+								this.drawTooltip(x + 11, y + 4, msg);
+							}
 						}
 					}
 				}
@@ -176,7 +201,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(final int x, final int y) {
+	protected void drawGuiContainerForegroundLayer(final int xx, final int yy) {
 		final int ox = guiLeft; // (width - xSize) / 2;
 		final int oy = guiTop; // (height - ySize) / 2;
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -185,7 +210,8 @@ public abstract class WCTBaseGui extends GuiContainer {
 			scrollBar.draw(this);
 		}
 
-		drawFG(ox, oy, x, y);
+		drawFG(ox, oy, xx, yy);
+
 	}
 
 	public abstract void drawFG(int offsetX, int offsetY, int mouseX, int mouseY);
@@ -239,6 +265,10 @@ public abstract class WCTBaseGui extends GuiContainer {
 	protected void mouseClickMove(final int x, final int y, final int c, final long d) {
 		final Slot slot = getSlot(x, y);
 		final ItemStack itemstack = WCTUtils.player().inventory.getItemStack();
+
+		if (getScrollBar() != null) {
+			getScrollBar().click(this, x - guiLeft, y - guiTop);
+		}
 
 		if (slot instanceof SlotFake && itemstack != null) {
 			drag_click.add(slot);
@@ -316,12 +346,9 @@ public abstract class WCTBaseGui extends GuiContainer {
 				if (!(slot instanceof SlotME) && slot != null) {
 					slotNum = slot.slotNumber;
 				}
-				if (inventorySlots instanceof ContainerWCT) {
-					((ContainerWCT) inventorySlots).setTargetStack(stack);
-				}
-				else {
-					((WCTBaseContainer) inventorySlots).setTargetStack(stack);
-				}
+
+				((WCTBaseContainer) inventorySlots).setTargetStack(stack);
+
 				final PacketInventoryAction p = new PacketInventoryAction(InventoryAction.MOVE_REGION, slotNum, 0);
 				NetworkHandler.instance().sendToServer(p);
 				return;
@@ -368,7 +395,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				action = (mouseButton == 1) ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
 				stack = ((SlotME) slot).getAEStack();
 
-				if (stack != null && action == InventoryAction.PICKUP_OR_SET_DOWN && stack.getStackSize() == 0 && player.inventory.getItemStack() == null) {
+				if (stack != null && action == InventoryAction.PICKUP_OR_SET_DOWN && stack.getStackSize() == 0 && player.inventory.getItemStack().isEmpty()) {
 					action = InventoryAction.AUTO_CRAFT;
 				}
 
@@ -418,13 +445,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 				bl_clicked = slot;
 				dbl_clickTimer = Stopwatch.createStarted();
 				if (slot != null) {
-					dbl_whichItem = slot.getHasStack() ? slot.getStack().copy() : null;
+					dbl_whichItem = slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
 				}
 				else {
-					dbl_whichItem = null;
+					dbl_whichItem = ItemStack.EMPTY;
 				}
 			}
-			else if (dbl_whichItem != null) {
+			else if (!dbl_whichItem.isEmpty()) {
 				// a replica of the weird broken vanilla feature.
 
 				final List<Slot> slots = getInventorySlots();
@@ -443,16 +470,16 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 	@Override
 	protected boolean checkHotbarKeys(final int keyCode) {
-		final Slot theSlot;
-
-		try {
-			theSlot = ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, this, "theSlot", "field_147006_u", "f");
-		}
-		catch (final Throwable t) {
-			return false;
-		}
-
-		if (WCTUtils.player().inventory.getItemStack() == null && theSlot != null) {
+		final Slot theSlot = getSlotUnderMouse();
+		/*
+				try {
+					theSlot = ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, this, "theSlot", "field_147006_u", "f");
+				}
+				catch (final Throwable t) {
+					return false;
+				}
+		*/
+		if (WCTUtils.player().inventory.getItemStack().isEmpty() && theSlot != null) {
 			for (int j = 0; j < 9; ++j) {
 				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
 					final List<Slot> slots = getInventorySlots();
@@ -460,7 +487,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 					for (final Slot s : slots) {
 						if (s.getSlotIndex() == j && s.inventory == playerInv) {
 							//disable hotbar key-swapping WCT
-							if (!s.canTakeStack(WCTUtils.player(playerInv)) || (s.getStack() != null && s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
+							if (!s.canTakeStack(WCTUtils.player(playerInv)) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
 								return false;
 							}
 						}
@@ -505,44 +532,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 	public abstract void drawBG(int offsetX, int offsetY, int mouseX, int mouseY);
 
-	@Override
-	public void handleMouseInput() throws IOException {
-		super.handleMouseInput();
-
-		final int i = Mouse.getEventDWheel();
-		if (i != 0 && isShiftKeyDown()) {
-			final int x = Mouse.getEventX() * width / mc.displayWidth;
-			final int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-			mouseWheelEvent(x, y, i / Math.abs(i));
-		}
-		else if (i != 0 && scrollBar != null) {
-
-			scrollBar.wheel(i);
-		}
-	}
-
-	private void mouseWheelEvent(final int x, final int y, final int wheel) {
-		final Slot slot = getSlot(x, y);
-		if (slot instanceof SlotME) {
-			final IAEItemStack item = ((SlotME) slot).getAEStack();
-			if (item != null) {
-				if (inventorySlots instanceof ContainerWCT) {
-					((ContainerWCT) inventorySlots).setTargetStack(item);
-				}
-				else {
-					((WCTBaseContainer) inventorySlots).setTargetStack(item);
-				}
-				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
-				final int times = Math.abs(wheel);
-				final int inventorySize = getInventorySlots().size();
-				for (int h = 0; h < times; h++) {
-					final PacketInventoryAction p = new PacketInventoryAction(direction, inventorySize, 0);
-					NetworkHandler.instance().sendToServer(p);
-				}
-			}
-		}
-	}
-
 	protected boolean enableSpaceClicking() {
 		return true;
 	}
@@ -558,9 +547,11 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 		//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 		GL11.glEnable(GL11.GL_LIGHTING);
+		GlStateManager.enableDepth();
 		//GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 		RenderHelper.enableGUIStandardItemLighting();
+		GlStateManager.disableDepth();
 		itemRender.renderItemAndEffectIntoGUI(is, x, y);
 		//GL11.glPopAttrib();
 
@@ -591,9 +582,9 @@ public abstract class WCTBaseGui extends GuiContainer {
 				itemRender.zLevel = 100.0F;
 
 				if (!isPowered()) {
-					GL11.glDisable(GL11.GL_LIGHTING);
+					//GL11.glDisable(GL11.GL_LIGHTING);
 					drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);
-					GL11.glEnable(GL11.GL_LIGHTING);
+					//GL11.glEnable(GL11.GL_LIGHTING);
 				}
 
 				zLevel = 0.0F;
@@ -611,12 +602,12 @@ public abstract class WCTBaseGui extends GuiContainer {
 		else {
 			try {
 				final ItemStack is = s.getStack();
-				if (s instanceof AppEngSlot && (((AppEngSlot) s).renderIconWithItem() || is == null) && (((AppEngSlot) s).shouldDisplay())) {
+				if (s instanceof AppEngSlot && (((AppEngSlot) s).renderIconWithItem() || is.isEmpty()) && (((AppEngSlot) s).shouldDisplay())) {
 					final AppEngSlot aes = (AppEngSlot) s;
 					if (aes.getIcon() >= 0) {
 						this.bindTexture("guis/states.png");
 
-						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+						//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						final Tessellator tessellator = Tessellator.getInstance();
 						final BufferBuilder vb = tessellator.getBuffer();
 						try {
@@ -647,13 +638,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 						}
 						catch (final Exception err) {
 						}
-						GL11.glPopAttrib();
+						//GL11.glPopAttrib();
 					}
 				}
 
-				if (is != null && s instanceof AppEngSlot) {
+				if (!is.isEmpty() && s instanceof AppEngSlot) {
 					if (((AppEngSlot) s).getIsValid() == hasCalculatedValidness.NotAvailable) {
-						boolean isValid = s.isItemValid(is) || s instanceof SlotOutput || s instanceof AppEngCraftingSlot || s instanceof SlotDisabled || s instanceof SlotInaccessible || s instanceof SlotFake || s instanceof SlotRestrictedInput || s instanceof SlotDisconnected;
+						boolean isValid = s.isItemValid(is) || s instanceof SlotOutput || s instanceof AppEngCraftingSlot || s instanceof SlotPlayerHotBar || s instanceof SlotDisabled || s instanceof SlotInaccessible || s instanceof SlotFake || s instanceof SlotRestrictedInput || s instanceof SlotDisconnected;
 						if (isValid && s instanceof SlotRestrictedInput) {
 							try {
 								isValid = ((SlotRestrictedInput) s).isValid(is, WCTUtils.world());
@@ -694,6 +685,91 @@ public abstract class WCTBaseGui extends GuiContainer {
 		super.drawSlot(s);
 	}
 
+	public List<String> handleItemTooltip(final ItemStack stack, final int mouseX, final int mouseY, final List<String> currentToolTip) {
+		if (!stack.isEmpty()) {
+			final Slot s = getSlot(mouseX, mouseY);
+			if (s instanceof SlotME) {
+				final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
+
+				IAEItemStack myStack = null;
+
+				try {
+					final SlotME theSlotField = (SlotME) s;
+					myStack = theSlotField.getAEStack();
+				}
+				catch (final Throwable ignore) {
+				}
+
+				if (myStack != null) {
+					if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
+						final String local = ButtonToolTips.ItemsStored.getLocal();
+						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize());
+						final String format = String.format(local, formattedAmount);
+
+						currentToolTip.add(TextFormatting.GRAY + format);
+					}
+
+					if (myStack.getCountRequestable() > 0) {
+						final String local = ButtonToolTips.ItemsRequestable.getLocal();
+						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable());
+						final String format = String.format(local, formattedAmount);
+
+						currentToolTip.add(TextFormatting.GRAY + format);
+					}
+
+				}
+				else if (stack.getCount() > BigNumber || (stack.getCount() > 1 && stack.isItemDamaged())) {
+					final String local = ButtonToolTips.ItemsStored.getLocal();
+					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(stack.getCount());
+					final String format = String.format(local, formattedAmount);
+
+					currentToolTip.add("\u00a77" + format);
+				}
+			}
+		}
+		return currentToolTip;
+	}
+
+	@Override
+	protected void renderToolTip(final ItemStack stack, final int x, final int y) {
+		final Slot s = getSlot(x, y);
+		if (s instanceof SlotME && !stack.isEmpty()) {
+			final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
+
+			IAEItemStack myStack = null;
+
+			try {
+				final SlotME theSlotField = (SlotME) s;
+				myStack = theSlotField.getAEStack();
+			}
+			catch (final Throwable ignore) {
+			}
+
+			ITooltipFlag.TooltipFlags tooltipFlag = mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+			if (myStack != null) {
+				final List<String> currentToolTip = stack.getTooltip(mc.player, tooltipFlag);
+
+				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
+					currentToolTip.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize()));
+				}
+
+				if (myStack.getCountRequestable() > 0) {
+					currentToolTip.add("Items Requestable: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable()));
+				}
+
+				this.drawTooltip(x, y, currentToolTip);
+				return;
+			}
+			else if (stack.getCount() > BigNumber) {
+				List<String> var4 = stack.getTooltip(mc.player, tooltipFlag);
+				var4.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(stack.getCount()));
+				this.drawTooltip(x, y, var4);
+				return;
+			}
+		}
+		super.renderToolTip(stack, x, y);
+	}
+
 	protected boolean isPowered() {
 		return true;
 	}
@@ -721,5 +797,14 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 	public static final synchronized void setSwitchingGuis(final boolean switchingGuisIn) {
 		switchingGuis = switchingGuisIn;
+	}
+
+	public static boolean isTabKeyDown() {
+		if (Minecraft.IS_RUNNING_ON_MAC) {
+			return Keyboard.isKeyDown(48);
+		}
+		else {
+			return Keyboard.isKeyDown(15);
+		}
 	}
 }

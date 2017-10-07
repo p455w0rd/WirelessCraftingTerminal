@@ -23,7 +23,7 @@ import p455w0rdslib.util.MathUtils;
 public class ContainerMagnet extends Container {
 
 	public final InventoryPlayer inventoryPlayer;
-	public ItemStack magnetItem;
+	public final ItemStack magnetItem;
 	public WCTInventoryMagnetFilter magnetInventory;
 	private int distributeState = 0;
 	private int pressedKeyInRange = -1;

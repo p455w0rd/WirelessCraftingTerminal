@@ -1,5 +1,7 @@
 package p455w0rd.wct.container.slot;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -14,10 +16,7 @@ public class SlotMagnetFilter extends Slot {
 
 	public SlotMagnetFilter(IInventory inventory, int slotIndex, int xPos, int yPos) {
 		super(inventory, slotIndex, xPos, yPos);
-		if (inventory == null) {
-			throw new IllegalArgumentException("Inventory must not be null");
-		}
-		this.stackLimit = -1;
+		stackLimit = -1;
 	}
 
 	public SlotMagnetFilter setPhantom() {
@@ -31,24 +30,24 @@ public class SlotMagnetFilter extends Slot {
 	}
 
 	@Override
-	public void putStack(ItemStack itemStack) {
+	public void putStack(@Nonnull ItemStack itemStack) {
 		if (!isPhantom() || canAdjustPhantom()) {
 			super.putStack(itemStack);
 		}
 	}
 
 	public SlotMagnetFilter setCanAdjustPhantom(boolean canAdjust) {
-		this.canAdjustPhantom = canAdjust;
+		canAdjustPhantom = canAdjust;
 		return this;
 	}
 
 	public SlotMagnetFilter setStackLimit(int limit) {
-		this.stackLimit = limit;
+		stackLimit = limit;
 		return this;
 	}
 
 	public boolean isPhantom() {
-		return this.isPhantom;
+		return isPhantom;
 	}
 
 	public boolean canAdjustPhantom() {
@@ -68,7 +67,8 @@ public class SlotMagnetFilter extends Slot {
 	public int getSlotStackLimit() {
 		if (stackLimit < 0) {
 			return super.getSlotStackLimit();
-		} else {
+		}
+		else {
 			return stackLimit;
 		}
 	}

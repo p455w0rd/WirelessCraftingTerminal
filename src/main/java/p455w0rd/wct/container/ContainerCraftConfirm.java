@@ -17,7 +17,7 @@ import appeng.api.networking.crafting.ICraftingCPU;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
 import appeng.api.networking.crafting.ICraftingLink;
-import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEInventory;
 import appeng.api.storage.ITerminalHost;
@@ -308,7 +308,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 		}
 	}
 
-	private BaseActionSource getActionSrc() {
+	private IActionSource getActionSrc() {
 		return new WCTPlayerSource(getPlayerInv().player, (WCTIActionHost) getTarget());
 	}
 

@@ -17,7 +17,7 @@ public class GuiTabButton extends GuiButton implements ITooltip {
 	private final String message;
 	private int hideEdge = 0;
 	private int myIcon = -1;
-	private ItemStack myItem;
+	private ItemStack myItem = ItemStack.EMPTY;
 
 	public GuiTabButton(final int xIn, final int yIn, final int ico, final String message, final RenderItem ir) {
 		super(0, 0, 16, "");
@@ -43,7 +43,7 @@ public class GuiTabButton extends GuiButton implements ITooltip {
 	}
 
 	@Override
-	public void drawButton(final Minecraft minecraft, final int x, final int y, float partial) {
+	public void drawButton(final Minecraft minecraft, final int mouseX, final int mouseY, float partial) {
 		if (visible) {
 			GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			minecraft.renderEngine.bindTexture(new ResourceLocation(AppEng.MOD_ID, "textures/guis/states.png"));
@@ -64,7 +64,7 @@ public class GuiTabButton extends GuiButton implements ITooltip {
 
 			mouseDragged(minecraft, x, y);
 
-			if (myItem != null) {
+			if (!myItem.isEmpty()) {
 				zLevel = 100.0F;
 				itemRenderer.zLevel = 100.0F;
 

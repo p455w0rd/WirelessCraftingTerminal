@@ -3,7 +3,6 @@ package p455w0rd.wct.container.slot;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,8 +28,7 @@ public class SlotArmor extends AppEngSlot {
 
 	@Override
 	public boolean isItemValid(ItemStack stack) {
-		Item item = (stack == null ? null : stack.getItem());
-		return item != null && item.isValidArmor(stack, EntityEquipmentSlot.values()[armorType.ordinal() + 1], player);
+		return !stack.isEmpty() && stack.getItem().isValidArmor(stack, EntityEquipmentSlot.values()[armorType.ordinal() + 1], player);
 	}
 
 	@Override

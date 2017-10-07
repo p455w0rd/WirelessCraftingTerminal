@@ -15,10 +15,10 @@
  */
 package p455w0rd.wct.items;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.text.WordUtils;
@@ -31,7 +31,7 @@ import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
-import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.core.Api;
@@ -51,6 +51,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -66,6 +67,7 @@ import p455w0rd.wct.api.networking.security.WCTPlayerSource;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
@@ -86,8 +88,8 @@ public class ItemMagnet extends ItemBase {
 	private IEnergySource powerSrc;
 	//private IMEMonitor<IAEItemStack> monitor;
 	//private IMEInventoryHandler<IAEItemStack> cellInv;
-	private BaseActionSource mySrc;
-	private ItemStack thisItemStack;
+	private IActionSource mySrc;
+	private ItemStack thisItemStack = ItemStack.EMPTY;
 	private int pickupTimer = 0;
 
 	private static final String name = "magnet_card";
@@ -98,11 +100,11 @@ public class ItemMagnet extends ItemBase {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean hasEffect(ItemStack item) {
+	public boolean hasEffect(@Nonnull ItemStack item) {
 		return isActivated(item);
 	}
 
-	public void setItemStack(ItemStack is) {
+	public void setItemStack(@Nonnull ItemStack is) {
 		thisItemStack = is;
 	}
 
@@ -112,15 +114,15 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public ItemStack getItemStack() {
-		if (thisItemStack != null && (thisItemStack.getItem() instanceof ItemMagnet)) {
+		if (thisItemStack != null && (thisItemStack.getItem() == ModItems.MAGNET_CARD)) {
 			return thisItemStack;
 		}
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack is, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
+	public void addInformation(@Nonnull ItemStack is, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
 		list.add(color("aqua") + "==============================");
 		String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
@@ -204,7 +206,7 @@ public class ItemMagnet extends ItemBase {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
-		if (!world.isRemote && hand == EnumHand.MAIN_HAND && item != null && !item.isEmpty()) {
+		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
 			if (!player.isSneaking()) {
 				if (!WCTUtils.isMagnetInitialized(item)) {
 					item.getTagCompound().setBoolean("Initialized", true);
@@ -221,7 +223,7 @@ public class ItemMagnet extends ItemBase {
 		}
 		else {
 			if (!WCTUtils.isMagnetInitialized(item)) {
-				NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true, item));
+				NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
 			}
 			if (player.isSneaking()) {
 				switchMagnetMode(item, player, false);
@@ -254,11 +256,11 @@ public class ItemMagnet extends ItemBase {
 		}
 	}
 
-	public static void switchMagnetMode(ItemStack item, EntityPlayer player) {
+	public static void switchMagnetMode(@Nonnull ItemStack item, EntityPlayer player) {
 		switchMagnetMode(item, player, true);
 	}
 
-	public static void switchMagnetMode(ItemStack item, EntityPlayer player, boolean sync) {
+	public static void switchMagnetMode(@Nonnull ItemStack item, EntityPlayer player, boolean sync) {
 		if (player.getEntityWorld().isRemote) {
 			int newMode = 0;
 			if (getDamageUnsafe(item) == 0) {
@@ -291,8 +293,8 @@ public class ItemMagnet extends ItemBase {
 		}
 	}
 
-	private static int getDamageUnsafe(ItemStack stack) {
-		if (!stack.hasTagCompound()) {
+	private static int getDamageUnsafe(@Nonnull ItemStack stack) {
+		if (!stack.isEmpty() && !stack.hasTagCompound()) {
 			stack.setTagCompound(new NBTTagCompound());
 			if (!stack.getTagCompound().hasKey("MagnetMode")) {
 				stack.getTagCompound().setInteger("MagnetMode", 0);
@@ -301,15 +303,15 @@ public class ItemMagnet extends ItemBase {
 		return stack.getTagCompound().getInteger("MagnetMode");
 	}
 
-	private static void setDamageUnsafe(ItemStack stack, int damage) {
+	private static void setDamageUnsafe(@Nonnull ItemStack stack, int damage) {
 		stack.getTagCompound().setInteger("MagnetMode", damage);
 	}
 
-	public void doMagnet(ItemStack item, World world, EntityPlayer player, ItemStack wirelessTerm) {
+	public void doMagnet(@Nonnull ItemStack item, World world, EntityPlayer player, @Nonnull ItemStack wirelessTerm) {
 		if (world.isRemote) {
 			return;
 		}
-		if (getItemStack() == null) {
+		if (getItemStack().isEmpty()) {
 			return;
 		}
 		if (!isActivated(item)) {
@@ -322,7 +324,7 @@ public class ItemMagnet extends ItemBase {
 			return;
 		}
 		distanceFromPlayer = 6;
-		List<ItemStack> filteredList = getFilteredItems(getItemStack());
+		NonNullList<ItemStack> filteredList = getFilteredItems(getItemStack());
 		// items
 		Iterator<?> iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
@@ -336,7 +338,7 @@ public class ItemMagnet extends ItemBase {
 			}
 
 			ItemStack itemStackToGet = itemToGet.getItem();
-			if (itemStackToGet == null) {
+			if (itemStackToGet.isEmpty()) {
 				return;
 			}
 			int stackSize = itemStackToGet.getCount();
@@ -356,7 +358,7 @@ public class ItemMagnet extends ItemBase {
 
 					// whitelist
 					if (getMode(getItemStack())) {
-						if (isItemFiltered(itemStackToGet, filteredList) && filteredList != null && filteredList.size() > 0) {
+						if (isItemFiltered(itemStackToGet, filteredList) && !filteredList.isEmpty()) {
 							if (doInject(ais, stackSize, player, itemToGet, itemStackToGet, world)) {
 								itemToGet.setDead();
 							}
@@ -368,7 +370,7 @@ public class ItemMagnet extends ItemBase {
 					}
 					// blacklist
 					else {
-						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList == null || filteredList.size() <= 0) {
+						if (!isItemFiltered(itemStackToGet, filteredList) || filteredList.isEmpty()) {
 							if (doInject(ais, stackSize, player, itemToGet, itemStackToGet, world)) {
 								itemToGet.setDead();
 							}
@@ -395,7 +397,7 @@ public class ItemMagnet extends ItemBase {
 			world.playSound((EntityPlayer) null, xpToGet.posX, xpToGet.posY, xpToGet.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
 			//player.onItemPickup(xpToGet, 1);
 			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, player);
-			if (itemstack != null && itemstack.isItemDamaged()) {
+			if (!itemstack.isEmpty() && itemstack.isItemDamaged()) {
 				int i = Math.min(xpToDurability(xpAmount), itemstack.getItemDamage());
 				xpAmount -= durabilityToXp(i);
 				itemstack.setItemDamage(itemstack.getItemDamage() - i);
@@ -448,8 +450,8 @@ public class ItemMagnet extends ItemBase {
 		return false;
 	}
 
-	private boolean isItemFiltered(ItemStack is, List<ItemStack> itemList) {
-		if (is != null && itemList != null) {
+	private boolean isItemFiltered(@Nonnull ItemStack is, NonNullList<ItemStack> itemList) {
+		if (!is.isEmpty() && !itemList.isEmpty()) {
 			for (int i = 0; i < itemList.size(); i++) {
 				ItemStack thisStack = itemList.get(i);
 				//use oredict
@@ -487,11 +489,11 @@ public class ItemMagnet extends ItemBase {
 		return false;
 	}
 
-	private boolean isMetaEqual(ItemStack is1, ItemStack is2) {
+	private boolean isMetaEqual(@Nonnull ItemStack is1, @Nonnull ItemStack is2) {
 		return is1.getItemDamage() == is2.getItemDamage();
 	}
 
-	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, ItemStack wirelessTerm) {
+	private boolean hasNetworkAccess(final SecurityPermissions perm, final boolean requirePower, EntityPlayer player, @Nonnull ItemStack wirelessTerm) {
 		if (player.capabilities.isCreativeMode) {
 			return true;
 		}
@@ -512,19 +514,19 @@ public class ItemMagnet extends ItemBase {
 		return false;
 	}
 
-	private List<ItemStack> getFilteredItems(ItemStack magnetItem) {
-		if (magnetItem == null) {
-			return null;
+	private NonNullList<ItemStack> getFilteredItems(@Nonnull ItemStack magnetItem) {
+		if (magnetItem.isEmpty()) {
+			return NonNullList.create();
 		}
-		if (magnetItem.getItem() instanceof ItemMagnet) {
+		if (magnetItem.getItem() == ModItems.MAGNET_CARD) {
 			if (magnetItem.hasTagCompound()) {
 				NBTTagCompound nbtTC = magnetItem.getTagCompound();
 				if (!nbtTC.hasKey("MagnetFilter")) {
-					return null;
+					return NonNullList.create();
 				}
 				NBTTagList tagList = nbtTC.getTagList("MagnetFilter", 10);
 				if (tagList.tagCount() > 0 && tagList != null) {
-					List<ItemStack> itemList = new ArrayList<ItemStack>();
+					NonNullList<ItemStack> itemList = NonNullList.create();
 					for (int i = 0; i < tagList.tagCount(); i++) {
 						itemList.add(new ItemStack(tagList.getCompoundTagAt(i)));
 					}
@@ -532,12 +534,12 @@ public class ItemMagnet extends ItemBase {
 				}
 			}
 		}
-		return null;
+		return NonNullList.create();
 	}
 
-	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, ItemStack itemStackToGet, World world) {
+	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, @Nonnull ItemStack itemStackToGet, World world) {
 		ais = Api.INSTANCE.storage().poweredInsert(powerSrc, obj.getItemInventory(), ais, mySrc);
-		if (ais != null && WCTUtils.getMagnet(player.inventory) != null && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
+		if (ais != null && !WCTUtils.getMagnet(player.inventory).isEmpty() && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
 			world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
@@ -545,7 +547,7 @@ public class ItemMagnet extends ItemBase {
 		return ais == null;
 	}
 
-	private boolean isBoosterInstalled(ItemStack wirelessTerm) {
+	private boolean isBoosterInstalled(@Nonnull ItemStack wirelessTerm) {
 		if (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
 			if (wirelessTerm.hasTagCompound()) {
 				NBTTagList boosterNBTList = wirelessTerm.getTagCompound().getTagList("BoosterSlot", 10);
@@ -553,8 +555,8 @@ public class ItemMagnet extends ItemBase {
 					NBTTagCompound boosterTagCompound = boosterNBTList.getCompoundTagAt(0);
 					if (boosterTagCompound != null) {
 						ItemStack boosterCard = new ItemStack(boosterTagCompound);
-						if (boosterCard != null) {
-							return (boosterCard.getItem() instanceof ItemInfinityBooster);
+						if (boosterCard != null && !boosterCard.isEmpty()) {
+							return (boosterCard.getItem() == ModItems.BOOSTER_CARD);
 						}
 					}
 				}
@@ -564,8 +566,8 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	// true=whitelist (default:whitelist)
-	private boolean getMode(ItemStack magnetItem) {
-		if (magnetItem.getItem() instanceof ItemMagnet) {
+	private boolean getMode(@Nonnull ItemStack magnetItem) {
+		if (magnetItem.getItem() == ModItems.MAGNET_CARD) {
 			if (magnetItem.hasTagCompound()) {
 				NBTTagCompound nbtTC = magnetItem.getTagCompound();
 				if (nbtTC.hasKey("Whitelisting")) {
@@ -576,8 +578,8 @@ public class ItemMagnet extends ItemBase {
 		return true;
 	}
 
-	private WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
-		if (it != null) {
+	private WCTGuiObject getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+		if (!it.isEmpty()) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
 				return new WCTGuiObject(wh, it, player, w, x, y, z);
@@ -587,27 +589,29 @@ public class ItemMagnet extends ItemBase {
 		return null;
 	}
 
-	public static List<?> getEntitiesInRange(Class<? extends Entity> entityType, World world, int x, int y, int z, int distance) {
+	public static List<? extends Entity> getEntitiesInRange(Class<? extends Entity> entityType, World world, int x, int y, int z, int distance) {
 		return world.getEntitiesWithinAABB(entityType, new AxisAlignedBB(x - distance, y - distance, z - distance, x + distance, y + distance, z + distance));
 	}
 
+	@Nonnull
 	public ItemStack getStack() {
 		return this.getStack(1);
 	}
 
+	@Nonnull
 	public ItemStack getStack(final int size) {
 		return new ItemStack(this, size);
 	}
 
-	protected boolean isActivated(ItemStack item) {
-		if (item == null) {
+	protected boolean isActivated(@Nonnull ItemStack item) {
+		if (item.isEmpty()) {
 			return false;
 		}
 		return getDamageUnsafe(item) != 0;
 	}
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack stack) {
+	public int getMaxItemUseDuration(@Nonnull ItemStack stack) {
 		return 1;
 	}
 

@@ -6,23 +6,22 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import p455w0rd.wct.init.ModGlobals;
-import p455w0rd.wct.items.ItemInfinityBooster;
+import p455w0rd.wct.init.ModItems;
 
 public class SlotBooster extends AppEngSlot {
 
-	public SlotBooster(IItemHandler inv, int index, int xPos, int yPos) {
-		super(inv, index, xPos, yPos);
+	public SlotBooster(IItemHandler inv, int xPos, int yPos) {
+		super(inv, 0, xPos, yPos);
+	}
+
+	@Override
+	public int getSlotStackLimit() {
+		return 1;
 	}
 
 	@Override
 	public boolean isItemValid(ItemStack is) {
-		if (is != null) {
-			if (is.getItem() instanceof ItemInfinityBooster) {
-				return true;
-			}
-		}
-		// Everything returns false except an instance of our Item
-		return false;
+		return !is.isEmpty() && (is.getItem() == ModItems.BOOSTER_CARD);
 	}
 
 	@Override

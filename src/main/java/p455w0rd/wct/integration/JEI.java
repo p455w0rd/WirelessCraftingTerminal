@@ -39,12 +39,10 @@ import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fml.common.Loader;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
@@ -59,8 +57,6 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
  */
 @JEIPlugin
 public class JEI implements IModPlugin {
-
-	public static final String MODID = "jei";
 
 	@Override
 	public void register(@Nonnull IModRegistry registry) {
@@ -83,10 +79,6 @@ public class JEI implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-	}
-
-	public static boolean isLoaded() {
-		return Loader.isModLoaded(MODID);
 	}
 
 	public class RecipeTransferHandler<T extends Container> implements IRecipeTransferHandler<T> {
@@ -122,14 +114,20 @@ public class JEI implements IModPlugin {
 				}
 
 				for (final Slot slot : container.inventorySlots) {
-					if (slot instanceof SlotCraftingMatrix || slot instanceof SlotFakeCraftingMatrix || slot.inventory instanceof InventoryCrafting) {
+					if (slot instanceof SlotCraftingMatrix || slot instanceof SlotFakeCraftingMatrix) {
 						if (slot.getSlotIndex() == slotIndex) {
 							final NBTTagList tags = new NBTTagList();
 							final List<ItemStack> list = new LinkedList<ItemStack>();
+							final ItemStack displayed = ingredient.getDisplayedIngredient();
 
-							// prefer pure crystals.
+							// prefer currently displayed item
+							if (displayed != null && !displayed.isEmpty()) {
+								list.add(displayed);
+							}
+
+							// prefer non-pure crystals. :)
 							for (ItemStack stack : ingredient.getAllIngredients()) {
-								if (Platform.isRecipePrioritized(stack)) {
+								if (!Platform.isRecipePrioritized(stack)) {
 									list.add(0, stack);
 								}
 								else {
@@ -150,6 +148,7 @@ public class JEI implements IModPlugin {
 				}
 
 				slotIndex++;
+
 			}
 
 			try {
@@ -161,6 +160,10 @@ public class JEI implements IModPlugin {
 
 			return null;
 		}
+	}
+
+	public static boolean isIngrediantOverlayActive() {
+		return mezz.jei.config.Config.isOverlayEnabled();
 	}
 
 }

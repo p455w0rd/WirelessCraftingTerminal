@@ -43,13 +43,13 @@ public class SlotSingleItem extends Slot {
 	@Override
 	public ItemStack getStack() {
 		ItemStack orgStack = delegate.getStack();
-		if (orgStack != null) {
+		if (!orgStack.isEmpty()) {
 			ItemStack modifiedStack = orgStack.copy();
 			modifiedStack.setCount(1);
 			return modifiedStack;
 		}
 
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override

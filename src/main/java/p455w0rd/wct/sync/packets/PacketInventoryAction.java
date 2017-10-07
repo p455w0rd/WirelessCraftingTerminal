@@ -124,14 +124,14 @@ public class PacketInventoryAction extends WCTPacket {
 
 				if (baseContainer instanceof ContainerWCT) {
 					if (((ContainerWCT) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((ContainerWCT) baseContainer).getTargetStack().getItemStack());
+						cca.getCraftingItem().putStack(((ContainerWCT) baseContainer).getTargetStack().createItemStack());
 						cca.setItemToCraft(((ContainerWCT) baseContainer).getTargetStack());
 					}
 				}
 
 				if (baseContainer instanceof WCTBaseContainer) {
 					if (((WCTBaseContainer) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().getItemStack());
+						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().createItemStack());
 						cca.setItemToCraft(((WCTBaseContainer) baseContainer).getTargetStack());
 					}
 				}
@@ -141,11 +141,7 @@ public class PacketInventoryAction extends WCTPacket {
 			//}
 		}
 		else {
-			if (baseContainer instanceof ContainerWCT) {
-				((ContainerWCT) baseContainer).doAction(sender, action, slot, id);
-				((ContainerWCT) baseContainer).detectAndSendChanges();
-			}
-			else if (baseContainer instanceof WCTBaseContainer) {
+			if (baseContainer instanceof WCTBaseContainer) {
 				((WCTBaseContainer) baseContainer).doAction(sender, action, slot, id);
 				((WCTBaseContainer) baseContainer).detectAndSendChanges();
 			}
@@ -161,7 +157,7 @@ public class PacketInventoryAction extends WCTPacket {
 				ch.getPlayers().get(0).inventory.setItemStack(ItemStack.EMPTY);
 			}
 			else {
-				ch.getPlayers().get(0).inventory.setItemStack(slotItem.getItemStack());
+				ch.getPlayers().get(0).inventory.setItemStack(slotItem.createItemStack());
 			}
 		}
 	}

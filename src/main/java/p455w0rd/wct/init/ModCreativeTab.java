@@ -15,12 +15,11 @@
  */
 package p455w0rd.wct.init;
 
-import java.util.List;
-
-import appeng.items.tools.powered.powersink.AERootPoweredItem;
+import appeng.api.config.Actionable;
+import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 /**
  * @author p455w0rd
@@ -36,16 +35,16 @@ public class ModCreativeTab extends CreativeTabs {
 	@Override
 	public ItemStack getIconItemStack() {
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((AERootPoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER);
+		((AEBasePoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
 		return is;
 	}
 
 	@Override
-	public void displayAllRelevantItems(List<ItemStack> items) {
+	public void displayAllRelevantItems(NonNullList<ItemStack> items) {
 
 		items.add(new ItemStack(ModItems.WCT));
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((AERootPoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER);
+		((AEBasePoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
 		items.add(is);
 		items.add(new ItemStack(ModItems.MAGNET_CARD));
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
@@ -56,8 +55,8 @@ public class ModCreativeTab extends CreativeTabs {
 	}
 
 	@Override
-	public Item getTabIconItem() {
-		return new ItemStack(ModItems.WCT).getItem();
+	public ItemStack getTabIconItem() {
+		return getIconItemStack();
 	}
 
 }

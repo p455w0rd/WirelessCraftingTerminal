@@ -6,8 +6,8 @@ import appeng.api.AEApi;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.crafting.CraftingItemList;
 import appeng.api.networking.crafting.ICraftingCPU;
-import appeng.api.networking.security.BaseActionSource;
 import appeng.api.networking.security.IActionHost;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.data.IAEItemStack;
@@ -164,7 +164,8 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 	}
 
 	@Override
-	public void postChange(final IBaseMonitor<IAEItemStack> monitor, final Iterable<IAEItemStack> change, final BaseActionSource actionSource) {
+	public void postChange(final IBaseMonitor<IAEItemStack> monitor, final Iterable<IAEItemStack> change, final IActionSource actionSource) {
+		//public void postChange(final IBaseMonitor<IAEItemStack> monitor, final Iterable<IAEItemStack> change, final WCTIActionSource actionSource) {
 		for (IAEItemStack is : change) {
 			is = is.copy();
 			is.setStackSize(1);

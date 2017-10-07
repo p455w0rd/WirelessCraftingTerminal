@@ -1,9 +1,11 @@
 package p455w0rd.wct.client.gui;
 
+import static p455w0rd.wct.init.ModEvents.CLIENT_TICKS;
+
 import java.io.IOException;
-import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -18,25 +20,25 @@ import appeng.api.util.IConfigManager;
 import appeng.client.gui.widgets.GuiImgButton;
 import appeng.client.gui.widgets.ISortSource;
 import appeng.core.AEConfig;
-import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
+import appeng.integration.Integrations;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
-import net.minecraft.inventory.ClickType;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.Optional.Interface;
-import net.minecraftforge.fml.common.Optional.Method;
 import p455w0rd.wct.client.gui.widgets.GuiMagnetButton;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
@@ -48,9 +50,6 @@ import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.container.slot.AppEngSlot;
-import p455w0rd.wct.container.slot.OptionalSlotFake;
-import p455w0rd.wct.container.slot.SlotAEBauble;
-import p455w0rd.wct.container.slot.SlotBooster;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotTrash;
@@ -58,7 +57,6 @@ import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModGlobals.Mods;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
@@ -66,10 +64,11 @@ import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import p455w0rd.wct.util.WCTUtils;
-import yalter.mousetweaks.api.IMTModGuiContainer2;
+import p455w0rdslib.util.RenderUtils;
+import yalter.mousetweaks.api.MouseTweaksIgnore;
 
-@Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer2", modid = "mousetweaks", striprefs = true)
-public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost, IMTModGuiContainer2 {
+@MouseTweaksIgnore
+public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost {
 
 	private float xSize_lo;
 	private float ySize_lo;
@@ -113,6 +112,8 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private int standardSize;
 	private final int lowerTextureOffset = 0;
 	private int rows = 0;
+	EntityLivingBase entity;
+	boolean isHalloween = false;
 
 	public GuiWCT(Container container) {
 		super(container);
@@ -129,6 +130,12 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		configSrc = containerWCT.getConfigManager();
 		devicePowered = containerWCT.isPowered();
 		((ContainerWCT) inventorySlots).setGui(this);
+
+		entity = WCTUtils.player();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		isHalloween = calendar.get(2) + 1 == 10 && calendar.get(5) == 31;
+
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
@@ -153,6 +160,10 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 			scrollBar.wheel(i);
 		}
+	}
+
+	public ItemRepo getRepo() {
+		return repo;
 	}
 
 	private void mouseWheelEvent(final int x, final int y, final int wheel) {
@@ -345,11 +356,13 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		buttonList.add(terminalStyleBox = new GuiImgButton(guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE)));
 
+		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
 		searchField.setMaxStringLength(25);
 		searchField.setTextColor(0xFFFFFF);
+		searchField.setSelectionColor(0xFF99FF99);
 		searchField.setVisible(true);
-		searchField.setEnabled(true);
+		//searchField.setEnabled(true);
 
 		buttonList.add(craftingStatusBtn = new GuiTabButton(guiLeft + 169, guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
 		buttonList.add(magnetGUIButton = new GuiMagnetButton(guiLeft + 157, guiTop + ySize - 115));
@@ -357,8 +370,13 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		final Enum<?> setting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
 		searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.JEI_AUTOSEARCH == setting);
+		searchField.setCanLoseFocus(SearchBoxMode.MANUAL_SEARCH == setting || SearchBoxMode.JEI_MANUAL_SEARCH == setting);
 
-		if (memoryText != null) {
+		if (setting == SearchBoxMode.JEI_AUTOSEARCH || setting == SearchBoxMode.JEI_MANUAL_SEARCH) {
+			memoryText = Integrations.jei().getSearchText();
+		}
+
+		if (memoryText != null && !memoryText.isEmpty()) {
 			searchField.setText(memoryText);
 			repo.setSearchString(memoryText);
 			repo.updateView();
@@ -382,6 +400,11 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					craftingGridOffsetY = Math.min(craftingGridOffsetY, g.yPos);
 				}
 			}
+		}
+
+		if (isHalloween) {
+			entity = new EntitySkeleton(WCTUtils.world());
+			entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(Blocks.LIT_PUMPKIN));
 		}
 	}
 
@@ -427,6 +450,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					searchField.setText(repo.getSearchString());
 					wasTextboxFocused = false;
 					wasResized = false;
+
 				}
 				reInit = false;
 				tick = 0;
@@ -436,7 +460,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
-		magnetGUIButton.visible = WCTUtils.isMagnetInstalled(mc.player.inventory);
+		if (magnetGUIButton != null && mc.player.inventory != null) {
+			magnetGUIButton.visible = WCTUtils.isMagnetInstalled(mc.player.inventory);
+		}
 		if (!mc.player.isEntityAlive() || mc.player.isDead) {
 			mc.player.closeScreen();
 		}
@@ -453,7 +479,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float btn) {
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		//super.drawScreen(mouseX, mouseY, btn);
 		xSize_lo = mouseX;
 		ySize_lo = mouseY;
@@ -462,7 +488,8 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (hasClicked && scrollBar != null) {
 			scrollBar.click(this, mouseX - guiLeft, mouseY - guiTop);
 		}
-		super.drawScreen(mouseX, mouseY, btn);
+
+		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 
 	@Override
@@ -481,6 +508,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			scrollBar.draw(this);
 		}
 		drawFG(ox, oy, mouseX, mouseY);
+
 	}
 
 	@Override
@@ -488,9 +516,6 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		mc.fontRenderer.drawString(I18n.format("container.inventory"), 7, ySize - 172 + 3, 4210752);
-		if (searchField != null) {
-			searchField.drawTextBox();
-		}
 	}
 
 	@Override
@@ -500,25 +525,6 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		drawBG(ox, oy, x, y);
 
-		final List<Slot> slots = getInventorySlots();
-		for (final Slot slot : slots) {
-			if (slot instanceof OptionalSlotFake) {
-				final OptionalSlotFake fs = (OptionalSlotFake) slot;
-				if (fs.renderDisabled()) {
-					if (fs.isEnabled()) {
-						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
-					}
-					else {
-						GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.4F);
-						GL11.glEnable(GL11.GL_BLEND);
-						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
-						GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-						GL11.glPopAttrib();
-					}
-				}
-			}
-		}
 	}
 
 	@Override
@@ -537,38 +543,36 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
 			this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, WCTUtils.player());
 
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : WCTUtils.player()));
+		if (isHalloween && !isAltKeyDown()) {
+
+			String name = "Happy Halloween!            ";
+			int idx = (int) ((CLIENT_TICKS / 4) % name.length());
+			name = (name + " " + name).substring(idx, idx + 10);
+
+			FontRenderer fr = RenderUtils.getFontRenderer();
+			GlStateManager.disableDepth();
+			fr.drawStringWithShadow(name, (guiLeft + 52) - fr.getStringWidth(name) / 2, (guiTop + rows * 18) + 90, 0xFFFFA00F);
+			GlStateManager.enableDepth();
+		}
+
+		if (searchField != null) {
+			searchField.drawTextBox();
+		}
 	}
 
 	@Override
 	protected void mouseClicked(final int xCoord, final int yCoord, final int btn) throws IOException {
+		searchField.mouseClicked(xCoord, yCoord, btn);
 
-		final Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
-
-		if (searchMode != SearchBoxMode.AUTOSEARCH && searchMode != SearchBoxMode.JEI_AUTOSEARCH) {
-			searchField.mouseClicked(xCoord - guiLeft, yCoord - guiTop, btn);
-		}
-
-		if (btn == 1 && searchField.isMouseIn(xCoord - guiLeft, yCoord - guiTop)) {
+		if (btn == 1 && searchField.isMouseIn(xCoord, yCoord)) {
 			searchField.setText("");
 			repo.setSearchString("");
 			repo.updateView();
 			setScrollBar();
 		}
-		/*
-				drag_click.clear();
 
-				if (btn == 1) {
-					for (final Object o : buttonList) {
-						final GuiButton guibutton = (GuiButton) o;
-						if (guibutton.mousePressed(mc, xCoord, yCoord)) {
-							super.mouseClicked(xCoord, yCoord, 0);
-							return;
-						}
-					}
-				}
-		*/
 		super.mouseClicked(xCoord, yCoord, btn);
 	}
 
@@ -576,9 +580,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		Keyboard.enableRepeatEvents(false);
-		if (searchField.getText() != null) {
-			memoryText = searchField.getText();
-		}
+		memoryText = searchField.getText();
 	}
 
 	@Override
@@ -597,37 +599,34 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		return ((ContainerWCT) inventorySlots).getCustomName();
 	}
 
-	@Override
-	protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
-		//if (slotIn != null && slotIn.getStack() != null && !(slotIn.getStack().getItem() instanceof IWirelessCraftingTerminalItem) && type != ClickType.SWAP) {
-		super.handleMouseClick(slotIn, slotId, mouseButton, type);
-		//}
+	public MEGuiTextField getSearchField() {
+		return searchField;
 	}
 
 	@Override
 	protected void keyTyped(final char character, final int key) throws IOException {
-		Slot slot = null;
-		try {
-			slot = ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, this, "theSlot", "field_147006_u", "f");
-		}
-		catch (final Throwable t) {
-		}
-		if (slot != null && ((slot instanceof SlotBooster && slot.getHasStack() && slot.getStack().getItem() == ModItems.BOOSTER_CARD) || (slot instanceof SlotAEBauble && slot.getHasStack() && slot.getStack().getItem() == ModItems.WCT))) {
-			//System.out.println("");
-			return;
-		}
 		if (!checkHotbarKeys(key)) {
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
 			if (ModKeybindings.openTerminal.getKeyCode() == key) {
-				if (AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE) == SearchBoxMode.MANUAL_SEARCH && !searchField.isFocused()) {
+				Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+				if ((searchMode == SearchBoxMode.MANUAL_SEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH) && !searchField.isFocused()) {
 					WCTUtils.player().closeScreen();
 				}
 				else {
 					if (isCtrlKeyDown()) {
 						WCTUtils.player().closeScreen();
 					}
+				}
+			}
+
+			if (isTabKeyDown()) {
+				if (!searchField.isFocused()) {
+					searchField.setFocused(true);
+				}
+				if (!searchField.getText().isEmpty()) {
+					searchField.selectAll();
 				}
 			}
 			if (searchField.textboxKeyTyped(character, key)) {
@@ -660,88 +659,6 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	@Override
 	protected List<InternalSlotME> getMeSlots() {
 		return meSlots;
-	}
-
-	public List<String> handleItemTooltip(final ItemStack stack, final int mouseX, final int mouseY, final List<String> currentToolTip) {
-		if (stack != null) {
-			final Slot s = getSlot(mouseX, mouseY);
-			if (s instanceof SlotME) {
-				final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
-
-				IAEItemStack myStack = null;
-
-				try {
-					final SlotME theSlotField = (SlotME) s;
-					myStack = theSlotField.getAEStack();
-				}
-				catch (final Throwable ignore) {
-				}
-
-				if (myStack != null) {
-					if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
-						final String local = ButtonToolTips.ItemsStored.getLocal();
-						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize());
-						final String format = String.format(local, formattedAmount);
-
-						currentToolTip.add("\u00a77" + format);
-					}
-
-					if (myStack.getCountRequestable() > 0) {
-						final String local = ButtonToolTips.ItemsRequestable.getLocal();
-						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable());
-						final String format = String.format(local, formattedAmount);
-
-						currentToolTip.add("\u00a77" + format);
-					}
-				}
-				else if (stack.getCount() > BigNumber || (stack.getCount() > 1 && stack.isItemDamaged())) {
-					final String local = ButtonToolTips.ItemsStored.getLocal();
-					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(stack.getCount());
-					final String format = String.format(local, formattedAmount);
-
-					currentToolTip.add("\u00a77" + format);
-				}
-			}
-		}
-		return currentToolTip;
-	}
-
-	@Override
-	protected void renderToolTip(final ItemStack stack, final int x, final int y) {
-		final Slot s = getSlot(x, y);
-		if (s instanceof SlotME && stack != null) {
-			final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
-
-			IAEItemStack myStack = null;
-
-			try {
-				final SlotME theSlotField = (SlotME) s;
-				myStack = theSlotField.getAEStack();
-			}
-			catch (final Throwable ignore) {
-			}
-
-			if (myStack != null) {
-				final List<String> currentToolTip = stack.getTooltip(WCTUtils.player(), mc.gameSettings.advancedItemTooltips ? TooltipFlags.ADVANCED : TooltipFlags.NORMAL);
-
-				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
-					currentToolTip.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize()));
-				}
-
-				if (myStack.getCountRequestable() > 0) {
-					currentToolTip.add("Items Requestable: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable()));
-				}
-
-				drawTooltip(x, y, join(currentToolTip, "\n"));
-			}
-			else if (stack.getCount() > BigNumber) {
-				final List<String> var4 = stack.getTooltip(WCTUtils.player(), mc.gameSettings.advancedItemTooltips ? TooltipFlags.ADVANCED : TooltipFlags.NORMAL);
-				var4.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(stack.getCount()));
-				drawTooltip(x, y, join(var4, "\n"));
-				return;
-			}
-		}
-		super.renderToolTip(stack, x, y);
 	}
 
 	@Override
@@ -782,48 +699,6 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	@Override
 	public Enum getSortDisplay() {
 		return configSrc.getSetting(Settings.VIEW_MODE);
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean MT_isMouseTweaksDisabled() {
-		return true;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean MT_isWheelTweakDisabled() {
-		return false;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public Container MT_getContainer() {
-		return null;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public Slot MT_getSlotUnderMouse() {
-		return null;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean MT_isCraftingOutput(Slot slot) {
-		return false;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean MT_isIgnored(Slot slot) {
-		return false;
-	}
-
-	@Method(modid = "mousetweaks")
-	@Override
-	public boolean MT_disableRMBDraggingFunctionality() {
-		return false;
 	}
 
 }

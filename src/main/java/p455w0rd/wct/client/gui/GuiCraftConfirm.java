@@ -303,7 +303,7 @@ public class GuiCraftConfirm extends WCTBaseGui {
 				final int posX = x * (1 + sectionLength) + xo + sectionLength - 19;
 				final int posY = y * offY + yo;
 
-				final ItemStack is = refStack.copy().getItemStack();
+				final ItemStack is = refStack.copy().createItemStack();
 
 				if (tooltip == z - viewStart) {
 					dspToolTip = Platform.getItemDisplayName(is);

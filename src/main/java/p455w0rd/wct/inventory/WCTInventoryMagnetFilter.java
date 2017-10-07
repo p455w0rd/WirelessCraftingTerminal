@@ -5,6 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import p455w0rd.wct.container.ContainerMagnet;
@@ -12,14 +13,14 @@ import p455w0rd.wct.container.ContainerMagnet;
 public class WCTInventoryMagnetFilter implements IInventory {
 
 	private String name = "MagnetFilter";
-	private final ItemStack invItem;
-	private ItemStack[] inventory;
+	private final ItemStack magnet;
+	private NonNullList<ItemStack> inventory;
 	private ContainerMagnet container;
 
 	public WCTInventoryMagnetFilter(ItemStack stack) {
-		super();
-		inventory = new ItemStack[27];
-		invItem = stack;
+
+		inventory = NonNullList.withSize(27, ItemStack.EMPTY);
+		magnet = stack;
 		if (!stack.hasTagCompound()) {
 			stack.setTagCompound(new NBTTagCompound());
 		}
@@ -32,12 +33,12 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public int getSizeInventory() {
-		return 27;
+		return inventory.size();
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return inventory[slot];
+		return inventory.get(slot);
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
-		inventory[slot] = stack;
+		inventory.set(slot, stack);
 
 		if (!stack.isEmpty() && stack.getCount() > getInventoryStackLimit()) {
 			stack.setCount(getInventoryStackLimit());
@@ -87,7 +88,7 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public void markDirty() {
-		writeNBT(invItem.getTagCompound());
+		writeNBT(magnet.getTagCompound());
 		container.detectAndSendChanges();
 	}
 
@@ -98,23 +99,26 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	public void readFromNBT(NBTTagCompound nbtTagCompound) {
 		NBTTagList tagList = nbtTagCompound.getTagList(name, 10);
-		inventory = new ItemStack[getSizeInventory()];
+		inventory = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
 		for (int i = 0; i < tagList.tagCount(); ++i) {
 			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
 			int slot = tagCompound.getInteger("Slot");
-			if (slot >= 0 && slot < inventory.length) {
-				inventory[slot] = new ItemStack(tagCompound);
+			if (slot >= 0 && slot < inventory.size()) {
+				inventory.set(slot, new ItemStack(tagCompound));
 			}
 		}
 	}
 
 	public void writeNBT(NBTTagCompound nbtTagCompound) {
+		if (nbtTagCompound == null) {
+			nbtTagCompound = new NBTTagCompound();
+		}
 		NBTTagList tagList = new NBTTagList();
-		for (int currentIndex = 0; currentIndex < inventory.length; ++currentIndex) {
-			if (inventory[currentIndex] != null) {
+		for (int currentIndex = 0; currentIndex < inventory.size(); ++currentIndex) {
+			if (!inventory.get(currentIndex).isEmpty()) {
 				NBTTagCompound tagCompound = new NBTTagCompound();
 				tagCompound.setInteger("Slot", currentIndex);
-				inventory[currentIndex].writeToNBT(tagCompound);
+				inventory.get(currentIndex).writeToNBT(tagCompound);
 				tagList.appendTag(tagCompound);
 			}
 		}
@@ -155,14 +159,14 @@ public class WCTInventoryMagnetFilter implements IInventory {
 
 	@Override
 	public void clear() {
-		for (int i = 0; i < inventory.length; i++) {
+		for (int i = 0; i < inventory.size(); i++) {
 			setInventorySlotContents(i, ItemStack.EMPTY);
 		}
 	}
 
 	@Override
 	public boolean isEmpty() {
-		for (int i = 0; i < inventory.length; i++) {
+		for (int i = 0; i < inventory.size(); i++) {
 			if (!getStackInSlot(i).isEmpty()) {
 				return false;
 			}

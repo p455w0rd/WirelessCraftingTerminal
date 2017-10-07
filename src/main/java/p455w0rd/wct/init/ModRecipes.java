@@ -20,9 +20,11 @@ import appeng.core.ApiDefinitions;
 import appeng.core.api.definitions.ApiMaterials;
 import appeng.core.api.definitions.ApiParts;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
-import net.minecraftforge.oredict.ShapelessOreRecipe;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import p455w0rdslib.util.RecipeUtils;
 
 /**
  * @author p455w0rd
@@ -30,6 +32,9 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
  */
 public class ModRecipes {
 
+	public static IRecipe WCT, MAGNET_CARD, BOOSTER_CARD;
+
+	@SuppressWarnings("deprecation")
 	public static void init() {
 		if (ModConfig.WCT_MINETWEAKER_OVERRIDE) {
 			return;
@@ -45,12 +50,15 @@ public class ModRecipes {
 		ItemStack advancedCard = materials.advCard().maybeStack(1).get();
 		ItemStack annihilationPlane = parts.annihilationPlane().maybeStack(1).get();
 
-		GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(ModItems.WCT), new Object[] {
+		ForgeRegistries.RECIPES.register(WCT = new ShapelessRecipes(ModGlobals.MODID + ":wct", new ItemStack(ModItems.WCT), RecipeUtils.createInput(new Object[] {
 				wt,
 				fluixPearl,
 				craftingTerminal
-		}));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.MAGNET_CARD), new Object[] {
+		})).setRegistryName(new ResourceLocation(ModGlobals.MODID, "wct")));
+
+		//RecipeUtils.addShapeless(new ItemStack(ModItems.WCT), wt, fluixPearl, craftingTerminal));
+
+		ForgeRegistries.RECIPES.register(MAGNET_CARD = RecipeUtils.addOldShaped(new ItemStack(ModItems.MAGNET_CARD), new Object[] {
 				"abc",
 				"ded",
 				"ddd",
@@ -67,7 +75,7 @@ public class ModRecipes {
 		}));
 
 		if (!ModConfig.WCT_DISABLE_BOOSTER_RECIPE) {
-			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
+			ForgeRegistries.RECIPES.register(BOOSTER_CARD = RecipeUtils.addOldShaped(new ItemStack(ModItems.BOOSTER_CARD), new Object[] {
 					"a a",
 					" b ",
 					"   ",

@@ -252,7 +252,7 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource {
 				final int posX = x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19;
 				final int posY = y * offY + ITEMSTACK_TOP_OFFSET;
 
-				final ItemStack is = refStack.copy().getItemStack();
+				final ItemStack is = refStack.copy().createItemStack();
 
 				if (tooltip == z - viewStart) {
 					dspToolTip = Platform.getItemDisplayName(is);

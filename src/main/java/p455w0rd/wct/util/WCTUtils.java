@@ -15,6 +15,8 @@
  */
 package p455w0rd.wct.util;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -28,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemMagnet;
 
@@ -37,22 +40,23 @@ import p455w0rd.wct.items.ItemMagnet;
  */
 public class WCTUtils {
 
+	@Nonnull
 	public static ItemStack getWirelessTerm(InventoryPlayer playerInv) {
-		if (playerInv.player.getHeldItemMainhand() != null && playerInv.player.getHeldItemMainhand().getItem() instanceof IWirelessCraftingTerminalItem) {
+		if (!playerInv.player.getHeldItemMainhand().isEmpty() && playerInv.player.getHeldItemMainhand().getItem() instanceof IWirelessCraftingTerminalItem) {
 			return playerInv.player.getHeldItemMainhand();
 		}
-		ItemStack wirelessTerm = null;
+		ItemStack wirelessTerm = ItemStack.EMPTY;
 		if (Mods.BAUBLES.isLoaded()) {
 			wirelessTerm = Baubles.getWCTBauble(playerInv.player);
 		}
-		if (wirelessTerm == null) {
+		if (wirelessTerm.isEmpty()) {
 			int invSize = playerInv.getSizeInventory();
 			if (invSize <= 0) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			for (int i = 0; i < invSize; ++i) {
 				ItemStack item = playerInv.getStackInSlot(i);
-				if (item == null) {
+				if (item.isEmpty()) {
 					continue;
 				}
 				if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
@@ -64,20 +68,21 @@ public class WCTUtils {
 		return wirelessTerm;
 	}
 
+	@Nonnull
 	public static ItemStack getMagnet(InventoryPlayer playerInv) {
 		// Is player holding a Magnet Card?
-		if (playerInv.player.getHeldItemMainhand() != null && playerInv.player.getHeldItemMainhand().getItem() instanceof ItemMagnet) {
+		if (!playerInv.player.getHeldItemMainhand().isEmpty() && playerInv.player.getHeldItemMainhand().getItem() == ModItems.MAGNET_CARD) {
 			return playerInv.player.getHeldItemMainhand();
 		}
 		// if not true, try to return first magnet card from first
 		// wireless term that has a MagnetCard installed
 		ItemStack wirelessTerm = getWirelessTerm(playerInv);
-		if (wirelessTerm != null && wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
-			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
-			if (nbtTC.hasKey("MagnetSlot")) {
-				NBTTagList magnetSlot = nbtTC.getTagList("MagnetSlot", 10);
+		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound() && wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
+			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound("MagnetSlot");
+			if (magnetNBT != null) {
+				NBTTagList magnetSlot = magnetNBT.getTagList("Items", 10);
 				ItemStack magnetItem = new ItemStack(magnetSlot.getCompoundTagAt(0));
-				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+				if (magnetItem != null && !magnetItem.isEmpty() && magnetItem.getItem() == ModItems.MAGNET_CARD) {
 					return magnetItem;
 				}
 			}
@@ -85,16 +90,16 @@ public class WCTUtils {
 		// No wireless crafting terminal with Magnet Card installed,
 		// is there a Magnet Card in the player's inventory?
 		int invSize = playerInv.getSizeInventory();
-		ItemStack magnetItem = null;
+		ItemStack magnetItem = ItemStack.EMPTY;
 		if (invSize <= 0) {
-			return null;
+			return ItemStack.EMPTY;
 		}
 		for (int i = 0; i < invSize; ++i) {
 			ItemStack item = playerInv.getStackInSlot(i);
-			if (item == null) {
+			if (item.isEmpty()) {
 				continue;
 			}
-			if (item.getItem() instanceof ItemMagnet) {
+			if (item.getItem() == ModItems.MAGNET_CARD) {
 				magnetItem = item;
 				break;
 			}
@@ -102,8 +107,8 @@ public class WCTUtils {
 		return magnetItem;
 	}
 
-	public static boolean isMagnetInitialized(ItemStack magnetItem) {
-		if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+	public static boolean isMagnetInitialized(@Nonnull ItemStack magnetItem) {
+		if (!magnetItem.isEmpty() && magnetItem.getItem() == ModItems.MAGNET_CARD) {
 			if (!magnetItem.hasTagCompound()) {
 				magnetItem.setTagCompound(new NBTTagCompound());
 			}
@@ -115,12 +120,18 @@ public class WCTUtils {
 	}
 
 	public static boolean isMagnetInstalled(InventoryPlayer ip) {
-		if (getWirelessTerm(ip) != null && getWirelessTerm(ip).hasTagCompound() && getWirelessTerm(ip).getTagCompound().hasKey("MagnetSlot")) {
-			NBTTagCompound magnetNBTForm = getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
-			if (magnetNBTForm != null) {
-				ItemStack magnetItem = new ItemStack(magnetNBTForm);
-				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
-					return true;
+		if (!getWirelessTerm(ip).isEmpty() && getWirelessTerm(ip).hasTagCompound() && getWirelessTerm(ip).getTagCompound().hasKey("MagnetSlot")) {
+			NBTTagCompound magnetNBT = getWirelessTerm(ip).getSubCompound("MagnetSlot");
+			if (magnetNBT != null) {
+				NBTTagList magnetList = magnetNBT.getTagList("Items", 10);
+				if (magnetList != null && !magnetList.hasNoTags()) {
+					NBTTagCompound magnetNBTForm = magnetList.getCompoundTagAt(0);
+					if (magnetNBTForm != null) {
+						ItemStack magnetItem = new ItemStack(magnetNBTForm);
+						if (!magnetItem.isEmpty() && magnetItem.getItem() instanceof ItemMagnet) {
+							return true;
+						}
+					}
 				}
 			}
 		}
@@ -128,7 +139,7 @@ public class WCTUtils {
 	}
 
 	public static void removeTimerTags(ItemStack is) {
-		if (is == null || is.getTagCompound() == null) {
+		if (is.isEmpty() || is.getTagCompound() == null) {
 			return;
 		}
 		if (is.getTagCompound().hasKey("WCTReset")) {

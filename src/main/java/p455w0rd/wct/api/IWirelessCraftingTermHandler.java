@@ -18,11 +18,13 @@ package p455w0rd.wct.api;
 import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.items.IAEItemPowerStorage;
 import cofh.redstoneflux.api.IEnergyContainerItem;
+import net.minecraftforge.fml.common.Optional;
 
 /**
  * @author p455w0rd
  *
  */
+@Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyContainerItem", modid = "redstoneflux")
 public interface IWirelessCraftingTermHandler extends IWirelessTermHandler, IAEItemPowerStorage, IEnergyContainerItem {
 
 }

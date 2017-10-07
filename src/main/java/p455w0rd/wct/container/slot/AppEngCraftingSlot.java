@@ -111,6 +111,10 @@ public class AppEngCraftingSlot extends AppEngSlot {
 		return super.decrStackSize(par1);
 	}
 
+	public EntityPlayer getPlayer() {
+		return thePlayer;
+	}
+
 	protected NonNullList<ItemStack> getRemainingItems(InventoryCrafting ic, World world) {
 		return CraftingManager.getRemainingItems(ic, world);
 	}

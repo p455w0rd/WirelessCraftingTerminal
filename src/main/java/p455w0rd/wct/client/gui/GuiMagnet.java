@@ -217,15 +217,23 @@ public class GuiMagnet extends GuiContainer {
 
 			if (WCTUtils.isMagnetInstalled(((ContainerMagnet) inventorySlots).inventoryPlayer)) {
 				ItemStack wct = WCTUtils.getWirelessTerm(((ContainerMagnet) inventorySlots).inventoryPlayer);
-				NBTTagCompound newNBT = wct.getTagCompound();
-				NBTTagList magnetNBTForm = wct.getTagCompound().getTagList("MagnetSlot", 10);
-				if (magnetNBTForm.getCompoundTagAt(0) != null) {
-					magnetNBTForm.set(0, magnetItem.serializeNBT());
+				if (!wct.isEmpty() && wct.hasTagCompound()) {
+					NBTTagCompound newNBT = wct.getSubCompound("MagnetSlot");
+					if (newNBT != null) {
+						NBTTagList magnetNBTList = newNBT.getTagList("Items", 10);
+						if (magnetNBTList != null && !magnetNBTList.hasNoTags()) {
+							NBTTagCompound magnetNBTForm = magnetNBTList.getCompoundTagAt(0);
+							if (magnetNBTForm != null) {
+								NBTTagCompound newMagnetNBTForm = magnetItem.serializeNBT();
+								magnetNBTList.set(0, newMagnetNBTForm);
+							}
+							wct.getSubCompound("MagnetSlot").setTag("Items", magnetNBTList);
+						}
+					}
 				}
-				newNBT.setTag("MagnetSlot", magnetNBTForm);
 			}
 		}
-		NetworkHandler.instance().sendToServer(new PacketMagnetFilter(type, mode, magnetItem));
+		NetworkHandler.instance().sendToServer(new PacketMagnetFilter(type, mode));
 	}
 
 	private boolean getMode(int type) {

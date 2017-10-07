@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
-import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.helpers.InventoryAction;
@@ -46,7 +46,7 @@ public class ContainerCraftAmount extends WCTBaseContainer {
 		return WCTUtils.world(WCTUtils.player(getPlayerInv()));
 	}
 
-	public BaseActionSource getActionSrc() {
+	public IActionSource getActionSrc() {
 		return new WCTPlayerSource(getPlayerInv().player, (WCTIActionHost) getTarget());
 	}
 

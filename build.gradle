@@ -19,11 +19,10 @@ archivesBaseName = "WirelessCraftingTerminal"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-	version = "1.12-14.21.1.2412"
+	version = "1.12.1-14.22.1.2485"
 	runDir = "run"
-	
 	mappings = "snapshot_20170624"
-	useDepAts = false
+	useDepAts = true
 }
 
 repositories {

@@ -17,7 +17,12 @@ package p455w0rd.wct.init;
 
 import org.lwjgl.input.Keyboard;
 
+import appeng.api.config.SearchBoxMode;
+import appeng.api.config.Settings;
+import appeng.core.AEConfig;
+import appeng.integration.Integrations;
 import appeng.tile.networking.TileController;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,6 +36,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -40,10 +46,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.client.gui.GuiWCT;
+import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
@@ -65,6 +75,9 @@ import p455w0rdslib.util.ChunkUtils;
  *
  */
 public class ModEvents {
+
+	@SideOnly(Side.CLIENT)
+	public static long CLIENT_TICKS = 0;
 
 	public static void init() {
 		MinecraftForge.EVENT_BUS.register(new ModEvents());
@@ -129,18 +142,19 @@ public class ModEvents {
 				continue;
 			}
 			*/
-		if (wirelessTerm != null && wirelessTerm.hasTagCompound()) {
-			NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
-			NBTTagList tagList = nbtTC.getTagList("MagnetSlot", 10);
-			if (tagList != null) {
-				NBTTagCompound magCompound = tagList.getCompoundTagAt(0);
-				if (magCompound != null) {
-					ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magCompound);
-					if (magnetItem != null) {
-						((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
-						if (magnetItem.getItem() instanceof ItemMagnet) {
-							((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
-							//continue;
+		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound()) {
+			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound("MagnetSlot");
+			if (magnetNBT != null) {
+				NBTTagList tagList = magnetNBT.getTagList("Items", 10);
+				if (tagList != null && !tagList.hasNoTags()) {
+					NBTTagCompound magCompound = tagList.getCompoundTagAt(0);
+					if (magCompound != null) {
+						ItemStack magnetItem = new ItemStack(magCompound);
+						if (!magnetItem.isEmpty()) {
+							((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
+							if (magnetItem.getItem() instanceof ItemMagnet) {
+								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
+							}
 						}
 					}
 				}
@@ -151,7 +165,15 @@ public class ModEvents {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onKeyInput(KeyInputEvent event) {
+	public void onClientTick(ClientTickEvent e) {
+		if (e.phase == Phase.END) {
+			CLIENT_TICKS++;
+		}
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onKeyInput(KeyInputEvent e) {
 		EntityPlayer p = WCTUtils.player();
 		if (p.openContainer == null) {
 			return;
@@ -159,7 +181,7 @@ public class ModEvents {
 		//if (p.openContainer instanceof ContainerPlayer) {
 		if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
 			ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
-			if (is == null) {
+			if (is.isEmpty()) {
 				return;
 			}
 			IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
@@ -175,7 +197,7 @@ public class ModEvents {
 		}
 		else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
 			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-			if (magnetItem != null) {
+			if (!magnetItem.isEmpty()) {
 				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
 					if (magnetItem.getTagCompound() == null) {
 						magnetItem.setTagCompound(new NBTTagCompound());
@@ -189,7 +211,7 @@ public class ModEvents {
 		}
 		else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
 			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-			if (magnetItem != null) {
+			if (!magnetItem.isEmpty()) {
 				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
 					if (!magnetItem.hasTagCompound()) {
 						magnetItem.setTagCompound(new NBTTagCompound());
@@ -234,6 +256,24 @@ public class ModEvents {
 		if (Mods.BAUBLES.isLoaded() && !BaubleRenderDispatcher.getRegistry().containsKey(event.getRenderer())) {
 			event.getRenderer().addLayer(new BaubleRenderDispatcher(event.getRenderer()));
 			BaubleRenderDispatcher.getRegistry().put(event.getRenderer(), null);
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onkeyTyped(GuiScreenEvent.KeyboardInputEvent.Post e) {
+		if (Mods.JEI.isLoaded() && Minecraft.getMinecraft().currentScreen instanceof GuiWCT) {
+			Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+			if (searchMode == SearchBoxMode.JEI_AUTOSEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH) {
+				GuiWCT gui = (GuiWCT) Minecraft.getMinecraft().currentScreen;
+				String searchText = Integrations.jei().getSearchText();
+				if (gui.getSearchField() != null) {
+					gui.getRepo().setSearchString(searchText);
+					gui.getRepo().updateView();
+					gui.getSearchField().setText(searchText);
+					WCTBaseGui.memoryText = searchText;
+				}
+			}
 		}
 	}
 

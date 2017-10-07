@@ -2,7 +2,7 @@ package p455w0rd.wct.container.slot;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
-import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.init.ModItems;
 
 public class SlotMagnet extends AppEngSlot {
 
@@ -11,8 +11,13 @@ public class SlotMagnet extends AppEngSlot {
 	}
 
 	@Override
+	public int getSlotStackLimit() {
+		return 1;
+	}
+
+	@Override
 	public boolean isItemValid(ItemStack is) {
-		return ((is != null) && (is.getItem() instanceof ItemMagnet));
+		return !is.isEmpty() && (is.getItem() == ModItems.MAGNET_CARD);
 	}
 
 }

@@ -3,13 +3,14 @@ package p455w0rd.wct.sync.packets;
 import java.util.concurrent.Future;
 
 import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridHost;
+import appeng.api.networking.IGridNode;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.handlers.GuiHandler;
@@ -44,9 +45,16 @@ public class PacketCraftRequest extends WCTPacket {
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		if (player.openContainer instanceof ContainerCraftAmount) {
 			final ContainerCraftAmount cca = (ContainerCraftAmount) player.openContainer;
-			final Object target = cca.getTarget();
-			if (target instanceof IGridHost) {
-				final IGrid g = cca.obj.getTargetGrid();
+			final Object target = cca.getTarget();//.getTarget();
+			if (target instanceof WCTIActionHost) {
+				final WCTIActionHost ah = (WCTIActionHost) target;
+				final IGridNode gn = ah.getActionableNode(true);
+
+				if (gn == null) {
+					return;
+				}
+
+				final IGrid g = gn.getGrid();
 				if (g == null || cca.getItemToCraft() == null) {
 					return;
 				}

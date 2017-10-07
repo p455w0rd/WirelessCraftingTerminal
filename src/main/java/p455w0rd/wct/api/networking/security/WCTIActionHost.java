@@ -1,8 +1,9 @@
 package p455w0rd.wct.api.networking.security;
 
-import appeng.api.networking.*;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.security.IActionHost;
 
-public interface WCTIActionHost extends IGridHost {
+public interface WCTIActionHost extends IActionHost {
 
 	/**
 	 * Used to for calculating security rules, you must supply a node from your
@@ -12,6 +13,7 @@ public interface WCTIActionHost extends IGridHost {
 	 * @return the the gridnode that actions from this IGridHost are preformed
 	 * by.
 	 */
+	@Override
 	IGridNode getActionableNode();
 
 	IGridNode getActionableNode(boolean ignoreRange);

@@ -40,10 +40,11 @@ public class CommonProxy {
 		NetworkHandler.init();
 		ModEvents.init();
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
+		ModRecipes.init();
 	}
 
 	public void init(FMLInitializationEvent e) {
-		ModRecipes.init();
+
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {

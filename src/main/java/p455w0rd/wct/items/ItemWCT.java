@@ -62,13 +62,14 @@ import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
  *
  */
-@Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles|api")
+@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
 public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
 	private static final String name = "wct";
@@ -89,14 +90,14 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
-		if (!world.isRemote && hand == EnumHand.MAIN_HAND && item != null && !item.isEmpty()) {
+		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
 			GuiHandler.open(GuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		if (world.isRemote) {
 			WCTBaseGui.memoryText = "";
 		}
-		return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 	}
 
 	@Override
@@ -106,12 +107,13 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemList) {
-		super.getCheckedSubItems(creativeTab, itemList);
-
-		itemList.add(new ItemStack(this));
-		ItemStack is = new ItemStack(this);
-		injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
-		itemList.add(is);
+		if (isInCreativeTab(creativeTab)) {
+			super.getCheckedSubItems(creativeTab, itemList);
+			itemList.add(new ItemStack(this));
+			ItemStack is = new ItemStack(this);
+			injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
+			itemList.add(is);
+		}
 	}
 
 	@Override
@@ -215,10 +217,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public boolean canHandle(ItemStack is) {
-		if (is.getItem().getRegistryName().toString().equals(getRegistryName().toString())) {
-			return true;
-		}
-		return false;
+		return ItemStack.areItemsEqual(is, getDefaultInstance());
 	}
 
 	private double injectPower(PowerUnits inputUnit, final ItemStack is, final double amount, final boolean simulate) {
@@ -230,26 +229,47 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			return amount - requiredExt;
 		}
 		else {
-			final double powerRemainder = injectAEPower(is, inputUnit.convertTo(PowerUnits.AE, amount), Actionable.MODULATE);
+			final double powerRemainder = injectAEPower(is, inputUnit.convertTo(PowerUnits.AE, amount), simulate ? Actionable.SIMULATE : Actionable.MODULATE);
 			return PowerUnits.AE.convertTo(inputUnit, powerRemainder);
 		}
 	}
 
 	@Override
+	public double injectAEPower(final ItemStack is, final double amount, Actionable mode) {
+		final double maxStorage = getAEMaxPower(is);
+		final double currentStorage = getAECurrentPower(is);
+		final double required = maxStorage - currentStorage;
+		final double overflow = Math.min(amount * 10000 - required, amount - required);
+
+		if (mode == Actionable.MODULATE) {
+			final NBTTagCompound data = Platform.openNbtData(is);
+			final double toAdd = Math.min(Math.min(amount * 10000, required), required);
+
+			data.setDouble("internalCurrentPower", currentStorage + toAdd);
+		}
+
+		return Math.max(0, overflow);
+	}
+
+	@Optional.Method(modid = "redstoneflux")
+	@Override
 	public int receiveEnergy(final ItemStack is, final int maxReceive, final boolean simulate) {
 		return maxReceive - (int) injectPower(PowerUnits.RF, is, maxReceive, simulate);
 	}
 
+	@Optional.Method(modid = "redstoneflux")
 	@Override
 	public int extractEnergy(final ItemStack container, final int maxExtract, final boolean simulate) {
 		return 0;
 	}
 
+	@Optional.Method(modid = "redstoneflux")
 	@Override
 	public int getEnergyStored(final ItemStack is) {
 		return (int) PowerUnits.AE.convertTo(PowerUnits.RF, getAECurrentPower(is));
 	}
 
+	@Optional.Method(modid = "redstoneflux")
 	@Override
 	public int getMaxEnergyStored(final ItemStack is) {
 		return (int) PowerUnits.AE.convertTo(PowerUnits.RF, getAEMaxPower(is));
@@ -269,13 +289,16 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@Override
 	public boolean checkForBooster(final ItemStack wirelessTerminal) {
 		if (wirelessTerminal.hasTagCompound()) {
-			NBTTagList boosterNBTList = wirelessTerminal.getTagCompound().getTagList(BOOSTER_SLOT_NBT, 10);
-			if (boosterNBTList != null) {
-				NBTTagCompound boosterTagCompound = boosterNBTList.getCompoundTagAt(0);
-				if (boosterTagCompound != null) {
-					ItemStack boosterCard = new ItemStack(boosterTagCompound);
-					if (boosterCard != null) {
-						return ((boosterCard.getItem() instanceof ItemInfinityBooster) && ModConfig.WCT_BOOSTER_ENABLED);
+			NBTTagCompound boosterNBT = wirelessTerminal.getSubCompound(BOOSTER_SLOT_NBT);
+			if (boosterNBT != null) {
+				NBTTagList boosterNBTList = boosterNBT.getTagList("Items", 10);
+				if (boosterNBTList != null) {
+					NBTTagCompound boosterTagCompound = boosterNBTList.getCompoundTagAt(0);
+					if (boosterTagCompound != null) {
+						ItemStack boosterCard = new ItemStack(boosterTagCompound);
+						if (boosterCard != null) {
+							return ((boosterCard.getItem() instanceof ItemInfinityBooster) && ModConfig.WCT_BOOSTER_ENABLED);
+						}
 					}
 				}
 			}
@@ -285,13 +308,16 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	private boolean isMagnetInstalled(final ItemStack wirelessTerminal) {
 		if (wirelessTerminal.hasTagCompound()) {
-			NBTTagList magnetNBTList = wirelessTerminal.getTagCompound().getTagList(MAGNET_SLOT_NBT, 10);
-			if (magnetNBTList != null) {
-				NBTTagCompound magnetTagCompound = magnetNBTList.getCompoundTagAt(0);
-				if (magnetTagCompound != null) {
-					ItemStack magnetCard = new ItemStack(magnetTagCompound);
-					if (magnetCard != null) {
-						return ((magnetCard.getItem() instanceof ItemMagnet));
+			NBTTagCompound magnetNBT = wirelessTerminal.getSubCompound(MAGNET_SLOT_NBT);
+			if (magnetNBT != null) {
+				NBTTagList magnetNBTList = magnetNBT.getTagList("Items", 10);
+				if (magnetNBTList != null) {
+					NBTTagCompound magnetTagCompound = magnetNBTList.getCompoundTagAt(0);
+					if (magnetTagCompound != null) {
+						ItemStack magnetCard = new ItemStack(magnetTagCompound);
+						if (magnetCard != null) {
+							return ((magnetCard.getItem() == ModItems.MAGNET_CARD));
+						}
 					}
 				}
 			}
@@ -315,6 +341,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			return;
 		}
 		checkForBooster(wirelessTerminal);
+		isMagnetInstalled(wirelessTerminal);
 	}
 
 	//@Optional.Method(modid = "Baubles|API")

@@ -1,11 +1,12 @@
 package p455w0rd.wct.container.slot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.energy.IEnergySource;
-import appeng.api.networking.security.BaseActionSource;
+import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IStorageMonitorable;
 import appeng.api.storage.data.IAEItemStack;
@@ -39,12 +40,12 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 	private final IItemHandler craftInv;
 	private final IItemHandler pattern;
 
-	private final BaseActionSource mySrc;
+	private final IActionSource mySrc;
 	private final IEnergySource energySrc;
 	private final IStorageMonitorable storage;
 	private final IContainerCraftingPacket container;
 
-	public SlotCraftingTerm(final EntityPlayer player, final BaseActionSource mySrc, final IEnergySource energySrc, final IStorageMonitorable storage, final IItemHandler cMatrix, final IItemHandler secondMatrix, final IItemHandler output, final int x, final int y, final IContainerCraftingPacket ccp) {
+	public SlotCraftingTerm(final EntityPlayer player, final IActionSource mySrc, final IEnergySource energySrc, final IStorageMonitorable storage, final IItemHandler cMatrix, final IItemHandler secondMatrix, final IItemHandler output, final int x, final int y, final IContainerCraftingPacket ccp) {
 		super(player, cMatrix, output, 0, x, y);
 		this.energySrc = energySrc;
 		this.storage = storage;
@@ -100,16 +101,16 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 			return;
 		}
 
-		final ItemStack rs = Platform.cloneItemStack(getStack());
-		if (rs == null) {
+		final ItemStack rs = getStack().copy();
+		if (rs.isEmpty()) {
 			return;
 		}
 
 		for (int x = 0; x < maxTimesToCraft; x++) {
-			if (ia.simulateAdd(rs) == null) {
+			if (ia.simulateAdd(rs).isEmpty()) {
 				final IItemList<IAEItemStack> all = inv.getStorageList();
 				final ItemStack extra = ia.addItems(craftItem(who, rs, inv, all));
-				if (extra != null) {
+				if (!extra.isEmpty()) {
 					final List<ItemStack> drops = new ArrayList<ItemStack>();
 					drops.add(extra);
 					Platform.spawnDrops(WCTUtils.world(who), new BlockPos((int) who.posX, (int) who.posY, (int) who.posZ), drops);
@@ -150,15 +151,13 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 		return maxTimesToCraft;
 	}
 
-	@SuppressWarnings({
-			"rawtypes",
-			"unchecked"
-	})
-	private ItemStack craftItem(final EntityPlayer p, final ItemStack request, final IMEMonitor<IAEItemStack> inv, final IItemList all) {
+	private ItemStack craftItem(final EntityPlayer p, final ItemStack request, final IMEMonitor<IAEItemStack> inv, final IItemList<IAEItemStack> all) {
 		ItemStack is = getStack();
 
-		if (is != null && Platform.itemComparisons().isEqualItem(request, is)) {
+		if (!is.isEmpty() && ItemStack.areItemsEqual(request, is)) {
 			final ItemStack[] set = new ItemStack[getPattern().getSlots()];
+
+			Arrays.fill(set, ItemStack.EMPTY);
 
 			// add one of each item to the items on the board...
 			if (Platform.isServer()) {
@@ -167,7 +166,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 					ic.setInventorySlotContents(x, getPattern().getStackInSlot(x));
 				}
 
-				final IRecipe r = findRecipe(ic, WCTUtils.world(p));
+				final IRecipe r = findRecipe(ic, p.getEntityWorld());
 
 				if (r == null) {
 					final Item target = request.getItem();
@@ -175,7 +174,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 						boolean isBad = false;
 						for (int x = 0; x < ic.getSizeInventory(); x++) {
 							final ItemStack pis = ic.getStackInSlot(x);
-							if (pis == null) {
+							if (pis.isEmpty()) {
 								continue;
 							}
 							if (pis.getItem() != target) {
@@ -235,7 +234,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 					// eek! put it back!
 					final IAEItemStack fail = inv.injectItems(AEItemStack.create(set[x]), Actionable.MODULATE, mySrc);
 					if (fail != null) {
-						drops.add(fail.getItemStack());
+						drops.add(fail.createItemStack());
 					}
 				}
 			}
