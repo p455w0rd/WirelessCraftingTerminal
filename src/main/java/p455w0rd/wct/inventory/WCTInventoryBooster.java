@@ -16,7 +16,6 @@ public class WCTInventoryBooster implements IInventory {
 	private ItemStack[] inventory;
 
 	public WCTInventoryBooster(ItemStack stack) {
-		super();
 		inventory = new ItemStack[1];
 		invItem = stack;
 		if (stack != null) {

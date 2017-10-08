@@ -1,19 +1,14 @@
 package p455w0rd.wct.container.slot;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import p455w0rd.wct.util.WCTUtils;
 
 public class SlotTrash extends AppEngSlot {
 
-	private final EntityPlayer entityPlayer;
-	private ItemStack itemStack;
-	private boolean shouldDeleteMouseStack;
-	private String name = "TrashSlot";
+	public SlotTrash(IInventory inv, int x, int y) {
+		super(inv, 0, x, y);
+	}
 
+	/*
 	public SlotTrash(IInventory inv, int x, int y, EntityPlayer player) {
 		super(null, 0, x, y);
 		entityPlayer = player;
@@ -47,6 +42,7 @@ public class SlotTrash extends AppEngSlot {
 		if (itemStack != null && shouldDeleteMouseStack) {
 			entityPlayer.inventory.setItemStack(null);
 		}
+		writeNBT();
 	}
 
 	@Override
@@ -106,7 +102,13 @@ public class SlotTrash extends AppEngSlot {
 			itemStack.writeToNBT(tagCompound);
 			tagList.appendTag(tagCompound);
 		}
-
+		if (getContainer() != null && (getContainer() instanceof ContainerWCT)) {
+			if (Mods.BAUBLES.isLoaded()) {
+				if (Platform.isClient()) {
+					Baubles.doForcedSync(entityPlayer, terminal);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -116,4 +118,5 @@ public class SlotTrash extends AppEngSlot {
 		}
 		writeNBT();
 	}
+	*/
 }

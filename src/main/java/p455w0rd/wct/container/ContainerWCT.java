@@ -127,7 +127,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		customName = "WCTContainer";
 		boosterInventory = new WCTInventoryBooster(containerstack);
 		magnetInventory = new WCTInventoryMagnet(containerstack);
-		trashInventory = new WCTInventoryTrash(this, containerstack);
+		trashInventory = new WCTInventoryTrash(containerstack);
 		craftingGrid = new WCTInventoryCrafting(this, 3, 3, containerstack);
 		host = hostIn;
 		if (Platform.isServer()) {
@@ -149,7 +149,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
-			addSlotToContainer(new SlotBooster(boosterInventory, 0, 134, -20));
+			addSlotToContainer(new SlotBooster(boosterInventory, 134, -20));
 		}
 		else {
 			addSlotToContainer(new NullSlot());
@@ -182,7 +182,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		// Add crafting result slot
 		addSlotToContainer(new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, craftingGrid, craftingGrid, output, Mods.BAUBLES.isLoaded() ? 142 : 174, -58, this));
 		addSlotToContainer(new SlotMagnet(magnetInventory, 152, -20));
-		addSlotToContainer(new SlotTrash(trashInventory, 98, -22, player).setContainer(this));
+		addSlotToContainer(new SlotTrash(trashInventory, 98, -22));
 		addSlotToContainer(new AppEngSlot(inventoryPlayer, 40, 80, -22) {
 			@Override
 			public boolean isItemValid(ItemStack stack) {
@@ -709,29 +709,30 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 
 			super.detectAndSendChanges();
-		}
-		if (!isInRange()) {
-			if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
+
+			if (!isInRange()) {
+				if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
+					if (isValidContainer()) {
+						WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.OutOfRange.get());
+					}
+					setValidContainer(false);
+				}
+				if (!networkIsPowered()) {
+					if (isValidContainer()) {
+						WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
+					}
+					setValidContainer(false);
+				}
+			}
+			else if (!hasAccess(SecurityPermissions.CRAFT, true) || !hasAccess(SecurityPermissions.EXTRACT, true) || !hasAccess(SecurityPermissions.INJECT, true)) {
 				if (isValidContainer()) {
-					WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.OutOfRange.get());
+					WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.CommunicationError.get());
 				}
 				setValidContainer(false);
 			}
-			if (!networkIsPowered()) {
-				if (isValidContainer()) {
-					WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
-				}
-				setValidContainer(false);
+			else {
+				setPowerMultiplier(AEConfig.instance().wireless_getDrainRate(obj.getRange()));
 			}
-		}
-		else if (!hasAccess(SecurityPermissions.CRAFT, true) || !hasAccess(SecurityPermissions.EXTRACT, true) || !hasAccess(SecurityPermissions.INJECT, true)) {
-			if (isValidContainer()) {
-				WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.CommunicationError.get());
-			}
-			setValidContainer(false);
-		}
-		else {
-			setPowerMultiplier(AEConfig.instance().wireless_getDrainRate(obj.getRange()));
 		}
 	}
 
@@ -900,7 +901,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		craftingGrid.writeNBT(containerstack.getTagCompound());
 
 		if (Mods.BAUBLES.isLoaded()) {
-			if (!Platform.isClient()) {
+			if (Platform.isClient()) {
 				Baubles.doForcedSync(inventoryPlayer.player, containerstack);
 			}
 		}

@@ -1,7 +1,11 @@
 package p455w0rd.wct.client.gui;
 
+import static p455w0rd.wct.init.ModEvents.CLIENT_TICKS;
+
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,12 +27,18 @@ import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -65,6 +75,7 @@ import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import p455w0rd.wct.util.WCTUtils;
+import p455w0rdslib.util.RenderUtils;
 import yalter.mousetweaks.api.IMTModGuiContainer2;
 
 @Interface(iface = "yalter.mousetweaks.api.IMTModGuiContainer2", modid = "mousetweaks", striprefs = true)
@@ -113,6 +124,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private final int lowerTextureOffset = 0;
 	private int rows = 0;
 
+	EntityLivingBase entity;
+	boolean isHalloween = false;
+
 	public GuiWCT(Container container) {
 		super(container);
 		xSize = GUI_WIDTH;
@@ -128,6 +142,11 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		configSrc = containerWCT.getConfigManager();
 		devicePowered = containerWCT.isPowered();
 		((ContainerWCT) inventorySlots).setGui(this);
+
+		entity = WCTUtils.player();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		isHalloween = calendar.get(2) + 1 == 10 && calendar.get(5) == 31;
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
@@ -199,7 +218,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			final GuiImgButton iBtn = (GuiImgButton) btn;
 			if (iBtn.getSetting() != Settings.ACTIONS) {
 				final Enum<?> cv = iBtn.getCurrentValue();
-				final Enum<?> next = Platform.rotateEnum(cv, backwards, iBtn.getSetting().getPossibleValues());
+				Enum<?> next = Platform.rotateEnum(cv, backwards, iBtn.getSetting().getPossibleValues());
 
 				if (btn == terminalStyleBox) {
 					AEConfig.instance().getConfigManager().putSetting(iBtn.getSetting(), next);
@@ -258,10 +277,11 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (btn == magnetGUIButton) {
 			NetworkHandler.instance().sendToServer(new PacketSwitchGuis(GuiHandler.GUI_MAGNET));
 		}
+
 	}
 
 	private void reinitalize() {
-		buttonList.clear();
+		//buttonList.clear();
 		initGui();
 	}
 
@@ -383,6 +403,11 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					craftingGridOffsetY = Math.min(craftingGridOffsetY, g.yPos);
 				}
 			}
+		}
+
+		if (isHalloween) {
+			entity = new EntitySkeleton(WCTUtils.world());
+			entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(Blocks.LIT_PUMPKIN));
 		}
 	}
 
@@ -538,7 +563,19 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
 			this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, WCTUtils.player());
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : WCTUtils.player()));
+
+		if (isHalloween && !isAltKeyDown()) {
+
+			String name = "Happy Halloween!            ";
+			int idx = (int) ((CLIENT_TICKS / 4) % name.length());
+			name = (name + " " + name).substring(idx, idx + 10);
+
+			FontRenderer fr = RenderUtils.getFontRenderer();
+			GlStateManager.disableDepth();
+			fr.drawStringWithShadow(name, (guiLeft + 52) - fr.getStringWidth(name) / 2, (guiTop + rows * 18) + 90, 0xFFFFA00F);
+			GlStateManager.enableDepth();
+		}
 
 	}
 
@@ -559,7 +596,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-
+		
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;

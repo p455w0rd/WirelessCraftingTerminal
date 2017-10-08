@@ -40,6 +40,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.WCT;
@@ -66,9 +68,19 @@ import p455w0rdslib.util.ChunkUtils;
  */
 public class ModEvents {
 
+	public static long CLIENT_TICKS = 0;
+
 	public static void init() {
 		MinecraftForge.EVENT_BUS.register(new ModEvents());
 		ChunkUtils.register(WCT.INSTANCE);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onClientTick(ClientTickEvent e) {
+		if (e.phase == Phase.END) {
+			CLIENT_TICKS++;
+		}
 	}
 
 	@SubscribeEvent

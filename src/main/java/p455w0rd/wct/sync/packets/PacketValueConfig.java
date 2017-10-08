@@ -17,6 +17,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import p455w0rd.wct.client.gui.GuiCraftingCPU;
 import p455w0rd.wct.container.ContainerCraftConfirm;
@@ -24,8 +25,11 @@ import p455w0rd.wct.container.ContainerCraftingCPU;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
+import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.wct.util.WCTUtils;
 
 public class PacketValueConfig extends WCTPacket {
 
@@ -148,6 +152,13 @@ public class PacketValueConfig extends WCTPacket {
 
 					try {
 						cm.putSetting(e, Enum.valueOf(def.getClass(), Value));
+						if (Mods.BAUBLES.isLoaded()) {
+							ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
+							NBTTagCompound wctNBT = wct.getTagCompound();
+							wctNBT.setString(Name, Value);
+							wct.setTagCompound(wctNBT);
+							Baubles.doForcedSync(player, wct);
+						}
 					}
 					catch (final IllegalArgumentException err) {
 						// :P
@@ -155,6 +166,7 @@ public class PacketValueConfig extends WCTPacket {
 					break;
 				}
 			}
+
 		}
 	}
 }

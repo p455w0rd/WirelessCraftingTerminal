@@ -3,14 +3,15 @@ package p455w0rd.wct.container.slot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.items.ItemInfinityBooster;
 
 public class SlotBooster extends AppEngSlot {
 
-	public SlotBooster(IInventory inv, int index, int xPos, int yPos) {
-		super(inv, index, xPos, yPos);
+	public SlotBooster(IInventory inv, int xPos, int yPos) {
+		super(inv, 0, xPos, yPos);
 	}
 
 	@Override

@@ -1,63 +1,29 @@
 package p455w0rd.wct.inventory;
 
-import appeng.tile.inventory.AppEngInternalInventory;
-import appeng.tile.inventory.IAEAppEngInventory;
-import appeng.tile.inventory.InvOperation;
-import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import p455w0rd.wct.items.ItemInfinityBooster;
 
-public class WCTInventoryTrash extends AppEngInternalInventory {
+public class WCTInventoryTrash implements IInventory {
 
-	private String name = "TrashSlot";
+	private String INVENTORY_NAME = "TrashSlot";
 	private final ItemStack invItem;
 	private ItemStack[] inventory;
-	private IAEAppEngInventory aeInv;
-	private boolean enableClientEvents = true;
 
-	public WCTInventoryTrash(Container container, ItemStack stack) {
-		super((IAEAppEngInventory) container, 1);
+	public WCTInventoryTrash(ItemStack stack) {
 		inventory = new ItemStack[1];
 		invItem = stack;
-		setTileEntity((IAEAppEngInventory) container);
-	}
-
-	@Override
-	protected boolean eventsEnabled() {
-		return Platform.isServer() || isEnableClientEvents();
-	}
-
-	private boolean isEnableClientEvents() {
-		return enableClientEvents;
-	}
-
-	@Override
-	public void setEnableClientEvents(final boolean enableClientEvents) {
-		this.enableClientEvents = enableClientEvents;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		for (int x = 0; x < getSizeInventory(); x++) {
-			if (getStackInSlot(x) != null) {
-				return false;
+		if (stack != null) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
 			}
+			readFromNBT(stack.getTagCompound());
 		}
-		return true;
-	}
-
-	private IAEAppEngInventory getTileEntity() {
-		return aeInv;
-	}
-
-	@Override
-	public void setTileEntity(final IAEAppEngInventory aeInv) {
-		this.aeInv = aeInv;
 	}
 
 	@Override
@@ -67,17 +33,7 @@ public class WCTInventoryTrash extends AppEngInternalInventory {
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return slot >= getSizeInventory() ? null : inventory[slot];
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return name.length() > 0;
+		return inventory[slot];
 	}
 
 	@Override
@@ -86,27 +42,24 @@ public class WCTInventoryTrash extends AppEngInternalInventory {
 	}
 
 	@Override
-	public ItemStack decrStackSize(final int slot, final int qty) {
-		if (inventory[slot] != null) {
-			final ItemStack split = getStackInSlot(slot);
-			ItemStack ns = null;
-			if (qty >= split.stackSize) {
-				ns = inventory[slot];
-				inventory[slot] = null;
+	public ItemStack decrStackSize(int slot, int amount) {
+		ItemStack stack = getStackInSlot(slot);
+		if (stack != null) {
+			if (stack.stackSize > amount) {
+				stack = stack.splitStack(amount);
+				markDirty();
 			}
 			else {
-				ns = split.splitStack(qty);
+				setInventorySlotContents(slot, null);
 			}
-			this.markDirty();
-			return ns;
 		}
-		return null;
+		return stack;
 	}
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
 		inventory[slot] = stack;
-		//eventHandler.onCraftMatrixChanged(this);
+
 		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
 			stack.stackSize = getInventoryStackLimit();
 		}
@@ -120,45 +73,57 @@ public class WCTInventoryTrash extends AppEngInternalInventory {
 
 	@Override
 	public void markDirty() {
-		if (getTileEntity() != null && eventsEnabled()) {
-			getTileEntity().onChangeInventory(this, -1, InvOperation.markDirty, null, null);
-		}
-		for (int i = 0; i < getSizeInventory(); ++i) {
-			if (getStackInSlot(i) != null && getStackInSlot(i).stackSize == 0) {
-				inventory[i] = null;
-			}
-		}
 		writeNBT(invItem.getTagCompound());
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack) {
-		return true;
+		return (itemstack.getItem() instanceof ItemInfinityBooster);
 	}
 
-	public NBTTagCompound writeNBT(NBTTagCompound nbtTagCompound) {
-		// Write the ItemStacks in the inventory to NBT
+	public void readFromNBT(NBTTagCompound nbtTagCompound) {
+		NBTTagList tagList = nbtTagCompound.getTagList(INVENTORY_NAME, 10);
+		inventory = new ItemStack[getSizeInventory()];
+		for (int i = 0; i < tagList.tagCount(); ++i) {
+			NBTTagCompound tagCompound = tagList.getCompoundTagAt(i);
+			int slot = tagCompound.getInteger("Slot");
+			if (slot >= 0 && slot < inventory.length) {
+				inventory[slot] = ItemStack.loadItemStackFromNBT(tagCompound);
+			}
+		}
+	}
+
+	public void writeNBT(NBTTagCompound nbtTagCompound) {
 		NBTTagList tagList = new NBTTagList();
 		for (int currentIndex = 0; currentIndex < inventory.length; ++currentIndex) {
 			if (inventory[currentIndex] != null) {
 				NBTTagCompound tagCompound = new NBTTagCompound();
-				tagCompound.setByte("Slot", (byte) currentIndex);
+				tagCompound.setInteger("Slot", currentIndex);
 				inventory[currentIndex].writeToNBT(tagCompound);
 				tagList.appendTag(tagCompound);
 			}
 		}
-		nbtTagCompound.setTag("CraftingMatrix", tagList);
-		return nbtTagCompound;
+		nbtTagCompound.setTag(INVENTORY_NAME, tagList);
+	}
+
+	@Override
+	public String getName() {
+		return INVENTORY_NAME;
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return false;
 	}
 
 	@Override
 	public ITextComponent getDisplayName() {
-		return new TextComponentString(name);
+		return new TextComponentString(INVENTORY_NAME);
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		return null;
+		return getStackInSlot(index);
 	}
 
 	@Override
@@ -185,5 +150,7 @@ public class WCTInventoryTrash extends AppEngInternalInventory {
 
 	@Override
 	public void clear() {
+		setInventorySlotContents(0, null);
 	}
+
 }
