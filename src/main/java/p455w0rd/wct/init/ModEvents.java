@@ -76,7 +76,6 @@ import p455w0rdslib.util.ChunkUtils;
  */
 public class ModEvents {
 
-	@SideOnly(Side.CLIENT)
 	public static long CLIENT_TICKS = 0;
 
 	public static void init() {

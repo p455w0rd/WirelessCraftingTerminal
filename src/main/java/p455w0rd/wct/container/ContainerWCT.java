@@ -195,7 +195,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				for (int i = 0; i < 9; ++i) {
 					addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
 				}
-		
+
 				// Add player inventory slots
 				for (int i = 0; i < 3; ++i) {
 					for (int j = 0; j < 9; ++j) {
@@ -936,7 +936,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int idx) {
-		Slot clickSlot;
 		AppEngSlot appEngSlot = null;
 		ItemStack tis = ItemStack.EMPTY;
 		boolean isAppengSlot = false;
@@ -1045,9 +1044,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					}
 				}
 
-				/**
-				 * Handle Fake Slot Shift clicking.
-				 */
 				if (selectedSlots.isEmpty() && appEngSlot.isPlayerSide()) {
 					if (!tis.isEmpty()) {
 						// target slots in the container...
