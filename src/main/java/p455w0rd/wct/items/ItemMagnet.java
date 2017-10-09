@@ -33,8 +33,8 @@ import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
-import appeng.core.Api;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -352,7 +352,7 @@ public class ItemMagnet extends ItemBase {
 			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && ModConfig.WCT_BOOSTER_ENABLED);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);
 			if ((ignoreRange && hasAxxess) || (obj.rangeCheck() && hasAxxess)) {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(itemStackToGet);
+				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(itemStackToGet);
 				ais.setStackSize(stackSize);
 				if (!itemToGet.isDead) {
 
@@ -417,7 +417,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	private void doInventoryPickup(EntityItem itemToGet, EntityPlayer player, ItemStack itemStackToGet, World world, int stackSize) {
-		if (itemToGet.getDistanceToEntity(player) <= distanceFromPlayer) {
+		if (itemToGet.getDistance(player) <= distanceFromPlayer) {
 			if (player.inventory.addItemStackToInventory(itemStackToGet)) {
 				player.onItemPickup(itemToGet, stackSize);
 				world.playSound(player, player.getPosition(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((WCTUtils.world(player).rand.nextFloat() - WCTUtils.world(player).rand.nextFloat()) * 0.7F + 2F));
@@ -538,7 +538,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, @Nonnull ItemStack itemStackToGet, World world) {
-		ais = Api.INSTANCE.storage().poweredInsert(powerSrc, obj.getItemInventory(), ais, mySrc);
+		ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(powerSrc, obj, ais, mySrc);
 		if (ais != null && !WCTUtils.getMagnet(player.inventory).isEmpty() && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);

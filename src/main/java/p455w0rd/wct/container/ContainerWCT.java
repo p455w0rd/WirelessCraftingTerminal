@@ -27,6 +27,7 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.ITerminalHost;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.AEPartLocation;
@@ -34,7 +35,6 @@ import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
 import appeng.container.ContainerNull;
 import appeng.core.AEConfig;
-import appeng.core.Api;
 import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.helpers.InventoryAction;
@@ -113,7 +113,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	public ItemStack craftItem = ItemStack.EMPTY;
 	private double powerMultiplier = 0.5;
 	private int ticks = 0;
-	private final IItemList<IAEItemStack> items = AEApi.instance().storage().createItemList();
+	private final IItemList<IAEItemStack> items = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 	private final IConfigManager clientCM;
 	private IConfigManager serverCM;
 	@GuiSync(98)
@@ -142,7 +142,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		host = hostIn;
 		if (Platform.isServer()) {
 			serverCM = obj.getConfigManager();
-			monitor = obj.getItemInventory();
+			monitor = obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 			if (monitor != null) {
 				monitor.addListener(this, null);
 				setCellInventory(monitor);
@@ -195,7 +195,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				for (int i = 0; i < 9; ++i) {
 					addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
 				}
-
+		
 				// Add player inventory slots
 				for (int i = 0; i < 3; ++i) {
 					for (int j = 0; j < 9; ++j) {
@@ -411,7 +411,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					ais.setStackSize(ais.getStackSize() - myItem.getCount());
 				}
 
-				ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					adp.addItems(ais.createItemStack());
 				}
@@ -426,11 +426,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			final ItemStack isg = player.inventory.getItemStack();
 
 			if (!isg.isEmpty() && releaseQty > 0) {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(isg);
+				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(isg);
 				ais.setStackSize(1);
 				final IAEItemStack extracted = ais.copy();
 
-				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final InventoryAdaptor ia = new AdaptorItemHandler(new WrapperCursorItemHandler(player.inventory));
 
@@ -466,7 +466,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (liftQty > 0) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(1);
-					ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						final InventoryAdaptor ia = new AdaptorItemHandler(new WrapperCursorItemHandler(player.inventory));
 
@@ -489,7 +489,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (slotItem != null) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(ais.createItemStack().getMaxStackSize());
-					ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						player.inventory.setItemStack(ais.createItemStack());
 					}
@@ -501,8 +501,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				return;
 			}
 			else {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
-				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(player.inventory.getItemStack());
+				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					player.inventory.setItemStack(ais.createItemStack());
 				}
@@ -528,7 +528,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					if (ais != null) {
 						final long stackSize = Math.min(maxSize, ais.getStackSize());
 						ais.setStackSize((stackSize + 1) >> 1);
-						ais = Api.INSTANCE.storage().poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+						ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					}
 
 					if (ais != null) {
@@ -541,9 +541,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 			}
 			else {
-				IAEItemStack ais = AEApi.instance().storage().createItemStack(player.inventory.getItemStack());
+				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(player.inventory.getItemStack());
 				ais.setStackSize(1);
-				ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final ItemStack is = player.inventory.getItemStack();
 					is.shrink(1);
@@ -660,20 +660,19 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			setValidContainer(false);
 		}
 
-		// drain 1 ae t
 		ticks++;
 		if (ticks > 10) {
 			if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
-				obj.extractAEPower(getPowerMultiplier() * ticks, Actionable.MODULATE, PowerMultiplier.CONFIG);
+				obj.extractAEPower(AEConfig.instance().wireless_getDrainRate(obj.getRange()), Actionable.MODULATE, PowerMultiplier.CONFIG);
 			}
 			else {
-				obj.extractAEPower((int) (0.5 * ticks), Actionable.MODULATE, PowerMultiplier.CONFIG);
+				obj.extractAEPower((int) (Math.min(500.0, AEConfig.instance().wireless_getDrainRate(obj.getRange()))), Actionable.MODULATE, PowerMultiplier.CONFIG);
 			}
 			ticks = 0;
 		}
 
 		if (Platform.isServer()) {
-			if (monitor != host.getItemInventory()) {
+			if (monitor != host.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class))) {
 				setValidContainer(false);
 			}
 
@@ -1278,7 +1277,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		if (getPowerSource() == null || obj == null) {
 			return input;
 		}
-		final IAEItemStack ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), obj, AEApi.instance().storage().createItemStack(input), getActionSource());
+		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
 		if (ais == null) {
 			return ItemStack.EMPTY;
 		}

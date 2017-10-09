@@ -37,7 +37,7 @@ public class PacketInventoryAction extends WCTPacket {
 		id = stream.readLong();
 		final boolean hasItem = stream.readBoolean();
 		if (hasItem) {
-			slotItem = AEItemStack.loadItemStackFromPacket(stream);
+			slotItem = AEItemStack.fromPacket(stream);
 		}
 		else {
 			slotItem = null;

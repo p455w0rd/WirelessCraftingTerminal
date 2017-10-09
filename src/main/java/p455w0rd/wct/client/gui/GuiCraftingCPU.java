@@ -16,6 +16,7 @@ import appeng.api.AEApi;
 import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.AEColor;
@@ -60,9 +61,9 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource {
 
 	private final ContainerCraftingCPU craftingCpu;
 
-	private IItemList<IAEItemStack> storage = AEApi.instance().storage().createItemList();
-	private IItemList<IAEItemStack> active = AEApi.instance().storage().createItemList();
-	private IItemList<IAEItemStack> pending = AEApi.instance().storage().createItemList();
+	private IItemList<IAEItemStack> storage = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
+	private IItemList<IAEItemStack> active = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
+	private IItemList<IAEItemStack> pending = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 
 	private List<IAEItemStack> visual = new ArrayList<IAEItemStack>();
 	private GuiButton cancel;
@@ -83,9 +84,9 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource {
 	}
 
 	public void clearItems() {
-		storage = AEApi.instance().storage().createItemList();
-		active = AEApi.instance().storage().createItemList();
-		pending = AEApi.instance().storage().createItemList();
+		storage = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
+		active = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
+		pending = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 		visual = new ArrayList<IAEItemStack>();
 	}
 

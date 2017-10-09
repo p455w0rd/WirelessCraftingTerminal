@@ -16,6 +16,7 @@ import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.items.storage.ItemViewCell;
@@ -137,7 +138,7 @@ public class PacketJEIRecipe extends WCTPacket {
 
 				if (inv != null && recipe != null && security != null) {
 
-					final IMEMonitor<IAEItemStack> storage = inv.getItemInventory();
+					final IMEMonitor<IAEItemStack> storage = inv.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 					final IPartitionList<IAEItemStack> filter = ItemViewCell.createFilter(cct.getViewCells());
 
 					for (int x = 0; x < craftMatrix.getSlots(); x++) {
@@ -150,7 +151,7 @@ public class PacketJEIRecipe extends WCTPacket {
 
 							// put away old item
 							if (newItem != currentItem && security.hasPermission(player, SecurityPermissions.INJECT)) {
-								final IAEItemStack in = AEItemStack.create(currentItem);
+								final IAEItemStack in = AEItemStack.fromItemStack(currentItem);
 								final IAEItemStack out = cct.useRealItems() ? Platform.poweredInsert(energy, storage, in, cct.getActionSource()) : null;
 								if (out != null) {
 									currentItem = out.createItemStack();
@@ -164,7 +165,7 @@ public class PacketJEIRecipe extends WCTPacket {
 						if (currentItem.isEmpty() && recipe[x] != null) {
 							// for each variant
 							for (int y = 0; y < recipe[x].length && currentItem.isEmpty(); y++) {
-								final IAEItemStack request = AEItemStack.create(recipe[x][y]);
+								final IAEItemStack request = AEItemStack.fromItemStack(recipe[x][y]);
 								if (request != null) {
 									// try ae
 									if ((filter == null || filter.isListed(request)) && security.hasPermission(player, SecurityPermissions.EXTRACT)) {

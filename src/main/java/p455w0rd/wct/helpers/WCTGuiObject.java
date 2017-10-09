@@ -16,9 +16,10 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
-import appeng.api.storage.StorageChannel;
-import appeng.api.storage.data.IAEFluidStack;
+import appeng.api.storage.IStorageChannel;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
@@ -68,7 +69,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 				if (targetGrid != null) {
 					sg = targetGrid.getCache(IStorageGrid.class);
 					if (sg != null) {
-						itemStorage = sg.getItemInventory();
+						itemStorage = sg.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 					}
 				}
 			}
@@ -84,19 +85,8 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public IMEMonitor<IAEItemStack> getItemInventory() {
-		if (sg == null) {
-			return null;
-		}
-		return sg.getItemInventory();
-	}
-
-	@Override
-	public IMEMonitor<IAEFluidStack> getFluidInventory() {
-		if (sg == null) {
-			return null;
-		}
-		return sg.getFluidInventory();
+	public <T extends IAEStack<T>> IMEMonitor<T> getInventory(IStorageChannel<T> channel) {
+		return sg.getInventory(channel);
 	}
 
 	@Override
@@ -113,8 +103,12 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 		}
 	}
 
+	/**
+	 * Don't use - will be removed by AE2 soon
+	 */
 	@Override
-	public IItemList<IAEItemStack> getAvailableItems(final IItemList out) {
+	@Deprecated
+	public IItemList<IAEItemStack> getAvailableItems(final IItemList<IAEItemStack> out) {
 		if (itemStorage != null) {
 			return itemStorage.getAvailableItems(out);
 		}
@@ -191,11 +185,11 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public StorageChannel getChannel() {
+	public IStorageChannel<IAEItemStack> getChannel() {
 		if (itemStorage != null) {
 			return itemStorage.getChannel();
 		}
-		return StorageChannel.ITEMS;
+		return AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
 	}
 
 	@Override

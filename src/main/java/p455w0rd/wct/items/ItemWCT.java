@@ -217,7 +217,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public boolean canHandle(ItemStack is) {
-		return ItemStack.areItemsEqual(is, getDefaultInstance());
+		return is.getItem() == this;
 	}
 
 	private double injectPower(PowerUnits inputUnit, final ItemStack is, final double amount, final boolean simulate) {
@@ -239,11 +239,11 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		final double maxStorage = getAEMaxPower(is);
 		final double currentStorage = getAECurrentPower(is);
 		final double required = maxStorage - currentStorage;
-		final double overflow = Math.min(amount * 10000 - required, amount - required);
+		final double overflow = Math.min(amount * 2 - required, amount - required);
 
 		if (mode == Actionable.MODULATE) {
 			final NBTTagCompound data = Platform.openNbtData(is);
-			final double toAdd = Math.min(Math.min(amount * 10000, required), required);
+			final double toAdd = Math.min(amount * 2, required);
 
 			data.setDouble("internalCurrentPower", currentStorage + toAdd);
 		}

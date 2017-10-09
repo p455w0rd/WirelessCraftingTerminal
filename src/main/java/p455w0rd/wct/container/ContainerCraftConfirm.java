@@ -21,6 +21,7 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEInventory;
 import appeng.api.storage.ITerminalHost;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.helpers.InventoryAction;
@@ -178,7 +179,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 					final PacketMEInventoryUpdate b = new PacketMEInventoryUpdate((byte) 1);
 					final PacketMEInventoryUpdate c = result.isSimulation() ? new PacketMEInventoryUpdate((byte) 2) : null;
 
-					final IItemList<IAEItemStack> plan = AEApi.instance().storage().createItemList();
+					final IItemList<IAEItemStack> plan = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 					result.populatePlan(plan);
 					/*
 										try {
@@ -201,7 +202,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 						p.setStackSize(out.getCountRequestable());
 
 						final IStorageGrid sg = getGrid().getCache(IStorageGrid.class);
-						final IMEInventory<IAEItemStack> items = sg.getItemInventory();
+						final IMEInventory<IAEItemStack> items = sg.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 
 						IAEItemStack m = null;
 						if (c != null && result.isSimulation()) {

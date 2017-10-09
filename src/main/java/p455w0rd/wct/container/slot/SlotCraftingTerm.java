@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IStorageMonitorable;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.container.ContainerNull;
@@ -77,7 +79,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 			return;
 		}
 
-		final IMEMonitor<IAEItemStack> inv = storage.getItemInventory();
+		final IMEMonitor<IAEItemStack> inv = storage.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 		final int howManyPerCraft = getStack().getCount();
 		int maxTimesToCraft = 0;
 
@@ -232,7 +234,7 @@ public class SlotCraftingTerm extends AppEngCraftingSlot {
 				}
 				else if (!set[x].isEmpty()) {
 					// eek! put it back!
-					final IAEItemStack fail = inv.injectItems(AEItemStack.create(set[x]), Actionable.MODULATE, mySrc);
+					final IAEItemStack fail = inv.injectItems(AEItemStack.fromItemStack(set[x]), Actionable.MODULATE, mySrc);
 					if (fail != null) {
 						drops.add(fail.createItemStack());
 					}

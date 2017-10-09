@@ -20,9 +20,9 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
-import appeng.core.Api;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
@@ -169,7 +169,7 @@ public abstract class WCTBaseContainer extends Container {
 		try {
 			final NBTTagCompound data = CompressedStreamTools.readCompressed(new ByteArrayInputStream(buffer));
 			if (data != null) {
-				setTargetStack(AEApi.instance().storage().createItemStack(new ItemStack(data)));
+				setTargetStack(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(new ItemStack(data)));
 			}
 		}
 		catch (final IOException e) {
@@ -188,7 +188,7 @@ public abstract class WCTBaseContainer extends Container {
 			/*
 			final ItemStack a = stack == null ? ItemStack.EMPTY : stack.createItemStack();
 			final ItemStack b = clientRequestedTargetItem == null ? ItemStack.EMPTY : clientRequestedTargetItem.createItemStack();
-			
+
 			if (Platform.itemComparisons().isSameItem(a, b)) {
 				return;
 			}
@@ -592,7 +592,7 @@ public abstract class WCTBaseContainer extends Container {
 	protected void updateHeld(final EntityPlayerMP p) {
 		if (Platform.isServer()) {
 			try {
-				NetworkHandler.instance().sendTo(new PacketInventoryAction(InventoryAction.UPDATE_HAND, 0, AEItemStack.create(p.inventory.getItemStack())), p);
+				NetworkHandler.instance().sendTo(new PacketInventoryAction(InventoryAction.UPDATE_HAND, 0, AEItemStack.fromItemStack(p.inventory.getItemStack())), p);
 			}
 			catch (final IOException e) {
 			}
@@ -603,7 +603,7 @@ public abstract class WCTBaseContainer extends Container {
 		if (getPowerSource() == null || getCellInventory() == null) {
 			return input;
 		}
-		final IAEItemStack ais = Api.INSTANCE.storage().poweredInsert(getPowerSource(), getCellInventory(), AEApi.instance().storage().createItemStack(input), getActionSource());
+		final IAEItemStack ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
 		if (ais == null) {
 			return ItemStack.EMPTY;
 		}

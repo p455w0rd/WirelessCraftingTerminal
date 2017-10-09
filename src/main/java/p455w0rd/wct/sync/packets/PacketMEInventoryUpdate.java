@@ -1,21 +1,29 @@
 package p455w0rd.wct.sync.packets;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.BufferOverflowException;
-import java.util.*;
-import java.util.zip.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.Nullable;
 
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.item.AEItemStack;
-import io.netty.buffer.*;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.*;
-import p455w0rd.wct.client.gui.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.wct.client.gui.GuiCraftConfirm;
+import p455w0rd.wct.client.gui.GuiCraftingCPU;
+import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -68,7 +76,7 @@ public class PacketMEInventoryUpdate extends WCTPacket {
 		gzReader.close();
 
 		while (uncompressed.readableBytes() > 0) {
-			list.add(AEItemStack.loadItemStackFromPacket(uncompressed));
+			list.add(AEItemStack.fromPacket(uncompressed));
 		}
 
 		empty = list.isEmpty();
