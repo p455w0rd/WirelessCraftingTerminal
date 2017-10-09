@@ -386,4 +386,14 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 		return true;
 	}
 
+	@Override
+	public Item getItem() {
+		return this;
+	}
+
+	@Override
+	public ItemStack getStack() {
+		return new ItemStack(this);
+	}
+
 }

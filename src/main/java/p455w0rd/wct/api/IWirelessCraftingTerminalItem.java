@@ -21,7 +21,7 @@ import net.minecraft.item.ItemStack;
  * @author p455w0rd
  *
  */
-public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHandler {
+public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHandler, IWCTItem {
 
 	// checks if an Infinity Booster Caqrd is installed on the WCT
 	public boolean checkForBooster(final ItemStack wirelessTerminal);

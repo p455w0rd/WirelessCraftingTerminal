@@ -21,6 +21,8 @@ import java.util.List;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
+import p455w0rd.wct.api.IWCTItem;
+import p455w0rd.wct.api.IWCTItems;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemWCT;
@@ -29,7 +31,9 @@ import p455w0rd.wct.items.ItemWCT;
  * @author p455w0rd
  *
  */
-public class ModItems {
+public class ModItems extends IWCTItems {
+
+	private static final ModItems INSTANCE = new ModItems();
 
 	private static List<IModelHolder> ITEM_LIST = new ArrayList<IModelHolder>();
 
@@ -48,6 +52,25 @@ public class ModItems {
 		for (IModelHolder item : ITEM_LIST) {
 			item.initModel();
 		}
+	}
+
+	public static ModItems instance() {
+		return INSTANCE;
+	}
+
+	@Override
+	public IWCTItem wirelessCraftingTerminal() {
+		return WCT;
+	}
+
+	@Override
+	public IWCTItem infinityBoosterCard() {
+		return BOOSTER_CARD;
+	}
+
+	@Override
+	public IWCTItem magnetCard() {
+		return MAGNET_CARD;
 	}
 
 }

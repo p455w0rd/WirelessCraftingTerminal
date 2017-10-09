@@ -17,16 +17,19 @@ package p455w0rd.wct.items;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
+import p455w0rd.wct.api.IWCTItem;
 
 /**
  * @author p455w0rd
  *
  */
-public class ItemBase extends Item implements IModelHolder {
+public class ItemBase extends Item implements IModelHolder, IWCTItem {
 
 	private String name = "";
 
@@ -42,5 +45,15 @@ public class ItemBase extends Item implements IModelHolder {
 	@SideOnly(Side.CLIENT)
 	public void initModel() {
 		ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+	}
+
+	@Override
+	public Item getItem() {
+		return this;
+	}
+
+	@Override
+	public ItemStack getStack() {
+		return new ItemStack(this);
 	}
 }
