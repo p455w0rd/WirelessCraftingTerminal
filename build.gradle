@@ -64,6 +64,20 @@ dependencies {
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.11-B25_1.10.2"
 }
 
+task apiJar(type: Jar) {
+	classifier = 'api'
+	from sourceSets.api.output
+
+	// TODO: when FG bug is fixed, remove allJava from the api jar.
+	// https://github.com/MinecraftForge/ForgeGradle/issues/369
+	// Gradle should be able to pull them from the -sources jar.
+	from sourceSets.api.allJava
+}
+
+artifacts {
+	archives apiJar
+}
+
 processResources {
 	inputs.property "version", project.version
 	inputs.property "mcversion", project.minecraft.version
