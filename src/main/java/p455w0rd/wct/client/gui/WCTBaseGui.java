@@ -83,7 +83,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 	private Slot bl_clicked;
 	public boolean subGui;
 	private final StackSizeRenderer stackSizeRenderer = new StackSizeRenderer();
-	public static String memoryText = "";
 
 	public WCTBaseGui(final Container container) {
 		super(container);
@@ -305,13 +304,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-		
+
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-		
+
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {

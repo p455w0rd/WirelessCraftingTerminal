@@ -31,6 +31,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
+import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.util.WCTUtils;
 
 public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIActionHost {
@@ -62,7 +64,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 			// :P
 		}
 
-		if (obj instanceof IGridHost) {
+		if (obj != null && obj instanceof IGridHost) {
 			final IGridNode n = ((IGridHost) obj).getGridNode(AEPartLocation.INTERNAL);
 			if (n != null) {
 				targetGrid = n.getGrid();
@@ -76,6 +78,21 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 		}
 	}
 
+	public IWirelessAccessPoint getWAP() {
+		if (myWap == null) {
+			if (targetGrid != null) {
+				final IMachineSet tw = targetGrid.getMachines(TileWireless.class);
+				for (final IGridNode n : tw) {
+					if (n.getMachine() instanceof IWirelessAccessPoint) {
+						final IWirelessAccessPoint wap = (IWirelessAccessPoint) n.getMachine();
+						myWap = wap;
+					}
+				}
+			}
+		}
+		return myWap;
+	}
+
 	public IGrid getTargetGrid() {
 		return targetGrid;
 	}
@@ -86,7 +103,10 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 
 	@Override
 	public <T extends IAEStack<T>> IMEMonitor<T> getInventory(IStorageChannel<T> channel) {
-		return sg.getInventory(channel);
+		if (sg != null && channel != null) {
+			return sg.getInventory(channel);
+		}
+		return null;
 	}
 
 	@Override
@@ -223,19 +243,35 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 
 	@Override
 	public IGridNode getActionableNode() {
-		return getActionableNode(false);
+		boolean ignoreRange = false;
+		if (!effectiveItem.isEmpty() && effectiveItem.getItem() == ModItems.WCT) {
+			ItemWCT item = (ItemWCT) effectiveItem.getItem();
+			ignoreRange = item.checkForBooster(effectiveItem);
+		}
+		return getActionableNode(ignoreRange);
 	}
 
 	@Override
 	public IGridNode getActionableNode(boolean ignoreRange) {
 		this.rangeCheck(ignoreRange);
 		if (myWap != null) {
-			//return this.getTargetGrid().getPivot();
-			return myWap.getActionableNode();
+			if (myWap.getActionableNode() != null) {
+				return myWap.getActionableNode();
+			}
+			else if (getTargetGrid() != null) {
+				return getTargetGrid().getPivot();
+			}
+
 		}
 		else {
 			if (ignoreRange) {
-				return getTargetGrid().getPivot();
+				IGrid grid = getTargetGrid();
+				if (grid != null) {
+					IGridNode node = grid.getPivot();
+					if (node != null) {
+						return node;
+					}
+				}
 			}
 		}
 		return null;
@@ -274,11 +310,11 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 		return false;
 	}
 
-	private boolean testWap(final IWirelessAccessPoint wap) {
+	public boolean testWap(final IWirelessAccessPoint wap) {
 		return testWap(wap, false);
 	}
 
-	private boolean testWap(final IWirelessAccessPoint wap, boolean ignoreRange) {
+	public boolean testWap(final IWirelessAccessPoint wap, boolean ignoreRange) {
 		double rangeLimit = wap.getRange();
 		rangeLimit *= rangeLimit;
 

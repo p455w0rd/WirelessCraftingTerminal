@@ -15,6 +15,7 @@ import appeng.api.config.Settings;
 import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
+import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.guiobjects.IPortableCell;
 import appeng.api.implementations.tiles.IViewCellStorage;
 import appeng.api.networking.IGrid;
@@ -58,10 +59,13 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemShield;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -87,6 +91,7 @@ import p455w0rd.wct.container.slot.SlotMagnet;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.container.slot.SlotTrash;
+import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModItems;
@@ -94,6 +99,8 @@ import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.inventory.WCTInventoryBooster;
 import p455w0rd.wct.inventory.WCTInventoryMagnet;
 import p455w0rd.wct.inventory.WCTInventoryTrash;
+import p455w0rd.wct.items.ItemInfinityBooster;
+import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
@@ -195,7 +202,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				for (int i = 0; i < 9; ++i) {
 					addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
 				}
-		
+
 				// Add player inventory slots
 				for (int i = 0; i < 3; ++i) {
 					for (int j = 0; j < 9; ++j) {
@@ -641,6 +648,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void detectAndSendChanges() {
+		if (Platform.isClient()) {
+			return;
+		}
 		if (obj != null) {
 			if (containerstack != obj.getItemStack()) {
 				if (!containerstack.isEmpty()) {
@@ -762,7 +772,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	public int getBoosterIndex() {
 		if (getBoosterSlot() != null) {
 			for (int i = 0; i < inventorySlots.size(); i++) {
-				if (inventorySlots.get(i) == getBoosterSlot()) {
+				if (inventorySlots.get(i) instanceof SlotBooster) {
 					return i;
 				}
 			}
@@ -792,6 +802,15 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		return -1;
 	}
 
+	public int getBaublesIndex() {
+		for (int i = 0; i < inventorySlots.size(); i++) {
+			if (Baubles.isAEBaubleSlot(inventorySlots.get(i))) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	public SlotMagnet getMagnetSlot() {
 		return magnetSlot;
 	}
@@ -808,6 +827,21 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		return isValidContainer();
+	}
+
+	public boolean isInVanillaWAPRange() {
+		if (obj == null) {
+			BlockPos playerPos = getPlayerInv().player.getPosition();
+			obj = new WCTGuiObject((IWirelessTermHandler) containerstack.getItem(), containerstack, getPlayerInv().player, getPlayerInv().player.getEntityWorld(), playerPos.getX(), playerPos.getY(), playerPos.getZ());
+		}
+		if (obj.getWAP() != null) {
+			double wapRange = obj.getWAP().getRange();
+			BlockPos wapPos = obj.getWAP().getLocation().getPos();
+			BlockPos playerPos = getPlayerInv().player.getPosition();
+			double distanceToWap = Math.sqrt(playerPos.distanceSq(wapPos));
+			return distanceToWap <= wapRange;
+		}
+		return false;
 	}
 
 	protected boolean isInRange() {
@@ -1006,6 +1040,60 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				return ItemStack.EMPTY;
 			}
 			if (appEngSlot != null && appEngSlot.getHasStack()) {
+
+				if (isInInventory(appEngSlot) || isInHotbar(appEngSlot)) {
+					if (tis.getItem() instanceof ItemArmor) {
+						int type = ((ItemArmor) tis.getItem()).armorType.getIndex();
+						if (mergeItemStack(tis, 40 - type, 40 - type + 1, false)) {
+							appEngSlot.clearStack();
+							return ItemStack.EMPTY;
+						}
+					}
+					else if (tis.getItem() instanceof ItemInfinityBooster) {
+						if (mergeItemStack(tis.copy(), getBoosterIndex(), getBoosterIndex() + 1, false)) {
+							if (tis.getCount() > 1) {
+								tis.shrink(1);
+							}
+							else {
+								appEngSlot.clearStack();
+							}
+							return ItemStack.EMPTY;
+						}
+					}
+					else if (tis.getItem() instanceof ItemMagnet) {
+						if (mergeItemStack(tis.copy(), getMagnetIndex(), getMagnetIndex() + 1, false)) {
+							if (tis.getCount() > 1) {
+								tis.shrink(1);
+							}
+							else {
+								appEngSlot.clearStack();
+							}
+							return ItemStack.EMPTY;
+						}
+					}
+					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis)) {
+						if (mergeItemStack(tis.copy(), getBaublesIndex(), getBaublesIndex() + 7, false)) {
+							if (tis.getCount() > 1) {
+								tis.shrink(1);
+							}
+							else {
+								appEngSlot.clearStack();
+							}
+							return ItemStack.EMPTY;
+						}
+					}
+					else if (tis.getItem() instanceof ItemShield) {
+						if (mergeItemStack(tis.copy(), 53, 54, false)) {
+							if (tis.getCount() > 1) {
+								tis.shrink(1);
+							}
+							else {
+								appEngSlot.clearStack();
+							}
+							return ItemStack.EMPTY;
+						}
+					}
+				}
 
 				final List<Slot> selectedSlots = new ArrayList<Slot>();
 
@@ -1290,7 +1378,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	private boolean isInInventory(@Nonnull AppEngSlot slot) {
 		if (slot instanceof SlotPlayerInv) {
-			return slot.slotNumber >= 9 && slot.slotNumber < 36;
+			return slot.slotNumber >= 0 && slot.slotNumber <= 27;
 		}
 		return false;
 	}

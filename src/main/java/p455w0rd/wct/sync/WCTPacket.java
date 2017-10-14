@@ -1,12 +1,16 @@
 package p455w0rd.wct.sync;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.*;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import p455w0rd.wct.sync.network.*;
+import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.wct.sync.network.NetworkHandler;
 
 @SuppressWarnings("rawtypes")
 public abstract class WCTPacket implements Packet {
@@ -50,6 +54,23 @@ public abstract class WCTPacket implements Packet {
 	@Override
 	public void writePacketData(final PacketBuffer buf) throws IOException {
 		throw new RuntimeException("Not Implemented");
+	}
+
+	public ByteArrayInputStream getPacketByteArray(ByteBuf stream, int readerIndex, int readableBytes) {
+		final ByteArrayInputStream bytes;
+		if (stream.hasArray()) {
+			bytes = new ByteArrayInputStream(stream.array(), readerIndex, readableBytes);
+		}
+		else {
+			byte[] data = new byte[stream.capacity()];
+			stream.getBytes(readerIndex, data, 0, readableBytes);
+			bytes = new ByteArrayInputStream(data);
+		}
+		return bytes;
+	}
+
+	public ByteArrayInputStream getPacketByteArray(ByteBuf stream) {
+		return this.getPacketByteArray(stream, 0, stream.readableBytes());
 	}
 
 	public void setCallParam(final PacketCallState call) {

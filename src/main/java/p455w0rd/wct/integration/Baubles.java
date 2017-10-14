@@ -2,6 +2,7 @@ package p455w0rd.wct.integration;
 
 import javax.annotation.Nonnull;
 
+import baubles.api.IBauble;
 import baubles.api.cap.BaublesCapabilities;
 import baubles.api.cap.IBaublesItemHandler;
 import baubles.common.container.SlotBauble;
@@ -68,6 +69,14 @@ public class Baubles {
 		for (int i = 0; i < 7; i++) {
 			container.addSlotToContainer(new SlotAEBauble(baubles, i, 178, -62 + i * 18));
 		}
+	}
+
+	public static boolean isBaubleItem(ItemStack stack) {
+		return stack.getItem() instanceof IBauble;
+	}
+
+	public static boolean isAEBaubleSlot(Slot slot) {
+		return slot instanceof SlotAEBauble;
 	}
 
 	public static boolean isBaubleSlot(Slot slot) {

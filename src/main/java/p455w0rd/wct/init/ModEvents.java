@@ -53,7 +53,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
-import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
@@ -263,14 +262,14 @@ public class ModEvents {
 	public void onkeyTyped(GuiScreenEvent.KeyboardInputEvent.Post e) {
 		if (Mods.JEI.isLoaded() && Minecraft.getMinecraft().currentScreen instanceof GuiWCT) {
 			Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
-			if (searchMode == SearchBoxMode.JEI_AUTOSEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH) {
+			if (searchMode == SearchBoxMode.JEI_AUTOSEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH || searchMode == SearchBoxMode.JEI_AUTOSEARCH_KEEP || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH_KEEP) {
 				GuiWCT gui = (GuiWCT) Minecraft.getMinecraft().currentScreen;
 				String searchText = Integrations.jei().getSearchText();
 				if (gui.getSearchField() != null) {
 					gui.getRepo().setSearchString(searchText);
 					gui.getRepo().updateView();
 					gui.getSearchField().setText(searchText);
-					WCTBaseGui.memoryText = searchText;
+					GuiWCT.memoryText = searchText;
 				}
 			}
 		}

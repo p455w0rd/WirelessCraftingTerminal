@@ -1,5 +1,6 @@
 package p455w0rd.wct.container.slot;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,6 +23,11 @@ public class SlotBooster extends AppEngSlot {
 	@Override
 	public boolean isItemValid(ItemStack is) {
 		return !is.isEmpty() && (is.getItem() == ModItems.BOOSTER_CARD);
+	}
+
+	@Override
+	public boolean canTakeStack(final EntityPlayer player) {
+		return player.capabilities.isCreativeMode;
 	}
 
 	@Override

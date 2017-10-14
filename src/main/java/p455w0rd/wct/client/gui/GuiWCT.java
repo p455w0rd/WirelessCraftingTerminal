@@ -70,6 +70,7 @@ import yalter.mousetweaks.api.MouseTweaksIgnore;
 @MouseTweaksIgnore
 public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHost {
 
+	public static String memoryText = "";
 	private float xSize_lo;
 	private float ySize_lo;
 	public static int tick = 0, GUI_HEIGHT = 240, GUI_WIDTH = 198, AE_ROW_HEIGHT = 18, AE_NUM_ROWS = 0,
@@ -368,16 +369,22 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		buttonList.add(magnetGUIButton = new GuiMagnetButton(guiLeft + 157, guiTop + ySize - 115));
 		craftingStatusBtn.setHideEdge(13);
 
-		final Enum<?> setting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
-		searchField.setFocused(SearchBoxMode.AUTOSEARCH == setting || SearchBoxMode.JEI_AUTOSEARCH == setting);
-		searchField.setCanLoseFocus(SearchBoxMode.MANUAL_SEARCH == setting || SearchBoxMode.JEI_MANUAL_SEARCH == setting);
+		final Enum<?> searchModeSetting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+		final boolean isAutoFocus = SearchBoxMode.AUTOSEARCH == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH == searchModeSetting || SearchBoxMode.AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH_KEEP == searchModeSetting;
+		final boolean isManualFocus = SearchBoxMode.MANUAL_SEARCH == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH == searchModeSetting || SearchBoxMode.MANUAL_SEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH_KEEP == searchModeSetting;
+		final boolean isKeepFilter = SearchBoxMode.AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.MANUAL_SEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH_KEEP == searchModeSetting;
+		final boolean isJEIEnabled = SearchBoxMode.JEI_AUTOSEARCH == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH == searchModeSetting;
 
-		if (setting == SearchBoxMode.JEI_AUTOSEARCH || setting == SearchBoxMode.JEI_MANUAL_SEARCH) {
+		searchField.setFocused(isAutoFocus);
+		searchField.setCanLoseFocus(isManualFocus);
+
+		if (isJEIEnabled) {
 			memoryText = Integrations.jei().getSearchText();
 		}
 
-		if (memoryText != null && !memoryText.isEmpty()) {
+		if (isKeepFilter && memoryText != null && !memoryText.isEmpty()) {
 			searchField.setText(memoryText);
+			searchField.selectAll();
 			repo.setSearchString(memoryText);
 			repo.updateView();
 			setScrollBar();

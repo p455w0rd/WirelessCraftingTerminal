@@ -65,7 +65,7 @@ public abstract class WCTBaseContainer extends Container {
 	protected final InventoryPlayer inventoryPlayer;
 	protected IActionSource mySrc;
 	protected final HashSet<Integer> locked = new HashSet<Integer>();
-	public final WCTGuiObject obj;
+	public WCTGuiObject obj;
 	protected final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
 	protected final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
 	private boolean isContainerValid = true;
@@ -188,7 +188,7 @@ public abstract class WCTBaseContainer extends Container {
 			/*
 			final ItemStack a = stack == null ? ItemStack.EMPTY : stack.createItemStack();
 			final ItemStack b = clientRequestedTargetItem == null ? ItemStack.EMPTY : clientRequestedTargetItem.createItemStack();
-
+			
 			if (Platform.itemComparisons().isSameItem(a, b)) {
 				return;
 			}

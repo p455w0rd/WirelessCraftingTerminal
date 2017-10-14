@@ -51,7 +51,7 @@ public class PacketJEIRecipe extends WCTPacket {
 
 	// automatic.
 	public PacketJEIRecipe(final ByteBuf stream) throws IOException {
-		final ByteArrayInputStream bytes = getPacketByteArray(stream, 0, stream.readableBytes());
+		final ByteArrayInputStream bytes = getPacketByteArray(stream);
 		bytes.skip(stream.readerIndex());
 		final NBTTagCompound comp = CompressedStreamTools.readCompressed(bytes);
 		if (comp != null) {
@@ -92,19 +92,6 @@ public class PacketJEIRecipe extends WCTPacket {
 		}
 
 		return null;
-	}
-
-	public ByteArrayInputStream getPacketByteArray(ByteBuf stream, int readerIndex, int readableBytes) {
-		final ByteArrayInputStream bytes;
-		if (stream.hasArray()) {
-			bytes = new ByteArrayInputStream(stream.array(), readerIndex, readableBytes);
-		}
-		else {
-			byte[] data = new byte[stream.capacity()];
-			stream.getBytes(readerIndex, data, 0, readableBytes);
-			bytes = new ByteArrayInputStream(data);
-		}
-		return bytes;
 	}
 
 	@Override

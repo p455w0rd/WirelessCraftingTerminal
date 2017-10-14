@@ -1,6 +1,5 @@
 package p455w0rd.wct.sync.packets;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,7 +33,7 @@ public class PacketValueConfig extends WCTPacket {
 
 	// automatic.
 	public PacketValueConfig(final ByteBuf stream) throws IOException {
-		final DataInputStream dis = new DataInputStream(new ByteArrayInputStream(stream.array(), stream.readerIndex(), stream.readableBytes()));
+		final DataInputStream dis = new DataInputStream(getPacketByteArray(stream, stream.readerIndex(), stream.readableBytes()));
 		Name = dis.readUTF();
 		Value = dis.readUTF();
 	}

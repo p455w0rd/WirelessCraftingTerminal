@@ -58,7 +58,6 @@ import p455w0rd.wct.api.IBaubleItem;
 import p455w0rd.wct.api.IBaubleRender;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
-import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
@@ -90,12 +89,12 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
-		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
+		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
 			GuiHandler.open(GuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		if (world.isRemote) {
-			WCTBaseGui.memoryText = "";
+			//WCTBaseGui.memoryText = "";
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 	}
