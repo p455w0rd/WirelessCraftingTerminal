@@ -538,20 +538,43 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		this.bindTexture(Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
 		final int x_width = 199;
+		/*
+				this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
+		
+				for (int x = 0; x < rows; x++) {
+					this.drawTexturedModalRect(offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18);
+				}
+		
+				this.drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
+		
+				if (ModConfig.WCT_BOOSTER_ENABLED) {
+					this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
+				}
+		
+				GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : WCTUtils.player()));
+				*/
 
-		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
+		//draw "over inventory area"
+		drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
 
-		for (int x = 0; x < rows; x++) {
-			this.drawTexturedModalRect(offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18);
+		//draw "top line" of ME inv
+		drawTexturedModalRect(offsetX, offsetY + 18, 0, 18, x_width, 18);
+
+		for (int i = 1; i < rows - 1; i++) {
+			drawTexturedModalRect(offsetX, offsetY + 18 + i * 18, 0, 18 + 18, x_width, 18);
 		}
 
-		this.drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
+		//draw "bottom line" of ME inv
+		drawTexturedModalRect(offsetX, offsetY + 18 + (rows - 1) * 18, 0, 18 + 2 * 18, x_width, 18);
+
+		//draw player inv
+		drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
 
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
-			this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
+			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + 94, 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, WCTUtils.player());
 
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : WCTUtils.player()));
 		if (isHalloween && !isAltKeyDown()) {
 
 			String name = "Happy Halloween!            ";
