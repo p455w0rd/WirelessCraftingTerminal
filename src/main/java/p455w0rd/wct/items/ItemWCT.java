@@ -32,6 +32,9 @@ import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.ConfigManager;
 import appeng.util.Platform;
 import baubles.api.BaubleType;
+import ic2.api.item.IElectricItem;
+import ic2.api.item.IElectricItemManager;
+import ic2.api.item.ISpecialElectricItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -40,6 +43,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -59,17 +63,29 @@ import p455w0rd.wct.api.IBaubleRender;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.render.RenderLayerWCT;
+import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.integration.IC2;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
  *
  */
-@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
-public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
+@Optional.InterfaceList(value = {
+
+		@Optional.Interface(iface = "ic2.api.item.ISpecialElectricItem", modid = "ic2"),
+
+		@Optional.Interface(iface = "ic2.api.item.IElectricItemManager", modid = "ic2"),
+
+		@Optional.Interface(iface = "ic2.api.item.IElectricItem", modid = "ic2"),
+
+		@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
+})
+public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem, IElectricItemManager, ISpecialElectricItem {
 
 	private static final String name = "wct";
 	public static final String LINK_KEY_STRING = "key";
@@ -341,6 +357,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		}
 		checkForBooster(wirelessTerminal);
 		isMagnetInstalled(wirelessTerminal);
+		chargeFromArmor(wirelessTerminal, p);
 	}
 
 	//@Optional.Method(modid = "Baubles|API")
@@ -359,6 +376,99 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
 		return true;
+	}
+
+	private double injectExtPower(final PowerUnits input, final ItemStack is, final double amount, final boolean simulate) {
+		if (simulate) {
+			final int requiredEU = (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(is) - getAECurrentPower(is));
+			if (amount < requiredEU) {
+				return 0;
+			}
+			return amount - requiredEU;
+		}
+		else {
+			final double powerRemainder = injectAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount), simulate ? Actionable.SIMULATE : Actionable.MODULATE);
+			return PowerUnits.AE.convertTo(PowerUnits.EU, powerRemainder);
+		}
+	}
+
+	@Override
+	public double charge(final ItemStack is, final double amount, final int tier, final boolean ignoreTransferLimit, final boolean simulate) {
+		double addedAmt = amount;
+		final double limit = getTransferLimit(is);
+
+		if (!ignoreTransferLimit && amount > limit) {
+			addedAmt = limit;
+		}
+
+		return addedAmt - ((int) injectExtPower(PowerUnits.EU, is, addedAmt, simulate));
+	}
+
+	@Override
+	public double getCharge(final ItemStack is) {
+		return (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAECurrentPower(is));
+	}
+
+	@Override
+	public boolean canUse(final ItemStack is, final double amount) {
+		return getCharge(is) > amount;
+	}
+
+	@Override
+	public boolean use(final ItemStack is, final double amount, final EntityLivingBase entity) {
+		if (canUse(is, amount)) {
+			// use the power..
+			extractAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount), Actionable.MODULATE);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void chargeFromArmor(final ItemStack itemStack, final EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer && Mods.IC2.isLoaded()) {
+			EntityPlayer player = (EntityPlayer) entity;
+			ItemStack chestStack = player.inventory.armorItemInSlot(2);
+			if (chestStack != null) {
+				Item chestItem = chestStack.getItem();
+				if (chestItem instanceof IElectricItem && ((IElectricItem) chestItem).canProvideEnergy(itemStack) && player.openContainer instanceof ContainerWCT) {
+					charge(itemStack, 40, 4, true, false);
+					if (!player.capabilities.isCreativeMode) {
+						IC2.drawPowerFromChestItem(chestStack, 40);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public String getToolTip(final ItemStack itemStack) {
+		return null;
+	}
+
+	@Override
+	public double getMaxCharge(final ItemStack itemStack) {
+		return PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(itemStack));
+	}
+
+	@Override
+	public int getTier(final ItemStack itemStack) {
+		return 4;
+	}
+
+	public double getTransferLimit(final ItemStack itemStack) {
+		return Math.max(32, getMaxCharge(itemStack) / 200);
+	}
+
+	@Override
+	@Optional.Method(modid = "ic2")
+	public IElectricItemManager getManager(final ItemStack itemStack) {
+		return this;
+	}
+
+	@Override
+	public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate) {
+		return 0;
 	}
 
 }

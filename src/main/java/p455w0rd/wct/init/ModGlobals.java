@@ -16,7 +16,8 @@ public class ModGlobals {
 	public static enum Mods {
 			BAUBLES("baubles", "Baubles"),
 			BAUBLESAPI("Baubles|API", "Baubles API"),
-			JEI("jei", "Just Enough Items"), ITEMSCROLLER("itemscroller", "Item Scroller");
+			JEI("jei", "Just Enough Items"), ITEMSCROLLER("itemscroller", "Item Scroller"),
+			IC2("ic2", "IndustrialCraft 2");
 
 		private String modid, name;
 

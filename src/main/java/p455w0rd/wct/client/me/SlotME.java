@@ -1,5 +1,7 @@
 package p455w0rd.wct.client.me;
 
+import javax.annotation.Nonnull;
+
 import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -51,6 +53,11 @@ public class SlotME extends SlotItemHandler {
 	@Override
 	public int getSlotStackLimit() {
 		return 0;
+	}
+
+	@Override
+	public int getItemStackLimit(@Nonnull ItemStack stack) {
+		return getItemHandler() != null ? super.getItemStackLimit(stack) : getSlotStackLimit();
 	}
 
 	@Override
