@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container;
 
 import javax.annotation.Nonnull;
@@ -7,6 +22,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.container.slot.SlotInaccessible;
 import appeng.helpers.InventoryAction;
 import appeng.tile.inventory.AppEngInternalInventory;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,7 +31,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftAmount extends WCTBaseContainer {

@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -37,14 +37,14 @@ public class ModItems {
 	public static ItemMagnet MAGNET_CARD;
 	public static ItemInfinityBooster BOOSTER_CARD;
 
-	public static void init() {
+	public static void preInit() {
 		ITEM_LIST.add(WCT = new ItemWCT());
 		ITEM_LIST.add(MAGNET_CARD = new ItemMagnet());
 		ITEM_LIST.add(BOOSTER_CARD = new ItemInfinityBooster());
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static void initModels() {
+	public static void preInitModels() {
 		for (IModelHolder item : ITEM_LIST) {
 			item.initModel();
 		}

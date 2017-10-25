@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container;
 
 import java.io.IOException;
@@ -24,6 +39,7 @@ import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.container.guisync.GuiSync;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,10 +51,9 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.container.guisync.GuiSync;
-import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModGuiHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.util.WCTUtils;
@@ -91,12 +106,12 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			setCpuCoProcessors(0);
 			setName("");
 			/*
-			try {
-				NetworkHandler.instance().sendTo(new PacketUpdateCPUInfo(0, 0), (EntityPlayerMP) getPlayerInv().player);
-			}
-			catch (IOException e) {
-				//
-			}
+						try {
+							ModNetworking.instance().sendTo(new PacketUpdateCPUInfo(0, 0), (EntityPlayerMP) getPlayerInv().player);
+						}
+						catch (IOException e) {
+							//
+						}
 			*/
 		}
 		else {
@@ -105,12 +120,12 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			setCpuCoProcessors(cpus.get(getSelectedCpu()).getProcessors());
 			/*
 						try {
-							NetworkHandler.instance().sendTo(new PacketUpdateCPUInfo((int) getCpuAvailableBytes(), getCpuCoProcessors()), (EntityPlayerMP) getPlayerInv().player);
+							ModNetworking.instance().sendTo(new PacketUpdateCPUInfo((int) getCpuAvailableBytes(), getCpuCoProcessors()), (EntityPlayerMP) getPlayerInv().player);
 						}
 						catch (IOException e) {
 							//
 						}
-						*/
+			*/
 		}
 	}
 
@@ -183,7 +198,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 					result.populatePlan(plan);
 					/*
 										try {
-											NetworkHandler.instance().sendTo(new PacketSetJobBytes((int) result.getByteTotal()), (EntityPlayerMP) getPlayerInv().player);
+											ModNetworking.instance().sendTo(new PacketSetJobBytes((int) result.getByteTotal()), (EntityPlayerMP) getPlayerInv().player);
 										}
 										catch (IOException e) {
 											//
@@ -232,10 +247,10 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 
 					for (final Object g : listeners) {
 						if (g instanceof EntityPlayer) {
-							NetworkHandler.instance().sendTo(a, (EntityPlayerMP) g);
-							NetworkHandler.instance().sendTo(b, (EntityPlayerMP) g);
+							ModNetworking.instance().sendTo(a, (EntityPlayerMP) g);
+							ModNetworking.instance().sendTo(b, (EntityPlayerMP) g);
 							if (c != null) {
-								NetworkHandler.instance().sendTo(c, (EntityPlayerMP) g);
+								ModNetworking.instance().sendTo(c, (EntityPlayerMP) g);
 							}
 						}
 					}
@@ -286,7 +301,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 
 		final WCTIActionHost ah = getActionHost(obj);
 		if (ah instanceof WCTGuiObject) {
-			originalGui = GuiHandler.GUI_WCT;
+			originalGui = ModGuiHandler.GUI_WCT;
 		}
 
 		if (result != null && !isSimulation()) {
@@ -295,7 +310,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			setAutoStart(false);
 			if (g != null && originalGui == 0)// && this.getOpenContext() != null )
 			{
-				NetworkHandler.instance().sendTo(new PacketSwitchGuis(originalGui), (EntityPlayerMP) getInventoryPlayer().player);
+				ModNetworking.instance().sendTo(new PacketSwitchGuis(originalGui), (EntityPlayerMP) getInventoryPlayer().player);
 
 				//final TileEntity te = this.getOpenContext().getTile();
 				//Platform.openGUI( this.getInventoryPlayer().player, te, this.getOpenContext().getSide(), originalGui );
@@ -304,7 +319,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
-				GuiHandler.open(originalGui, player, world, new BlockPos(x, y, z));
+				ModGuiHandler.open(originalGui, player, world, new BlockPos(x, y, z));
 			}
 		}
 	}

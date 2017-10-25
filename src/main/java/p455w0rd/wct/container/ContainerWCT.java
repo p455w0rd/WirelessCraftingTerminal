@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container;
 
 import java.io.IOException;
@@ -34,7 +49,17 @@ import appeng.api.storage.data.IItemList;
 import appeng.api.util.AEPartLocation;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
+import appeng.client.me.InternalSlotME;
+import appeng.client.me.SlotME;
 import appeng.container.ContainerNull;
+import appeng.container.guisync.GuiSync;
+import appeng.container.slot.AppEngCraftingSlot;
+import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.SlotCraftingMatrix;
+import appeng.container.slot.SlotCraftingTerm;
+import appeng.container.slot.SlotDisabled;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotInaccessible;
 import appeng.core.AEConfig;
 import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IContainerCraftingPacket;
@@ -74,35 +99,27 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
-import p455w0rd.wct.client.me.InternalSlotME;
-import p455w0rd.wct.client.me.SlotME;
-import p455w0rd.wct.container.guisync.GuiSync;
-import p455w0rd.wct.container.slot.AppEngCraftingSlot;
-import p455w0rd.wct.container.slot.AppEngSlot;
 import p455w0rd.wct.container.slot.NullSlot;
 import p455w0rd.wct.container.slot.SlotArmor;
 import p455w0rd.wct.container.slot.SlotBooster;
-import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotCraftingTerm;
-import p455w0rd.wct.container.slot.SlotDisabled;
-import p455w0rd.wct.container.slot.SlotFake;
-import p455w0rd.wct.container.slot.SlotInaccessible;
+import p455w0rd.wct.container.slot.SlotBoosterEnergy;
 import p455w0rd.wct.container.slot.SlotMagnet;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
-import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.inventory.WCTInventoryBooster;
 import p455w0rd.wct.inventory.WCTInventoryMagnet;
 import p455w0rd.wct.inventory.WCTInventoryTrash;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
+import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import p455w0rd.wct.util.WCTUtils;
 
@@ -118,7 +135,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	private final SlotCraftingMatrix[] craftingSlots = new SlotCraftingMatrix[9];
 	private final SlotCraftingTerm outputSlot;
 	public ItemStack craftItem = ItemStack.EMPTY;
-	private double powerMultiplier = 0.5;
 	private int ticks = 0;
 	private final IItemList<IAEItemStack> items = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 	private final IConfigManager clientCM;
@@ -132,20 +148,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	private IGridNode networkNode;
 	private final AppEngInternalInventory viewCell = new AppEngInternalInventory(this, 5);
 
-	/**
-	 * Constructor for our custom container
-	 *
-	 * @author p455w0rd
-	 */
 	public ContainerWCT(EntityPlayer player, ITerminalHost hostIn) {
 		super(player.inventory, getActionHost(getGuiObject(WCTUtils.getWirelessTerm(player.inventory), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)));
 		initConfig(clientCM = new ConfigManager(this));
 		containerstack = WCTUtils.getWirelessTerm(inventoryPlayer);
 		customName = "WCTContainer";
-		//boosterInventory = new WCTInventoryBooster(containerstack);
-		//magnetInventory = new WCTInventoryMagnet(containerstack);
-		//trashInventory = new WCTInventoryTrash(this, containerstack);
-		//craftingGrid = new WCTInventoryCrafting(this, 3, 3, containerstack);
 		host = hostIn;
 		if (Platform.isServer()) {
 			serverCM = obj.getConfigManager();
@@ -177,6 +184,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 			}
 			else {
+				WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.CommunicationError.get());
 				setValidContainer(false);
 			}
 		}
@@ -185,10 +193,18 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
-			addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20).setContainer(this));
+			if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
+				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20));
+				boosterSlot.setContainer(this);
+			}
+			else {
+				addSlotToContainer(boosterSlot = new SlotBoosterEnergy(134, -20));
+				boosterSlot.setContainer(this);
+			}
 		}
 		else {
-			addSlotToContainer(boosterSlot = new NullSlot().setContainer(this));
+			addSlotToContainer(boosterSlot = new NullSlot());
+			boosterSlot.setContainer(this);
 		}
 		for (int i = 0; i < getPlayerInv().getSizeInventory(); i++) {
 			ItemStack currStack = getPlayerInv().getStackInSlot(i);
@@ -197,33 +213,19 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 		}
 		bindPlayerInventory(inventoryPlayer, 8, 0);
-		/*
-				// Add hotbar slots
-				for (int i = 0; i < 9; ++i) {
-					addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
-				}
 
-				// Add player inventory slots
-				for (int i = 0; i < 3; ++i) {
-					for (int j = 0; j < 9; ++j) {
-						addSlotToContainer(new SlotPlayerInv(inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 0 + i * 18));
-					}
-				}
-		*/
-		// Add armor slots
 		for (int i = 0; i < 4; ++i) {
 			addSlotToContainer(new SlotArmor(player, new InvWrapper(inventoryPlayer), 39 - i, (int) 8.5, (i * 18) - 76, EntityEquipmentSlot.values()[6 - (i + 2)]));
 		}
 
 		final IItemHandler crafting = getInventoryByName("crafting");
-		// Add crafting grid slots
+
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
 				addSlotToContainer(craftingSlots[j + i * 3] = new SlotCraftingMatrix(this, crafting, j + i * 3, 80 + j * 18, (i * 18) - 76));
 			}
 		}
 
-		// Add crafting result slot
 		addSlotToContainer(outputSlot = new SlotCraftingTerm(getPlayerInv().player, mySrc, getPowerSource(), obj, crafting, crafting, output, Mods.BAUBLES.isLoaded() ? 142 : 174, -58, this));
 		addSlotToContainer(magnetSlot = new SlotMagnet(magnetInventory, 152, -20));
 		addSlotToContainer(new SlotTrash(trashInventory, 98, -22));
@@ -273,9 +275,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		final ContainerNull cn = new ContainerNull();
 		final InventoryCrafting ic = new InventoryCrafting(cn, 3, 3);
 		for (int x = 0; x < 9; x++) {
-			//if (!inv.getStackInSlot(x).isEmpty()) {
-			//	ic.setInventorySlotContents(x, inv.getStackInSlot(x));
-			//}
 			ic.setInventorySlotContents(x, craftingSlots[x].getStack());
 		}
 
@@ -291,7 +290,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			getResultSlot().putStack(craftingResult);
 		}
 
-		//getResultSlot().putStack(CraftingManager.findMatchingRecipe(ic, WCTUtils.world(getPlayerInv().player)));
 		writeToNBT();
 	}
 
@@ -361,20 +359,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					break;
 				}
 			}
-			/*
-						if (action == InventoryAction.MOVE_REGION) {
-							final List<Slot> from = new LinkedList<Slot>();
-							for (final Object j : inventorySlots) {
-								if (j instanceof SlotCraftingMatrix) {// && j.getClass() == s.getClass()) {
-									from.add((Slot) j);
-								}
-							}
-							for (final Slot fr : from) {
-								transferStackInSlot(player, fr.slotNumber);
-							}
-							return;
-						}
-						*/
 			if (action == InventoryAction.MOVE_REGION) {
 				final List<Slot> from = new LinkedList<Slot>();
 
@@ -612,12 +596,10 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void saveChanges() {
-		//writeToNBT();
 	}
 
 	@Override
 	public void onChangeInventory(final IItemHandler inv, final int slot, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack) {
-		// <3
 	}
 
 	@Override
@@ -672,11 +654,24 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 		ticks++;
 		if (ticks > 10) {
-			if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
+			if (isInRange()) {
 				obj.extractAEPower(AEConfig.instance().wireless_getDrainRate(obj.getRange()), Actionable.MODULATE, PowerMultiplier.CONFIG);
+				if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+					if (!WCTUtils.isInRange(getWirelessTerminal())) {
+						WCTUtils.setInRange(getWirelessTerminal(), true);
+						ModNetworking.instance().sendTo(new PacketSetInRange(true), (EntityPlayerMP) getPlayerInv().player);
+					}
+				}
 			}
 			else {
 				obj.extractAEPower((int) (Math.min(500.0, AEConfig.instance().wireless_getDrainRate(obj.getRange()))), Actionable.MODULATE, PowerMultiplier.CONFIG);
+				if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+					if (WCTUtils.isInRange(getWirelessTerminal())) {
+						WCTUtils.setInRange(getWirelessTerminal(), false);
+						ModNetworking.instance().sendTo(new PacketSetInRange(false), (EntityPlayerMP) getPlayerInv().player);
+					}
+					WCTUtils.drainInfinityEnergy(getWirelessTerminal(), getPlayerInv().player);
+				}
 			}
 			ticks = 0;
 		}
@@ -695,7 +690,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					for (final IContainerListener crafter : listeners) {
 						if (crafter instanceof EntityPlayerMP) {
 							try {
-								NetworkHandler.instance().sendTo(new PacketValueConfig(set.name(), sideLocal.name()), (EntityPlayerMP) crafter);
+								ModNetworking.instance().sendTo(new PacketValueConfig(set.name(), sideLocal.name()), (EntityPlayerMP) crafter);
 							}
 							catch (final IOException e) {
 								//
@@ -727,20 +722,19 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 						for (final Object c : listeners) {
 							if (c instanceof EntityPlayer) {
-								NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
+								ModNetworking.instance().sendTo(piu, (EntityPlayerMP) c);
 							}
 						}
 					}
 				}
 				catch (final IOException e) {
-					//
 				}
 			}
 
 			super.detectAndSendChanges();
 
 			if (!isInRange()) {
-				if (!isBoosterInstalled() || !ModConfig.WCT_BOOSTER_ENABLED) {
+				if (!hasInfiniteRange()) {
 					if (isValidContainer()) {
 						WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.OutOfRange.get());
 					}
@@ -759,20 +753,17 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 				setValidContainer(false);
 			}
-			else {
-				setPowerMultiplier(AEConfig.instance().wireless_getDrainRate(obj.getRange()));
-			}
 		}
 	}
 
-	public boolean isBoosterInstalled() {
-		return getBoosterSlot() != null && getBoosterSlot().getHasStack() && getBoosterSlot().getStack().getItem() == ModItems.BOOSTER_CARD;
+	private boolean hasInfiniteRange() {
+		return WCTUtils.hasInfiniteRange(containerstack);
 	}
 
 	public int getBoosterIndex() {
 		if (getBoosterSlot() != null) {
 			for (int i = 0; i < inventorySlots.size(); i++) {
-				if (inventorySlots.get(i) instanceof SlotBooster) {
+				if ((inventorySlots.get(i) instanceof SlotBooster) || (inventorySlots.get(i) instanceof SlotBoosterEnergy)) {
 					return i;
 				}
 			}
@@ -781,7 +772,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	public AppEngSlot getBoosterSlot() {
-		return boosterSlot instanceof SlotBooster ? boosterSlot : null;
+		return boosterSlot instanceof SlotBooster ? boosterSlot : boosterSlot instanceof SlotBoosterEnergy ? boosterSlot : null;
+
 	}
 
 	public boolean isMagnetInstalled() {
@@ -845,7 +837,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	protected boolean isInRange() {
-		return obj.rangeCheck(ModConfig.WCT_BOOSTER_ENABLED && isBoosterInstalled());
+		return obj.rangeCheck(hasInfiniteRange());
 	}
 
 	protected boolean networkIsPowered() {
@@ -929,20 +921,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void onUpdate(final String field, final Object oldValue, final Object newValue) {
-		// =]
 	}
 
 	public boolean isPowered() {
 		double pwr = ((IWirelessCraftingTerminalItem) containerstack.getItem()).getAECurrentPower(containerstack);
 		return (pwr > 0.0);
-	}
-
-	private double getPowerMultiplier() {
-		return powerMultiplier;
-	}
-
-	void setPowerMultiplier(final double powerMultiplier) {
-		this.powerMultiplier = powerMultiplier;
 	}
 
 	private void readNBT() {
@@ -967,6 +950,10 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		containerstack.setTagCompound(newNBT);
 	}
 
+	public ItemStack getWirelessTerminal() {
+		return containerstack;
+	}
+
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int idx) {
 		AppEngSlot appEngSlot = null;
@@ -974,55 +961,18 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		boolean isAppengSlot = false;
 		if (inventorySlots.get(idx) instanceof AppEngSlot) {
 			isAppengSlot = true;
-			appEngSlot = (AppEngSlot) inventorySlots.get(idx); // require AE SLots!
+			appEngSlot = (AppEngSlot) inventorySlots.get(idx);
 			tis = appEngSlot.getStack();
 		}
 		if (tis.isEmpty()) {
 			return ItemStack.EMPTY;
 		}
-		// Try to place armor in armor slot/booster in booster slot first
+
 		if (isAppengSlot && appEngSlot != null) {
 
-			/* eh...some other time..lets get this update out
-			if (isInInventory(appEngSlot) || isInHotbar(appEngSlot)) {
-				if (tis.getItem() instanceof ItemArmor) {
-					int type = ((ItemArmor) tis.getItem()).armorType.getIndex();
-					if (mergeItemStack(tis, 40 - type, 40 - type + 1, false)) {
-						appEngSlot.clearStack();
-						return ItemStack.EMPTY;
-					}
-				}
-				else if (tis.getItem() instanceof ItemInfinityBooster) {
-					if (mergeItemStack(tis.copy(), getBoosterIndex(), getBoosterIndex() + 1, false)) {
-						if (tis.getCount() > 1) {
-							tis.shrink(1);
-						}
-						else {
-							appEngSlot.clearStack();
-						}
-						return ItemStack.EMPTY;
-					}
-				}
-				else {
-					if (tis.getItem() instanceof ItemMagnet) {
-						if (mergeItemStack(tis.copy(), getMagnetIndex(), getMagnetIndex() + 1, false)) {
-							if (tis.getCount() > 1) {
-								tis.shrink(1);
-							}
-							else {
-								appEngSlot.clearStack();
-							}
-							return ItemStack.EMPTY;
-						}
-					}
-				}
-			}
-			*/
 			if (Platform.isClient()) {
-				return ItemStack.EMPTY; //cos Mr Server are mor knower at bettering stuffs
+				return ItemStack.EMPTY;
 			}
-
-			//-TheRealp455w0rd 2017 :)
 
 			boolean hasMETiles = false;
 			for (final Object is : inventorySlots) {
@@ -1033,7 +983,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 
 			if (hasMETiles && Platform.isClient()) {
-				return ItemStack.EMPTY; //I'm your friendly neighborhood Client Side
+				return ItemStack.EMPTY;
 			}
 
 			if (appEngSlot instanceof SlotDisabled || appEngSlot instanceof SlotInaccessible) {
@@ -1051,7 +1001,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					}
 					else if (tis.getItem() instanceof ItemInfinityBooster) {
 						if (mergeItemStack(tis.copy(), getBoosterIndex(), getBoosterIndex() + 1, false)) {
-							if (tis.getCount() > 1) {
+							if (tis.getCount() > 1 && ModConfig.USE_OLD_INFINTY_MECHANIC) {
 								tis.shrink(1);
 							}
 							else {
@@ -1097,17 +1047,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 				final List<Slot> selectedSlots = new ArrayList<Slot>();
 
-				/**
-				 * Gather a list of valid destinations.
-				 */
 				if (appEngSlot.isPlayerSide()) {
 					tis = shiftStoreItem(tis);
-
-					// target slots in the container...
 					for (final Object inventorySlot : inventorySlots) {
 						if (inventorySlot instanceof AppEngSlot) {
 							final AppEngSlot cs = (AppEngSlot) inventorySlot;
-
 							if (!(cs.isPlayerSide()) && !(cs instanceof SlotFake) && !(cs instanceof AppEngCraftingSlot)) {
 								if (cs.isItemValid(tis)) {
 									selectedSlots.add(cs);
@@ -1117,7 +1061,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					}
 				}
 				else {
-					// target slots in the container...
 					for (final Object inventorySlot : inventorySlots) {
 						if (inventorySlot instanceof AppEngSlot) {
 							final AppEngSlot cs = (AppEngSlot) inventorySlot;
@@ -1146,7 +1089,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									else if (destination.isEmpty()) {
 										cs.putStack(tis.copy());
 										cs.onSlotChanged();
-										updateSlot(cs);
+										//updateSlot(cs);
 										return ItemStack.EMPTY;
 									}
 								}
@@ -1156,7 +1099,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 
 				if (!tis.isEmpty()) {
-					// find partials..
 					for (final Slot d : selectedSlots) {
 						if (d instanceof SlotDisabled || d instanceof SlotME) {
 							continue;
@@ -1166,8 +1108,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 							if (d.getHasStack()) {
 								final ItemStack t = d.getStack();
 
-								if (Platform.itemComparisons().isSameItem(tis, t)) // t.isItemEqual(tis))
-								{
+								if (Platform.itemComparisons().isSameItem(tis, t)) {
 									int maxSize = t.getMaxStackSize();
 									if (maxSize > d.getSlotStackLimit()) {
 										maxSize = d.getSlotStackLimit();
@@ -1185,22 +1126,18 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									if (tis.getCount() <= 0) {
 										appEngSlot.putStack(ItemStack.EMPTY);
 										d.onSlotChanged();
-
-										// if ( hasMETiles ) updateClient();
-
-										updateSlot(appEngSlot);
-										updateSlot(d);
+										//updateSlot(appEngSlot);
+										//updateSlot(d);
 										return ItemStack.EMPTY;
 									}
 									else {
-										updateSlot(d);
+										//updateSlot(d);
 									}
 								}
 							}
 						}
 					}
 
-					// any match..
 					for (final Slot d : selectedSlots) {
 						if (d instanceof SlotDisabled || d instanceof SlotME) {
 							continue;
@@ -1228,17 +1165,12 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									if (tis.getCount() <= 0) {
 										appEngSlot.putStack(ItemStack.EMPTY);
 										d.onSlotChanged();
-
-										// if ( worldEntity != null )
-										// worldEntity.markDirty();
-										// if ( hasMETiles ) updateClient();
-
-										updateSlot(appEngSlot);
-										updateSlot(d);
+										//updateSlot(appEngSlot);
+										//updateSlot(d);
 										return ItemStack.EMPTY;
 									}
 									else {
-										updateSlot(d);
+										//updateSlot(d);
 									}
 								}
 							}
@@ -1259,17 +1191,12 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 								if (tis.getCount() <= 0) {
 									appEngSlot.putStack(ItemStack.EMPTY);
 									d.onSlotChanged();
-
-									// if ( worldEntity != null )
-									// worldEntity.markDirty();
-									// if ( hasMETiles ) updateClient();
-
-									updateSlot(appEngSlot);
-									updateSlot(d);
+									//updateSlot(appEngSlot);
+									//updateSlot(d);
 									return ItemStack.EMPTY;
 								}
 								else {
-									updateSlot(d);
+									//updateSlot(d);
 								}
 							}
 						}
@@ -1278,9 +1205,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 				appEngSlot.putStack(!tis.isEmpty() ? tis.copy() : ItemStack.EMPTY);
 			}
-
-			updateSlot(appEngSlot);
-
+			//updateSlot(appEngSlot);
 		}
 		detectAndSendChanges();
 		return ItemStack.EMPTY;
@@ -1290,8 +1215,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	public void swapSlotContents(final int slotA, final int slotB) {
 		final Slot a = getSlot(slotA);
 		final Slot b = getSlot(slotB);
-
-		// NPE protection...
 		if (a == null || b == null) {
 			return;
 		}
@@ -1299,27 +1222,18 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		final ItemStack isA = a.getStack();
 		final ItemStack isB = b.getStack();
 
-		// something to do?
 		if (isA.isEmpty() && isB.isEmpty()) {
 			return;
 		}
-
-		// can take?
-
 		if (!isA.isEmpty() && !a.canTakeStack(getInventoryPlayer().player)) {
 			return;
 		}
-
 		if (!isB.isEmpty() && !b.canTakeStack(getInventoryPlayer().player)) {
 			return;
 		}
-
-		// swap valid?
-
 		if (!isB.isEmpty() && !a.isItemValid(isB)) {
 			return;
 		}
-
 		if (!isA.isEmpty() && !b.isItemValid(isA)) {
 			return;
 		}
@@ -1327,7 +1241,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		ItemStack testA = isB.isEmpty() ? ItemStack.EMPTY : isB.copy();
 		ItemStack testB = isA.isEmpty() ? ItemStack.EMPTY : isA.copy();
 
-		// can put some back?
 		if (!testA.isEmpty() && testA.getCount() > a.getSlotStackLimit()) {
 			if (!testB.isEmpty()) {
 				return;
@@ -1356,9 +1269,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		b.putStack(testB);
 	}
 
+	@SuppressWarnings("unused")
+	@Deprecated
 	private void updateSlot(final Slot clickSlot) {
-		//detectAndSendChanges();
-		//writeToNBT();
 	}
 
 	private ItemStack shiftStoreItem(final ItemStack input) {
@@ -1399,10 +1312,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		return ItemStack.EMPTY;
 	}
 
-	/**
-	 * Handles shift-clicking of items whose maxStackSize is 1
-	 */
-
 	@Override
 	protected boolean mergeItemStack(ItemStack stack, int start, int end, boolean backwards) {
 		boolean flag1 = false;
@@ -1426,13 +1335,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					if (l <= stack.getMaxStackSize() && l <= slot.getSlotStackLimit()) {
 						stack.setCount(0);
 						itemstack1.setCount(l);
-						//boosterInventory.markDirty(k);
 						flag1 = true;
 					}
 					else if (itemstack1.getCount() < stack.getMaxStackSize() && l < slot.getSlotStackLimit()) {
 						stack.shrink(stack.getMaxStackSize() - itemstack1.getCount());
 						itemstack1.setCount(stack.getMaxStackSize());
-						//boosterInventory.markDirty(k);
 						flag1 = true;
 					}
 				}
@@ -1456,22 +1363,18 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					if (l <= slot.getSlotStackLimit()) {
 						slot.putStack(stack.copy());
 						stack.setCount(0);
-						//boosterInventory.markDirty(k);
 						flag1 = true;
 						break;
 					}
 					else {
 						putStackInSlot(k, new ItemStack(stack.getItem(), slot.getSlotStackLimit(), stack.getItemDamage()));
 						stack.shrink(slot.getSlotStackLimit());
-						//boosterInventory.markDirty(k);
 						flag1 = true;
 					}
 				}
-
 				k += (backwards ? -1 : 1);
 			}
 		}
-
 		return flag1;
 	}
 

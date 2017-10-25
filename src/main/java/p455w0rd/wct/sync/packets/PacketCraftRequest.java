@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.sync.packets;
 
 import java.util.concurrent.Future;
@@ -13,7 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerCraftConfirm;
-import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
@@ -70,7 +85,8 @@ public class PacketCraftRequest extends WCTPacket {
 					int y = (int) player.posY;
 					int z = (int) player.posZ;
 
-					GuiHandler.open(GuiHandler.GUI_CRAFT_CONFIRM, player, WCTUtils.world(player), new BlockPos(x, y, z));
+					ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_CONFIRM, player, WCTUtils.world(player), new BlockPos(x, y, z));
+					//Platform.openGUI(player, null, cca.getOpenContext().getSide(), GuiBridge.GUI_CRAFTING_CONFIRM);
 
 					if (player.openContainer instanceof ContainerCraftConfirm) {
 						final ContainerCraftConfirm ccc = (ContainerCraftConfirm) player.openContainer;

@@ -33,6 +33,12 @@ tooltip.using.desc=Using
 tooltip.filtered_items.desc=Filtered Items
 tooltip.only_works.desc=Only works when in Wireless Crafting Terminal slot!
 tooltip.installed.desc=Installed
+tooltip.infinite_range.desc=Infinite Range
+tooltip.infinity_energy.desc=Infinity Energy
+tooltip.units.desc=Units
+tooltip.in_wap_range.desc=(In range of WAP)
+tooltip.out_of.desc=Out of
+tooltip.infinity_energy_low.desc=Infinity Energy is low!
 
 // Chat Messages
 chatmessages.magnet_deactivated.desc=Magnet Card Deactivated

@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -16,13 +16,13 @@
 package p455w0rd.wct.util;
 
 import appeng.bootstrap.FeatureFactory;
-import appeng.core.*;
-import appeng.core.api.definitions.*;
+import appeng.core.Api;
+import appeng.core.ApiDefinitions;
+import appeng.core.api.definitions.ApiBlocks;
+import appeng.core.api.definitions.ApiItems;
+import appeng.core.api.definitions.ApiMaterials;
+import appeng.core.api.definitions.ApiParts;
 
-/**
- * @author p455w0rd
- *
- */
 public class AEUtils {
 
 	public static Api getApi() {

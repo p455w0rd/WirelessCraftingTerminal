@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -15,6 +15,8 @@
  */
 package p455w0rd.wct.init;
 
+import java.util.Random;
+
 import org.lwjgl.input.Keyboard;
 
 import appeng.api.config.SearchBoxMode;
@@ -24,6 +26,7 @@ import appeng.integration.Integrations;
 import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -56,11 +59,9 @@ import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.handlers.GuiHandler;
-import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
@@ -75,9 +76,10 @@ import p455w0rdslib.util.ChunkUtils;
  */
 public class ModEvents {
 
-	public static long CLIENT_TICKS = 0;
+	public static long CLIENT_TICKS = 0L;
+	public static long SERVER_TICKS = 0L;
 
-	public static void init() {
+	public static void preInit() {
 		MinecraftForge.EVENT_BUS.register(new ModEvents());
 		ChunkUtils.register(WCT.INSTANCE);
 	}
@@ -165,6 +167,9 @@ public class ModEvents {
 	@SideOnly(Side.CLIENT)
 	public void onClientTick(ClientTickEvent e) {
 		if (e.phase == Phase.END) {
+			if (CLIENT_TICKS > Long.MAX_VALUE - 1000) {
+				CLIENT_TICKS = 0L;
+			}
 			CLIENT_TICKS++;
 		}
 	}
@@ -186,7 +191,7 @@ public class ModEvents {
 			if (wirelessTerm != null && wirelessTerm.isWirelessCraftingEnabled(is)) {
 				//if (!FMLClientHandler.instance().isGUIOpen(GuiWCT.class)) {
 				if (!(p.openContainer instanceof ContainerWCT)) {
-					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_WCT));
+					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WCT));
 				}
 				else {
 					p.closeScreen();
@@ -200,10 +205,10 @@ public class ModEvents {
 					if (magnetItem.getTagCompound() == null) {
 						magnetItem.setTagCompound(new NBTTagCompound());
 					}
-					NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 				}
 				if (!(p.openContainer instanceof ContainerMagnet)) {
-					NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_MAGNET));
+					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_MAGNET));
 				}
 			}
 		}
@@ -214,7 +219,7 @@ public class ModEvents {
 					if (!magnetItem.hasTagCompound()) {
 						magnetItem.setTagCompound(new NBTTagCompound());
 					}
-					NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 				}
 				ItemMagnet.switchMagnetMode(magnetItem, p);
 			}
@@ -229,22 +234,22 @@ public class ModEvents {
 		if (event.getEntity() instanceof EntityDragon && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_DRAGON_DROPS_BOOSTER) {
 			event.getDrops().add(drop);
 		}
-		/*
+
 		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
 			int n = rand.nextInt(100);
-			if (n <= ModConfig.WCT_BOOSTER_DROPCHANCE) {
+			if (n <= ModConfig.WCT_BOOSTER_DROP_CHANCE) {
 				event.getDrops().add(drop);
 			}
 		}
-		*/
+
 	}
 
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerLoggedInEvent e) {
 		if (e.player instanceof EntityPlayerMP) {
 			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER, ModConfig.WCT_DRAGON_DROPS_BOOSTER);
-			NetworkHandler.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
+			ModNetworking.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
 		}
 	}
 

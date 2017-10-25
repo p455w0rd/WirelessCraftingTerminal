@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -16,6 +16,8 @@
 package p455w0rd.wct;
 
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -33,21 +35,21 @@ public class WCT {
 	@SidedProxy(clientSide = ModGlobals.CLIENT_PROXY, serverSide = ModGlobals.SERVER_PROXY)
 	public static CommonProxy PROXY;
 
-	@Mod.Instance(ModGlobals.MODID)
+	@Instance(ModGlobals.MODID)
 	public static WCT INSTANCE;
 
-	@Mod.EventHandler
+	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		INSTANCE = this;
 		PROXY.preInit(e);
 	}
 
-	@Mod.EventHandler
+	@EventHandler
 	public void init(FMLInitializationEvent e) {
 		PROXY.init(e);
 	}
 
-	@Mod.EventHandler
+	@EventHandler
 	public void postInit(FMLPostInitializationEvent e) {
 		PROXY.postInit(e);
 	}

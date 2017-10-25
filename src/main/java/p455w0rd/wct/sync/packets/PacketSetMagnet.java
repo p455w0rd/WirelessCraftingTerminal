@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.sync.packets;
 
 import io.netty.buffer.ByteBuf;
@@ -6,12 +21,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.util.WCTUtils;
 
 public class PacketSetMagnet extends WCTPacket {
@@ -39,17 +54,9 @@ public class PacketSetMagnet extends WCTPacket {
 			return;
 		}
 		if (!magnetItem.hasTagCompound()) {
-			NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+			ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 		}
-		//ItemMagnet.switchMagnetMode(magnetItem, player);
-		/*
-		if (magnetItem.getItemDamage() == 2) {
-			WCTUtils.getWirelessTerm(player.inventory).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0).setShort("Damage", (short) 0);
-		}
-		else {
-			WCTUtils.getWirelessTerm(player.inventory).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0).setShort("Damage", (short) (magnetItem.getItemDamage() + 1));
-		}
-		*/
+
 		ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
 		if (!wct.isEmpty() && WCTUtils.isMagnetInstalled(player.inventory)) {
 
@@ -68,8 +75,6 @@ public class PacketSetMagnet extends WCTPacket {
 					Baubles.setBaublesItemStack(player, slotIndex, wct);
 				}
 			}
-			//wct.getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0).setInteger("MagnetMode", magnetDamage);
-
 		}
 
 	}

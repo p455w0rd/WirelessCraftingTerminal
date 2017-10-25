@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
@@ -23,7 +38,18 @@ import com.google.common.collect.Lists;
 
 import appeng.api.storage.data.IAEItemStack;
 import appeng.client.gui.widgets.ITooltip;
+import appeng.client.me.InternalSlotME;
+import appeng.client.me.SlotDisconnected;
+import appeng.client.me.SlotME;
 import appeng.container.AEBaseContainer;
+import appeng.container.slot.AppEngCraftingSlot;
+import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.AppEngSlot.hasCalculatedValidness;
+import appeng.container.slot.OptionalSlotFake;
+import appeng.container.slot.SlotCraftingTerm;
+import appeng.container.slot.SlotDisabled;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotInaccessible;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.core.AEConfig;
 import appeng.core.localization.ButtonToolTips;
@@ -47,26 +73,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
-import p455w0rd.wct.client.me.InternalSlotME;
-import p455w0rd.wct.client.me.SlotDisconnected;
-import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.client.render.StackSizeRenderer;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
-import p455w0rd.wct.container.slot.AppEngCraftingSlot;
-import p455w0rd.wct.container.slot.AppEngSlot;
-import p455w0rd.wct.container.slot.AppEngSlot.hasCalculatedValidness;
-import p455w0rd.wct.container.slot.OptionalSlotFake;
-import p455w0rd.wct.container.slot.SlotCraftingTerm;
-import p455w0rd.wct.container.slot.SlotDisabled;
-import p455w0rd.wct.container.slot.SlotFake;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.container.slot.SlotOutput;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotSingleItem;
-import p455w0rd.wct.init.ModGlobals.Mods;
+import p455w0rd.wct.init.ModNetworking;
+import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.integration.JEI;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
 import p455w0rd.wct.util.WCTUtils;
@@ -274,7 +289,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 			if (drag_click.size() > 1) {
 				for (final Slot dr : drag_click) {
 					final PacketInventoryAction p = new PacketInventoryAction(c == 0 ? InventoryAction.PICKUP_OR_SET_DOWN : InventoryAction.PLACE_SINGLE, dr.slotNumber, 0);
-					NetworkHandler.instance().sendToServer(p);
+					ModNetworking.instance().sendToServer(p);
 				}
 			}
 		}
@@ -295,7 +310,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 			}
 
 			final PacketInventoryAction p = new PacketInventoryAction(action, slotIdx, 0);
-			NetworkHandler.instance().sendToServer(p);
+			ModNetworking.instance().sendToServer(p);
 
 			return;
 		}
@@ -304,13 +319,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-
+		
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-
+		
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {
@@ -328,7 +343,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 			}
 
 			final PacketInventoryAction p = new PacketInventoryAction(action, slotIdx, 0);
-			NetworkHandler.instance().sendToServer(p);
+			ModNetworking.instance().sendToServer(p);
 
 			return;
 		}
@@ -349,7 +364,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				((WCTBaseContainer) inventorySlots).setTargetStack(stack);
 
 				final PacketInventoryAction p = new PacketInventoryAction(InventoryAction.MOVE_REGION, slotNum, 0);
-				NetworkHandler.instance().sendToServer(p);
+				ModNetworking.instance().sendToServer(p);
 				return;
 			}
 		}
@@ -379,7 +394,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 			if (action != null) {
 				final PacketInventoryAction p = new PacketInventoryAction(action, slot.getSlotIndex(), ((SlotDisconnected) slot).getSlot().getId());
-				NetworkHandler.instance().sendToServer(p);
+				ModNetworking.instance().sendToServer(p);
 			}
 
 			return;
@@ -430,7 +445,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 					((AEBaseContainer) inventorySlots).setTargetStack(stack);
 				}
 				final PacketInventoryAction p = new PacketInventoryAction(action, getInventorySlots().size(), 0);
-				NetworkHandler.instance().sendToServer(p);
+				ModNetworking.instance().sendToServer(p);
 			}
 
 			return;
@@ -499,7 +514,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 					else {
 						for (final Slot s : slots) {
 							if (s.getSlotIndex() == j && s.inventory == playerInv) {
-								NetworkHandler.instance().sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
+								ModNetworking.instance().sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
 								return true;
 							}
 						}

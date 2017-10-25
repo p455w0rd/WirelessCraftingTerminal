@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -64,12 +64,12 @@ import net.minecraftforge.oredict.OreDictionary;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.util.WCTUtils;
@@ -214,7 +214,7 @@ public class ItemMagnet extends ItemBase {
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
-				GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
+				ModGuiHandler.open(ModGuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
 			}
 			else {
 				switchMagnetMode(item, player, false);
@@ -223,7 +223,7 @@ public class ItemMagnet extends ItemBase {
 		}
 		else {
 			if (!WCTUtils.isMagnetInitialized(item)) {
-				NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+				ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 			}
 			if (player.isSneaking()) {
 				switchMagnetMode(item, player, false);
@@ -233,7 +233,7 @@ public class ItemMagnet extends ItemBase {
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
-				GuiHandler.open(GuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
+				ModGuiHandler.open(ModGuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
 				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 			}
 		}
@@ -275,7 +275,7 @@ public class ItemMagnet extends ItemBase {
 			setDamageUnsafe(item, newMode);
 			displayMessage(newMode);
 			if (sync) {
-				NetworkHandler.instance().sendToServer(new PacketSetMagnet(newMode));
+				ModNetworking.instance().sendToServer(new PacketSetMagnet(newMode));
 			}
 		}
 		else {

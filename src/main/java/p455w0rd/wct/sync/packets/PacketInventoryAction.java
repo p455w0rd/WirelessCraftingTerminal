@@ -1,9 +1,25 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.sync.packets;
 
 import java.io.IOException;
 
 import appeng.api.storage.data.IAEItemStack;
 import appeng.client.ClientHelper;
+import appeng.container.ContainerOpenContext;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
@@ -15,10 +31,9 @@ import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.container.ContainerCraftAmount;
-import p455w0rd.wct.container.ContainerOpenContext;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
-import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
@@ -117,7 +132,7 @@ public class PacketInventoryAction extends WCTPacket {
 			int y = (int) player.posY;
 			int z = (int) player.posZ;
 
-			GuiHandler.open(GuiHandler.GUI_CRAFT_AMOUNT, player, WCTUtils.world(player), new BlockPos(x, y, z));
+			ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_AMOUNT, player, WCTUtils.world(player), new BlockPos(x, y, z));
 
 			if (sender.openContainer instanceof ContainerCraftAmount) {
 				final ContainerCraftAmount cca = (ContainerCraftAmount) sender.openContainer;

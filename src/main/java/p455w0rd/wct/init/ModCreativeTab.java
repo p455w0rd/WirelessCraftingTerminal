@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -27,9 +27,14 @@ import net.minecraft.util.NonNullList;
  */
 public class ModCreativeTab extends CreativeTabs {
 
-	public ModCreativeTab() {
+	public static CreativeTabs CREATIVE_TAB;
+
+	private ModCreativeTab() {
 		super(ModGlobals.MODID);
-		//setBackgroundImageName(Globals.MODID + ".png");
+	}
+
+	public static void preInit() {
+		CREATIVE_TAB = CREATIVE_TAB == null ? CREATIVE_TAB = new ModCreativeTab() : CREATIVE_TAB;
 	}
 
 	@Override

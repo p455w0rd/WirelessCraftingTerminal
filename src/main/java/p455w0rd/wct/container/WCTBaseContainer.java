@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container;
 
 import java.io.ByteArrayInputStream;
@@ -23,6 +38,15 @@ import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.client.me.InternalSlotME;
+import appeng.client.me.SlotME;
+import appeng.container.AEBaseContainer;
+import appeng.container.ContainerOpenContext;
+import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.SlotCraftingMatrix;
+import appeng.container.slot.SlotDisabled;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotInaccessible;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
@@ -30,7 +54,6 @@ import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -42,25 +65,18 @@ import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.client.me.InternalSlotME;
-import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.container.guisync.GuiSync;
 import p455w0rd.wct.container.guisync.SyncData;
-import p455w0rd.wct.container.slot.AppEngSlot;
-import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotDisabled;
-import p455w0rd.wct.container.slot.SlotFake;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketPartialItem;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
-public abstract class WCTBaseContainer extends Container {
+public abstract class WCTBaseContainer extends AEBaseContainer {
 
 	protected final InventoryPlayer inventoryPlayer;
 	protected IActionSource mySrc;
@@ -79,6 +95,7 @@ public abstract class WCTBaseContainer extends Container {
 	protected IMEMonitor<IAEItemStack> monitor;
 
 	public WCTBaseContainer(final InventoryPlayer ip, final Object anchor) {
+		super(ip, null, null);
 		inventoryPlayer = ip;
 		obj = anchor instanceof WCTGuiObject ? (WCTGuiObject) anchor : null;
 
@@ -89,6 +106,10 @@ public abstract class WCTBaseContainer extends Container {
 			mySrc = new WCTPlayerSource(ip.player, getActionHost(obj));
 		}
 		prepareSync();
+	}
+
+	public List<IContainerListener> getListeners() {
+		return listeners;
 	}
 
 	protected static WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
@@ -131,14 +152,14 @@ public abstract class WCTBaseContainer extends Container {
 						piu.appendItem(send);
 					}
 					catch (final BufferOverflowException boe) {
-						NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
+						ModNetworking.instance().sendTo(piu, (EntityPlayerMP) c);
 
 						piu = new PacketMEInventoryUpdate();
 						piu.appendItem(send);
 					}
 				}
 				if (piu != null && c != null) {
-					NetworkHandler.instance().sendTo(piu, (EntityPlayerMP) c);
+					ModNetworking.instance().sendTo(piu, (EntityPlayerMP) c);
 				}
 			}
 			catch (final IOException e) {
@@ -178,10 +199,12 @@ public abstract class WCTBaseContainer extends Container {
 		dataChunks.clear();
 	}
 
+	@Override
 	public IAEItemStack getTargetStack() {
 		return clientRequestedTargetItem;
 	}
 
+	@Override
 	public void setTargetStack(final IAEItemStack stack) {
 		// client doesn't need to re-send, makes for lower overhead rapid packets.
 		if (Platform.isClient()) {
@@ -229,7 +252,7 @@ public abstract class WCTBaseContainer extends Container {
 				for (final byte[] packet : miniPackets) {
 					final PacketPartialItem ppi = new PacketPartialItem(page, miniPackets.size(), packet);
 					page++;
-					NetworkHandler.instance().sendToServer(ppi);
+					ModNetworking.instance().sendToServer(ppi);
 				}
 			}
 			catch (final IOException e) {
@@ -240,10 +263,12 @@ public abstract class WCTBaseContainer extends Container {
 		clientRequestedTargetItem = stack == null ? null : stack.copy();
 	}
 
+	@Override
 	public IActionSource getActionSource() {
 		return mySrc;
 	}
 
+	@Override
 	public void verifyPermissions(final SecurityPermissions security, final boolean requirePower) {
 		if (Platform.isClient()) {
 			return;
@@ -258,6 +283,7 @@ public abstract class WCTBaseContainer extends Container {
 		setValidContainer(isValidContainer() && hasAccess(security, requirePower));
 	}
 
+	@Override
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final IGrid grid = obj.getTargetGrid();
 		if (grid != null) {
@@ -273,10 +299,12 @@ public abstract class WCTBaseContainer extends Container {
 		return false;
 	}
 
+	@Override
 	public void lockPlayerInventorySlot(final int idx) {
 		locked.add(idx);
 	}
 
+	@Override
 	public Object getTarget() {
 		if (obj != null) {
 			return obj;
@@ -284,25 +312,29 @@ public abstract class WCTBaseContainer extends Container {
 		return null;
 	}
 
+	@Override
 	public InventoryPlayer getPlayerInv() {
 		return getInventoryPlayer();
 	}
 
-	public final void updateFullProgressBar(final int idx, final long value) {
-		if (syncData.containsKey(idx)) {
-			syncData.get(idx).update(value);
-			return;
+	/*
+		public final void updateFullProgressBar(final int idx, final long value) {
+			if (syncData.containsKey(idx)) {
+				syncData.get(idx).update(value);
+				return;
+			}
+	
+			updateProgressBar(idx, (int) value);
 		}
-
-		updateProgressBar(idx, (int) value);
-	}
-
+	*/
+	@Override
 	public void stringSync(final int idx, final String value) {
 		if (syncData.containsKey(idx)) {
 			syncData.get(idx).update(value);
 		}
 	}
 
+	@Override
 	protected void bindPlayerInventory(final InventoryPlayer inventoryPlayer, final int offsetX, final int offsetY) {
 		IItemHandler ih = new PlayerInvWrapper(inventoryPlayer);
 		// bind player inventory
@@ -567,13 +599,14 @@ public abstract class WCTBaseContainer extends Container {
 		return ItemStack.EMPTY;
 	}
 
+	/*
 	@Override
 	public final void updateProgressBar(final int idx, final int value) {
 		if (syncData.containsKey(idx)) {
 			syncData.get(idx).update((long) value);
 		}
 	}
-
+	*/
 	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		if (isValidContainer()) {
@@ -587,12 +620,14 @@ public abstract class WCTBaseContainer extends Container {
 		return ((AppEngSlot) s).isDraggable();
 	}
 
+	@Override
 	public abstract void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id);
 
+	@Override
 	protected void updateHeld(final EntityPlayerMP p) {
 		if (Platform.isServer()) {
 			try {
-				NetworkHandler.instance().sendTo(new PacketInventoryAction(InventoryAction.UPDATE_HAND, 0, AEItemStack.fromItemStack(p.inventory.getItemStack())), p);
+				ModNetworking.instance().sendTo(new PacketInventoryAction(InventoryAction.UPDATE_HAND, 0, AEItemStack.fromItemStack(p.inventory.getItemStack())), p);
 			}
 			catch (final IOException e) {
 			}
@@ -636,7 +671,7 @@ public abstract class WCTBaseContainer extends Container {
 
 					if (getCustomName() != null) {
 						try {
-							NetworkHandler.instance().sendTo(new PacketValueConfig("CustomName", getCustomName()), (EntityPlayerMP) getInventoryPlayer().player);
+							ModNetworking.instance().sendTo(new PacketValueConfig("CustomName", getCustomName()), (EntityPlayerMP) getInventoryPlayer().player);
 						}
 						catch (final IOException e) {
 						}
@@ -646,6 +681,7 @@ public abstract class WCTBaseContainer extends Container {
 		}
 	}
 
+	@Override
 	public void swapSlotContents(final int slotA, final int slotB) {
 		final Slot a = getSlot(slotA);
 		final Slot b = getSlot(slotB);
@@ -715,55 +751,72 @@ public abstract class WCTBaseContainer extends Container {
 		b.putStack(testB);
 	}
 
+	@Override
 	public void onUpdate(final String field, final Object oldValue, final Object newValue) {
 
 	}
 
+	@Override
 	public boolean isValidForSlot(final Slot s, final ItemStack i) {
 		return true;
 	}
 
+	@Override
 	public IMEInventoryHandler<IAEItemStack> getCellInventory() {
 		return cellInv;
 	}
 
+	@Override
 	public void setCellInventory(final IMEInventoryHandler<IAEItemStack> cellInv) {
 		this.cellInv = cellInv;
 	}
 
+	@Override
 	public String getCustomName() {
 		return customName;
 	}
 
+	@Override
 	public void setCustomName(final String customName) {
 		this.customName = customName;
 	}
 
+	@Override
 	public InventoryPlayer getInventoryPlayer() {
 		return inventoryPlayer;
 	}
 
+	@Override
 	public boolean isValidContainer() {
 		return isContainerValid;
 	}
 
+	@Override
 	public void setValidContainer(final boolean isContainerValid) {
 		this.isContainerValid = isContainerValid;
 	}
 
+	@Override
 	public ContainerOpenContext getOpenContext() {
 		return openContext;
 	}
 
+	@Override
 	public void setOpenContext(final ContainerOpenContext openContext) {
 		this.openContext = openContext;
 	}
 
+	@Override
 	public IEnergySource getPowerSource() {
 		return powerSrc;
 	}
 
+	@Override
 	public void setPowerSource(final IEnergySource powerSrc) {
 		this.powerSrc = powerSrc;
+	}
+
+	public WCTGuiObject getObject() {
+		return obj;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -30,7 +30,7 @@ public class ModKeybindings {
 	public static KeyBinding openMagnetFilter;
 	public static KeyBinding changeMagnetMode;
 
-	public static void init() {
+	public static void preInit() {
 		openTerminal = new KeyBinding("key.open_terminal.desc", Keyboard.CHAR_NONE, "key.categories.wct");
 		openMagnetFilter = new KeyBinding("key.open_magnet.desc", Keyboard.CHAR_NONE, "key.categories.wct");
 		changeMagnetMode = new KeyBinding("key.switch_magnet_mode.desc", Keyboard.CHAR_NONE, "key.categories.wct");

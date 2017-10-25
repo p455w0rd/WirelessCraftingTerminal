@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
@@ -24,9 +39,9 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.container.ContainerCraftConfirm;
-import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModGuiHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
@@ -48,9 +63,6 @@ public class GuiCraftConfirm extends WCTBaseGui {
 	private GuiButton selectCPU;
 	private int tooltip = -1;
 	InventoryPlayer inventoryPlayer;
-	private static int jobBytes;
-	private static int currCPUAvailBytes;
-	private static int currCPUCoCPUs;
 
 	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
 		super(new ContainerCraftConfirm(inventoryPlayer, te));
@@ -64,7 +76,7 @@ public class GuiCraftConfirm extends WCTBaseGui {
 		this.inventoryPlayer = inventoryPlayer;
 
 		if (te instanceof WCTGuiObject) {
-			OriginalGui = GuiHandler.GUI_WCT;
+			OriginalGui = ModGuiHandler.GUI_WCT;
 		}
 
 	}
@@ -153,35 +165,11 @@ public class GuiCraftConfirm extends WCTBaseGui {
 		return ((ContainerCraftConfirm) inventorySlots).isSimulation();
 	}
 
-	public int getJobBytes() {
-		return GuiCraftConfirm.jobBytes;
-	}
-
-	public static void setJobBytes(int numBytes) {
-		jobBytes = numBytes;
-	}
-
-	public int getCurrentCPUAvailBytes() {
-		return GuiCraftConfirm.currCPUAvailBytes;
-	}
-
-	public static void setCurrentCPUAvailBytes(int numBytes) {
-		currCPUAvailBytes = numBytes;
-	}
-
-	public int getCurrentCPUCoCPUs() {
-		return GuiCraftConfirm.currCPUCoCPUs;
-	}
-
-	public static void setCurrentCPUCoCPUs(int coCPUs) {
-		currCPUCoCPUs = coCPUs;
-	}
-
 	@Override
 	public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		int bytesUsed = getJobBytes();
-		int availBytes = getCurrentCPUAvailBytes();
-		int availCoCPUs = getCurrentCPUCoCPUs();
+		final long bytesUsed = ccc.getUsedBytes();
+		final long availBytes = ccc.getCpuAvailableBytes();
+		final int availCoCPUs = ccc.getCpuCoProcessors();
 		String byteUsed = NumberFormat.getInstance().format(bytesUsed);
 
 		final String Add = bytesUsed > 0 ? (byteUsed + ' ' + GuiText.BytesUsed.getLocal()) : GuiText.CalculatingWait.getLocal();
@@ -472,19 +460,19 @@ public class GuiCraftConfirm extends WCTBaseGui {
 
 		if (btn == selectCPU) {
 			try {
-				NetworkHandler.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
+				ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
 			}
 			catch (final IOException e) {
 			}
 		}
 
 		if (btn == cancel) {
-			NetworkHandler.instance().sendToServer(new PacketSwitchGuis(OriginalGui));
+			ModNetworking.instance().sendToServer(new PacketSwitchGuis(OriginalGui));
 		}
 
 		if (btn == start) {
 			try {
-				NetworkHandler.instance().sendToServer(new PacketValueConfig("Terminal.Start", "Start"));
+				ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Start", "Start"));
 			}
 			catch (final Throwable e) {
 			}

@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -20,10 +20,6 @@ import appeng.api.implementations.items.IAEItemPowerStorage;
 import cofh.redstoneflux.api.IEnergyContainerItem;
 import net.minecraftforge.fml.common.Optional;
 
-/**
- * @author p455w0rd
- *
- */
 @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyContainerItem", modid = "redstoneflux")
 public interface IWirelessCraftingTermHandler extends IWirelessTermHandler, IAEItemPowerStorage, IEnergyContainerItem {
 

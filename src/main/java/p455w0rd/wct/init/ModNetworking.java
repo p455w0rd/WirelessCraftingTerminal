@@ -1,4 +1,19 @@
-package p455w0rd.wct.sync.network;
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
+package p455w0rd.wct.init;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -8,26 +23,34 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import p455w0rd.wct.WCT;
 import p455w0rd.wct.sync.WCTPacket;
+import p455w0rd.wct.sync.network.IPacketHandler;
+import p455w0rd.wct.sync.network.WCTClientPacketHandler;
+import p455w0rd.wct.sync.network.WCTServerPacketHandler;
 
-public class NetworkHandler {
+public class ModNetworking {
 
-	private static final NetworkHandler INSTANCE = new NetworkHandler();
+	private static final ModNetworking INSTANCE = new ModNetworking();
 	private static final String CHANNEL_NAME = "WCT";
 	private static final FMLEventChannel CHANNEL = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNEL_NAME);;
 
 	private static final IPacketHandler clientHandler = WCTClientPacketHandler.instance();
 	private static final IPacketHandler serverHandler = WCTServerPacketHandler.instance();
 
-	public NetworkHandler() {
+	private ModNetworking() {
 	}
 
-	public static void init() {
+	public static void preInit() {
 		MinecraftForge.EVENT_BUS.register(instance());
 		getEventChannel().register(instance());
 	}
 
-	public static NetworkHandler instance() {
+	public static void postInit() {
+		NetworkRegistry.INSTANCE.registerGuiHandler(WCT.INSTANCE, new ModGuiHandler());
+	}
+
+	public static ModNetworking instance() {
 		return INSTANCE;
 	}
 
@@ -67,19 +90,6 @@ public class NetworkHandler {
 		getEventChannel().sendToServer(message.getProxy());
 	}
 
-	/*
-		@SubscribeEvent
-		public void onPlayerLogin(PlayerLoggedInEvent e) {
-			if (e.player instanceof EntityPlayerMP) {
-				WorldData.instance().dimensionData().sendToPlayer(null);
-			}
-		}
-	
-		@SubscribeEvent
-		public void newConnection(final ServerConnectionFromClientEvent ev) {
-			WorldData.instance().dimensionData().sendToPlayer(ev.getManager());
-		}
-	*/
 	@SubscribeEvent
 	public void serverPacket(final ServerCustomPacketEvent ev) {
 		final NetHandlerPlayServer srv = (NetHandlerPlayServer) ev.getPacket().handler();

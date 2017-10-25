@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
@@ -23,12 +38,12 @@ import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.client.gui.widgets.WCTGuiButton;
 import p455w0rd.wct.client.gui.widgets.WCTGuiCheckBox;
 import p455w0rd.wct.container.ContainerMagnet;
-import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.items.ItemWCT;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.util.WCTUtils;
@@ -132,7 +147,7 @@ public class GuiMagnet extends GuiContainer {
 			return;
 		}
 		if (!magnetItem.hasTagCompound()) {
-			NetworkHandler.instance().sendToServer(new PacketMagnetFilter(0, true));
+			ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 		}
 		mode = getMode(1);
 		ignoreNBT = getMode(2);
@@ -161,7 +176,7 @@ public class GuiMagnet extends GuiContainer {
 			updateMode(4, useOreDict);
 		}
 		if (btn == originalGuiBtn) {
-			NetworkHandler.instance().sendToServer(new PacketSwitchGuis(GuiHandler.GUI_WCT));
+			ModNetworking.instance().sendToServer(new PacketSwitchGuis(ModGuiHandler.GUI_WCT));
 		}
 	}
 
@@ -174,7 +189,7 @@ public class GuiMagnet extends GuiContainer {
 		if (mouseButton == 0) {
 			for (int i = 0; i < buttonList.size(); ++i) {
 				GuiButton guibutton = buttonList.get(i);
-
+		
 				if (guibutton.mousePressed(mc, mouseX, mouseY)) {
 					//net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre event = new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
 					//if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))
@@ -233,7 +248,7 @@ public class GuiMagnet extends GuiContainer {
 				}
 			}
 		}
-		NetworkHandler.instance().sendToServer(new PacketMagnetFilter(type, mode));
+		ModNetworking.instance().sendToServer(new PacketMagnetFilter(type, mode));
 	}
 
 	private boolean getMode(int type) {

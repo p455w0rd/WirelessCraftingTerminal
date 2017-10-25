@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import appeng.container.slot.SlotCraftingMatrix;
+import appeng.container.slot.SlotFakeCraftingMatrix;
 import appeng.util.Platform;
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IJeiRuntime;
@@ -44,11 +46,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModItems;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketJEIRecipe;
 
 /**
@@ -152,7 +152,7 @@ public class JEI implements IModPlugin {
 			}
 
 			try {
-				NetworkHandler.instance().sendToServer(new PacketJEIRecipe(recipe));
+				ModNetworking.instance().sendToServer(new PacketJEIRecipe(recipe));
 			}
 			catch (IOException e) {
 

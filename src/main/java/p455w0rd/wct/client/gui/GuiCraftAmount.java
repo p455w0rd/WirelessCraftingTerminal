@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
@@ -7,21 +22,22 @@ import appeng.api.storage.ITerminalHost;
 import appeng.client.gui.widgets.GuiNumberBox;
 import appeng.core.AEConfig;
 import appeng.core.localization.GuiText;
+import appeng.helpers.Reflected;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.container.ContainerCraftAmount;
-import p455w0rd.wct.handlers.GuiHandler;
-import p455w0rd.wct.helpers.Reflected;
 import p455w0rd.wct.helpers.WCTGuiObject;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.items.ItemWCT;
-import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketCraftRequest;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 
 public class GuiCraftAmount extends WCTBaseGui {
+
 	private GuiNumberBox amountToCraft;
 	private GuiTabButton originalGuiBtn;
 
@@ -71,7 +87,7 @@ public class GuiCraftAmount extends WCTBaseGui {
 		final Object target = ((ContainerCraftAmount) inventorySlots).getTarget();
 
 		if (target instanceof WCTGuiObject) {
-			originalGui = GuiHandler.GUI_WCT;
+			originalGui = ModGuiHandler.GUI_WCT;
 		}
 
 		if (originalGui == 0 && myIcon != null) {
@@ -156,11 +172,11 @@ public class GuiCraftAmount extends WCTBaseGui {
 		try {
 
 			if (btn == originalGuiBtn) {
-				NetworkHandler.instance().sendToServer(new PacketSwitchGuis(originalGui));
+				ModNetworking.instance().sendToServer(new PacketSwitchGuis(originalGui));
 			}
 
 			if (btn == next) {
-				NetworkHandler.instance().sendToServer(new PacketCraftRequest(Integer.parseInt(amountToCraft.getText()), isShiftKeyDown()));
+				ModNetworking.instance().sendToServer(new PacketCraftRequest(Integer.parseInt(amountToCraft.getText()), isShiftKeyDown()));
 			}
 		}
 		catch (final NumberFormatException e) {

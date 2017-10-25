@@ -1,3 +1,18 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container;
 
 import java.io.IOException;
@@ -13,6 +28,7 @@ import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.container.guisync.GuiSync;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
@@ -22,8 +38,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IContainerListener;
-import p455w0rd.wct.container.guisync.GuiSync;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
@@ -66,7 +81,7 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 		for (final Object g : listeners) {
 			if (g instanceof EntityPlayer) {
 				try {
-					NetworkHandler.instance().sendTo(new PacketValueConfig("CraftingStatus", "Clear"), (EntityPlayerMP) g);
+					ModNetworking.instance().sendTo(new PacketValueConfig("CraftingStatus", "Clear"), (EntityPlayerMP) g);
 				}
 				catch (final IOException e) {
 				}
@@ -139,15 +154,15 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 				for (final Object g : listeners) {
 					if (g instanceof EntityPlayer) {
 						if (!a.isEmpty()) {
-							NetworkHandler.instance().sendTo(a, (EntityPlayerMP) g);
+							ModNetworking.instance().sendTo(a, (EntityPlayerMP) g);
 						}
 
 						if (!b.isEmpty()) {
-							NetworkHandler.instance().sendTo(b, (EntityPlayerMP) g);
+							ModNetworking.instance().sendTo(b, (EntityPlayerMP) g);
 						}
 
 						if (!c.isEmpty()) {
-							NetworkHandler.instance().sendTo(c, (EntityPlayerMP) g);
+							ModNetworking.instance().sendTo(c, (EntityPlayerMP) g);
 						}
 					}
 				}

@@ -1,0 +1,38 @@
+{
+	"conditions": [
+		{
+			"type": "wct:recipes_enabled"
+		}
+	],
+	"type": "forge:ore_shaped",
+	"pattern": [
+		"abc",
+		"ded",
+		"ddd"
+	],
+	"key": {
+		"a": {
+			"type": "forge:ore_dict",
+			"ore": "blockRedstone"
+		},
+		"b": {
+			"item": "appliedenergistics2:part",
+			"data": 300
+		},
+		"c": {
+			"type": "forge:ore_dict",
+			"ore": "blockLapis"
+		},
+		"d": {
+			"type": "forge:ore_dict",
+			"ore": "blockIron"
+		},
+		"e": {
+			"item": "appliedenergistics2:material",
+			"data": 28
+		}
+	},
+	"result": {
+		"item": "wct:magnet_card"
+	}
+}

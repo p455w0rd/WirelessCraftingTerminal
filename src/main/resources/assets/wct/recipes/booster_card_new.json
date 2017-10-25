@@ -1,0 +1,27 @@
+{
+	"conditions": [
+		{
+			"type": "wct:booster_enabled",
+			"type": "wct:infinity_mechanic_new"
+		}
+	],
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"a a",
+		" b ",
+		"   "
+	],
+	"key": {
+		"a": {
+			"item": "appliedenergistics2:material",
+			"data": 9
+		},
+		"b": {
+			"item": "appliedenergistics2:material",
+			"data": 41
+		}
+	},
+	"result": {
+		"item": "wct:infinity_booster_card"
+	}
+}

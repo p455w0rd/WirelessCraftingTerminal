@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -32,9 +32,6 @@ import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import appeng.util.ConfigManager;
 import appeng.util.Platform;
 import baubles.api.BaubleType;
-import ic2.api.item.IElectricItem;
-import ic2.api.item.IElectricItemManager;
-import ic2.api.item.ISpecialElectricItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -42,11 +39,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -63,12 +59,11 @@ import p455w0rd.wct.api.IBaubleRender;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.render.RenderLayerWCT;
-import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.handlers.GuiHandler;
+import p455w0rd.wct.client.render.StackSizeRenderer.ReadableNumberConverter;
 import p455w0rd.wct.init.ModConfig;
-import p455w0rd.wct.init.ModGlobals.Mods;
-import p455w0rd.wct.init.ModItems;
-import p455w0rd.wct.integration.IC2;
+import p455w0rd.wct.init.ModGuiHandler;
+import p455w0rd.wct.init.ModNetworking;
+import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -77,21 +72,14 @@ import p455w0rd.wct.util.WCTUtils;
  */
 @Optional.InterfaceList(value = {
 
-		@Optional.Interface(iface = "ic2.api.item.ISpecialElectricItem", modid = "ic2"),
-
-		@Optional.Interface(iface = "ic2.api.item.IElectricItemManager", modid = "ic2"),
-
-		@Optional.Interface(iface = "ic2.api.item.IElectricItem", modid = "ic2"),
-
 		@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
 })
-public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem, IElectricItemManager, ISpecialElectricItem {
+public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
 	private static final String name = "wct";
 	public static final String LINK_KEY_STRING = "key";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
-	private static final String BOOSTER_SLOT_NBT = "BoosterSlot";
-	private static final String MAGNET_SLOT_NBT = "MagnetSlot";
+
 	private EntityPlayer entityPlayer;
 
 	public ItemWCT() {
@@ -106,11 +94,8 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			GuiHandler.open(GuiHandler.GUI_WCT, player, world, player.getPosition());
+			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
-		}
-		if (world.isRemote) {
-			//WCTBaseGui.memoryText = "";
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 	}
@@ -144,6 +129,9 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(final ItemStack is, final World world, final List<String> list, final ITooltipFlag advancedTooltips) {
+		if (entityPlayer == null || WCTUtils.getGUIObject(is, entityPlayer) == null) {
+			return;
+		}
 		String encKey = getEncryptionKey(is);
 		String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", TextFormatting.YELLOW + "" + TextFormatting.BOLD + "" + TextFormatting.ITALIC + "Shift" + TextFormatting.GRAY);
 		String pctTxtColor = TextFormatting.WHITE + "";
@@ -163,17 +151,28 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
 		}
 		list.add("Link Status: " + linked);
-		if (isShiftKeyDown()) {
-			String boosterStatus = (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
-			String magnetStatus = (isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
-			if (ModConfig.WCT_BOOSTER_ENABLED) {
-				list.add(I18n.format("item.infinity_booster_card.name") + ": " + boosterStatus);
+		String magnetStatus = (WCTUtils.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
+		if (ModConfig.WCT_BOOSTER_ENABLED) {
+			if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
+				list.add(I18n.format("item.infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
 			}
-			list.add(I18n.format("item.magnet_card.name") + ": " + magnetStatus);
+			else {
+				int infinityEnergyAmount = WCTUtils.getInfinityEnergy(is);
+				String amountColor = infinityEnergyAmount < ModConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
+				String reasonString = "";
+				if (infinityEnergyAmount <= 0) {
+					reasonString = I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc");
+				}
+				boolean outsideOfWAPRange = !WCTUtils.isInRange(is);
+				if (!outsideOfWAPRange) {
+					reasonString = I18n.format("tooltip.in_wap_range.desc");
+				}
+				String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
+				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
+				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc"));
+			}
 		}
-		else {
-			list.add(shift);
-		}
+		list.add(I18n.format("item.magnet_card.name") + ": " + magnetStatus);
 	}
 
 	@Override
@@ -298,50 +297,14 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean hasEffect(ItemStack is) {
-		return checkForBooster(is);
+		if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
+			return checkForBooster(is);
+		}
+		return WCTUtils.hasInfiniteRange(is) && !WCTUtils.isInRange(is);
 	}
 
 	@Override
-	public boolean checkForBooster(final ItemStack wirelessTerminal) {
-		if (wirelessTerminal.hasTagCompound()) {
-			NBTTagCompound boosterNBT = wirelessTerminal.getSubCompound(BOOSTER_SLOT_NBT);
-			if (boosterNBT != null) {
-				NBTTagList boosterNBTList = boosterNBT.getTagList("Items", 10);
-				if (boosterNBTList != null) {
-					NBTTagCompound boosterTagCompound = boosterNBTList.getCompoundTagAt(0);
-					if (boosterTagCompound != null) {
-						ItemStack boosterCard = new ItemStack(boosterTagCompound);
-						if (boosterCard != null) {
-							return ((boosterCard.getItem() instanceof ItemInfinityBooster) && ModConfig.WCT_BOOSTER_ENABLED);
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean isMagnetInstalled(final ItemStack wirelessTerminal) {
-		if (wirelessTerminal.hasTagCompound()) {
-			NBTTagCompound magnetNBT = wirelessTerminal.getSubCompound(MAGNET_SLOT_NBT);
-			if (magnetNBT != null) {
-				NBTTagList magnetNBTList = magnetNBT.getTagList("Items", 10);
-				if (magnetNBTList != null) {
-					NBTTagCompound magnetTagCompound = magnetNBTList.getCompoundTagAt(0);
-					if (magnetTagCompound != null) {
-						ItemStack magnetCard = new ItemStack(magnetTagCompound);
-						if (magnetCard != null) {
-							return ((magnetCard.getItem() == ModItems.MAGNET_CARD));
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public void onUpdate(final ItemStack is, final World w, final Entity e, int i, boolean f) {
+	public void onUpdate(final ItemStack wirelessTerminal, final World w, final Entity e, int i, boolean f) {
 		if (!(e instanceof EntityPlayer)) {
 			return;
 		}
@@ -349,126 +312,49 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (entityPlayer == null) {
 			entityPlayer = p;
 		}
-		ItemStack wirelessTerminal = null;
+		//ItemStack wirelessTerminal = null;
 		InventoryPlayer inv = p.inventory;
-		wirelessTerminal = WCTUtils.getWirelessTerm(inv);
+		//wirelessTerminal = WCTUtils.getWirelessTerm(inv);
 		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
 			return;
 		}
-		checkForBooster(wirelessTerminal);
-		isMagnetInstalled(wirelessTerminal);
-		chargeFromArmor(wirelessTerminal, p);
+		if (p instanceof EntityPlayerMP) {
+			rangeCheck(wirelessTerminal, (EntityPlayerMP) p);
+		}
+		WCTUtils.isBoosterInstalled(wirelessTerminal);
+		WCTUtils.isMagnetInstalled(wirelessTerminal);
 	}
 
-	//@Optional.Method(modid = "Baubles|API")
+	private void rangeCheck(ItemStack wirelessTerm, EntityPlayerMP player) {
+		boolean inRange = WCTUtils.isInRangeOfWAP(wirelessTerm, player);
+		boolean currentValue = WCTUtils.isInRange(wirelessTerm);
+		if (inRange != currentValue) {
+			WCTUtils.setInRange(wirelessTerm, inRange);
+			ModNetworking.instance().sendTo(new PacketSetInRange(inRange), player);
+		}
+	}
+
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
 		return BaubleType.HEAD;
 	}
 
-	//@Optional.Method(modid = "Baubles|API")
 	@Override
 	public IBaubleRender getRender() {
 		return RenderLayerWCT.getInstance();
 	}
 
-	//@Optional.Method(modid = "Baubles|API")
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
 		return true;
 	}
 
-	private double injectExtPower(final PowerUnits input, final ItemStack is, final double amount, final boolean simulate) {
-		if (simulate) {
-			final int requiredEU = (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(is) - getAECurrentPower(is));
-			if (amount < requiredEU) {
-				return 0;
-			}
-			return amount - requiredEU;
+	@Override
+	public void onWornTick(ItemStack itemstack, EntityLivingBase playerIn) {
+		if (playerIn instanceof EntityPlayerMP) {
+			EntityPlayerMP player = (EntityPlayerMP) playerIn;
+			rangeCheck(itemstack, player);
 		}
-		else {
-			final double powerRemainder = injectAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount), simulate ? Actionable.SIMULATE : Actionable.MODULATE);
-			return PowerUnits.AE.convertTo(PowerUnits.EU, powerRemainder);
-		}
-	}
-
-	@Override
-	public double charge(final ItemStack is, final double amount, final int tier, final boolean ignoreTransferLimit, final boolean simulate) {
-		double addedAmt = amount;
-		final double limit = getTransferLimit(is);
-
-		if (!ignoreTransferLimit && amount > limit) {
-			addedAmt = limit;
-		}
-
-		return addedAmt - ((int) injectExtPower(PowerUnits.EU, is, addedAmt, simulate));
-	}
-
-	@Override
-	public double getCharge(final ItemStack is) {
-		return (int) PowerUnits.AE.convertTo(PowerUnits.EU, getAECurrentPower(is));
-	}
-
-	@Override
-	public boolean canUse(final ItemStack is, final double amount) {
-		return getCharge(is) > amount;
-	}
-
-	@Override
-	public boolean use(final ItemStack is, final double amount, final EntityLivingBase entity) {
-		if (canUse(is, amount)) {
-			// use the power..
-			extractAEPower(is, PowerUnits.EU.convertTo(PowerUnits.AE, amount), Actionable.MODULATE);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void chargeFromArmor(final ItemStack itemStack, final EntityLivingBase entity) {
-		if (entity instanceof EntityPlayer && Mods.IC2.isLoaded()) {
-			EntityPlayer player = (EntityPlayer) entity;
-			ItemStack chestStack = player.inventory.armorItemInSlot(2);
-			if (chestStack != null) {
-				Item chestItem = chestStack.getItem();
-				if (chestItem instanceof IElectricItem && ((IElectricItem) chestItem).canProvideEnergy(itemStack) && player.openContainer instanceof ContainerWCT) {
-					charge(itemStack, 40, 4, true, false);
-					if (!player.capabilities.isCreativeMode) {
-						IC2.drawPowerFromChestItem(chestStack, 40);
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public String getToolTip(final ItemStack itemStack) {
-		return null;
-	}
-
-	@Override
-	public double getMaxCharge(final ItemStack itemStack) {
-		return PowerUnits.AE.convertTo(PowerUnits.EU, getAEMaxPower(itemStack));
-	}
-
-	@Override
-	public int getTier(final ItemStack itemStack) {
-		return 4;
-	}
-
-	public double getTransferLimit(final ItemStack itemStack) {
-		return Math.max(32, getMaxCharge(itemStack) / 200);
-	}
-
-	@Override
-	@Optional.Method(modid = "ic2")
-	public IElectricItemManager getManager(final ItemStack itemStack) {
-		return this;
-	}
-
-	@Override
-	public double discharge(ItemStack stack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate) {
-		return 0;
 	}
 
 }

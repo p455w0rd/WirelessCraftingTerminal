@@ -1,5 +1,5 @@
 /*
- * This file is part of Wireless Crafting Terminal. Copyright (c) 2016, p455w0rd
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
  * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
  *
  * Wireless Crafting Terminal is free software: you can redistribute it and/or
@@ -15,18 +15,14 @@
  */
 package p455w0rd.wct.proxy;
 
-import appeng.api.AEApi;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import p455w0rd.wct.WCT;
-import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModEvents;
+import p455w0rd.wct.init.ModIntegration;
 import p455w0rd.wct.init.ModItems;
-import p455w0rd.wct.init.ModRecipes;
-import p455w0rd.wct.sync.network.NetworkHandler;
+import p455w0rd.wct.init.ModNetworking;
 
 /**
  * @author p455w0rd
@@ -35,13 +31,11 @@ import p455w0rd.wct.sync.network.NetworkHandler;
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent e) {
-		ModConfig.init();
-		ModItems.init();
-		NetworkHandler.init();
-		ModEvents.init();
-		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
-		AEApi.instance().registries().charger().addChargeRate(ModItems.WCT, ModConfig.WCT_MAX_POWER);
-		ModRecipes.init();
+		ModConfig.preInit();
+		ModItems.preInit();
+		ModNetworking.preInit();
+		ModEvents.preInit();
+		ModIntegration.preInit();
 	}
 
 	public void init(FMLInitializationEvent e) {
@@ -49,7 +43,7 @@ public class CommonProxy {
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
-		NetworkRegistry.INSTANCE.registerGuiHandler(WCT.INSTANCE, new GuiHandler());
+		ModNetworking.postInit();
 	}
 
 }
