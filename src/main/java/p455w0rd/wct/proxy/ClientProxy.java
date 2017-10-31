@@ -20,8 +20,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import p455w0rd.wct.init.ModCreativeTab;
+import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
+import p455w0rd.wct.integration.ItemScroller;
 
 /**
  * @author p455w0rd
@@ -47,6 +49,9 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postInit(FMLPostInitializationEvent e) {
 		super.postInit(e);
+		if (Mods.ITEMSCROLLER.isLoaded()) {
+			ItemScroller.blackListSlots();
+		}
 	}
 
 }
