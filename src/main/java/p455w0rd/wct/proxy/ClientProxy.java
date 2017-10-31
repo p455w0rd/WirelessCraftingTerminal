@@ -48,6 +48,9 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void postInit(FMLPostInitializationEvent e) {
+		if (Mods.ITEMSCROLLER.isLoaded()) {
+			ItemScroller.blackListSlots();
+		}
 		super.postInit(e);
 		if (Mods.ITEMSCROLLER.isLoaded()) {
 			ItemScroller.blackListSlots();

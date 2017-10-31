@@ -4,9 +4,12 @@ import java.io.IOException;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.*;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import p455w0rd.wct.sync.network.*;
+import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.wct.sync.network.NetworkHandler;
 
 @SuppressWarnings("rawtypes")
 public abstract class WCTPacket implements Packet {

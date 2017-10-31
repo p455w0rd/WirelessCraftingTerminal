@@ -65,6 +65,7 @@ import p455w0rd.wct.client.gui.WCTBaseGui;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -388,12 +389,12 @@ public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public Item getItem() {
-		return this;
+		return ModItems.WCT;
 	}
 
 	@Override
 	public ItemStack getStack() {
-		return new ItemStack(this);
+		return new ItemStack(ModItems.WCT);
 	}
 
 }

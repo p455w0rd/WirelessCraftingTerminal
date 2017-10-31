@@ -7,9 +7,9 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import p455w0rd.wct.api.IWCTInteractionHelper;
-import p455w0rd.wct.api.IWirelessCraftingTermHandler;
+import p455w0rd.wct.api.IWCTItem;
+import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.handlers.GuiHandler;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
@@ -31,18 +31,21 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 		if (is == null) {
 			return;
 		}
-		if (is.hasTagCompound()) {
-			//String sourceKey = is.getTagCompound().getString(ItemWCT.LINK_KEY_STRING);
-			//if ((sourceKey != null) && (!sourceKey.isEmpty())) {
-			if (isTerminalLinked(ModItems.WCT, is)) {
-				NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_WCT));
-			}
+
+		if (isTerminalLinked(WCTApi.instance().items().wirelessCraftingTerminal(), is)) {
+			NetworkHandler.instance().sendToServer(new PacketOpenGui(GuiHandler.GUI_WCT));
+
 		}
 
 	}
 
-	public static boolean isTerminalLinked(final IWirelessCraftingTermHandler wirelessTerminal, final ItemStack wirelessTerminalItemstack) {
-		return (!wirelessTerminal.getEncryptionKey(wirelessTerminalItemstack).isEmpty());
+	public static boolean isTerminalLinked(final IWCTItem wirelessTerminal, final ItemStack wirelessTerminalItemstack) {
+		String sourceKey = "";
+		if (wirelessTerminalItemstack.hasTagCompound()) {
+			sourceKey = wirelessTerminalItemstack.getTagCompound().getString(ItemWCT.LINK_KEY_STRING);
+			return (sourceKey != null) && (!sourceKey.isEmpty());
+		}
+		return false;
 	}
 
 }

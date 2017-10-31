@@ -21,6 +21,7 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.IConfigManager;
 import appeng.client.gui.widgets.GuiImgButton;
 import appeng.client.gui.widgets.ISortSource;
+import appeng.container.slot.AppEngSlot;
 import appeng.core.AEConfig;
 import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
@@ -56,7 +57,6 @@ import p455w0rd.wct.client.me.ItemRepo;
 import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
-import p455w0rd.wct.container.slot.AppEngSlot;
 import p455w0rd.wct.container.slot.OptionalSlotFake;
 import p455w0rd.wct.container.slot.SlotAEBauble;
 import p455w0rd.wct.container.slot.SlotBooster;
@@ -64,7 +64,6 @@ import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotTrash;
 import p455w0rd.wct.handlers.GuiHandler;
-import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModGlobals.Mods;
 import p455w0rd.wct.init.ModItems;
@@ -551,20 +550,36 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		this.bindTexture(Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
 		final int x_width = 199;
+		/*
+				this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
 
-		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
+				for (int x = 0; x < rows; x++) {
+					this.drawTexturedModalRect(offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18);
+				}
 
-		for (int x = 0; x < rows; x++) {
-			this.drawTexturedModalRect(offsetX, offsetY + 18 + x * 18, 0, 18, x_width, 18);
-		}
+				this.drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
 
-		this.drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
-
-		if (ModConfig.WCT_BOOSTER_ENABLED) {
-			this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
-		}
+				if (ModConfig.WCT_BOOSTER_ENABLED) {
+					this.drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
+				}
+				*/
 		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : WCTUtils.player()));
 
+		//draw "over inventory area"
+		drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
+
+		//draw "top line" of ME inv
+		drawTexturedModalRect(offsetX, offsetY + 18, 0, 18, x_width, 18);
+
+		for (int i = 1; i < rows - 1; i++) {
+			drawTexturedModalRect(offsetX, offsetY + 18 + i * 18, 0, 18 + 18, x_width, 18);
+		}
+
+		//draw "bottom line" of ME inv
+		drawTexturedModalRect(offsetX, offsetY + 18 + (rows - 1) * 18, 0, 18 + 2 * 18, x_width, 18);
+
+		//draw player inv
+		drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
 		if (isHalloween && !isAltKeyDown()) {
 
 			String name = "Happy Halloween!            ";
@@ -596,7 +611,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 		/*
 				drag_click.clear();
-		
+
 				if (btn == 1) {
 					for (final Object o : buttonList) {
 						final GuiButton guibutton = (GuiButton) o;

@@ -125,7 +125,7 @@ public class PacketValueConfig extends WCTPacket {
 			if (c instanceof ContainerWCT) {
 				((ContainerWCT) c).setCustomName(Value);
 			}
-			if (c instanceof WCTBaseContainer) {
+			else if (c instanceof WCTBaseContainer) {
 				((WCTBaseContainer) c).setCustomName(Value);
 			}
 		}
@@ -133,7 +133,7 @@ public class PacketValueConfig extends WCTPacket {
 			if (c instanceof ContainerWCT) {
 				((ContainerWCT) c).stringSync(Integer.parseInt(Name.substring(8)), Value);
 			}
-			if (c instanceof WCTBaseContainer) {
+			else if (c instanceof WCTBaseContainer) {
 				((WCTBaseContainer) c).stringSync(Integer.parseInt(Name.substring(8)), Value);
 			}
 		}

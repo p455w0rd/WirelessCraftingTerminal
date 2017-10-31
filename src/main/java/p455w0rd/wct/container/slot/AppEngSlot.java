@@ -1,21 +1,38 @@
+/*
+ * This file is part of Wireless Crafting Terminal. Copyright (c) 2017, p455w0rd
+ * (aka TheRealp455w0rd), All rights reserved unless otherwise stated.
+ *
+ * Wireless Crafting Terminal is free software: you can redistribute it and/or
+ * modify it under the terms of the MIT License.
+ *
+ * Wireless Crafting Terminal is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the MIT License for
+ * more details.
+ *
+ * You should have received a copy of the MIT License along with Wireless
+ * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
+ */
 package p455w0rd.wct.container.slot;
 
 import appeng.tile.inventory.AppEngInternalInventory;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
 
+/**
+ * @author p455w0rd
+ *
+ */
 public class AppEngSlot extends Slot {
 
 	private final int defX;
 	private final int defY;
 	private boolean isDraggable = true;
 	private boolean isPlayerSide = false;
-	private Container myContainer = null;
+	private WCTBaseContainer myContainer = null;
 	private int IIcon = -1;
 	private hasCalculatedValidness isValid;
 	private boolean isDisplay = false;
@@ -76,12 +93,7 @@ public class AppEngSlot extends Slot {
 			super.putStack(par1ItemStack);
 
 			if (getContainer() != null) {
-				if (getContainer() instanceof ContainerWCT) {
-					((ContainerWCT) getContainer()).onSlotChange(this);
-				}
-				if (getContainer() instanceof WCTBaseContainer) {
-					((WCTBaseContainer) getContainer()).onSlotChange(this);
-				}
+				getContainer().onSlotChange(this);
 			}
 		}
 	}
@@ -183,27 +195,12 @@ public class AppEngSlot extends Slot {
 		this.isValid = isValid;
 	}
 
-	Container getContainer() {
-		if (myContainer instanceof ContainerWCT) {
-			return myContainer;
-		}
-		if (myContainer instanceof WCTBaseContainer) {
-			return myContainer;
-		}
+	public WCTBaseContainer getContainer() {
 		return myContainer;
 	}
 
-	public AppEngSlot setContainer(final Container myContainer) {
-		if (this.myContainer instanceof ContainerWCT) {
-			this.myContainer = myContainer;
-		}
-		else if (this.myContainer instanceof WCTBaseContainer) {
-			this.myContainer = myContainer;
-		}
-		else {
-			this.myContainer = myContainer;
-		}
-		return this;
+	public void setContainer(final WCTBaseContainer myContainer) {
+		this.myContainer = myContainer;
 	}
 
 	public enum hasCalculatedValidness {

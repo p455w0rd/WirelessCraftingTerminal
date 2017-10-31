@@ -155,15 +155,32 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			addSlotToContainer(new NullSlot());
 		}
 
+		for (int i = 0; i < getPlayerInv().getSizeInventory(); i++) {
+			ItemStack currStack = getPlayerInv().getStackInSlot(i);
+			if (currStack != null && currStack == containerstack) {
+				lockPlayerInventorySlot(i);
+			}
+		}
+
 		// Add hotbar slots
-		for (int i = 0; i < 9; ++i) {
-			addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
+		for (int i = 0; i < 9; i++) {
+			if (locked.contains(i)) {
+				addSlotToContainer(new SlotDisabled(inventoryPlayer, i, i * 18 + 8, 58));
+			}
+			else {
+				addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + 8, 58));
+			}
 		}
 
 		// Add player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				addSlotToContainer(new SlotPlayerInv(inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 0 + i * 18));
+				if (locked.contains(j + i * 9 + 9)) {
+					addSlotToContainer(new SlotDisabled(inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 0 + i * 18));
+				}
+				else {
+					addSlotToContainer(new SlotPlayerInv(inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 0 + i * 18));
+				}
 			}
 		}
 

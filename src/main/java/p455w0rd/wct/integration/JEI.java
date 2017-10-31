@@ -44,7 +44,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.fml.common.Loader;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingMatrix;
 import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
@@ -83,10 +82,6 @@ public class JEI implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-	}
-
-	public static boolean isLoaded() {
-		return Loader.isModLoaded(MODID);
 	}
 
 	public class RecipeTransferHandler<T extends Container> implements IRecipeTransferHandler<T> {
