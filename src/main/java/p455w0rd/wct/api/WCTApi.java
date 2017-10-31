@@ -15,7 +15,7 @@ public abstract class WCTApi {
 	public static WCTApi instance() {
 		if (API == null) {
 			try {
-				Class<?> clazz = Class.forName("net.p455w0rd.wct.implementation.WCTAPIImplementation");
+				Class<?> clazz = Class.forName("p455w0rd.wct.implementation.WCTAPIImplementation");
 				Method instanceAccessor = clazz.getMethod("instance");
 				API = (WCTApi) instanceAccessor.invoke(null);
 			}
