@@ -9,7 +9,7 @@ import p455w0rd.wct.implementation.WCTInteractionHelper;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModItems;
 
-public class WCTApi {
+public abstract class WCTApi {
 
 	protected static WCTApi API = null;
 
