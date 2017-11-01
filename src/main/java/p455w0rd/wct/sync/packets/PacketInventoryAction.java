@@ -137,16 +137,9 @@ public class PacketInventoryAction extends WCTPacket {
 			if (sender.openContainer instanceof ContainerCraftAmount) {
 				final ContainerCraftAmount cca = (ContainerCraftAmount) sender.openContainer;
 
-				if (baseContainer instanceof ContainerWCT) {
-					if (((ContainerWCT) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((ContainerWCT) baseContainer).getTargetStack().createItemStack());
-						cca.setItemToCraft(((ContainerWCT) baseContainer).getTargetStack());
-					}
-				}
-
 				if (baseContainer instanceof WCTBaseContainer) {
 					if (((WCTBaseContainer) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().createItemStack());
+						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().asItemStackRepresentation());
 						cca.setItemToCraft(((WCTBaseContainer) baseContainer).getTargetStack());
 					}
 				}

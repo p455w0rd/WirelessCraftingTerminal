@@ -30,12 +30,12 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
-import p455w0rd.wct.sync.packets.PacketPartialItem;
 import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
+import p455w0rd.wct.sync.packets.PacketTargetItemStack;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
 public class WCTPacketHandlerBase {
@@ -54,7 +54,7 @@ public class WCTPacketHandlerBase {
 
 			PACKET_RECIPE_NEI(PacketJEIRecipe.class),
 
-			PACKET_PARTIAL_ITEM(PacketPartialItem.class),
+			PACKET_TARGET_ITEM(PacketTargetItemStack.class),
 
 			PACKET_CRAFTING_REQUEST(PacketCraftRequest.class),
 

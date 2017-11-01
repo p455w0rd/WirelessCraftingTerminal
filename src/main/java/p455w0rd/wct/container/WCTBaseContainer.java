@@ -15,15 +15,12 @@
  */
 package p455w0rd.wct.container;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import appeng.api.AEApi;
@@ -57,8 +54,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
@@ -73,7 +68,7 @@ import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
-import p455w0rd.wct.sync.packets.PacketPartialItem;
+import p455w0rd.wct.sync.packets.PacketTargetItemStack;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
 public abstract class WCTBaseContainer extends AEBaseContainer {
@@ -82,7 +77,6 @@ public abstract class WCTBaseContainer extends AEBaseContainer {
 	protected IActionSource mySrc;
 	protected final HashSet<Integer> locked = new HashSet<Integer>();
 	public WCTGuiObject obj;
-	protected final List<PacketPartialItem> dataChunks = new LinkedList<PacketPartialItem>();
 	protected final HashMap<Integer, SyncData> syncData = new HashMap<Integer, SyncData>();
 	private boolean isContainerValid = true;
 	protected String customName;
@@ -167,38 +161,6 @@ public abstract class WCTBaseContainer extends AEBaseContainer {
 		}
 	}
 
-	public void postPartial(final PacketPartialItem packetPartialItem) {
-		dataChunks.add(packetPartialItem);
-		if (packetPartialItem.getPageCount() == dataChunks.size()) {
-			parsePartials();
-		}
-	}
-
-	private void parsePartials() {
-		int total = 0;
-		for (final PacketPartialItem ppi : dataChunks) {
-			total += ppi.getSize();
-		}
-
-		final byte[] buffer = new byte[total];
-		int cursor = 0;
-
-		for (final PacketPartialItem ppi : dataChunks) {
-			cursor = ppi.write(buffer, cursor);
-		}
-
-		try {
-			final NBTTagCompound data = CompressedStreamTools.readCompressed(new ByteArrayInputStream(buffer));
-			if (data != null) {
-				setTargetStack(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(new ItemStack(data)));
-			}
-		}
-		catch (final IOException e) {
-		}
-
-		dataChunks.clear();
-	}
-
 	@Override
 	public IAEItemStack getTargetStack() {
 		return clientRequestedTargetItem;
@@ -208,56 +170,14 @@ public abstract class WCTBaseContainer extends AEBaseContainer {
 	public void setTargetStack(final IAEItemStack stack) {
 		// client doesn't need to re-send, makes for lower overhead rapid packets.
 		if (Platform.isClient()) {
-			/*
-			final ItemStack a = stack == null ? ItemStack.EMPTY : stack.createItemStack();
-			final ItemStack b = clientRequestedTargetItem == null ? ItemStack.EMPTY : clientRequestedTargetItem.createItemStack();
-			
-			if (Platform.itemComparisons().isSameItem(a, b)) {
-				return;
-			}
-			*/
+
 			if (stack == null && clientRequestedTargetItem == null) {
 				return;
 			}
 			if (stack != null && stack.isSameType(clientRequestedTargetItem)) {
 				return;
 			}
-
-			final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			final NBTTagCompound item = new NBTTagCompound();
-
-			if (stack != null) {
-				stack.writeToNBT(item);
-			}
-
-			try {
-				CompressedStreamTools.writeCompressed(item, stream);
-
-				final int maxChunkSize = 30000;
-				final List<byte[]> miniPackets = new LinkedList<byte[]>();
-
-				final byte[] data = stream.toByteArray();
-
-				final ByteArrayInputStream bis = new ByteArrayInputStream(data, 0, stream.size());
-				while (bis.available() > 0) {
-					final int nextBLock = bis.available() > maxChunkSize ? maxChunkSize : bis.available();
-					final byte[] nextSegment = new byte[nextBLock];
-					bis.read(nextSegment);
-					miniPackets.add(nextSegment);
-				}
-				bis.close();
-				stream.close();
-
-				int page = 0;
-				for (final byte[] packet : miniPackets) {
-					final PacketPartialItem ppi = new PacketPartialItem(page, miniPackets.size(), packet);
-					page++;
-					ModNetworking.instance().sendToServer(ppi);
-				}
-			}
-			catch (final IOException e) {
-				return;
-			}
+			ModNetworking.instance().sendToServer(new PacketTargetItemStack((AEItemStack) stack));
 		}
 
 		clientRequestedTargetItem = stack == null ? null : stack.copy();
@@ -323,7 +243,7 @@ public abstract class WCTBaseContainer extends AEBaseContainer {
 				syncData.get(idx).update(value);
 				return;
 			}
-	
+
 			updateProgressBar(idx, (int) value);
 		}
 	*/
