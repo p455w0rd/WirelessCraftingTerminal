@@ -16,6 +16,7 @@
 package p455w0rd.wct.api;
 
 import net.minecraft.item.ItemStack;
+import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -26,7 +27,7 @@ public interface IWirelessCraftingTerminalItem extends IWirelessCraftingTermHand
 
 	// checks if an Infinity Booster Caqrd is installed on the WCT
 	public default boolean checkForBooster(final ItemStack wirelessTerminal) {
-		return WCTUtils.isBoosterInstalled(wirelessTerminal);
+		return ModConfig.USE_OLD_INFINTY_MECHANIC ? WCTUtils.isBoosterInstalled(wirelessTerminal) : (WCTUtils.hasInfiniteRange(wirelessTerminal) && WCTUtils.hasInfinityEnergy(wirelessTerminal));
 	}
 
 	// checks if the Wireless Crafting Terminal is enabled on your item (need for ExtraCells Universal Terminal)

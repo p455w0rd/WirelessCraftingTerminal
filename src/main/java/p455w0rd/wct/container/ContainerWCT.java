@@ -147,10 +147,13 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	private IRecipe currentRecipe;
 	private IGridNode networkNode;
 	private final AppEngInternalInventory viewCell = new AppEngInternalInventory(this, 5);
+	final ContainerNull matrixContainer = new ContainerNull();
+	final InventoryCrafting craftingInv;
 
 	public ContainerWCT(EntityPlayer player, ITerminalHost hostIn) {
 		super(player.inventory, getActionHost(getGuiObject(WCTUtils.getWirelessTerm(player.inventory), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)));
 		initConfig(clientCM = new ConfigManager(this));
+		craftingInv = new InventoryCrafting(matrixContainer, 3, 3);
 		containerstack = WCTUtils.getWirelessTerm(inventoryPlayer);
 		customName = "WCTContainer";
 		host = hostIn;
@@ -272,24 +275,19 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void onCraftMatrixChanged(final IInventory inv) {
-		final ContainerNull cn = new ContainerNull();
-		final InventoryCrafting ic = new InventoryCrafting(cn, 3, 3);
 		for (int x = 0; x < 9; x++) {
-			ic.setInventorySlotContents(x, craftingSlots[x].getStack());
+			craftingInv.setInventorySlotContents(x, craftingSlots[x].getStack());
 		}
-
-		if (currentRecipe == null || !currentRecipe.matches(ic, getPlayerInv().player.world)) {
-			currentRecipe = CraftingManager.findMatchingRecipe(ic, getPlayerInv().player.world);
+		if (currentRecipe == null || !currentRecipe.matches(craftingInv, getPlayerInv().player.world)) {
+			currentRecipe = CraftingManager.findMatchingRecipe(craftingInv, getPlayerInv().player.world);
 		}
-
 		if (currentRecipe == null) {
 			getResultSlot().putStack(ItemStack.EMPTY);
 		}
 		else {
-			final ItemStack craftingResult = currentRecipe.getCraftingResult(ic);
+			final ItemStack craftingResult = currentRecipe.getCraftingResult(craftingInv);
 			getResultSlot().putStack(craftingResult);
 		}
-
 		writeToNBT();
 	}
 
