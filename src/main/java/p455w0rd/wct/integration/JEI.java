@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+
 import appeng.container.slot.SlotCraftingMatrix;
 import appeng.container.slot.SlotFakeCraftingMatrix;
 import appeng.util.Platform;
@@ -47,6 +49,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketJEIRecipe;
@@ -66,7 +69,11 @@ public class JEI implements IModPlugin {
 			blackList.addIngredientToBlacklist(new ItemStack(ModItems.BOOSTER_CARD));
 		}
 		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<ContainerWCT>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
-		registry.addDescription(new ItemStack(ModItems.WCT), "jei.test.desc");
+		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wct_bauble.desc" : "";
+		String boosterDescKey = ModConfig.USE_OLD_INFINTY_MECHANIC ? "jei.booster_old.desc" : "jei.booster.desc";
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), ItemStack.class, "jei.wct.desc", wctBaublesDescKey);
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.MAGNET_CARD)), ItemStack.class, "jei.magnet_card.desc");
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.BOOSTER_CARD)), ItemStack.class, boosterDescKey);
 	}
 
 	@Override
