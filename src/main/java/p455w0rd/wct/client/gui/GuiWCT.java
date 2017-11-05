@@ -47,6 +47,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
+import p455w0rd.wct.client.gui.widgets.GuiImgButtonBooster;
+import p455w0rd.wct.client.gui.widgets.GuiImgButtonMagnetMode;
 import p455w0rd.wct.client.gui.widgets.GuiMagnetButton;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
@@ -108,6 +110,8 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private GuiImgButton clearBtn;
 	private GuiTrashButton trashBtn;
 	private GuiImgButton terminalStyleBox;
+	private GuiImgButtonBooster autoConsumeBoostersBox;
+	private GuiImgButtonMagnetMode magnetModeBox;
 	public boolean devicePowered = false;
 	private boolean isJEIEnabled;
 	private boolean wasTextboxFocused = false;
@@ -275,6 +279,12 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		if (btn == magnetGUIButton) {
 			ModNetworking.instance().sendToServer(new PacketSwitchGuis(ModGuiHandler.GUI_MAGNET));
 		}
+		if (btn == autoConsumeBoostersBox) {
+			autoConsumeBoostersBox.cycleValue();
+		}
+		if (btn == magnetModeBox) {
+			magnetModeBox.cycleValue();
+		}
 	}
 
 	private void reinitalize() {
@@ -360,6 +370,14 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		offset += 20;
 
 		buttonList.add(terminalStyleBox = new GuiImgButton(guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE)));
+
+		if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+			offset += 20;
+			buttonList.add(autoConsumeBoostersBox = new GuiImgButtonBooster(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
+		}
+
+		offset += 20;
+		buttonList.add(magnetModeBox = new GuiImgButtonMagnetMode(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
 
 		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
@@ -470,8 +488,11 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
-		if (magnetGUIButton != null && mc.player.inventory != null) {
-			magnetGUIButton.visible = WCTUtils.isMagnetInstalled(mc.player.inventory);
+		if (magnetGUIButton != null) {
+			magnetGUIButton.visible = WCTUtils.isMagnetInstalled(containerWCT.getWirelessTerminal());
+		}
+		if (magnetModeBox != null) {
+			magnetModeBox.visible = WCTUtils.isMagnetInstalled(containerWCT.getWirelessTerminal());
 		}
 		if (!mc.player.isEntityAlive() || mc.player.isDead) {
 			mc.player.closeScreen();

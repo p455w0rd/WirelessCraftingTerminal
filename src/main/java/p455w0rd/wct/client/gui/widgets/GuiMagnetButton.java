@@ -34,6 +34,7 @@ public class GuiMagnetButton extends GuiButton implements ITooltip {
 		y = yIn;
 		width = 8;
 		height = 8;
+		visible = false;
 	}
 
 	@Override
@@ -42,11 +43,14 @@ public class GuiMagnetButton extends GuiButton implements ITooltip {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x, y, 0.0F);
 			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-			GlStateManager.scale(0.025F, 0.025F, 0.025F);
-			//GL11.glScalef(0.5f, 0.5f, 0.5f);
-			mc.getTextureManager().bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/magnet_button.png"));
+			//GlStateManager.scale(0.025F, 0.025F, 0.025F);
+			//GL11.glScalef(2.0f, 2.0f, 2.0f);
+			mc.getTextureManager().bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
 			hovered = par2 >= x && par3 >= y && par2 < x + width && par3 < y + height;
-			drawTexturedModalRect(0, 0, 0, 0, 256, 256);
+			GlStateManager.scale(0.5F, 0.5F, 0.5F);
+			this.drawTexturedModalRect(0, 0, 0, 0, 16, 16);
+
+			drawTexturedModalRect(0, 0, 16, 0, 16, 16);
 			mouseDragged(mc, par2, par3);
 			GL11.glPopMatrix();
 		}
@@ -54,7 +58,7 @@ public class GuiMagnetButton extends GuiButton implements ITooltip {
 
 	@Override
 	public String getMessage() {
-		return TextFormatting.WHITE + "" + I18n.format("gui.openmagnetgui") + "\n" + TextFormatting.GRAY + "" + I18n.format("gui.openmagnetgui.desc");
+		return TextFormatting.WHITE + "" + I18n.format("gui.openmagnetgui") + "\n" + TextFormatting.GRAY + "" + I18n.format("gui.openmagnetgui.desc") + "\n" + I18n.format("gui.openmagnetgui.desc2");
 	}
 
 	@Override

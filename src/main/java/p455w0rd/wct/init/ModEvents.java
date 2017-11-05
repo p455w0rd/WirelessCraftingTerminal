@@ -44,7 +44,9 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -65,6 +67,7 @@ import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
+import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.capabilities.CapabilityChunkLoader;
 import p455w0rdslib.capabilities.CapabilityChunkLoader.ProviderTE;
@@ -129,21 +132,18 @@ public class ModEvents {
 		if (invSize <= 0) {
 			return;
 		}
-		/*
-		for (int i = 0; i < invSize; ++i) {
-			ItemStack item = playerInv.getStackInSlot(i);
-			if (item == null) {
-				continue;
+		if (player instanceof EntityPlayerMP && !ModConfig.USE_OLD_INFINTY_MECHANIC && !wirelessTerm.isEmpty() && WCTUtils.shouldConsumeBoosters(wirelessTerm)) {
+			for (int i = 0; i < invSize; ++i) {
+				ItemStack slotStack = playerInv.getStackInSlot(i);
+				if (!slotStack.isEmpty() && slotStack.getItem() == ModItems.BOOSTER_CARD) {
+					WCTUtils.addInfinityBoosters(wirelessTerm, slotStack);
+					ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerm)), (EntityPlayerMP) player);
+					playerInv.setInventorySlotContents(i, ItemStack.EMPTY);
+				}
 			}
-			if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
-				wirelessTerm = item;
-			}
-			if (wirelessTerm == null) {
-				continue;
-			}
-			*/
+		}
 		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound()) {
-			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound("MagnetSlot");
+			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound(WCTUtils.MAGNET_SLOT_NBT);
 			if (magnetNBT != null) {
 				NBTTagList tagList = magnetNBT.getTagList("Items", 10);
 				if (tagList != null && !tagList.hasNoTags()) {
@@ -160,7 +160,6 @@ public class ModEvents {
 				}
 			}
 		}
-		//}
 	}
 
 	@SubscribeEvent
@@ -221,7 +220,7 @@ public class ModEvents {
 					}
 					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 				}
-				ItemMagnet.switchMagnetMode(magnetItem, p);
+				ItemMagnet.switchMagnetMode(magnetItem);
 			}
 		}
 		//}
@@ -280,4 +279,19 @@ public class ModEvents {
 		}
 	}
 
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onPickup(EntityItemPickupEvent e) {
+		if (e.getEntityPlayer() != null && e.getEntityPlayer() instanceof EntityPlayerMP) {
+			if (!ModConfig.USE_OLD_INFINTY_MECHANIC && e.getItem().getItem().getItem() == ModItems.BOOSTER_CARD) {
+				ItemStack wirelessTerminal = WCTUtils.getWirelessTerm(e.getEntityPlayer().inventory);
+				if (!wirelessTerminal.isEmpty() && WCTUtils.shouldConsumeBoosters(wirelessTerminal)) {
+					e.setCanceled(true);
+					ItemStack boosters = e.getItem().getItem().copy();
+					WCTUtils.addInfinityBoosters(wirelessTerminal, boosters);
+					ModNetworking.instance().sendToServer(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerminal)));
+					e.getItem().setDead();
+				}
+			}
+		}
+	}
 }

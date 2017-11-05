@@ -18,6 +18,9 @@ package p455w0rd.wct.util;
 import static p455w0rd.wct.init.ModConfig.INFINITY_ENERGY_DRAIN;
 import static p455w0rd.wct.init.ModConfig.INFINITY_ENERGY_PER_BOOSTER_CARD;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -57,6 +60,8 @@ public class WCTUtils {
 	public static final String TIMER_RESET_NBT = "WCTReset";
 	public static final String TIMER_PICKUP_NBT = "WCTPickupTimer";
 	public static final String IN_RANGE_NBT = "IsInRange";
+	public static final String AUTOCONSUME_BOOSTER_NBT = "AutoConsumeBoosters";
+	public static final String MAGNET_MODE_NBT = "MagnetMode";
 
 	public static NonNullList<ItemStack> getWirelessTerminals(EntityPlayer player) {
 		NonNullList<ItemStack> terminalList = NonNullList.<ItemStack>create();
@@ -100,6 +105,15 @@ public class WCTUtils {
 			}
 		}
 		return wirelessTerm;
+	}
+
+	public static boolean shouldConsumeBoosters(ItemStack wirelessTerminal) {
+		if (!ModConfig.USE_OLD_INFINTY_MECHANIC && wirelessTerminal.hasTagCompound()) {
+			if (wirelessTerminal.getTagCompound().hasKey(AUTOCONSUME_BOOSTER_NBT)) {
+				return wirelessTerminal.getTagCompound().getBoolean(AUTOCONSUME_BOOSTER_NBT);
+			}
+		}
+		return false;
 	}
 
 	public static boolean isBoosterInstalled(final ItemStack wirelessTerminal) {
@@ -175,7 +189,7 @@ public class WCTUtils {
 	}
 
 	public static double getDistanceToWAP(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		IWirelessAccessPoint wap = getWAP(wirelessTerm, player);
+		IWirelessAccessPoint wap = getClosestWAPToPlayer(wirelessTerm, player);
 		if (wap != null && player.getEntityWorld().provider.getDimension() == wap.getLocation().getWorld().provider.getDimension()) {
 			BlockPos wapPos = wap.getLocation().getPos();
 			BlockPos playerPos = player.getPosition();
@@ -186,13 +200,44 @@ public class WCTUtils {
 	}
 
 	public static double getWAPRange(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		IWirelessAccessPoint wap = getWAP(wirelessTerm, player);
+		IWirelessAccessPoint wap = getClosestWAPToPlayer(wirelessTerm, player);
 		if (wap != null) {
 			return wap.getRange();
 		}
 		return Double.MAX_VALUE;
 	}
 
+	public static IWirelessAccessPoint getClosestWAPToPlayer(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
+		List<IWirelessAccessPoint> wapList = getWAPs(wirelessTerm, player);
+		double closestDistance = -1.0D;
+		IWirelessAccessPoint closestWAP = null;
+		for (IWirelessAccessPoint wap : wapList) {
+			BlockPos wapPos = wap.getLocation().getPos();
+			BlockPos playerPos = player.getPosition();
+			double thisWAPDistance = Math.sqrt(playerPos.distanceSq(wapPos));
+			if (closestDistance == -1.0D) {
+				closestDistance = thisWAPDistance;
+				closestWAP = wap;
+			}
+			else {
+				if (thisWAPDistance < closestDistance) {
+					closestDistance = thisWAPDistance;
+					closestWAP = wap;
+				}
+			}
+		}
+		return closestDistance == -1.0D ? null : closestWAP;
+	}
+
+	public static List<IWirelessAccessPoint> getWAPs(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
+		WCTGuiObject object = getGUIObject(wirelessTerm, player);
+		if (object != null) {
+			return object.getWAPs();
+		}
+		return Collections.emptyList();
+	}
+
+	/*
 	public static IWirelessAccessPoint getWAP(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
 		WCTGuiObject object = getGUIObject(wirelessTerm, player);
 		if (object != null) {
@@ -200,7 +245,7 @@ public class WCTUtils {
 		}
 		return null;
 	}
-
+	*/
 	public static WCTGuiObject getGUIObject(EntityPlayer player) {
 		return getGUIObject(null, player);
 	}
@@ -262,6 +307,28 @@ public class WCTUtils {
 			stack.setTagCompound(new NBTTagCompound());
 		}
 		return stack.getTagCompound();
+	}
+
+	@Nonnull
+	public static ItemStack getMagnet(@Nonnull ItemStack wirelessTerm) {
+		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound() && wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
+			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound(MAGNET_SLOT_NBT);
+			if (magnetNBT != null) {
+				NBTTagList magnetSlot = magnetNBT.getTagList("Items", 10);
+				ItemStack magnetItem = new ItemStack(magnetSlot.getCompoundTagAt(0));
+				if (magnetItem != null && !magnetItem.isEmpty() && magnetItem.getItem() == ModItems.MAGNET_CARD) {
+					return magnetItem;
+				}
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	public static int getMagnetMode(ItemStack wirelessTerm) {
+		if (!getMagnet(wirelessTerm).isEmpty()) {
+			return ItemMagnet.getDamageUnsafe(getMagnet(wirelessTerm));
+		}
+		return -1;
 	}
 
 	@Nonnull

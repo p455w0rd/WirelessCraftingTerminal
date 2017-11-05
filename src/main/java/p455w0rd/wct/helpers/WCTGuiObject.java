@@ -15,6 +15,10 @@
  */
 package p455w0rd.wct.helpers;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import appeng.api.AEApi;
 import appeng.api.config.AccessRestriction;
 import appeng.api.config.Actionable;
@@ -91,6 +95,20 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 				}
 			}
 		}
+	}
+
+	public List<IWirelessAccessPoint> getWAPs() {
+		List<IWirelessAccessPoint> wapList = Lists.newArrayList();
+		if (targetGrid != null) {
+			final IMachineSet tw = targetGrid.getMachines(TileWireless.class);
+			for (final IGridNode n : tw) {
+				if (n.getMachine() instanceof IWirelessAccessPoint) {
+					final IWirelessAccessPoint wap = (IWirelessAccessPoint) n.getMachine();
+					wapList.add(wap);
+				}
+			}
+		}
+		return wapList;
 	}
 
 	public IWirelessAccessPoint getWAP() {

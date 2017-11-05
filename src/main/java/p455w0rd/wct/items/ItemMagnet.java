@@ -206,27 +206,12 @@ public class ItemMagnet extends ItemBase {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
-		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
-			if (!player.isSneaking()) {
-				if (!WCTUtils.isMagnetInitialized(item)) {
-					item.getTagCompound().setBoolean("Initialized", true);
-				}
-				int x = (int) player.posX;
-				int y = (int) player.posY;
-				int z = (int) player.posZ;
-				ModGuiHandler.open(ModGuiHandler.GUI_MAGNET, player, world, new BlockPos(x, y, z));
-			}
-			else {
-				switchMagnetMode(item, player, false);
-			}
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
-		}
-		else {
+		if (world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
 			if (!WCTUtils.isMagnetInitialized(item)) {
 				ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 			}
 			if (player.isSneaking()) {
-				switchMagnetMode(item, player, false);
+				switchMagnetMode(item);
 				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 			}
 			else {
@@ -237,74 +222,55 @@ public class ItemMagnet extends ItemBase {
 				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 			}
 		}
-		//return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+		return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+	}
+
+	public static String getMessage(int mode) {
+		switch (mode) {
+		case 1:
+			return I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc");
+		case 2:
+			return I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc");
+		case 0:
+		default:
+			return I18n.format("chatmessages.magnet_deactivated.desc");
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static void displayMessage(int mode) {
 		EntityPlayer player = WCTUtils.player();
-		switch (mode) {
-		case 1:
-			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")));
-			break;
-		case 2:
-			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc")));
-			break;
-		case 0:
-			WCTUtils.chatMessage(player, new TextComponentString(I18n.format("chatmessages.magnet_deactivated.desc")));
-			break;
+		WCTUtils.chatMessage(player, new TextComponentString(getMessage(mode)));
+	}
+
+	public static void switchMagnetMode(@Nonnull ItemStack item) {
+		int newMode = 0;
+		if (getDamageUnsafe(item) == 0) {
+			newMode = 1;
 		}
-	}
-
-	public static void switchMagnetMode(@Nonnull ItemStack item, EntityPlayer player) {
-		switchMagnetMode(item, player, true);
-	}
-
-	public static void switchMagnetMode(@Nonnull ItemStack item, EntityPlayer player, boolean sync) {
-		if (player.getEntityWorld().isRemote) {
-			int newMode = 0;
-			if (getDamageUnsafe(item) == 0) {
-				newMode = 1;
-			}
-			else if (getDamageUnsafe(item) == 1) {
-				newMode = 2;
-			}
-			else {
-				newMode = 0;
-			}
-			setDamageUnsafe(item, newMode);
-			displayMessage(newMode);
-			if (sync) {
-				ModNetworking.instance().sendToServer(new PacketSetMagnet(newMode));
-			}
+		else if (getDamageUnsafe(item) == 1) {
+			newMode = 2;
 		}
 		else {
-			int newMode = 0;
-			if (getDamageUnsafe(item) == 0) {
-				newMode = 1;
-			}
-			else if (getDamageUnsafe(item) == 1) {
-				newMode = 2;
-			}
-			else {
-				newMode = 0;
-			}
-			setDamageUnsafe(item, newMode);
+			newMode = 0;
 		}
+		setDamageUnsafe(item, newMode);
+		displayMessage(newMode);
+		ModNetworking.instance().sendToServer(new PacketSetMagnet(newMode));
 	}
 
-	private static int getDamageUnsafe(@Nonnull ItemStack stack) {
+	public static int getDamageUnsafe(@Nonnull ItemStack stack) {
 		if (!stack.isEmpty() && !stack.hasTagCompound()) {
 			stack.setTagCompound(new NBTTagCompound());
-			if (!stack.getTagCompound().hasKey("MagnetMode")) {
-				stack.getTagCompound().setInteger("MagnetMode", 0);
+			if (!stack.getTagCompound().hasKey(WCTUtils.MAGNET_MODE_NBT)) {
+				stack.getTagCompound().setInteger(WCTUtils.MAGNET_MODE_NBT, 0);
 			}
 		}
-		return stack.getTagCompound().getInteger("MagnetMode");
+		return stack.getTagCompound().getInteger(WCTUtils.MAGNET_MODE_NBT);
 	}
 
-	private static void setDamageUnsafe(@Nonnull ItemStack stack, int damage) {
-		stack.getTagCompound().setInteger("MagnetMode", damage);
+	public static void setDamageUnsafe(@Nonnull ItemStack stack, int damage) {
+		stack.getTagCompound().setInteger(WCTUtils.MAGNET_MODE_NBT, damage);
 	}
 
 	public void doMagnet(@Nonnull ItemStack item, World world, EntityPlayer player, @Nonnull ItemStack wirelessTerm) {
@@ -603,11 +569,11 @@ public class ItemMagnet extends ItemBase {
 		return new ItemStack(this, size);
 	}
 
-	protected boolean isActivated(@Nonnull ItemStack item) {
+	public boolean isActivated(@Nonnull ItemStack item) {
 		if (item.isEmpty()) {
 			return false;
 		}
-		return getDamageUnsafe(item) != 0;
+		return getDamageUnsafe(item) > 0;
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
+import p455w0rd.wct.sync.packets.PacketSetAutoConsumeBoosters;
 import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
@@ -70,7 +71,9 @@ public class WCTPacketHandlerBase {
 
 			PACKET_SYNC_INFINITY_ENERGY(PacketSyncInfinityEnergy.class),
 
-			PACKET_SET_IN_RANGE(PacketSetInRange.class);
+			PACKET_SET_IN_RANGE(PacketSetInRange.class),
+
+			PACKET_SET_AUTOCONSUME_BOOSTERS(PacketSetAutoConsumeBoosters.class);
 
 		private final Class<? extends WCTPacket> packetClass;
 		private final Constructor<? extends WCTPacket> packetConstructor;
