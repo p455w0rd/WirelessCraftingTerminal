@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import appeng.container.slot.SlotCraftingMatrix;
+import appeng.container.slot.SlotFakeCraftingMatrix;
 import appeng.util.Platform;
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IJeiRuntime;
@@ -45,8 +47,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotFakeCraftingMatrix;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.sync.network.NetworkHandler;

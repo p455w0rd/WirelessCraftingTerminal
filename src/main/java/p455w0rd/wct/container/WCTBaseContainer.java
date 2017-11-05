@@ -22,6 +22,13 @@ import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.container.AEBaseContainer;
+import appeng.container.ContainerOpenContext;
+import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.SlotCraftingMatrix;
+import appeng.container.slot.SlotDisabled;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotInaccessible;
 import appeng.core.Api;
 import appeng.helpers.ICustomNameObject;
 import appeng.helpers.InventoryAction;
@@ -30,7 +37,6 @@ import appeng.util.item.AEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -44,11 +50,6 @@ import p455w0rd.wct.client.me.InternalSlotME;
 import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.container.guisync.GuiSync;
 import p455w0rd.wct.container.guisync.SyncData;
-import p455w0rd.wct.container.slot.AppEngSlot;
-import p455w0rd.wct.container.slot.SlotCraftingMatrix;
-import p455w0rd.wct.container.slot.SlotDisabled;
-import p455w0rd.wct.container.slot.SlotFake;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotPlayerInv;
 import p455w0rd.wct.helpers.WCTGuiObject;
@@ -58,7 +59,7 @@ import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketPartialItem;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
-public abstract class WCTBaseContainer extends Container {
+public abstract class WCTBaseContainer extends AEBaseContainer {
 
 	protected final InventoryPlayer inventoryPlayer;
 	protected BaseActionSource mySrc;
@@ -77,6 +78,7 @@ public abstract class WCTBaseContainer extends Container {
 	protected IMEMonitor<IAEItemStack> monitor;
 
 	public WCTBaseContainer(final InventoryPlayer ip, final Object anchor) {
+		super(ip, null, null);
 		inventoryPlayer = ip;
 		obj = anchor instanceof WCTGuiObject ? (WCTGuiObject) anchor : null;
 
@@ -176,10 +178,12 @@ public abstract class WCTBaseContainer extends Container {
 		dataChunks.clear();
 	}
 
+	@Override
 	public IAEItemStack getTargetStack() {
 		return clientRequestedTargetItem;
 	}
 
+	@Override
 	public void setTargetStack(final IAEItemStack stack) {
 		// client doesn't need to re-send, makes for lower overhead rapid packets.
 		if (Platform.isClient()) {
@@ -230,10 +234,12 @@ public abstract class WCTBaseContainer extends Container {
 		clientRequestedTargetItem = stack == null ? null : stack.copy();
 	}
 
+	@Override
 	public BaseActionSource getActionSource() {
 		return mySrc;
 	}
 
+	@Override
 	public void verifyPermissions(final SecurityPermissions security, final boolean requirePower) {
 		if (Platform.isClient()) {
 			return;
@@ -248,6 +254,7 @@ public abstract class WCTBaseContainer extends Container {
 		setValidContainer(isValidContainer() && hasAccess(security, requirePower));
 	}
 
+	@Override
 	protected boolean hasAccess(final SecurityPermissions perm, final boolean requirePower) {
 		final IGrid grid = obj.getTargetGrid();
 		if (grid != null) {
@@ -263,10 +270,12 @@ public abstract class WCTBaseContainer extends Container {
 		return false;
 	}
 
+	@Override
 	public void lockPlayerInventorySlot(final int idx) {
 		locked.add(idx);
 	}
 
+	@Override
 	public Object getTarget() {
 		if (obj != null) {
 			return obj;
@@ -274,34 +283,28 @@ public abstract class WCTBaseContainer extends Container {
 		return null;
 	}
 
+	@Override
 	public InventoryPlayer getPlayerInv() {
 		return getInventoryPlayer();
 	}
 
-	public final void updateFullProgressBar(final int idx, final long value) {
-		if (syncData.containsKey(idx)) {
-			syncData.get(idx).update(value);
-			return;
-		}
-
-		updateProgressBar(idx, (int) value);
-	}
-
+	@Override
 	public void stringSync(final int idx, final String value) {
 		if (syncData.containsKey(idx)) {
 			syncData.get(idx).update(value);
 		}
 	}
 
+	@Override
 	protected void bindPlayerInventory(final InventoryPlayer inventoryPlayer, final int offsetX, final int offsetY) {
 		// bind player inventory
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (locked.contains(j + i * 9 + 9)) {
-					addSlotToContainer(new SlotDisabled(inventoryPlayer, j + i * 9 + 9, 8 + j * 18 + offsetX, offsetY + i * 18));
+					addSlotToContainer(new SlotDisabled(inventoryPlayer, j + i * 9 + 9, j * 18 + offsetX, offsetY + i * 18));
 				}
 				else {
-					addSlotToContainer(new SlotPlayerInv(inventoryPlayer, j + i * 9 + 9, 8 + j * 18 + offsetX, offsetY + i * 18));
+					addSlotToContainer(new SlotPlayerInv(inventoryPlayer, j + i * 9 + 9, j * 18 + offsetX, offsetY + i * 18));
 				}
 			}
 		}
@@ -309,10 +312,10 @@ public abstract class WCTBaseContainer extends Container {
 		// bind player hotbar
 		for (int i = 0; i < 9; i++) {
 			if (locked.contains(i)) {
-				addSlotToContainer(new SlotDisabled(inventoryPlayer, i, 8 + i * 18 + offsetX, 58 + offsetY));
+				addSlotToContainer(new SlotDisabled(inventoryPlayer, i, i * 18 + offsetX, 58 + offsetY));
 			}
 			else {
-				addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, 8 + i * 18 + offsetX, 58 + offsetY));
+				addSlotToContainer(new SlotPlayerHotBar(inventoryPlayer, i, i * 18 + offsetX, 58 + offsetY));
 			}
 		}
 	}
@@ -553,13 +556,6 @@ public abstract class WCTBaseContainer extends Container {
 	}
 
 	@Override
-	public final void updateProgressBar(final int idx, final int value) {
-		if (syncData.containsKey(idx)) {
-			syncData.get(idx).update((long) value);
-		}
-	}
-
-	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		if (isValidContainer()) {
 			return true;
@@ -572,8 +568,10 @@ public abstract class WCTBaseContainer extends Container {
 		return ((AppEngSlot) s).isDraggable();
 	}
 
+	@Override
 	public abstract void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id);
 
+	@Override
 	protected void updateHeld(final EntityPlayerMP p) {
 		if (Platform.isServer()) {
 			try {
@@ -631,6 +629,7 @@ public abstract class WCTBaseContainer extends Container {
 		}
 	}
 
+	@Override
 	public void swapSlotContents(final int slotA, final int slotB) {
 		final Slot a = getSlot(slotA);
 		final Slot b = getSlot(slotB);
@@ -700,58 +699,72 @@ public abstract class WCTBaseContainer extends Container {
 		b.putStack(testB);
 	}
 
+	@Override
 	public void onUpdate(final String field, final Object oldValue, final Object newValue) {
 
 	}
 
+	@Override
 	public void onSlotChange(final Slot s) {
 
 	}
 
+	@Override
 	public boolean isValidForSlot(final Slot s, final ItemStack i) {
 		return true;
 	}
 
+	@Override
 	public IMEInventoryHandler<IAEItemStack> getCellInventory() {
 		return cellInv;
 	}
 
+	@Override
 	public void setCellInventory(final IMEInventoryHandler<IAEItemStack> cellInv) {
 		this.cellInv = cellInv;
 	}
 
+	@Override
 	public String getCustomName() {
 		return customName;
 	}
 
+	@Override
 	public void setCustomName(final String customName) {
 		this.customName = customName;
 	}
 
+	@Override
 	public InventoryPlayer getInventoryPlayer() {
 		return inventoryPlayer;
 	}
 
+	@Override
 	public boolean isValidContainer() {
 		return isContainerValid;
 	}
 
+	@Override
 	public void setValidContainer(final boolean isContainerValid) {
 		this.isContainerValid = isContainerValid;
 	}
 
+	@Override
 	public ContainerOpenContext getOpenContext() {
 		return openContext;
 	}
 
+	@Override
 	public void setOpenContext(final ContainerOpenContext openContext) {
 		this.openContext = openContext;
 	}
 
+	@Override
 	public IEnergySource getPowerSource() {
 		return powerSrc;
 	}
 
+	@Override
 	public void setPowerSource(final IEnergySource powerSrc) {
 		this.powerSrc = powerSrc;
 	}

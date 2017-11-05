@@ -7,6 +7,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.security.BaseActionSource;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.container.slot.SlotInaccessible;
 import appeng.helpers.InventoryAction;
 import appeng.tile.inventory.AppEngInternalInventory;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,7 +16,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftAmount extends WCTBaseContainer {

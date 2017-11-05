@@ -1,5 +1,6 @@
 package p455w0rd.wct.container.slot;
 
+import appeng.container.slot.AppEngSlot;
 import baubles.api.IBauble;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

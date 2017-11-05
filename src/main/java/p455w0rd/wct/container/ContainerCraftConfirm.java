@@ -23,6 +23,7 @@ import appeng.api.storage.IMEInventory;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
+import appeng.container.guisync.GuiSync;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,14 +35,11 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.container.guisync.GuiSync;
 import p455w0rd.wct.handlers.GuiHandler;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.sync.network.NetworkHandler;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
-import p455w0rd.wct.sync.packets.PacketSetJobBytes;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
-import p455w0rd.wct.sync.packets.PacketUpdateCPUInfo;
 import p455w0rd.wct.util.WCTUtils;
 
 public class ContainerCraftConfirm extends WCTBaseContainer {
@@ -91,24 +89,11 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			setCpuAvailableBytes(0);
 			setCpuCoProcessors(0);
 			setName("");
-			try {
-				NetworkHandler.instance().sendTo(new PacketUpdateCPUInfo(0, 0), (EntityPlayerMP) getPlayerInv().player);
-			}
-			catch (IOException e) {
-				//
-			}
 		}
 		else {
 			setName(cpus.get(getSelectedCpu()).getName());
 			setCpuAvailableBytes(cpus.get(getSelectedCpu()).getSize());
 			setCpuCoProcessors(cpus.get(getSelectedCpu()).getProcessors());
-
-			try {
-				NetworkHandler.instance().sendTo(new PacketUpdateCPUInfo((int) getCpuAvailableBytes(), getCpuCoProcessors()), (EntityPlayerMP) getPlayerInv().player);
-			}
-			catch (IOException e) {
-				//
-			}
 		}
 	}
 
@@ -179,14 +164,14 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 
 					final IItemList<IAEItemStack> plan = AEApi.instance().storage().createItemList();
 					result.populatePlan(plan);
-
-					try {
-						NetworkHandler.instance().sendTo(new PacketSetJobBytes((int) result.getByteTotal()), (EntityPlayerMP) getPlayerInv().player);
-					}
-					catch (IOException e) {
-						//
-					}
-
+					/*
+										try {
+											//NetworkHandler.instance().sendTo(new PacketSetJobBytes((int) result.getByteTotal()), (EntityPlayerMP) getPlayerInv().player);
+										}
+										catch (IOException e) {
+											//
+										}
+					*/
 					setUsedBytes(result.getByteTotal());
 
 					for (final IAEItemStack out : plan) {

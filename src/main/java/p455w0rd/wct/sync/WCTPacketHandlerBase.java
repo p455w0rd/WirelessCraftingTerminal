@@ -17,11 +17,9 @@ import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.sync.packets.PacketPartialItem;
-import p455w0rd.wct.sync.packets.PacketSetJobBytes;
 import p455w0rd.wct.sync.packets.PacketSetMagnet;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
-import p455w0rd.wct.sync.packets.PacketUpdateCPUInfo;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
 public class WCTPacketHandlerBase {
@@ -53,10 +51,6 @@ public class WCTPacketHandlerBase {
 			PACKET_EMPTY_TRASH(PacketEmptyTrash.class),
 
 			PACKET_SYNC_CONFIGS(PacketConfigSync.class),
-
-			PACKET_SET_JOB(PacketSetJobBytes.class),
-
-			PACKET_UPDATECPUINFO(PacketUpdateCPUInfo.class),
 
 			PACKET_BAUBLE_SYNC(PacketBaubleSync.class);
 

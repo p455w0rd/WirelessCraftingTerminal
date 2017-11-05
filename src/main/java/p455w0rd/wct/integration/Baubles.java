@@ -1,5 +1,6 @@
 package p455w0rd.wct.integration;
 
+import baubles.api.IBauble;
 import baubles.api.cap.BaublesCapabilities;
 import baubles.api.cap.IBaublesItemHandler;
 import baubles.common.container.SlotBauble;
@@ -79,6 +80,14 @@ public class Baubles {
 		int slot = getWCTBaubleSlotIndex(player);
 		//NetworkHandler.instance().sendToDimension(new PacketBaubleSync(slot, stack), player.getEntityWorld().provider.getDimension());
 		NetworkHandler.instance().sendToServer(new PacketBaubleSync(slot, stack));
+	}
+
+	public static boolean isBaubleItem(ItemStack stack) {
+		return stack.getItem() instanceof IBauble;
+	}
+
+	public static boolean isAEBaubleSlot(Slot slot) {
+		return slot instanceof SlotAEBauble;
 	}
 
 }

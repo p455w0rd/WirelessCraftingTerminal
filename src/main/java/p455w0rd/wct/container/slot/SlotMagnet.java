@@ -1,5 +1,6 @@
 package p455w0rd.wct.container.slot;
 
+import appeng.container.slot.AppEngSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.items.ItemMagnet;

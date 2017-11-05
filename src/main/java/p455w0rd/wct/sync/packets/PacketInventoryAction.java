@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import appeng.api.storage.data.IAEItemStack;
 import appeng.client.ClientHelper;
+import appeng.container.ContainerOpenContext;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
@@ -12,9 +13,9 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.container.ContainerCraftAmount;
-import p455w0rd.wct.container.ContainerOpenContext;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.handlers.GuiHandler;
@@ -121,16 +122,11 @@ public class PacketInventoryAction extends WCTPacket {
 			if (sender.openContainer instanceof ContainerCraftAmount) {
 				final ContainerCraftAmount cca = (ContainerCraftAmount) sender.openContainer;
 
-				if (baseContainer instanceof ContainerWCT) {
-					if (((ContainerWCT) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((ContainerWCT) baseContainer).getTargetStack().getItemStack());
-						cca.setItemToCraft(((ContainerWCT) baseContainer).getTargetStack());
-					}
-				}
-
 				if (baseContainer instanceof WCTBaseContainer) {
 					if (((WCTBaseContainer) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().getItemStack());
+						ItemStack displayStack = ((WCTBaseContainer) baseContainer).getTargetStack().getItemStack().copy();
+						displayStack.stackSize = 1;
+						cca.getCraftingItem().putStack(displayStack);
 						cca.setItemToCraft(((WCTBaseContainer) baseContainer).getTargetStack());
 					}
 				}

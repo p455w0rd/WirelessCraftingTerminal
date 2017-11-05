@@ -1,5 +1,6 @@
 package p455w0rd.wct.container.slot;
 
+import appeng.container.slot.AppEngSlot;
 import net.minecraft.inventory.IInventory;
 
 public class SlotTrash extends AppEngSlot {
@@ -14,29 +15,29 @@ public class SlotTrash extends AppEngSlot {
 		entityPlayer = player;
 		readNBT();
 	}
-
+	
 	@Override
 	public ItemStack getStack() {
 		return itemStack;
 	}
-
+	
 	@Override
 	public boolean getHasStack() {
 		return itemStack != null;
 	}
-
+	
 	@Override
 	public void putStack(ItemStack itemStack) {
 		shouldDeleteMouseStack = (this.itemStack != null);
 		this.itemStack = itemStack;
 		writeNBT();
 	}
-
+	
 	@Override
 	public int getSlotStackLimit() {
 		return Integer.MAX_VALUE;
 	}
-
+	
 	@Override
 	public void onSlotChanged() {
 		if (itemStack != null && shouldDeleteMouseStack) {
@@ -44,17 +45,17 @@ public class SlotTrash extends AppEngSlot {
 		}
 		writeNBT();
 	}
-
+	
 	@Override
 	public boolean isItemValid(ItemStack itemStack) {
 		return true;
 	}
-
+	
 	@Override
 	public boolean canTakeStack(EntityPlayer player) {
 		return true;
 	}
-
+	
 	@Override
 	public ItemStack decrStackSize(int amount) {
 		if (itemStack != null) {
@@ -79,7 +80,7 @@ public class SlotTrash extends AppEngSlot {
 		}
 		return null;
 	}
-
+	
 	public void readNBT() {
 		NBTTagCompound nbtTagCompound = WCTUtils.getWirelessTerm(entityPlayer.inventory).getTagCompound();
 		NBTTagList tagList = nbtTagCompound.getTagList(name, 10);
@@ -88,7 +89,7 @@ public class SlotTrash extends AppEngSlot {
 			itemStack = ItemStack.loadItemStackFromNBT(tagCompound);
 		}
 	}
-
+	
 	public void writeNBT() {
 		ItemStack terminal = WCTUtils.getWirelessTerm(entityPlayer.inventory);
 		NBTTagCompound nbtTagCompound = terminal != null ? terminal.getTagCompound() : null;
@@ -110,7 +111,7 @@ public class SlotTrash extends AppEngSlot {
 			}
 		}
 	}
-
+	
 	@Override
 	public void clearStack() {
 		if (itemStack != null) {

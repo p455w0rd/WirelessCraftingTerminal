@@ -47,9 +47,6 @@ public class GuiCraftConfirm extends WCTBaseGui {
 	private GuiButton selectCPU;
 	private int tooltip = -1;
 	InventoryPlayer inventoryPlayer;
-	private static int jobBytes;
-	private static int currCPUAvailBytes;
-	private static int currCPUCoCPUs;
 
 	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
 		super(new ContainerCraftConfirm(inventoryPlayer, te));
@@ -152,37 +149,10 @@ public class GuiCraftConfirm extends WCTBaseGui {
 		return ((ContainerCraftConfirm) inventorySlots).isSimulation();
 	}
 
-	public int getJobBytes() {
-		return GuiCraftConfirm.jobBytes;
-	}
-
-	public static void setJobBytes(int numBytes) {
-		jobBytes = numBytes;
-	}
-
-	public int getCurrentCPUAvailBytes() {
-		return GuiCraftConfirm.currCPUAvailBytes;
-	}
-
-	public static void setCurrentCPUAvailBytes(int numBytes) {
-		currCPUAvailBytes = numBytes;
-	}
-
-	public int getCurrentCPUCoCPUs() {
-		return GuiCraftConfirm.currCPUCoCPUs;
-	}
-
-	public static void setCurrentCPUCoCPUs(int coCPUs) {
-		currCPUCoCPUs = coCPUs;
-	}
-
 	@Override
 	public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		int bytesUsed = getJobBytes();
-		int availBytes = getCurrentCPUAvailBytes();
-		int availCoCPUs = getCurrentCPUCoCPUs();
+		final long bytesUsed = ccc.getUsedBytes();
 		String byteUsed = NumberFormat.getInstance().format(bytesUsed);
-
 		final String Add = bytesUsed > 0 ? (byteUsed + ' ' + GuiText.BytesUsed.getLocal()) : GuiText.CalculatingWait.getLocal();
 		fontRendererObj.drawString(GuiText.CraftingPlan.getLocal() + " -- " + Add, 8, 7, 4210752);
 
@@ -192,7 +162,7 @@ public class GuiCraftConfirm extends WCTBaseGui {
 			dsp = GuiText.Simulation.getLocal();
 		}
 		else {
-			dsp = availBytes > 0 ? (GuiText.Bytes.getLocal() + ": " + availBytes + " : " + GuiText.CoProcessors.getLocal() + ": " + availCoCPUs) : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
+			dsp = ccc.getCpuAvailableBytes() > 0 ? (GuiText.Bytes.getLocal() + ": " + ccc.getCpuAvailableBytes() + " : " + GuiText.CoProcessors.getLocal() + ": " + ccc.getCpuCoProcessors()) : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
 		}
 
 		final int offset = (219 - fontRendererObj.getStringWidth(dsp)) / 2;

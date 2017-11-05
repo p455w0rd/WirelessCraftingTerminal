@@ -23,6 +23,14 @@ import com.google.common.collect.Lists;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.container.AEBaseContainer;
+import appeng.container.slot.AppEngCraftingSlot;
+import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.AppEngSlot.hasCalculatedValidness;
+import appeng.container.slot.OptionalSlotFake;
+import appeng.container.slot.SlotCraftingTerm;
+import appeng.container.slot.SlotDisabled;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotInaccessible;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.helpers.InventoryAction;
 import net.minecraft.client.gui.GuiButton;
@@ -49,14 +57,6 @@ import p455w0rd.wct.client.me.SlotME;
 import p455w0rd.wct.client.render.StackSizeRenderer;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
-import p455w0rd.wct.container.slot.AppEngCraftingSlot;
-import p455w0rd.wct.container.slot.AppEngSlot;
-import p455w0rd.wct.container.slot.AppEngSlot.hasCalculatedValidness;
-import p455w0rd.wct.container.slot.OptionalSlotFake;
-import p455w0rd.wct.container.slot.SlotCraftingTerm;
-import p455w0rd.wct.container.slot.SlotDisabled;
-import p455w0rd.wct.container.slot.SlotFake;
-import p455w0rd.wct.container.slot.SlotInaccessible;
 import p455w0rd.wct.container.slot.SlotOutput;
 import p455w0rd.wct.container.slot.SlotSingleItem;
 import p455w0rd.wct.sync.network.NetworkHandler;
@@ -275,13 +275,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-
+		
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-
+		
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {
