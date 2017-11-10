@@ -5,6 +5,7 @@ import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWCTInteractionHelper;
 import p455w0rd.wct.api.IWCTItems;
 import p455w0rd.wct.api.WCTApi;
+import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModItems;
 
 /**
@@ -40,7 +41,6 @@ public class WCTAPIImplementation extends WCTApi {
 		return true;
 	}
 
-	@Override
 	public IWCTInteractionHelper interact() {
 		return interactionHelper;
 	}
@@ -48,6 +48,11 @@ public class WCTAPIImplementation extends WCTApi {
 	@Override
 	public IWCTItems items() {
 		return ModItems.instance();
+	}
+
+	@Override
+	public boolean isInfinityBoosterCardEnabled() {
+		return ModConfig.WCT_BOOSTER_ENABLED;
 	}
 
 }

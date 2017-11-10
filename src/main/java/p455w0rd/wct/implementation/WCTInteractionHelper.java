@@ -39,7 +39,7 @@ public class WCTInteractionHelper implements IWCTInteractionHelper {
 
 	}
 
-	public static boolean isTerminalLinked(final IWCTItem wirelessTerminal, final ItemStack wirelessTerminalItemstack) {
+	private boolean isTerminalLinked(final IWCTItem wirelessTerminal, final ItemStack wirelessTerminalItemstack) {
 		String sourceKey = "";
 		if (wirelessTerminalItemstack.hasTagCompound()) {
 			sourceKey = wirelessTerminalItemstack.getTagCompound().getString(ItemWCT.LINK_KEY_STRING);
