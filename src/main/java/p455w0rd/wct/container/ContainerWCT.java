@@ -60,6 +60,8 @@ import appeng.container.slot.SlotCraftingTerm;
 import appeng.container.slot.SlotDisabled;
 import appeng.container.slot.SlotFake;
 import appeng.container.slot.SlotInaccessible;
+import appeng.container.slot.SlotRestrictedInput;
+import appeng.container.slot.SlotRestrictedInput.PlacableItemType;
 import appeng.core.AEConfig;
 import appeng.core.localization.PlayerMessages;
 import appeng.helpers.IContainerCraftingPacket;
@@ -118,6 +120,7 @@ import p455w0rd.wct.inventory.WCTInventoryMagnet;
 import p455w0rd.wct.inventory.WCTInventoryTrash;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
@@ -133,6 +136,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	private final AppEngSlot boosterSlot;
 	private final SlotMagnet magnetSlot;
 	private final SlotCraftingMatrix[] craftingSlots = new SlotCraftingMatrix[9];
+	private final SlotRestrictedInput[] viewCellSlots = new SlotRestrictedInput[4];
 	private final SlotCraftingTerm outputSlot;
 	public ItemStack craftItem = ItemStack.EMPTY;
 	private int ticks = 0;
@@ -146,7 +150,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	private final ITerminalHost host;
 	private IRecipe currentRecipe;
 	private IGridNode networkNode;
-	private final AppEngInternalInventory viewCell = new AppEngInternalInventory(this, 5);
+	private final AppEngInternalInventory viewCell = new AppEngInternalInventory(this, 4);
 	final ContainerNull matrixContainer = new ContainerNull();
 	final InventoryCrafting craftingInv;
 
@@ -245,6 +249,14 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 		});
 
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				viewCellSlots[j + i * 2] = new SlotRestrictedInput(PlacableItemType.VIEW_CELL, getViewCellStorage(), j + i * 2, i * 18 - 32, j * 18 + 40, getInventoryPlayer());
+				viewCellSlots[j + i * 2].setAllowEdit(true);
+				addSlotToContainer(viewCellSlots[j + i * 2]);
+			}
+		}
+
 		if (Mods.BAUBLES.isLoaded()) {
 			Baubles.addBaubleSlots(this, player);
 		}
@@ -266,6 +278,21 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	@Override
 	public IItemHandler getViewCellStorage() {
 		return viewCell;
+	}
+
+	@Override
+	public ItemStack[] getViewCells() {
+		final ItemStack[] list = new ItemStack[viewCellSlots.length];
+
+		for (int x = 0; x < viewCellSlots.length; x++) {
+			list[x] = viewCellSlots[x].getStack();
+		}
+
+		return list;
+	}
+
+	public SlotRestrictedInput getCellViewSlot(final int index) {
+		return viewCellSlots[index];
 	}
 
 	@Override
@@ -622,11 +649,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	}
 
 	@Override
-	public ItemStack[] getViewCells() {
-		return new ItemStack[0];
-	}
-
-	@Override
 	public void detectAndSendChanges() {
 		if (Platform.isClient()) {
 			return;
@@ -748,6 +770,12 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			else if (!hasAccess(SecurityPermissions.CRAFT, true) || !hasAccess(SecurityPermissions.EXTRACT, true) || !hasAccess(SecurityPermissions.INJECT, true)) {
 				if (isValidContainer()) {
 					WCTUtils.chatMessage(getPlayerInv().player, PlayerMessages.CommunicationError.get());
+				}
+				setValidContainer(false);
+			}
+			if (((ItemWCT) getWirelessTerminal().getItem()).getAECurrentPower(getWirelessTerminal()) <= 0) {
+				if (isValidContainer()) {
+					WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
 				}
 				setValidContainer(false);
 			}
@@ -933,6 +961,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			magnetInventory.readFromNBT(nbt, "MagnetSlot");
 			trashInventory.readFromNBT(nbt, "TrashSlot");
 			craftingGrid.readFromNBT(nbt, "CraftingMatrix");
+			viewCell.readFromNBT(nbt, "ViewCells");
 		}
 	}
 
@@ -945,6 +974,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		newNBT.setTag("MagnetSlot", magnetInventory.serializeNBT());
 		newNBT.setTag("TrashSlot", trashInventory.serializeNBT());
 		newNBT.setTag("CraftingMatrix", craftingGrid.serializeNBT());
+		//newNBT.setTag("ViewCells", viewCell.serializeNBT());
+		viewCell.writeToNBT(newNBT, "ViewCells");
 		containerstack.setTagCompound(newNBT);
 	}
 
@@ -1032,6 +1063,17 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					}
 					else if (tis.getItem() instanceof ItemShield) {
 						if (mergeItemStack(tis.copy(), 53, 54, false)) {
+							if (tis.getCount() > 1) {
+								tis.shrink(1);
+							}
+							else {
+								appEngSlot.clearStack();
+							}
+							return ItemStack.EMPTY;
+						}
+					}
+					else if (tis.getItem() == AEApi.instance().definitions().items().viewCell().maybeItem().get()) {
+						if (mergeItemStack(tis.copy(), 54, 58, false)) {
 							if (tis.getCount() > 1) {
 								tis.shrink(1);
 							}

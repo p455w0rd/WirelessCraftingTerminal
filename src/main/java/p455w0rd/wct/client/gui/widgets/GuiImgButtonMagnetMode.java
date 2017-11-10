@@ -15,6 +15,8 @@
  */
 package p455w0rd.wct.client.gui.widgets;
 
+import java.awt.Color;
+
 import appeng.client.gui.widgets.ITooltip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -56,12 +58,14 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, float partial) {
 		if (visible) {
 			hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-			//GlStateManager.pushMatrix();
+			GlStateManager.pushMatrix();
 			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
 			this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
 			this.drawTexturedModalRect(x, y, 16, 0, 16, 16);
-			//GlStateManager.popMatrix();
-
+			GlStateManager.popMatrix();
+			GlStateManager.pushMatrix();
+			renderGlint(mc);
+			GlStateManager.popMatrix();
 			mouseDragged(mc, mouseX, mouseY);
 		}
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -108,6 +112,44 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	public void cycleValue() {
 		ItemMagnet.switchMagnetMode(WCTUtils.getMagnet(getWirelessTerminal()));
 		currentValue = WCTUtils.getMagnetMode(getWirelessTerminal());
+	}
+
+	public void renderGlint(Minecraft mc) {
+		if (currentValue == 0) {
+			return;
+		}
+		Color color = new Color(-8372020);
+		mc.renderEngine.bindTexture(new ResourceLocation("textures/misc/enchanted_item_glint.png"));
+		GlStateManager.enableBlend();
+		GlStateManager.depthFunc(514);
+		GlStateManager.depthMask(true);
+		float f1 = 0.1F;
+		GlStateManager.color(f1, f1, f1, 1.0F);
+
+		for (int i = 0; i < 2; ++i) {
+			GlStateManager.disableLighting();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
+			float f2 = 0.76F;
+			GlStateManager.color(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue() / 255.0F, 1.0F);
+			GlStateManager.matrixMode(5890);
+			GlStateManager.loadIdentity();
+			float f3 = 0.00001F;
+			GlStateManager.scale(f3, f3, f3);
+			GlStateManager.rotate(30.0F - i * 60.0F, 0.0F, 0.0F, 1.0F);
+			GlStateManager.translate(0.0F, Minecraft.getSystemTime() % 3000L / 3000.0F / 3.0F, 0.0F);
+			GlStateManager.matrixMode(5888);
+			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
+			//this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
+			this.drawTexturedModalRect(x, y, 16, 0, 16, 16);
+		}
+
+		GlStateManager.matrixMode(5890);
+		GlStateManager.loadIdentity();
+		GlStateManager.matrixMode(5888);
+		//GlStateManager.enableLighting();
+		//GlStateManager.depthMask(true);
+		GlStateManager.depthFunc(515);
+		GlStateManager.disableBlend();
 	}
 
 }

@@ -62,7 +62,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -79,8 +78,8 @@ import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.container.slot.SlotOutput;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
 import p455w0rd.wct.container.slot.SlotSingleItem;
-import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.init.ModIntegration.Mods;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.JEI;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketSwapSlots;
@@ -619,7 +618,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				if (s instanceof AppEngSlot && (((AppEngSlot) s).renderIconWithItem() || is.isEmpty()) && (((AppEngSlot) s).shouldDisplay())) {
 					final AppEngSlot aes = (AppEngSlot) s;
 					if (aes.getIcon() >= 0) {
-						this.bindTexture("guis/states.png");
+						this.bindTexture("gui/states.png");
 
 						//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						final Tessellator tessellator = Tessellator.getInstance();
@@ -699,58 +698,14 @@ public abstract class WCTBaseGui extends GuiContainer {
 		super.drawSlot(s);
 	}
 
-	public List<String> handleItemTooltip(final ItemStack stack, final int mouseX, final int mouseY, final List<String> currentToolTip) {
-		if (!stack.isEmpty()) {
-			final Slot s = getSlot(mouseX, mouseY);
-			if (s instanceof SlotME) {
-				final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
-
-				IAEItemStack myStack = null;
-
-				try {
-					final SlotME theSlotField = (SlotME) s;
-					myStack = theSlotField.getAEStack();
-				}
-				catch (final Throwable ignore) {
-				}
-
-				if (myStack != null) {
-					if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
-						final String local = ButtonToolTips.ItemsStored.getLocal();
-						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize());
-						final String format = String.format(local, formattedAmount);
-
-						currentToolTip.add(TextFormatting.GRAY + format);
-					}
-
-					if (myStack.getCountRequestable() > 0) {
-						final String local = ButtonToolTips.ItemsRequestable.getLocal();
-						final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable());
-						final String format = String.format(local, formattedAmount);
-
-						currentToolTip.add(TextFormatting.GRAY + format);
-					}
-
-				}
-				else if (stack.getCount() > BigNumber || (stack.getCount() > 1 && stack.isItemDamaged())) {
-					final String local = ButtonToolTips.ItemsStored.getLocal();
-					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(stack.getCount());
-					final String format = String.format(local, formattedAmount);
-
-					currentToolTip.add("\u00a77" + format);
-				}
-			}
-		}
-		return currentToolTip;
-	}
-
 	@Override
 	protected void renderToolTip(final ItemStack stack, final int x, final int y) {
 		final Slot s = getSlot(x, y);
 		if (s instanceof SlotME && !stack.isEmpty()) {
-			final int BigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
+			final int bigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
 
 			IAEItemStack myStack = null;
+			final List<String> currentToolTip = getItemToolTip(stack);
 
 			try {
 				final SlotME theSlotField = (SlotME) s;
@@ -759,25 +714,34 @@ public abstract class WCTBaseGui extends GuiContainer {
 			catch (final Throwable ignore) {
 			}
 
-			ITooltipFlag.TooltipFlags tooltipFlag = mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
 			if (myStack != null) {
-				final List<String> currentToolTip = stack.getTooltip(mc.player, tooltipFlag);
 
-				if (myStack.getStackSize() > BigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
-					currentToolTip.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize()));
+				if (myStack.getStackSize() > bigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
+					final String local = ButtonToolTips.ItemsStored.getLocal();
+					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize());
+					final String format = String.format(local, formattedAmount);
+					currentToolTip.add(TextFormatting.GRAY + format);
 				}
 
 				if (myStack.getCountRequestable() > 0) {
-					currentToolTip.add("Items Requestable: " + NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable()));
+					final String local = ButtonToolTips.ItemsRequestable.getLocal();
+					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable());
+					final String format = String.format(local, formattedAmount);
+
+					currentToolTip.add(format);
 				}
 
-				this.drawTooltip(x, y, currentToolTip);
+				drawHoveringText(currentToolTip, x, y, fontRenderer);
 				return;
 			}
-			else if (stack.getCount() > BigNumber) {
-				List<String> var4 = stack.getTooltip(mc.player, tooltipFlag);
-				var4.add("Items Stored: " + NumberFormat.getNumberInstance(Locale.US).format(stack.getCount()));
-				this.drawTooltip(x, y, var4);
+			else if (stack.getCount() > bigNumber) {
+				final String local = ButtonToolTips.ItemsStored.getLocal();
+				final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(stack.getCount());
+				final String format = String.format(local, formattedAmount);
+
+				currentToolTip.add(TextFormatting.GRAY + format);
+
+				this.drawHoveringText(currentToolTip, x, y, fontRenderer);
 				return;
 			}
 		}

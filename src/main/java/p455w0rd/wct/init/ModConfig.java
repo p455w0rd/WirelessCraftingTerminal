@@ -39,12 +39,14 @@ public class ModConfig {
 	public static boolean WCT_ENABLE_CONTROLLER_CHUNKLOADER = true;
 	public static boolean WCT_WITHER_DROPS_BOOSTER = true;
 	public static boolean WCT_DRAGON_DROPS_BOOSTER = true;
-	public static int WCT_BOOSTER_DROP_CHANCE = 5;
+	public static int WCT_BOOSTER_DROP_CHANCE = 30;
 	public static int WCT_MAX_POWER = AEConfig.instance().getWirelessTerminalBattery();
 	public static boolean WCT_DISABLE_BOOSTER_RECIPE = false;
 	public static int INFINITY_ENERGY_PER_BOOSTER_CARD = 100;
 	public static int INFINITY_ENERGY_DRAIN = 15;
 	public static int INFINTY_ENERGY_LOW_WARNING_AMOUNT = 5000;
+	public static boolean WCT_ENDERMAN_DROP_BOOSTERS = true;
+	public static int WCT_ENDERMAN_BOOSTER_DROP_CHANCE = 5;
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
@@ -61,8 +63,9 @@ public class ModConfig {
 		WCT_BOOSTER_ENABLED = CONFIG.getBoolean("EnableBooster", DEF_CAT, true, "Enable Infinity Booster Card");
 		WCT_MINETWEAKER_OVERRIDE = CONFIG.getBoolean("DisableRecipes", DEF_CAT, false, "TRUE=all recipes disabled-For CraftTweaker compat");
 		WCT_ENABLE_CONTROLLER_CHUNKLOADER = CONFIG.getBoolean("EnableControllerChunkLoading", DEF_CAT, true, "If true, AE2 controller will chunk load itself");
-		WCT_BOOSTER_DROP_CHANCE = CONFIG.getInt("BoosterDropChance", DEF_CAT, 5, 1, 100, "Chance in percent (1-100) that booster card will drop upon killing a wither");
-		//WCT_MAX_POWER = CONFIG.getInt("PowerCapacity", DEF_CAT, 160000, 8000, 640000, "How much energy the Wireless Crafting Terminal can store");
+		WCT_BOOSTER_DROP_CHANCE = CONFIG.getInt("BoosterDropChance", DEF_CAT, 30, 1, 100, "Percentage chance that booster card will drop upon killing a wither. (between 1 and 100)");
+		WCT_ENDERMAN_DROP_BOOSTERS = CONFIG.getBoolean("EndermanDropBoosters", DEF_CAT, true, "Will Enderman randomly drop infinity booster cards on death?");
+		WCT_ENDERMAN_BOOSTER_DROP_CHANCE = CONFIG.getInt("EndermanBoosterDropChance", DEF_CAT, 5, 1, 100, "Percentage chance that booster card will drop upon killing an Enderman. (between 1 and 100)");
 		WCT_WITHER_DROPS_BOOSTER = CONFIG.getBoolean("WitherDropsBooster", DEF_CAT, true, "Should Withers drop Infinity Booster Card?");
 		WCT_DRAGON_DROPS_BOOSTER = CONFIG.getBoolean("DragonDropsBooster", DEF_CAT, true, "Should Dragons drop Infinity Booster Card?");
 		WCT_DISABLE_BOOSTER_RECIPE = CONFIG.getBoolean("DisableBoosterRecipe", DEF_CAT, false, "Should Infinity Booster Card Recipe be disable?");

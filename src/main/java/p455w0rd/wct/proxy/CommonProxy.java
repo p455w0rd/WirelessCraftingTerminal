@@ -15,6 +15,7 @@
  */
 package p455w0rd.wct.proxy;
 
+import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -30,7 +31,10 @@ import p455w0rd.wct.init.ModNetworking;
  */
 public class CommonProxy {
 
+	private static LoaderState WCT_STATE = LoaderState.NOINIT;
+
 	public void preInit(FMLPreInitializationEvent e) {
+		WCT_STATE = LoaderState.PREINITIALIZATION;
 		ModConfig.preInit();
 		ModItems.preInit();
 		ModNetworking.preInit();
@@ -39,11 +43,16 @@ public class CommonProxy {
 	}
 
 	public void init(FMLInitializationEvent e) {
-
+		WCT_STATE = LoaderState.INITIALIZATION;
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
+		WCT_STATE = LoaderState.POSTINITIALIZATION;
 		ModNetworking.postInit();
+	}
+
+	public LoaderState getLoaderState() {
+		return WCT_STATE;
 	}
 
 }

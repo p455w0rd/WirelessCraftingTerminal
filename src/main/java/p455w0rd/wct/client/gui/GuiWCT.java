@@ -123,6 +123,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	private int rows = 0;
 	EntityLivingBase entity;
 	boolean isHalloween = false;
+	private final ItemStack[] myCurrentViewCells = new ItemStack[4];
 
 	public GuiWCT(Container container) {
 		super(container);
@@ -587,6 +588,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		this.bindTexture(Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
 		final int x_width = 199;
+		boolean update = false;
 
 		//draw "over inventory area"
 		drawTexturedModalRect(offsetX, offsetY, 0, 0, x_width, 18);
@@ -604,6 +606,9 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		//draw player inv
 		drawTexturedModalRect(offsetX, offsetY + 16 + rows * 18 + lowerTextureOffset, 0, 106 - 18 - 18, x_width, 99 + reservedSpace - lowerTextureOffset);
 
+		//draw view cells
+		drawTexturedModalRect(offsetX - 40, offsetY + 16 + rows * 18 + lowerTextureOffset + 119, 213, 0, 43, 52);
+
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
 			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
@@ -620,6 +625,17 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			GlStateManager.disableDepth();
 			fr.drawStringWithShadow(name, (guiLeft + 52) - fr.getStringWidth(name) / 2, (guiTop + rows * 18) + 90, 0xFFFFA00F);
 			GlStateManager.enableDepth();
+		}
+
+		for (int i = 0; i < 4; i++) {
+			if (myCurrentViewCells[i] != containerWCT.getCellViewSlot(i).getStack()) {
+				update = true;
+				myCurrentViewCells[i] = containerWCT.getCellViewSlot(i).getStack();
+			}
+		}
+
+		if (update) {
+			repo.setViewCell(myCurrentViewCells);
 		}
 
 		if (searchField != null) {

@@ -28,6 +28,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -236,8 +237,16 @@ public class ModEvents {
 
 		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
-			int n = rand.nextInt(100);
+			int n = rand.nextInt(ModConfig.WCT_BOOSTER_DROP_CHANCE);
 			if (n <= ModConfig.WCT_BOOSTER_DROP_CHANCE) {
+				event.getDrops().add(drop);
+			}
+		}
+
+		if (event.getEntity() instanceof EntityEnderman && ModConfig.WCT_BOOSTER_ENABLED && !ModConfig.WCT_ENDERMAN_DROP_BOOSTERS) {
+			Random rand = event.getEntityLiving().getEntityWorld().rand;
+			int n = rand.nextInt(ModConfig.WCT_ENDERMAN_BOOSTER_DROP_CHANCE);
+			if (n <= ModConfig.WCT_ENDERMAN_BOOSTER_DROP_CHANCE) {
 				event.getDrops().add(drop);
 			}
 		}

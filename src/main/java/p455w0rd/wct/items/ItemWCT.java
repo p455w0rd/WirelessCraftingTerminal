@@ -47,6 +47,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -96,6 +97,9 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
 			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+		}
+		if (getAECurrentPower(item) <= 0 && !world.isRemote) {
+			WCTUtils.chatMessage(player, new TextComponentString("No Power"));
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 	}
