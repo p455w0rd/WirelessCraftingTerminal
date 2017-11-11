@@ -63,10 +63,12 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemShield;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
@@ -112,9 +114,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	ItemStack[] viewCells = new ItemStack[5];
 	private final AppEngInternalInventory output = new AppEngInternalInventory(this, 1);
 	private final ITerminalHost host;
+	private IRecipe currentRecipe;
 
 	final ContainerNull matrixContainer = new ContainerNull();
 	final InventoryCrafting craftingInv;
+	private final SlotCraftingMatrix[] craftingSlots = new SlotCraftingMatrix[9];
 
 	/**
 	 * Constructor for our custom container
@@ -173,7 +177,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		// Add crafting grid slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-				addSlotToContainer(new SlotCraftingMatrix(this, craftingInv, j + i * 3, 80 + j * 18, (i * 18) - 76));
+				addSlotToContainer(craftingSlots[j + i * 3] = new SlotCraftingMatrix(this, craftingInv, j + i * 3, 80 + j * 18, (i * 18) - 76));
 			}
 		}
 
@@ -221,6 +225,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void onCraftMatrixChanged(final IInventory inv) {
+
+		/*
 		for (int x = 0; x < 9; x++) {
 			if (inv.getStackInSlot(x) != null) {
 				craftingInv.setInventorySlotContents(x, inv.getStackInSlot(x));
@@ -228,6 +234,31 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 		getResultSlot().putStack(CraftingManager.getInstance().findMatchingRecipe(craftingInv, WCTUtils.world(getPlayerInv().player)));
 		writeToNBT();
+		*/
+		for (int x = 0; x < 9; x++) {
+			craftingInv.setInventorySlotContents(x, craftingSlots[x].getStack());
+		}
+		if (currentRecipe == null || !currentRecipe.matches(craftingInv, getPlayerInv().player.world)) {
+			currentRecipe = findMatchingRecipe(craftingInv, getPlayerInv().player.world);
+		}
+		if (currentRecipe == null) {
+			getResultSlot().putStack(null);
+		}
+		else {
+			final ItemStack craftingResult = currentRecipe.getCraftingResult(craftingInv);
+			getResultSlot().putStack(craftingResult);
+		}
+		writeToNBT();
+	}
+
+	private IRecipe findMatchingRecipe(InventoryCrafting craftMatrix, World worldIn) {
+		for (IRecipe irecipe : CraftingManager.getInstance().getRecipeList()) {
+			if (irecipe.matches(craftMatrix, worldIn)) {
+				return irecipe;
+			}
+		}
+
+		return null;
 	}
 
 	public SlotCraftingTerm getResultSlot() {
