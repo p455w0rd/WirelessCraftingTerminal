@@ -28,7 +28,6 @@ import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModLogger;
 import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.util.WCTUtils;
 
@@ -81,7 +80,7 @@ public class WCTAPIImpl extends WCTApi {
 	private boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
 		String sourceKey = "";
 		if (wirelessTerminalItemstack.hasTagCompound()) {
-			sourceKey = wirelessTerminalItemstack.getTagCompound().getString(ItemWCT.LINK_KEY_STRING);
+			sourceKey = wirelessTerminalItemstack.getTagCompound().getString("encryptionKey");
 			return (sourceKey != null) && (!sourceKey.isEmpty());
 		}
 		return false;

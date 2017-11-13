@@ -43,7 +43,6 @@ import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.packets.PacketMagnetFilter;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.util.WCTUtils;
@@ -70,7 +69,7 @@ public class GuiMagnet extends GuiContainer {
 		height = ySize;
 		magnetItem = magnetStack;
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((ItemWCT) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
+		((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 		myIcon = is;
 		loadSettings();
 	}
@@ -189,7 +188,7 @@ public class GuiMagnet extends GuiContainer {
 		if (mouseButton == 0) {
 			for (int i = 0; i < buttonList.size(); ++i) {
 				GuiButton guibutton = buttonList.get(i);
-		
+
 				if (guibutton.mousePressed(mc, mouseX, mouseY)) {
 					//net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre event = new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
 					//if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))

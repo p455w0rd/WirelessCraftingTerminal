@@ -27,13 +27,13 @@ import appeng.core.localization.GuiText;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
@@ -57,7 +57,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 		if (target instanceof WCTGuiObject) {
 			myIcon = definitions.items().wirelessTerminal().maybeStack(1).orElse(null);
 			ItemStack is = new ItemStack(ModItems.WCT);
-			((ItemWCT) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
+			((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 			myIcon = is;
 
 			originalGui = ModGuiHandler.GUI_WCT;

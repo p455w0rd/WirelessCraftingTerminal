@@ -120,7 +120,6 @@ import p455w0rd.wct.inventory.WCTInventoryMagnet;
 import p455w0rd.wct.inventory.WCTInventoryTrash;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
-import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketSetInRange;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
@@ -773,7 +772,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 				setValidContainer(false);
 			}
-			if (((ItemWCT) getWirelessTerminal().getItem()).getAECurrentPower(getWirelessTerminal()) <= 0) {
+			if (((IWirelessCraftingTerminalItem) getWirelessTerminal().getItem()).getAECurrentPower(getWirelessTerminal()) <= 0) {
 				if (isValidContainer()) {
 					WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
 				}
