@@ -5,8 +5,8 @@ import baubles.api.IBauble;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.WCTBaseContainer;
-import p455w0rd.wct.items.ItemWCT;
 
 /**
  * @author p455w0rd
@@ -23,7 +23,7 @@ public class SlotAEBauble extends AppEngSlot {
 		if (player == null || getStack() == null) {
 			return false;
 		}
-		return (!(!(player.openContainer instanceof WCTBaseContainer)) && (!(getStack().getItem() instanceof ItemWCT)));
+		return (!(!(player.openContainer instanceof WCTBaseContainer)) && (!(getStack().getItem() instanceof IWirelessCraftingTerminalItem)));
 	}
 
 	@Override

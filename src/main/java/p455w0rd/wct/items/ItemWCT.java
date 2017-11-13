@@ -76,7 +76,6 @@ import p455w0rd.wct.util.WCTUtils;
 public class ItemWCT extends AERootPoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
 	private static final String name = "wct";
-	public static final String LINK_KEY_STRING = "key";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
 	private static final String BOOSTER_SLOT_NBT = "BoosterSlot";
 	private static final String MAGNET_SLOT_NBT = "MagnetSlot";

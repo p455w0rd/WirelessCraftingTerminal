@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.api.IWCTItem;
 import p455w0rd.wct.api.IWCTItems;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemWCT;
@@ -59,7 +60,7 @@ public class ModItems extends IWCTItems {
 	}
 
 	@Override
-	public IWCTItem wirelessCraftingTerminal() {
+	public IWirelessCraftingTerminalItem wirelessCraftingTerminal() {
 		return WCT;
 	}
 

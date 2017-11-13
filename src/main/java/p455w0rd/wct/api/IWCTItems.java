@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public abstract class IWCTItems {
 
 	@Nonnull
-	public abstract IWCTItem wirelessCraftingTerminal();
+	public abstract IWirelessCraftingTerminalItem wirelessCraftingTerminal();
 
 	@Nonnull
 	public abstract IWCTItem infinityBoosterCard();
