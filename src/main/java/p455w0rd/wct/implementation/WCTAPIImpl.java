@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.relauncher.Side;
 import p455w0rd.wct.WCT;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
@@ -79,8 +80,8 @@ public class WCTAPIImpl extends WCTApi {
 
 	private boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
 		String sourceKey = "";
-		if (wirelessTerminalItemstack.hasTagCompound()) {
-			sourceKey = wirelessTerminalItemstack.getTagCompound().getString("encryptionKey");
+		if (wirelessTerminalItemstack.getItem() instanceof IWirelessCraftingTerminalItem && wirelessTerminalItemstack.hasTagCompound()) {
+			sourceKey = ((IWirelessCraftingTerminalItem) wirelessTerminalItemstack.getItem()).getEncryptionKey(wirelessTerminalItemstack);
 			return (sourceKey != null) && (!sourceKey.isEmpty());
 		}
 		return false;
