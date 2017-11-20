@@ -124,6 +124,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	EntityLivingBase entity;
 	boolean isHalloween = false;
 	private final ItemStack[] myCurrentViewCells = new ItemStack[4];
+	ItemStack wirelessTerm;
 
 	public GuiWCT(Container container) {
 		super(container);
@@ -140,12 +141,16 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		configSrc = containerWCT.getConfigManager();
 		devicePowered = containerWCT.isPowered();
 		((ContainerWCT) inventorySlots).setGui(this);
-
+		wirelessTerm = containerWCT.getWirelessTerminal();
 		entity = WCTUtils.player();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		isHalloween = calendar.get(2) + 1 == 10 && calendar.get(5) == 31;
 
+	}
+
+	public void setWirelessTerminal(ItemStack stack) {
+		wirelessTerm = stack;
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
@@ -557,8 +562,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
 		if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
-			ItemStack wirelessTerm = containerWCT.getWirelessTerminal();
-			int infinityEnergyAmount = WCTUtils.getInfinityEnergy(wirelessTerm);
+			int infinityEnergyAmount = WCTUtils.getInfinityEnergy(containerWCT.getWirelessTerminal());
 			if (WCTUtils.hasInfiniteRange(wirelessTerm)) {
 				if (!WCTUtils.isInRangeOfWAP(wirelessTerm, WCTUtils.player())) {
 					if (infinityEnergyAmount < ModConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT) {

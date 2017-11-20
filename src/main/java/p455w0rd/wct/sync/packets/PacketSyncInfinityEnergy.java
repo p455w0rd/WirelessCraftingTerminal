@@ -17,8 +17,10 @@ package p455w0rd.wct.sync.packets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
@@ -57,6 +59,10 @@ public class PacketSyncInfinityEnergy extends WCTPacket {
 			ContainerWCT container = (ContainerWCT) player.openContainer;
 			ItemStack wirelessTerm = container.getWirelessTerminal();
 			WCTUtils.setInfinityEnergy(wirelessTerm, infinityEnergy);
+			if (Minecraft.getMinecraft().currentScreen instanceof GuiWCT) {
+				GuiWCT wctGUI = (GuiWCT) Minecraft.getMinecraft().currentScreen;
+				wctGUI.setWirelessTerminal(wirelessTerm);
+			}
 		}
 		else {
 			if (!WCTUtils.getWirelessTerm(player.inventory).isEmpty()) {

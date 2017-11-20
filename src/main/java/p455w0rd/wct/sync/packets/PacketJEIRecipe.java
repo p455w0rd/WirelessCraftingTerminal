@@ -56,7 +56,6 @@ import net.minecraftforge.items.IItemHandler;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
@@ -120,7 +119,7 @@ public class PacketJEIRecipe extends WCTPacket {
 			IGridNode node = cct.getNetworkNode();
 			if (node == null) {
 				ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
-				if (wct.isEmpty() || wct.getItem() != ModItems.WCT) {
+				if (wct.isEmpty() || !(wct.getItem() instanceof IWirelessCraftingTerminalItem)) {
 					return;
 				}
 				WCTGuiObject obj = getGuiObject(wct, player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);

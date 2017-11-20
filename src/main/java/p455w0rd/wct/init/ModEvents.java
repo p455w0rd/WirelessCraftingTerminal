@@ -152,8 +152,8 @@ public class ModEvents {
 					if (magCompound != null) {
 						ItemStack magnetItem = new ItemStack(magCompound);
 						if (!magnetItem.isEmpty()) {
-							((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
 							if (magnetItem.getItem() instanceof ItemMagnet) {
+								((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
 								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
 							}
 						}
@@ -297,7 +297,7 @@ public class ModEvents {
 					e.setCanceled(true);
 					ItemStack boosters = e.getItem().getItem().copy();
 					WCTUtils.addInfinityBoosters(wirelessTerminal, boosters);
-					ModNetworking.instance().sendToServer(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerminal)));
+					ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerminal)), (EntityPlayerMP) e.getEntityPlayer());
 					e.getItem().setDead();
 				}
 			}

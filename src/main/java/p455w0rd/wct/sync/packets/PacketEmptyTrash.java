@@ -45,22 +45,6 @@ public class PacketEmptyTrash extends WCTPacket {
 				ContainerWCT container = (ContainerWCT) player.openContainer;
 				container.getTrashSlot().clearStack();
 				container.writeToNBT();
-				//container.detectAndSendChanges();
-				/*
-				ItemStack wirelessTerm = WCTUtils.getWirelessTerm(player.inventory);
-				if (wirelessTerm.getTagCompound() != null) {
-					NBTTagCompound nbtTC = wirelessTerm.getTagCompound();
-					if (nbtTC.hasKey("TrashSlot")) {
-						NBTTagList trashSlot = nbtTC.getTagList("TrashSlot", 10);
-						if (trashSlot != null) {
-							ItemStack trashItem = ItemStack.loadItemStackFromNBT(trashSlot.getCompoundTagAt(0));
-							if (trashItem != null) {
-								trashSlot.removeTag(0);
-							}
-						}
-					}
-				}
-				*/
 			}
 		}
 	}

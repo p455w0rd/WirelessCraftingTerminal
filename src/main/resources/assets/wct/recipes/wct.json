@@ -4,20 +4,25 @@
 			"type": "wct:recipes_enabled"
 		}
 	],
-    "type": "minecraft:crafting_shapeless",
-    "ingredients": [
-		{
+    "type": "forge:ore_shaped",
+	"pattern": [
+		"abc",
+		"   ",
+		"   "
+	],
+    "key": {
+		"a": {
 			"item": "appliedenergistics2:wireless_terminal"
 		},
-		{
+		"b": {
 			"item": "appliedenergistics2:material",
 			"data": 9
 		},
-		{
+		"c": {
 			"item": "appliedenergistics2:part",
 			"data": 360
 		}
-    ],
+	},
     "result": {
         "item": "wct:wct"
     }
