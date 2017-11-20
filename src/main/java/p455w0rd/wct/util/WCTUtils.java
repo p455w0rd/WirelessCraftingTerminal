@@ -179,7 +179,7 @@ public class WCTUtils {
 
 	public static boolean hasInfinityEnergy(@Nonnull ItemStack wirelessTerm) {
 		if (ensureTag(wirelessTerm).hasKey(INFINITY_ENERGY_NBT)) {
-			return getInfinityEnergy(wirelessTerm) > 0;
+			return getInfinityEnergy(wirelessTerm) > 0 && ModConfig.WCT_BOOSTER_ENABLED;
 		}
 		return false;
 	}

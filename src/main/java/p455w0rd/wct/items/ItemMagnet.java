@@ -62,10 +62,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
-import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
 import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
@@ -315,7 +313,7 @@ public class ItemMagnet extends ItemBase {
 				mySrc = new WCTPlayerSource(player, obj);
 			}
 
-			boolean ignoreRange = (isBoosterInstalled(wirelessTerm) && ModConfig.WCT_BOOSTER_ENABLED);
+			boolean ignoreRange = WCTUtils.hasInfiniteRange(wirelessTerm);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);
 			if ((ignoreRange && hasAxxess) || (obj.rangeCheck() && hasAxxess)) {
 				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(itemStackToGet);
@@ -513,6 +511,7 @@ public class ItemMagnet extends ItemBase {
 		return ais == null;
 	}
 
+	/*
 	private boolean isBoosterInstalled(@Nonnull ItemStack wirelessTerm) {
 		if (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
 			if (wirelessTerm.hasTagCompound()) {
@@ -530,7 +529,7 @@ public class ItemMagnet extends ItemBase {
 		}
 		return false;
 	}
-
+	*/
 	// true=whitelist (default:whitelist)
 	private boolean getMode(@Nonnull ItemStack magnetItem) {
 		if (magnetItem.getItem() == ModItems.MAGNET_CARD) {

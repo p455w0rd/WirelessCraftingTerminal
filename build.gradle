@@ -46,6 +46,10 @@ repositories {
 		name = "tehnut"
 		url = "http://tehnut.info/maven"
 	}
+	maven {
+        name = "covers Maven"
+        url = "http://maven.covers1624.net"
+    }
 }
 dependencies {
 	//compile ("appeng:appliedenergistics2:rv4-alpha-1:api"){
@@ -62,6 +66,7 @@ dependencies {
 	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
 	deobfCompile "appeng:appliedenergistics2:rv5-stable-1"
+	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
 }
 
 task apiJar(type: Jar) {
