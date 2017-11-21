@@ -1046,6 +1046,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 							else {
 								appEngSlot.clearStack();
 							}
+
 							return ItemStack.EMPTY;
 						}
 					}
@@ -1414,6 +1415,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				k += (backwards ? -1 : 1);
 			}
 		}
+		writeToNBT();
+		detectAndSendChanges();
 		return flag1;
 	}
 

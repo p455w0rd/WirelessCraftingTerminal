@@ -47,6 +47,7 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 		height = 16;
 		this.wirelessTerminal = wirelessTerminal;
 		currentValue = WCTUtils.getMagnetMode(wirelessTerminal);
+		visible = false;
 	}
 
 	public void setVisibility(final boolean vis) {
@@ -115,7 +116,7 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	}
 
 	public void renderGlint(Minecraft mc) {
-		if (currentValue == 0) {
+		if (currentValue <= 0) {
 			return;
 		}
 		Color color = new Color(-8372020);
