@@ -1046,7 +1046,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 							else {
 								appEngSlot.clearStack();
 							}
-
+							writeToNBT();
+							detectAndSendChanges();
 							return ItemStack.EMPTY;
 						}
 					}
@@ -1207,6 +1208,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 										d.onSlotChanged();
 										//updateSlot(appEngSlot);
 										//updateSlot(d);
+										writeToNBT();
+										detectAndSendChanges();
 										return ItemStack.EMPTY;
 									}
 									else {
@@ -1233,6 +1236,8 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									d.onSlotChanged();
 									//updateSlot(appEngSlot);
 									//updateSlot(d);
+									writeToNBT();
+									detectAndSendChanges();
 									return ItemStack.EMPTY;
 								}
 								else {
@@ -1338,18 +1343,21 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public ItemStack slotClick(int slot, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+		ItemStack returnStack = ItemStack.EMPTY;
 		try {
-			ItemStack returnStack = super.slotClick(slot, dragType, clickTypeIn, player);
-			writeToNBT();
-			detectAndSendChanges();
-			return returnStack;
+			returnStack = super.slotClick(slot, dragType, clickTypeIn, player);
+			//writeToNBT();
+			//detectAndSendChanges();
+
 		}
 		catch (IndexOutOfBoundsException e) {
 		}
-
-		writeToNBT();
-		detectAndSendChanges();
-		return ItemStack.EMPTY;
+		System.out.println(clickTypeIn);
+		if (clickTypeIn != ClickType.QUICK_MOVE) {
+			writeToNBT();
+			detectAndSendChanges();
+		}
+		return returnStack;
 	}
 
 	@Override
@@ -1415,8 +1423,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				k += (backwards ? -1 : 1);
 			}
 		}
-		writeToNBT();
-		detectAndSendChanges();
+
 		return flag1;
 	}
 

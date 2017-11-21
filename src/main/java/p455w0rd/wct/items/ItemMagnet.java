@@ -258,10 +258,12 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static int getDamageUnsafe(@Nonnull ItemStack stack) {
-		if (!stack.isEmpty() && !stack.hasTagCompound()) {
-			stack.setTagCompound(new NBTTagCompound());
-			if (!stack.getTagCompound().hasKey(WCTUtils.MAGNET_MODE_NBT)) {
-				stack.getTagCompound().setInteger(WCTUtils.MAGNET_MODE_NBT, 0);
+		if (!stack.isEmpty()) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+				if (!stack.getTagCompound().hasKey(WCTUtils.MAGNET_MODE_NBT)) {
+					stack.getTagCompound().setInteger(WCTUtils.MAGNET_MODE_NBT, 0);
+				}
 			}
 			return stack.getTagCompound().getInteger(WCTUtils.MAGNET_MODE_NBT);
 		}
