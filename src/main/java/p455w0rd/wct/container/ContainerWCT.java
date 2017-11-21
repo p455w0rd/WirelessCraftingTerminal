@@ -1117,7 +1117,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 				if (selectedSlots.isEmpty() && appEngSlot.isPlayerSide()) {
 					if (!tis.isEmpty()) {
-						// target slots in the container...
 						for (final Object inventorySlot : inventorySlots) {
 							if (inventorySlot instanceof AppEngSlot) {
 								final AppEngSlot cs = (AppEngSlot) inventorySlot;
@@ -1130,7 +1129,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									else if (destination.isEmpty()) {
 										cs.putStack(tis.copy());
 										cs.onSlotChanged();
-										//updateSlot(cs);
 										return ItemStack.EMPTY;
 									}
 								}
@@ -1167,12 +1165,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									if (tis.getCount() <= 0) {
 										appEngSlot.putStack(ItemStack.EMPTY);
 										d.onSlotChanged();
-										//updateSlot(appEngSlot);
-										//updateSlot(d);
 										return ItemStack.EMPTY;
-									}
-									else {
-										//updateSlot(d);
 									}
 								}
 							}
@@ -1206,14 +1199,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 									if (tis.getCount() <= 0) {
 										appEngSlot.putStack(ItemStack.EMPTY);
 										d.onSlotChanged();
-										//updateSlot(appEngSlot);
-										//updateSlot(d);
-										writeToNBT();
-										detectAndSendChanges();
 										return ItemStack.EMPTY;
-									}
-									else {
-										//updateSlot(d);
 									}
 								}
 							}
@@ -1234,89 +1220,16 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 								if (tis.getCount() <= 0) {
 									appEngSlot.putStack(ItemStack.EMPTY);
 									d.onSlotChanged();
-									//updateSlot(appEngSlot);
-									//updateSlot(d);
-									writeToNBT();
-									detectAndSendChanges();
 									return ItemStack.EMPTY;
-								}
-								else {
-									//updateSlot(d);
 								}
 							}
 						}
 					}
 				}
-
 				appEngSlot.putStack(!tis.isEmpty() ? tis.copy() : ItemStack.EMPTY);
 			}
-			//updateSlot(appEngSlot);
 		}
-		detectAndSendChanges();
 		return ItemStack.EMPTY;
-	}
-
-	@Override
-	public void swapSlotContents(final int slotA, final int slotB) {
-		final Slot a = getSlot(slotA);
-		final Slot b = getSlot(slotB);
-		if (a == null || b == null) {
-			return;
-		}
-
-		final ItemStack isA = a.getStack();
-		final ItemStack isB = b.getStack();
-
-		if (isA.isEmpty() && isB.isEmpty()) {
-			return;
-		}
-		if (!isA.isEmpty() && !a.canTakeStack(getInventoryPlayer().player)) {
-			return;
-		}
-		if (!isB.isEmpty() && !b.canTakeStack(getInventoryPlayer().player)) {
-			return;
-		}
-		if (!isB.isEmpty() && !a.isItemValid(isB)) {
-			return;
-		}
-		if (!isA.isEmpty() && !b.isItemValid(isA)) {
-			return;
-		}
-
-		ItemStack testA = isB.isEmpty() ? ItemStack.EMPTY : isB.copy();
-		ItemStack testB = isA.isEmpty() ? ItemStack.EMPTY : isA.copy();
-
-		if (!testA.isEmpty() && testA.getCount() > a.getSlotStackLimit()) {
-			if (!testB.isEmpty()) {
-				return;
-			}
-
-			final int totalA = testA.getCount();
-			testA.setCount(a.getSlotStackLimit());
-			testB = testA.copy();
-
-			testB.setCount(totalA - testA.getCount());
-		}
-
-		if (!testB.isEmpty() && testB.getCount() > b.getSlotStackLimit()) {
-			if (!testA.isEmpty()) {
-				return;
-			}
-
-			final int totalB = testB.getCount();
-			testB.setCount(b.getSlotStackLimit());
-			testA = testB.copy();
-
-			testA.setCount(totalB - testA.getCount());
-		}
-
-		a.putStack(testA);
-		b.putStack(testB);
-	}
-
-	@SuppressWarnings("unused")
-	@Deprecated
-	private void updateSlot(final Slot clickSlot) {
 	}
 
 	private ItemStack shiftStoreItem(final ItemStack input) {
@@ -1346,17 +1259,11 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		ItemStack returnStack = ItemStack.EMPTY;
 		try {
 			returnStack = super.slotClick(slot, dragType, clickTypeIn, player);
-			//writeToNBT();
-			//detectAndSendChanges();
-
 		}
 		catch (IndexOutOfBoundsException e) {
 		}
-		System.out.println(clickTypeIn);
-		if (clickTypeIn != ClickType.QUICK_MOVE) {
-			writeToNBT();
-			detectAndSendChanges();
-		}
+		writeToNBT();
+		detectAndSendChanges();
 		return returnStack;
 	}
 
@@ -1423,7 +1330,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				k += (backwards ? -1 : 1);
 			}
 		}
-
 		return flag1;
 	}
 
