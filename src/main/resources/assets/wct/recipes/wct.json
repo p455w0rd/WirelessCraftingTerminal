@@ -6,9 +6,8 @@
 	],
     "type": "forge:ore_shaped",
 	"pattern": [
-		"abc",
-		"   ",
-		"   "
+		"ab",
+		"c "
 	],
     "key": {
 		"a": {

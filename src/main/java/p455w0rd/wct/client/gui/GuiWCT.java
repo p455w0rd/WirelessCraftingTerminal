@@ -494,12 +494,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			reInit = true;
 			wasResized = true;
 		}
-		if (magnetGUIButton != null) {
-			magnetGUIButton.visible = WCTUtils.isMagnetInstalled(containerWCT.getWirelessTerminal());
-		}
-		if (magnetModeBox != null) {
-			magnetModeBox.visible = WCTUtils.isMagnetInstalled(containerWCT.getWirelessTerminal());
-		}
+
 		if (!mc.player.isEntityAlive() || mc.player.isDead) {
 			mc.player.closeScreen();
 		}
@@ -636,6 +631,13 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 				update = true;
 				myCurrentViewCells[i] = containerWCT.getCellViewSlot(i).getStack();
 			}
+		}
+
+		if (magnetGUIButton != null) {
+			magnetGUIButton.visible = containerWCT.getMagnetSlot().getHasStack();
+		}
+		if (magnetModeBox != null) {
+			magnetModeBox.visible = containerWCT.getMagnetSlot().getHasStack();
 		}
 
 		if (update) {
