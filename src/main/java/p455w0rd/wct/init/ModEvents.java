@@ -243,7 +243,7 @@ public class ModEvents {
 			}
 		}
 
-		if (event.getEntity() instanceof EntityEnderman && ModConfig.WCT_BOOSTER_ENABLED && !ModConfig.WCT_ENDERMAN_DROP_BOOSTERS) {
+		if (event.getEntity() instanceof EntityEnderman && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_ENDERMAN_DROP_BOOSTERS) {
 			Random rand = event.getEntityLiving().getEntityWorld().rand;
 			int n = rand.nextInt(ModConfig.WCT_ENDERMAN_BOOSTER_DROP_CHANCE);
 			if (n <= ModConfig.WCT_ENDERMAN_BOOSTER_DROP_CHANCE) {
