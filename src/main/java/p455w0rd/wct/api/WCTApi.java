@@ -25,6 +25,8 @@ public abstract class WCTApi {
 		return API;
 	}
 
+	public abstract IWCTInteractionHelper interact();
+
 	@Nonnull
 	public abstract IWCTItems items();
 

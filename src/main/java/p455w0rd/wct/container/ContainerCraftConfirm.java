@@ -13,6 +13,7 @@ import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
 import appeng.api.networking.crafting.ICraftingCPU;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
@@ -102,8 +103,13 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 		if (Platform.isClient()) {
 			return;
 		}
-
+		if (getGrid() == null) {
+			return;
+		}
 		final ICraftingGrid cc = getGrid().getCache(ICraftingGrid.class);
+		if (cc == null) {
+			return;
+		}
 		final ImmutableSet<ICraftingCPU> cpuSet = cc.getCpus();
 
 		int matches = 0;
@@ -240,8 +246,14 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 
 	private IGrid getGrid() {
 		final WCTIActionHost h = ((WCTIActionHost) getTarget());
-		return h.getActionableNode(true).getGrid();
+		if (h != null) {
+			IGridNode node = h.getActionableNode(true);
+			if (node != null) {
+				return node.getGrid();
+			}
+		}
 		//return obj2.getTargetGrid();
+		return null;
 	}
 
 	private boolean cpuMatches(final ICraftingCPU c) {
@@ -272,8 +284,11 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			originalGui = GuiHandler.GUI_WCT;
 		}
 
-		if (result != null && !isSimulation()) {
+		if (result != null && !isSimulation() && getGrid() != null) {
 			final ICraftingGrid cc = getGrid().getCache(ICraftingGrid.class);
+			if (cc == null) {
+				return;
+			}
 			final ICraftingLink g = cc.submitJob(result, null, getSelectedCpu() == -1 ? null : cpus.get(getSelectedCpu()).getCpu(), true, getActionSrc());
 			setAutoStart(false);
 			if (g != null && originalGui == 0)// && this.getOpenContext() != null )
