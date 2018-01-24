@@ -19,7 +19,6 @@ import appeng.api.config.Actionable;
 import appeng.items.tools.powered.powersink.AEBasePoweredItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 
 /**
  * @author p455w0rd
@@ -27,14 +26,13 @@ import net.minecraft.util.NonNullList;
  */
 public class ModCreativeTab extends CreativeTabs {
 
-	public static CreativeTabs CREATIVE_TAB;
+	public static CreativeTabs CREATIVE_TAB = new ModCreativeTab();
 
 	private ModCreativeTab() {
 		super(ModGlobals.MODID);
 	}
 
 	public static void preInit() {
-		CREATIVE_TAB = CREATIVE_TAB == null ? CREATIVE_TAB = new ModCreativeTab() : CREATIVE_TAB;
 	}
 
 	@Override
@@ -42,21 +40,6 @@ public class ModCreativeTab extends CreativeTabs {
 		ItemStack is = new ItemStack(ModItems.WCT);
 		((AEBasePoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
 		return is;
-	}
-
-	@Override
-	public void displayAllRelevantItems(NonNullList<ItemStack> items) {
-
-		items.add(new ItemStack(ModItems.WCT));
-		ItemStack is = new ItemStack(ModItems.WCT);
-		((AEBasePoweredItem) is.getItem()).injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
-		items.add(is);
-		items.add(new ItemStack(ModItems.MAGNET_CARD));
-		if (ModConfig.WCT_BOOSTER_ENABLED) {
-			items.add(new ItemStack(ModItems.BOOSTER_CARD));
-		}
-
-		super.displayAllRelevantItems(items);
 	}
 
 	@Override

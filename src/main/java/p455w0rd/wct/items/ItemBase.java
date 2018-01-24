@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
+import p455w0rd.wct.init.ModCreativeTab;
 
 /**
  * @author p455w0rd
@@ -40,6 +41,7 @@ public class ItemBase extends Item implements IModelHolder {
 		setUnlocalizedName(this.name);
 		ForgeRegistries.ITEMS.register(this);
 		setMaxStackSize(64);
+		setCreativeTab(ModCreativeTab.CREATIVE_TAB);
 	}
 
 	@Override

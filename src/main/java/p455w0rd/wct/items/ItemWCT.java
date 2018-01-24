@@ -35,7 +35,6 @@ import baubles.api.BaubleType;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,7 +45,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -62,6 +60,7 @@ import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.client.render.StackSizeRenderer.ReadableNumberConverter;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModCreativeTab;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketSetInRange;
@@ -88,6 +87,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		setUnlocalizedName(name);
 		setMaxStackSize(1);
 		ForgeRegistries.ITEMS.register(this);
+		setCreativeTab(ModCreativeTab.CREATIVE_TAB);
 	}
 
 	@Override
@@ -108,17 +108,18 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		return false;
 	}
 
-	@Override
-	public void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemList) {
-		if (isInCreativeTab(creativeTab)) {
-			super.getCheckedSubItems(creativeTab, itemList);
+	/*
+		@Override
+		public void getCheckedSubItems(final CreativeTabs tab, final NonNullList<ItemStack> itemList) {
+			//super.getCheckedSubItems(creativeTab, itemList);
+			//if (isInCreativeTab(tab)) {
 			itemList.add(new ItemStack(this));
 			ItemStack is = new ItemStack(this);
 			injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
 			itemList.add(is);
+			//}
 		}
-	}
-
+	*/
 	@Override
 	public boolean showDurabilityBar(ItemStack is) {
 		double aeCurrPower = getAECurrentPower(is);
