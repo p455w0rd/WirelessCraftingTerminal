@@ -17,8 +17,6 @@ package p455w0rd.wct.init;
 
 import java.util.Random;
 
-import org.lwjgl.input.Keyboard;
-
 import appeng.api.config.SearchBoxMode;
 import appeng.api.config.Settings;
 import appeng.core.AEConfig;
@@ -41,6 +39,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -57,17 +56,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.WCT;
-import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
-import p455w0rd.wct.container.ContainerMagnet;
-import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
-import p455w0rd.wct.sync.packets.PacketMagnetFilter;
-import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.capabilities.CapabilityChunkLoader;
@@ -174,57 +168,16 @@ public class ModEvents {
 		}
 	}
 
-	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onKeyInput(KeyInputEvent e) {
-		EntityPlayer p = WCTUtils.player();
-		if (p.openContainer == null) {
-			return;
-		}
-		//if (p.openContainer instanceof ContainerPlayer) {
-		if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
-			ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
-			if (is.isEmpty()) {
-				return;
-			}
-			IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
-			if (wirelessTerm != null && wirelessTerm.isWirelessCraftingEnabled(is)) {
-				//if (!FMLClientHandler.instance().isGUIOpen(GuiWCT.class)) {
-				if (!(p.openContainer instanceof ContainerWCT)) {
-					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WCT));
-				}
-				else {
-					p.closeScreen();
-				}
-			}
-		}
-		else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
-			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-			if (!magnetItem.isEmpty()) {
-				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
-					if (magnetItem.getTagCompound() == null) {
-						magnetItem.setTagCompound(new NBTTagCompound());
-					}
-					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
-				}
-				if (!(p.openContainer instanceof ContainerMagnet)) {
-					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_MAGNET));
-				}
-			}
-		}
-		else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
-			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
-			if (!magnetItem.isEmpty()) {
-				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
-					if (!magnetItem.hasTagCompound()) {
-						magnetItem.setTagCompound(new NBTTagCompound());
-					}
-					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
-				}
-				ItemMagnet.switchMagnetMode(magnetItem);
-			}
-		}
-		//}
+		WCTUtils.handleKeybind();
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onMouseEvent(MouseEvent event) {
+		WCTUtils.handleKeybind();
 	}
 
 	@SubscribeEvent

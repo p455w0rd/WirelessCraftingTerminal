@@ -534,29 +534,31 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			if (getPowerSource() == null || getCellInventory() == null) {
 				return;
 			}
-
 			if (player.inventory.getItemStack().isEmpty()) {
 				if (slotItem != null) {
 					IAEItemStack ais = slotItem.copy();
-					final long maxSize = ais.createItemStack().getMaxStackSize();
-					ais.setStackSize(maxSize);
-					ais = getCellInventory().extractItems(ais, Actionable.SIMULATE, getActionSource());
+					long maxSize = ais.createItemStack().getMaxStackSize();
+					long stackSize = Math.min(maxSize, ais.getStackSize());
+					long toBeExtracted = stackSize > 1 ? stackSize / 2 : 1;
+					long toBeKept = stackSize - toBeExtracted;
+					ais.setStackSize(ais.createItemStack().getMaxStackSize());
+					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 
 					if (ais != null) {
-						final long stackSize = Math.min(maxSize, ais.getStackSize());
-						ais.setStackSize((stackSize + 1) >> 1);
-						ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
-					}
-
-					if (ais != null) {
-						player.inventory.setItemStack(ais.createItemStack());
+						ItemStack extractedStack = ais.createItemStack();
+						extractedStack.setCount((int) toBeExtracted);
+						player.inventory.setItemStack(extractedStack);
 					}
 					else {
 						player.inventory.setItemStack(ItemStack.EMPTY);
 					}
+					ais.setStackSize(toBeKept);
+					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 					updateHeld(player);
 				}
+				return;
 			}
+
 			else {
 				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(player.inventory.getItemStack());
 				ais.setStackSize(1);
@@ -774,7 +776,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				}
 				setValidContainer(false);
 			}
-			if (((IWirelessCraftingTerminalItem) getWirelessTerminal().getItem()).getAECurrentPower(getWirelessTerminal()) <= 0) {
+			if (getWirelessTerminal().getItem() instanceof IWirelessCraftingTerminalItem && ((IWirelessCraftingTerminalItem) getWirelessTerminal().getItem()).getAECurrentPower(getWirelessTerminal()) <= 0) {
 				if (isValidContainer()) {
 					WCTUtils.chatMessage(getPlayerInv().player, new TextComponentString("No Power"));
 				}

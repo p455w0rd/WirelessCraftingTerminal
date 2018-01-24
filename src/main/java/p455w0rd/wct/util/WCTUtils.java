@@ -24,6 +24,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.lwjgl.input.Keyboard;
+
 import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.tiles.IWirelessAccessPoint;
 import net.minecraft.client.Minecraft;
@@ -41,15 +43,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
+import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
+import p455w0rd.wct.init.ModKeybindings;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.Baubles;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.sync.packets.PacketMagnetFilter;
+import p455w0rd.wct.sync.packets.PacketOpenGui;
 import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
 
 public class WCTUtils {
@@ -466,6 +473,55 @@ public class WCTUtils {
 
 	public static void chatMessage(EntityPlayer player, ITextComponent message) {
 		player.sendMessage(message);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static void handleKeybind() {
+		EntityPlayer p = WCTUtils.player();
+		if (p.openContainer == null) {
+			return;
+		}
+		if (ModKeybindings.openTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openTerminal.isPressed()) {
+			ItemStack is = WCTUtils.getWirelessTerm(p.inventory);
+			if (is.isEmpty()) {
+				return;
+			}
+			IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
+			if (wirelessTerm != null && wirelessTerm.isWirelessCraftingEnabled(is)) {
+				if (!(p.openContainer instanceof ContainerWCT)) {
+					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WCT));
+				}
+				else {
+					p.closeScreen();
+				}
+			}
+		}
+		else if (ModKeybindings.openMagnetFilter.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openMagnetFilter.isPressed()) {
+			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
+			if (!magnetItem.isEmpty()) {
+				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
+					if (magnetItem.getTagCompound() == null) {
+						magnetItem.setTagCompound(new NBTTagCompound());
+					}
+					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
+				}
+				if (!(p.openContainer instanceof ContainerMagnet)) {
+					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_MAGNET));
+				}
+			}
+		}
+		else if (ModKeybindings.changeMagnetMode.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.changeMagnetMode.isPressed()) {
+			ItemStack magnetItem = WCTUtils.getMagnet(p.inventory);
+			if (!magnetItem.isEmpty()) {
+				if (!WCTUtils.isMagnetInitialized(magnetItem)) {
+					if (!magnetItem.hasTagCompound()) {
+						magnetItem.setTagCompound(new NBTTagCompound());
+					}
+					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
+				}
+				ItemMagnet.switchMagnetMode(magnetItem);
+			}
+		}
 	}
 
 }
