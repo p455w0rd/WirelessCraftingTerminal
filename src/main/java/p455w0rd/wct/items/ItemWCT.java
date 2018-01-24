@@ -108,18 +108,6 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		return false;
 	}
 
-	/*
-		@Override
-		public void getCheckedSubItems(final CreativeTabs tab, final NonNullList<ItemStack> itemList) {
-			//super.getCheckedSubItems(creativeTab, itemList);
-			//if (isInCreativeTab(tab)) {
-			itemList.add(new ItemStack(this));
-			ItemStack is = new ItemStack(this);
-			injectAEPower(is, ModConfig.WCT_MAX_POWER, Actionable.MODULATE);
-			itemList.add(is);
-			//}
-		}
-	*/
 	@Override
 	public boolean showDurabilityBar(ItemStack is) {
 		double aeCurrPower = getAECurrentPower(is);
