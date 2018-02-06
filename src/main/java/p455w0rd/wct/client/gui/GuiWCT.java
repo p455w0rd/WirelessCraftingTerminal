@@ -377,7 +377,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		buttonList.add(terminalStyleBox = new GuiImgButton(guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE)));
 
-		if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+		if (!ModConfig.USE_OLD_INFINTY_MECHANIC && !WCTUtils.isWCTCreative(wirelessTerm)) {
 			offset += 20;
 			buttonList.add(autoConsumeBoostersBox = new GuiImgButtonBooster(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
 		}
@@ -565,7 +565,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					}
 				}
 			}
-			if (isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
+			if (!WCTUtils.isWCTCreative(wirelessTerm) && isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
 				String amountColor = infinityEnergyAmount < ModConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
 				drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
@@ -608,7 +608,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		//draw view cells
 		drawTexturedModalRect(offsetX - 40, offsetY + 16 + rows * 18 + lowerTextureOffset + 119, 213, 0, 43, 52);
 
-		if (ModConfig.WCT_BOOSTER_ENABLED) {
+		if (ModConfig.WCT_BOOSTER_ENABLED && !WCTUtils.isWCTCreative(wirelessTerm)) {
 			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
 

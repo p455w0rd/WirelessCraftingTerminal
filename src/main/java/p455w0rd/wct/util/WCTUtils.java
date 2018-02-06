@@ -180,7 +180,7 @@ public class WCTUtils {
 			return isBoosterInstalled(wirelessTerm);
 		}
 		else {
-			return hasInfinityEnergy(wirelessTerm);
+			return hasInfinityEnergy(wirelessTerm) || isWCTCreative(wirelessTerm);
 		}
 	}
 
@@ -277,22 +277,24 @@ public class WCTUtils {
 	}
 
 	public static void setInfinityEnergy(@Nonnull ItemStack wirelessTerm, int amount) {
-		NBTTagCompound nbt = ensureTag(wirelessTerm);
-		nbt.setInteger(INFINITY_ENERGY_NBT, amount);
-		wirelessTerm.setTagCompound(nbt);
+		if (!isWCTCreative(wirelessTerm)) {
+			NBTTagCompound nbt = ensureTag(wirelessTerm);
+			nbt.setInteger(INFINITY_ENERGY_NBT, amount);
+			wirelessTerm.setTagCompound(nbt);
+		}
 	}
 
 	public static int getInfinityEnergy(@Nonnull ItemStack wirelessTerm) {
 		NBTTagCompound nbt = ensureTag(wirelessTerm);
-		if (!nbt.hasKey(INFINITY_ENERGY_NBT)) {
+		if (!nbt.hasKey(INFINITY_ENERGY_NBT) && !isWCTCreative(wirelessTerm)) {
 			nbt.setInteger(INFINITY_ENERGY_NBT, 0);
 		}
-		return nbt.getInteger(INFINITY_ENERGY_NBT);
+		return isWCTCreative(wirelessTerm) ? Integer.MAX_VALUE : nbt.getInteger(INFINITY_ENERGY_NBT);
 	}
 
 	public static void drainInfinityEnergy(@Nonnull ItemStack wirelessTerm, EntityPlayer player) {
 		if (player instanceof EntityPlayerMP) {
-			if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+			if (!ModConfig.USE_OLD_INFINTY_MECHANIC && !isWCTCreative(wirelessTerm)) {
 				int current = getInfinityEnergy(wirelessTerm);
 				if (!isInRangeOfWAP(wirelessTerm, player)) {
 					int reducedAmount = current - INFINITY_ENERGY_DRAIN;
@@ -410,6 +412,36 @@ public class WCTUtils {
 			}
 		}
 		return false;
+	}
+
+	public static boolean isWCTCreative(ItemStack wirelessTerm) {
+		return !wirelessTerm.isEmpty() && wirelessTerm.getItem() == ModItems.CREATIVE_WCT;
+	}
+
+	public static ItemStack setCreativeWCT(ItemStack wirelessTerm, boolean makeCreative) {
+		if (!wirelessTerm.isEmpty()) {
+			if (makeCreative) {
+				if (wirelessTerm.getItem() == ModItems.WCT) {
+					ItemStack creativeStack = new ItemStack(ModItems.CREATIVE_WCT);
+					if (wirelessTerm.hasTagCompound()) {
+						creativeStack.setTagCompound(wirelessTerm.writeToNBT(new NBTTagCompound()));
+					}
+					wirelessTerm = creativeStack.copy();
+				}
+			}
+			else if (wirelessTerm.getItem() == ModItems.CREATIVE_WCT) {
+				ItemStack wirelessStack = new ItemStack(ModItems.WCT);
+				if (wirelessTerm.hasTagCompound()) {
+					wirelessStack.setTagCompound(wirelessTerm.writeToNBT(new NBTTagCompound()));
+				}
+				wirelessTerm = wirelessStack.copy();
+			}
+		}
+		return wirelessTerm;
+	}
+
+	public static ItemStack getCreativeWCT(ItemStack wirelessTerm) {
+		return setCreativeWCT(wirelessTerm, true);
 	}
 
 	public static void removeTimerTags(ItemStack is) {

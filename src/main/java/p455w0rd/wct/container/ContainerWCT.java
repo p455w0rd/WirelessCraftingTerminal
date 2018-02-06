@@ -200,7 +200,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			monitor = null;
 		}
 
-		if (ModConfig.WCT_BOOSTER_ENABLED) {
+		if (ModConfig.WCT_BOOSTER_ENABLED && !WCTUtils.isWCTCreative(getWirelessTerminal())) {
 			if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
 				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20));
 				boosterSlot.setContainer(this);

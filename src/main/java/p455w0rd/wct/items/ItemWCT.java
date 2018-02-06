@@ -39,7 +39,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -76,12 +75,15 @@ import p455w0rd.wct.util.WCTUtils;
 })
 public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
 
-	private static final String name = "wct";
 	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
 
 	private EntityPlayer entityPlayer;
 
 	public ItemWCT() {
+		this("wct");
+	}
+
+	public ItemWCT(String name) {
 		super(ModConfig.WCT_MAX_POWER);
 		setRegistryName(name);
 		setUnlocalizedName(name);
@@ -115,6 +117,9 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if ((int) aeCurrPower >= (int) aeMaxPower) {
 			return false;
 		}
+		if (WCTUtils.isWCTCreative(is)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -136,8 +141,12 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			pctTxtColor = TextFormatting.RED + "";
 		}
 		list.add(TextFormatting.AQUA + "==============================");
-		list.add(GuiText.StoredEnergy + ": " + pctTxtColor + (int) aeCurrPower + " AE - " + aeCurrPowerPct + "%");
-		//if (isShiftKeyDown()) {
+		if (WCTUtils.isWCTCreative(is)) {
+			list.add(GuiText.StoredEnergy.getLocal() + ": " + TextFormatting.GREEN + "" + I18n.format("tooltip.infinite.desc"));
+		}
+		else {
+			list.add(GuiText.StoredEnergy.getLocal() + ": " + pctTxtColor + (int) aeCurrPower + " AE - " + aeCurrPowerPct + "%");
+		}
 		String linked = TextFormatting.RED + GuiText.Unlinked.getLocal();
 		if (encKey != null && !encKey.isEmpty()) {
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
@@ -153,7 +162,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 				String amountColor = infinityEnergyAmount < ModConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String reasonString = "";
 				if (infinityEnergyAmount <= 0) {
-					reasonString = I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc");
+					reasonString = "(" + I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc") + ")";
 				}
 				boolean outsideOfWAPRange = !WCTUtils.isInRange(is);
 				if (!outsideOfWAPRange) {
@@ -161,7 +170,8 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 				}
 				String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
 				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
-				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc"));
+				String infinityEnergyString = WCTUtils.isWCTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount));
+				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
 			}
 		}
 		list.add(I18n.format("item.magnet_card.name") + ": " + magnetStatus);
@@ -199,11 +209,9 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			final NBTTagCompound data = Platform.openNbtData(target);
 			manager.writeToNBT(data);
 		});
-
 		out.registerSetting(Settings.SORT_BY, SortOrder.NAME);
 		out.registerSetting(Settings.VIEW_MODE, ViewItems.ALL);
 		out.registerSetting(Settings.SORT_DIRECTION, SortDir.ASCENDING);
-
 		out.readFromNBT(Platform.openNbtData(target).copy());
 		return out;
 	}
@@ -246,14 +254,11 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		final double currentStorage = getAECurrentPower(is);
 		final double required = maxStorage - currentStorage;
 		final double overflow = Math.min(amount * 2 - required, amount - required);
-
 		if (mode == Actionable.MODULATE) {
 			final NBTTagCompound data = Platform.openNbtData(is);
 			final double toAdd = Math.min(amount * 2, required);
-
 			data.setDouble("internalCurrentPower", currentStorage + toAdd);
 		}
-
 		return Math.max(0, overflow);
 	}
 
@@ -292,7 +297,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
 			return checkForBooster(is);
 		}
-		return WCTUtils.hasInfiniteRange(is) && !WCTUtils.isInRange(is);
+		return WCTUtils.hasInfiniteRange(is) && !WCTUtils.isInRange(is) && getEncryptionKey(is) != null && !getEncryptionKey(is).isEmpty();
 	}
 
 	@Override
@@ -304,9 +309,6 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (entityPlayer == null) {
 			entityPlayer = p;
 		}
-		//ItemStack wirelessTerminal = null;
-		InventoryPlayer inv = p.inventory;
-		//wirelessTerminal = WCTUtils.getWirelessTerm(inv);
 		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
 			return;
 		}

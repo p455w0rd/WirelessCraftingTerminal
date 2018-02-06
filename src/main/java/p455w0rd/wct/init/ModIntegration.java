@@ -28,6 +28,8 @@ public class ModIntegration {
 	public static void preInit() {
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
 		AEApi.instance().registries().charger().addChargeRate(ModItems.WCT, ModConfig.WCT_MAX_POWER);
+		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.CREATIVE_WCT);
+		AEApi.instance().registries().charger().addChargeRate(ModItems.CREATIVE_WCT, ModConfig.WCT_MAX_POWER);
 	}
 
 	public static void postInit() {

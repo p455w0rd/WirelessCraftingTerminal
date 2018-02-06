@@ -52,12 +52,6 @@ repositories {
     }
 }
 dependencies {
-	//compile ("appeng:appliedenergistics2:rv4-alpha-1:api"){
-	//	transitive = false
-	//}
-	//compile ("appeng:appliedenergistics2:rv4-alpha-7:dev"){
-	//	transitive = false
-	//}
 	deobfCompile "mezz.jei:jei_1.12.2:+"
 	//compile project(':appliedenergistics2')
 	//deobfCompile "com.enderio:EnderIO:1.10.2-3.0.1.112_beta"
@@ -65,7 +59,7 @@ dependencies {
 	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
 	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv5-stable-3"
+	deobfCompile "appeng:appliedenergistics2:rv5-stable-8"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
 }
 

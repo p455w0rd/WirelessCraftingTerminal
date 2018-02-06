@@ -24,6 +24,7 @@ import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemWCT;
+import p455w0rd.wct.items.ItemWCTCreative;
 
 /**
  * @author p455w0rd
@@ -34,11 +35,13 @@ public class ModItems {
 	private static List<IModelHolder> ITEM_LIST = new ArrayList<IModelHolder>();
 
 	public static ItemWCT WCT;
+	public static ItemWCTCreative CREATIVE_WCT;
 	public static ItemMagnet MAGNET_CARD;
 	public static ItemInfinityBooster BOOSTER_CARD;
 
 	public static void preInit() {
 		ITEM_LIST.add(WCT = new ItemWCT());
+		ITEM_LIST.add(CREATIVE_WCT = new ItemWCTCreative());
 		ITEM_LIST.add(MAGNET_CARD = new ItemMagnet());
 		ITEM_LIST.add(BOOSTER_CARD = new ItemInfinityBooster());
 	}
