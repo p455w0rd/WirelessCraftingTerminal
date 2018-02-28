@@ -1,0 +1,75 @@
+// Items
+item.wct.name=Terminale da Lavoro senza Fili
+item.wct_creative.name=Terminale da Lavoro senza Fili Creativo
+item.magnet_card.name=Carta Magnetica
+item.infinity_booster_card.name=Carta del potenziamento Infinito
+
+// Crative Tab
+itemGroup.wct=Terminale da Lavoro senza Fili
+
+// Blocks
+tile.advanced_charger.name=Caricatore Avanzato (Lavori in corso)
+
+// Tooltips
+tooltip.press_shift.desc=<Premi Shift>
+tooltip.magnet.desc=Un magnete che inserisce automagicamente gli oggetti nel tuo sistema AE
+tooltip.magnet_set_filter.desc=Tasto destro per impostare il filtro
+tooltip.or_press.desc=o premi
+tooltip.press.desc=Premi
+tooltip.status.desc=Stato
+tooltip.active.desc=Attivo
+tooltip.inactive.desc=Inattivo
+tooltip.to_switch.desc=per cambiare modalità
+tooltip.magnet_active_1.desc=gli oggetti in più vengono aggiunti all'inventario
+tooltip.magnet_active_2.desc=gli oggetti in più vengono lasciati per terra
+tooltip.magnet_whitelisting.desc=Permissione
+tooltip.magnet_blacklisting.desc=Blocco
+tooltip.filter_mode.desc=Modalita Filtro
+tooltip.not.desc=Non
+tooltip.ignoring.desc=Ignorando
+tooltip.nbt.desc=NBT
+tooltip.meta.desc=MetaData
+tooltip.oredict.desc=Ore Dictionary
+tooltip.using.desc=Usando
+tooltip.filtered_items.desc=Oggetti filtrati
+tooltip.only_works.desc=Funziona solo quando si trova in uno slot del Terminale da Lavoro senza Fili
+tooltip.installed.desc=Installato
+tooltip.infinite_range.desc=Raggio infinito
+tooltip.infinity_energy.desc=Energia Infinita
+tooltip.units.desc=Unità
+tooltip.in_wap_range.desc=(Nel raggio del WAP)
+tooltip.out_of.desc=Fuori dal
+tooltip.infinity_energy_low.desc=Energia dell'infinità bassa!
+tooltip.creative.desc=Creativo
+tooltip.infinite.desc=Infinito
+
+// Chat Messages
+chatmessages.magnet_deactivated.desc=Carta Magnetica Disattivata
+chatmessages.magnet_activated.desc=Carta Magnetica Attivata
+chatmessages.magnet_init.desc=Devi prima fare tasto destro con la Carta Magnetica in mano prima di usare il tasto prescelto!
+
+// Keybindings
+key.open_terminal.desc=Apri il Terminale da Lavoro senza Fili
+key.open_magnet.desc=Apri l'Interfaccia del filtro della Carta Magnetica
+key.switch_magnet_mode.desc=Attiva/Disattiva la Carta Magnetica
+key.categories.wct=Terminale da Lavoro senza Fili 2
+
+// GUI
+gui.title.magnet_filter=Filtro magnete
+gui.emptytrash=Cestino vuoto
+gui.emptytrash.desc=Cancella i contenuti del Cestino
+gui.openmagnetgui=Apri l'interfaccia del filtro magnete
+gui.openmagnetgui.desc=Apre il filtro della Carta Magnetica
+gui.openmagnetgui.desc2=Interfaccia per impostare gli oggetti filtrabili
+gui.consumeboosters=Consumo automatico dei Potenziatori
+gui.dontconsumeboosters.desc=Non consumando i potenziamenti della carta infinita
+gui.consumeboosters.desc=Consuma automaticamente i potenziamenti
+gui.consumeboosters.desc2=Carte, quando sono raccolte o sono nell'inventario
+gui.magnetmode=Modalità Magnete
+
+// JEI
+jei.wct.desc=Una versione senza fili del Terminale da Lavoro dell'AE2. In modo che funzioni ha bisogno di essere collegato ad un sistema ME tramite un Terminale di Sicurezza. Un controllo può essere impostato in Opzioni --> Controlli   per aprire l'interfaccia
+jei.wct_bauble.desc=Può essere indossato sulla testa nella Baubles
+jei.magnet_card.desc=Un magnete che può inserire oggetti automaticamente dentro il sistema ME connesso. Shift+Tasto destro per cambiare le modalità (Le modalità possono essere scambiate anche tramite controlli)
+jei.booster_old.desc=Inserisci una carta dell'infinità nell'apposito spazio nell'interfaccia del terminale per dare un raggio infinito ad esso.
+jei.booster.desc=Inserisci fino a 2,14 miliardi di questi negli appositi spazi del Terminale per aggiungere l'energia infinita interna che permette al terminale di essere utilizzato fuori dal raggio del WAP e in più dimensioni
