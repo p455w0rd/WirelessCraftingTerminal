@@ -135,11 +135,11 @@ public class ItemMagnet extends ItemBase {
 			list.add(color("italics") + "" + I18n.format("tooltip.magnet_set_filter.desc"));
 
 			if (isActivated(itemStack)) {
-				String boundKey = Keyboard.getKeyName(ModKeybindings.openMagnetFilter.getKeyCode());
+				String boundKey = ModKeybindings.openMagnetFilter.getDisplayName();
 				if (!boundKey.equals("NONE")) {
 					list.add(color("italics") + I18n.format("tooltip.or_press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey + "]");
 				}
-				String boundKey2 = Keyboard.getKeyName(ModKeybindings.changeMagnetMode.getKeyCode());
+				String boundKey2 = ModKeybindings.changeMagnetMode.getDisplayName();
 				if (!boundKey2.equals("NONE")) {
 					list.add(color("italics") + I18n.format("tooltip.press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey2 + "] " + color("gray") + color("italics") + I18n.format("tooltip.to_switch.desc"));
 				}
@@ -242,6 +242,9 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static void switchMagnetMode(@Nonnull ItemStack item) {
+		if (item == null || item.isEmpty()) {
+			return;
+		}
 		int newMode = 0;
 		if (getDamageUnsafe(item) == 0) {
 			newMode = 1;
@@ -271,6 +274,9 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static void setDamageUnsafe(@Nonnull ItemStack stack, int damage) {
+		if (!stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+		}
 		stack.getTagCompound().setInteger(WCTUtils.MAGNET_MODE_NBT, damage);
 	}
 
@@ -310,11 +316,9 @@ public class ItemMagnet extends ItemBase {
 			}
 			int stackSize = itemStackToGet.getCount();
 
-			if (obj == null) {
-				obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
-				powerSrc = obj;
-				mySrc = new WCTPlayerSource(player, obj);
-			}
+			obj = getGuiObject(wirelessTerm, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+			powerSrc = obj;
+			mySrc = new WCTPlayerSource(player, obj);
 
 			boolean ignoreRange = WCTUtils.hasInfiniteRange(wirelessTerm);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerm);

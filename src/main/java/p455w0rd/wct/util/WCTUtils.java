@@ -74,7 +74,7 @@ public class WCTUtils {
 		NonNullList<ItemStack> terminalList = NonNullList.<ItemStack>create();
 		InventoryPlayer playerInventory = player.inventory;
 		for (ItemStack wirelessTerm : playerInventory.mainInventory) {
-			if (wirelessTerm.getItem() == ModItems.WCT) {
+			if (isAnyWCT(wirelessTerm)) {
 				terminalList.add(wirelessTerm);
 			}
 		}
@@ -150,7 +150,7 @@ public class WCTUtils {
 
 	public static boolean isInRange(ItemStack wirelessTerm) {
 		NBTTagCompound nbt = ensureTag(wirelessTerm);
-		return nbt.hasKey(IN_RANGE_NBT) && nbt.getBoolean(IN_RANGE_NBT);
+		return (nbt.hasKey(IN_RANGE_NBT) && nbt.getBoolean(IN_RANGE_NBT)) || isWCTCreative(wirelessTerm);
 	}
 
 	public static ItemStack addInfinityBoosters(@Nonnull ItemStack wirelessTerm, ItemStack boosterCardStack) {
@@ -175,9 +175,9 @@ public class WCTUtils {
 		return boosterCardStack;
 	}
 
-	public static boolean hasInfiniteRange(ItemStack wirelessTerm) {
+	public static boolean hasInfiniteRange(@Nonnull ItemStack wirelessTerm) {
 		if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
-			return isBoosterInstalled(wirelessTerm);
+			return isBoosterInstalled(wirelessTerm) || isWCTCreative(wirelessTerm);
 		}
 		else {
 			return hasInfinityEnergy(wirelessTerm) || isWCTCreative(wirelessTerm);
@@ -188,7 +188,11 @@ public class WCTUtils {
 		if (ensureTag(wirelessTerm).hasKey(INFINITY_ENERGY_NBT)) {
 			return getInfinityEnergy(wirelessTerm) > 0 && ModConfig.WCT_BOOSTER_ENABLED;
 		}
-		return false;
+		return isWCTCreative(wirelessTerm);
+	}
+
+	public static boolean isAnyWCT(@Nonnull ItemStack wirelessTerm) {
+		return wirelessTerm.getItem() == ModItems.WCT || wirelessTerm.getItem() == ModItems.CREATIVE_WCT;
 	}
 
 	public static boolean isInRangeOfWAP(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {

@@ -107,7 +107,7 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	}
 
 	public ItemStack getWirelessTerminal() {
-		return wirelessTerminal;
+		return wirelessTerminal == null ? ItemStack.EMPTY : WCTUtils.isAnyWCT(wirelessTerminal) ? wirelessTerminal : ItemStack.EMPTY;
 	}
 
 	public void cycleValue() {

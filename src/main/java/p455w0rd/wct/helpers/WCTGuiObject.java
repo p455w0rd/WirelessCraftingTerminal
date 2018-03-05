@@ -51,7 +51,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.util.WCTUtils;
 
 public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIActionHost {
@@ -277,7 +276,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	@Override
 	public IGridNode getActionableNode() {
 		boolean ignoreRange = false;
-		if (!effectiveItem.isEmpty() && effectiveItem.getItem() == ModItems.WCT) {
+		if (!effectiveItem.isEmpty() && WCTUtils.isAnyWCT(effectiveItem)) {
 			IWirelessCraftingTerminalItem item = (IWirelessCraftingTerminalItem) effectiveItem.getItem();
 			ignoreRange = item.checkForBooster(effectiveItem);
 		}

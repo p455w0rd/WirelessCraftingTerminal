@@ -132,6 +132,9 @@ public class ContainerMagnet extends Container {
 			}
 			return ItemStack.EMPTY;
 		}
+		if (slotNum < 0) {
+			return ItemStack.EMPTY;
+		}
 
 		//Click+drag stack
 		else if (clickTypeIn == ClickType.QUICK_CRAFT) {

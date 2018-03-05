@@ -391,7 +391,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				for (final Object j : inventorySlots) {
 					if (j instanceof Slot && j.getClass() == s.getClass()) {
 						Slot sl = (Slot) j;
-						if (!sl.getHasStack() || (sl.getHasStack() && sl.getStack().getItem() != ModItems.WCT)) {
+						if (!sl.getHasStack() || (sl.getHasStack() && !WCTUtils.isAnyWCT(sl.getStack()))) {
 							from.add(sl);
 						}
 					}

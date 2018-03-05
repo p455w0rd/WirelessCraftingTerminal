@@ -57,7 +57,10 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 		final IActionHost host = (IActionHost) (te instanceof IActionHost ? te : null);
 
 		if (host != null && host.getActionableNode() != null) {
-			setNetwork(host.getActionableNode().getGrid());
+			IGrid grid = host.getActionableNode().getGrid();
+			if (grid != null) {
+				setNetwork(grid);
+			}
 		}
 
 		if (te instanceof TileCraftingTile) {

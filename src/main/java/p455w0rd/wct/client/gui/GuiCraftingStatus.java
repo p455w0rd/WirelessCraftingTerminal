@@ -48,12 +48,9 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 
 	public GuiCraftingStatus(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
 		super(new ContainerCraftingStatus(inventoryPlayer, te));
-
 		status = (ContainerCraftingStatus) inventorySlots;
 		final Object target = status.getTarget();
 		final IDefinitions definitions = AEApi.instance().definitions();
-		//final IParts parts = definitions.parts();
-
 		if (target instanceof WCTGuiObject) {
 			myIcon = definitions.items().wirelessTerminal().maybeStack(1).orElse(null);
 			ItemStack is = new ItemStack(ModItems.WCT);

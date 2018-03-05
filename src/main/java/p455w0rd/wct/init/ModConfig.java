@@ -61,7 +61,7 @@ public class ModConfig {
 			MinecraftForge.EVENT_BUS.register(new ModConfig());
 		}
 		WCT_BOOSTER_ENABLED = CONFIG.getBoolean("EnableBooster", DEF_CAT, true, "Enable Infinity Booster Card");
-		WCT_MINETWEAKER_OVERRIDE = CONFIG.getBoolean("DisableRecipes", DEF_CAT, false, "TRUE=all recipes disabled-For CraftTweaker compat");
+		//WCT_MINETWEAKER_OVERRIDE = CONFIG.getBoolean("DisableRecipes", DEF_CAT, false, "TRUE=all recipes disabled-For CraftTweaker compat");
 		WCT_ENABLE_CONTROLLER_CHUNKLOADER = CONFIG.getBoolean("EnableControllerChunkLoading", DEF_CAT, true, "If true, AE2 controller will chunk load itself");
 		WCT_BOOSTER_DROP_CHANCE = CONFIG.getInt("BoosterDropChance", DEF_CAT, 30, 1, 100, "Percentage chance that booster card will drop upon killing a wither. (between 1 and 100)");
 		WCT_ENDERMAN_DROP_BOOSTERS = CONFIG.getBoolean("EndermanDropBoosters", DEF_CAT, true, "Will Enderman randomly drop infinity booster cards on death?");

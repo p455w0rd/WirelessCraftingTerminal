@@ -18,6 +18,7 @@ package p455w0rd.wct.init;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
@@ -32,7 +33,7 @@ import p455w0rd.wct.items.ItemWCTCreative;
  */
 public class ModItems {
 
-	private static List<IModelHolder> ITEM_LIST = new ArrayList<IModelHolder>();
+	private static List<Item> ITEM_LIST = new ArrayList<Item>();
 
 	public static ItemWCT WCT;
 	public static ItemWCTCreative CREATIVE_WCT;
@@ -48,8 +49,10 @@ public class ModItems {
 
 	@SideOnly(Side.CLIENT)
 	public static void preInitModels() {
-		for (IModelHolder item : ITEM_LIST) {
-			item.initModel();
+		for (Item item : ITEM_LIST) {
+			if (item instanceof IModelHolder) {
+				((IModelHolder) item).initModel();
+			}
 		}
 	}
 

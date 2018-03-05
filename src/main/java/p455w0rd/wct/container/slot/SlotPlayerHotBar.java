@@ -19,8 +19,8 @@ import appeng.container.slot.AppEngSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.items.IItemHandler;
 import p455w0rd.wct.init.ModIntegration.Mods;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.integration.Baubles;
+import p455w0rd.wct.util.WCTUtils;
 
 public class SlotPlayerHotBar extends AppEngSlot {
 
@@ -39,12 +39,12 @@ public class SlotPlayerHotBar extends AppEngSlot {
 			if (!Baubles.getWCTBauble(player).isEmpty()) {
 				return true;
 			}
-			if (!getStack().isEmpty() && getStack().getItem() == ModItems.WCT) {
+			if (!getStack().isEmpty() && WCTUtils.isAnyWCT(getStack())) {
 				return super.canTakeStack(player);
 			}
 		}
 		else {
-			if (!getStack().isEmpty() && getStack().getItem() == ModItems.WCT) {
+			if (!getStack().isEmpty() && WCTUtils.isAnyWCT(getStack())) {
 				return true;
 			}
 		}

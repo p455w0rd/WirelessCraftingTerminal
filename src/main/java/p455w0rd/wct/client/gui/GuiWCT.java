@@ -382,8 +382,10 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 			buttonList.add(autoConsumeBoostersBox = new GuiImgButtonBooster(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
 		}
 
-		offset += 20;
-		buttonList.add(magnetModeBox = new GuiImgButtonMagnetMode(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
+		if (containerWCT.getWirelessTerminal() != null && WCTUtils.isAnyWCT(containerWCT.getWirelessTerminal())) {
+			offset += 20;
+			buttonList.add(magnetModeBox = new GuiImgButtonMagnetMode(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
+		}
 
 		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
