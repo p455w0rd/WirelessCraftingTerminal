@@ -470,7 +470,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				final List<Slot> slots = getInventorySlots();
 				for (final Slot inventorySlot : slots) {
 					if (inventorySlot != null && inventorySlot.canTakeStack(WCTUtils.player()) && inventorySlot.getHasStack() && inventorySlot.inventory == slot.inventory && Container.canAddItemToSlot(inventorySlot, dbl_whichItem, true)) {
-						super.handleMouseClick(inventorySlot, inventorySlot.slotNumber, 1, clickType);
+						handleMouseClick(inventorySlot, inventorySlot.slotNumber, 1, clickType);
 					}
 				}
 			}
