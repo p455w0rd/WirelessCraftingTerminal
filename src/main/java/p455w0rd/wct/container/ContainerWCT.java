@@ -534,38 +534,36 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			if (getPowerSource() == null || getCellInventory() == null) {
 				return;
 			}
+
 			if (player.inventory.getItemStack().isEmpty()) {
 				if (slotItem != null) {
 					IAEItemStack ais = slotItem.copy();
-					long maxSize = ais.createItemStack().getMaxStackSize();
-					long stackSize = Math.min(maxSize, ais.getStackSize());
-					long toBeExtracted = stackSize > 1 ? stackSize / 2 : 1;
-					long toBeKept = stackSize - toBeExtracted;
-					ais.setStackSize(ais.createItemStack().getMaxStackSize());
-					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					final long maxSize = ais.getDefinition().getMaxStackSize();
+					ais.setStackSize(maxSize);
+					ais = getCellInventory().extractItems(ais, Actionable.SIMULATE, getActionSource());
 
 					if (ais != null) {
-						ItemStack extractedStack = ais.createItemStack();
-						extractedStack.setCount((int) toBeExtracted);
-						player.inventory.setItemStack(extractedStack);
+						final long stackSize = Math.min(maxSize, ais.getStackSize());
+						ais.setStackSize((stackSize + 1) >> 1);
+						ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					}
+
+					if (ais != null) {
+						player.inventory.setItemStack(ais.createItemStack());
 					}
 					else {
 						player.inventory.setItemStack(ItemStack.EMPTY);
 					}
-					ais.setStackSize(toBeKept);
-					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 					updateHeld(player);
 				}
-				return;
 			}
-
 			else {
 				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(player.inventory.getItemStack());
 				ais.setStackSize(1);
-				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final ItemStack is = player.inventory.getItemStack();
-					is.shrink(1);
+					is.setCount(is.getCount() - 1);
 					if (is.getCount() <= 0) {
 						player.inventory.setItemStack(ItemStack.EMPTY);
 					}
@@ -576,7 +574,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			break;
 		case CREATIVE_DUPLICATE:
 			if (player.capabilities.isCreativeMode && slotItem != null) {
-				final ItemStack is = slotItem.createItemStack();
+				ItemStack is = slotItem.createItemStack();
 				is.setCount(is.getMaxStackSize());
 				player.inventory.setItemStack(is);
 				updateHeld(player);
