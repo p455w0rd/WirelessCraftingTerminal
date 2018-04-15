@@ -558,7 +558,7 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
-		if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
+		if (ModConfig.WCT_BOOSTER_ENABLED && !ModConfig.USE_OLD_INFINTY_MECHANIC) {
 			int infinityEnergyAmount = WCTUtils.getInfinityEnergy(containerWCT.getWirelessTerminal());
 			if (WCTUtils.hasInfiniteRange(wirelessTerm)) {
 				if (!WCTUtils.isInRangeOfWAP(wirelessTerm, WCTUtils.player())) {

@@ -66,10 +66,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.render.StackSizeRenderer;
@@ -318,13 +320,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-		
+
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-		
+
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {
@@ -484,35 +486,39 @@ public abstract class WCTBaseGui extends GuiContainer {
 	@Override
 	protected boolean checkHotbarKeys(final int keyCode) {
 		final Slot theSlot = getSlotUnderMouse();
-		/*
-				try {
-					theSlot = ObfuscationReflectionHelper.getPrivateValue(GuiContainer.class, this, "theSlot", "field_147006_u", "f");
-				}
-				catch (final Throwable t) {
-					return false;
-				}
-		*/
 		if (WCTUtils.player().inventory.getItemStack().isEmpty() && theSlot != null) {
+			if (theSlot.getStack().getItem() instanceof IWirelessCraftingTerminalItem) {
+				return false;
+			}
 			for (int j = 0; j < 9; ++j) {
 				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
-					final List<Slot> slots = getInventorySlots();
-					InventoryPlayer playerInv = inventorySlots instanceof ContainerWCT ? ((ContainerWCT) inventorySlots).getPlayerInv() : ((WCTBaseContainer) inventorySlots).getPlayerInv();
+					final List<Slot> slots = inventorySlots.inventorySlots;
+					InventoryPlayer playerInv = mc.player.inventory;
 					for (final Slot s : slots) {
-						if (s.getSlotIndex() == j && s.inventory == playerInv) {
-							//disable hotbar key-swapping WCT
-							if (!s.canTakeStack(WCTUtils.player(playerInv)) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
-								return false;
+						IInventory slotInv = s.inventory;
+						if (s instanceof AppEngSlot && ((AppEngSlot) s).getItemHandler() instanceof InvWrapper) {
+							slotInv = ((InvWrapper) ((AppEngSlot) s).getItemHandler()).getInv();
+						}
+						if (slotInv == playerInv) {
+							if (40 - s.getSlotIndex() == j) {
+								//disable hotbar key-swapping WCT
+								if (!s.canTakeStack(mc.player) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
+									return false;
+								}
 							}
 						}
 					}
-
 					if (theSlot.getSlotStackLimit() == 64) {
 						handleMouseClick(theSlot, theSlot.slotNumber, j, ClickType.SWAP);
 						return true;
 					}
 					else {
 						for (final Slot s : slots) {
-							if (s.getSlotIndex() == j && s.inventory == playerInv) {
+							IInventory slotInv = s.inventory;
+							if (s instanceof AppEngSlot && ((AppEngSlot) s).getItemHandler() instanceof InvWrapper) {
+								slotInv = ((InvWrapper) ((AppEngSlot) s).getItemHandler()).getInv();
+							}
+							if (40 - s.getSlotIndex() == j && slotInv == playerInv) {
 								ModNetworking.instance().sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
 								return true;
 							}
@@ -521,7 +527,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 				}
 			}
 		}
-
 		return false;
 	}
 
@@ -539,7 +544,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 				return slot;
 			}
 		}
-
 		return null;
 	}
 
@@ -557,17 +561,11 @@ public abstract class WCTBaseGui extends GuiContainer {
 	protected void drawItem(final int x, final int y, final ItemStack is) {
 		zLevel = 100.0F;
 		itemRender.zLevel = 100.0F;
-
-		//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GlStateManager.enableDepth();
-		//GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-		//GL11.glEnable(GL11.GL_DEPTH_TEST);
 		RenderHelper.enableGUIStandardItemLighting();
 		GlStateManager.disableDepth();
 		itemRender.renderItemAndEffectIntoGUI(is, x, y);
-		//GL11.glPopAttrib();
-
 		itemRender.zLevel = 0.0F;
 		zLevel = 0.0F;
 	}
@@ -593,19 +591,12 @@ public abstract class WCTBaseGui extends GuiContainer {
 			try {
 				zLevel = 100.0F;
 				itemRender.zLevel = 100.0F;
-
 				if (!isPowered()) {
-					//GL11.glDisable(GL11.GL_LIGHTING);
 					drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);
-					//GL11.glEnable(GL11.GL_LIGHTING);
 				}
-
 				zLevel = 0.0F;
 				itemRender.zLevel = 0.0F;
-
 				super.drawSlot(new SlotSingleItem(s));
-				//super.drawSlot(s);
-
 				stackSizeRenderer.renderStackSize(fontRenderer, ((SlotME) s).getAEStack(), s.getStack(), s.xPos, s.yPos);
 			}
 			catch (final Exception err) {
@@ -619,14 +610,11 @@ public abstract class WCTBaseGui extends GuiContainer {
 					final AppEngSlot aes = (AppEngSlot) s;
 					if (aes.getIcon() >= 0) {
 						this.bindTexture("gui/states.png");
-
-						//GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 						final Tessellator tessellator = Tessellator.getInstance();
 						final BufferBuilder vb = tessellator.getBuffer();
 						try {
 							final int uv_y = (int) Math.floor(aes.getIcon() / 16);
 							final int uv_x = aes.getIcon() - uv_y * 16;
-
 							GlStateManager.enableBlend();
 							GlStateManager.disableLighting();
 							GlStateManager.enableTexture2D();
@@ -636,9 +624,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 							final float par2 = aes.yPos;
 							final float par3 = uv_x * 16;
 							final float par4 = uv_y * 16;
-
 							vb.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-
 							final float f1 = 0.00390625F;
 							final float f = 0.00390625F;
 							final float par6 = 16;
@@ -651,7 +637,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 						}
 						catch (final Exception err) {
 						}
-						//GL11.glPopAttrib();
 					}
 				}
 
@@ -703,26 +688,21 @@ public abstract class WCTBaseGui extends GuiContainer {
 		final Slot s = getSlot(x, y);
 		if (s instanceof SlotME && !stack.isEmpty()) {
 			final int bigNumber = AEConfig.instance().useTerminalUseLargeFont() ? 999 : 9999;
-
 			IAEItemStack myStack = null;
 			final List<String> currentToolTip = getItemToolTip(stack);
-
 			try {
 				final SlotME theSlotField = (SlotME) s;
 				myStack = theSlotField.getAEStack();
 			}
 			catch (final Throwable ignore) {
 			}
-
 			if (myStack != null) {
-
 				if (myStack.getStackSize() > bigNumber || (myStack.getStackSize() > 1 && stack.isItemDamaged())) {
 					final String local = ButtonToolTips.ItemsStored.getLocal();
 					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getStackSize());
 					final String format = String.format(local, formattedAmount);
 					currentToolTip.add(TextFormatting.GRAY + format);
 				}
-
 				if (myStack.getCountRequestable() > 0) {
 					final String local = ButtonToolTips.ItemsRequestable.getLocal();
 					final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(myStack.getCountRequestable());
@@ -730,7 +710,6 @@ public abstract class WCTBaseGui extends GuiContainer {
 
 					currentToolTip.add(format);
 				}
-
 				drawHoveringText(currentToolTip, x, y, fontRenderer);
 				return;
 			}
@@ -738,9 +717,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 				final String local = ButtonToolTips.ItemsStored.getLocal();
 				final String formattedAmount = NumberFormat.getNumberInstance(Locale.US).format(stack.getCount());
 				final String format = String.format(local, formattedAmount);
-
 				currentToolTip.add(TextFormatting.GRAY + format);
-
 				this.drawHoveringText(currentToolTip, x, y, fontRenderer);
 				return;
 			}
@@ -785,4 +762,5 @@ public abstract class WCTBaseGui extends GuiContainer {
 			return Keyboard.isKeyDown(15);
 		}
 	}
+
 }
