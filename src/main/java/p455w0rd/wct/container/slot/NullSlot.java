@@ -77,4 +77,9 @@ public class NullSlot extends AppEngSlot {
 	public int getSlotIndex() {
 		return 0;
 	}
+
+	@Override
+	public boolean isSlotEnabled() {
+		return false;
+	}
 }
