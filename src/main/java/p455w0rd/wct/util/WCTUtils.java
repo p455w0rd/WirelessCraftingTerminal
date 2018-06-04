@@ -192,7 +192,7 @@ public class WCTUtils {
 	}
 
 	public static boolean isAnyWCT(@Nonnull ItemStack wirelessTerm) {
-		return wirelessTerm.getItem() == ModItems.WCT || wirelessTerm.getItem() == ModItems.CREATIVE_WCT;
+		return wirelessTerm.getItem() == ModItems.WCT || wirelessTerm.getItem() == ModItems.CREATIVE_WCT || wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem;
 	}
 
 	public static boolean isInRangeOfWAP(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
