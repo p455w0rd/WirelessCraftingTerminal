@@ -1,28 +1,24 @@
 {
-	"conditions": [
-		{
-			"type": "wct:recipes_enabled"
-		}
-	],
-    "type": "forge:ore_shaped",
-	"pattern": [
-		"ab",
-		"c "
-	],
-    "key": {
-		"a": {
-			"item": "appliedenergistics2:wireless_terminal"
-		},
-		"b": {
-			"item": "appliedenergistics2:material",
-			"data": 9
-		},
-		"c": {
-			"item": "appliedenergistics2:part",
-			"data": 360
-		}
-	},
-    "result": {
-        "item": "wct:wct"
+  "conditions": [
+    {
+      "type": "wct:recipes_enabled"
     }
+  ],
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "item": "appliedenergistics2:wireless_terminal"
+    },
+    {
+      "item": "appliedenergistics2:material",
+      "data": 9
+    },
+    {
+      "item": "appliedenergistics2:part",
+      "data": 360
+    }
+  ],
+  "result": {
+    "item": "wct:wct"
+  }
 }
