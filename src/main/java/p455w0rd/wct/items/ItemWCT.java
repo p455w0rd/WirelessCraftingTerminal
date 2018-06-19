@@ -312,6 +312,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
 			return;
 		}
+
 		if (p instanceof EntityPlayerMP) {
 			rangeCheck(wirelessTerminal, (EntityPlayerMP) p);
 		}
@@ -340,7 +341,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) {
-		return true;
+		return false;
 	}
 
 	@Override

@@ -17,16 +17,21 @@ package p455w0rd.wct.integration;
 
 import javax.annotation.Nonnull;
 
+import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import baubles.api.cap.BaublesCapabilities;
 import baubles.api.cap.IBaublesItemHandler;
 import baubles.common.container.SlotBauble;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotAEBauble;
+import p455w0rd.wct.init.ModNetworking;
+import p455w0rd.wct.sync.packets.PacketBaubleSync;
+import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
@@ -48,6 +53,23 @@ public class Baubles {
 			}
 		}
 		return ItemStack.EMPTY;
+	}
+
+	public static void updateWCTBauble(EntityPlayer player, ItemStack wirelessTerm) {
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				if (baubles.getStackInSlot(i).isEmpty()) {
+					continue;
+				}
+				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
+					baubles.setStackInSlot(i, wirelessTerm);
+					baubles.setChanged(i, true);
+					//return baubles.getStackInSlot(i);
+				}
+			}
+		}
+		//return ItemStack.EMPTY;
 	}
 
 	public static int getWCTBaubleSlotIndex(EntityPlayer player) {
@@ -96,6 +118,22 @@ public class Baubles {
 
 	public static boolean isBaubleSlot(Slot slot) {
 		return slot instanceof SlotBauble;
+	}
+
+	public static void sync(EntityPlayer player, ItemStack stack) {
+		if (player instanceof EntityPlayerMP) {
+			IBaublesItemHandler inv = getBaubles(player);
+			for (int i = 0; i < inv.getSlots(); i++) {
+				ItemStack currentStack = inv.getStackInSlot(i);
+				if (currentStack.getItem() instanceof IBauble) {
+					IBauble bauble = (IBauble) currentStack.getItem();
+					if (bauble.getBaubleType(currentStack) == BaubleType.HEAD && WCTUtils.isAnyWCT(currentStack)) {
+						updateWCTBauble(player, stack);
+						ModNetworking.instance().sendTo(new PacketBaubleSync(stack), (EntityPlayerMP) player);
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
+import p455w0rd.wct.sync.packets.PacketBaubleSync;
 import p455w0rd.wct.sync.packets.PacketConfigSync;
 import p455w0rd.wct.sync.packets.PacketCraftRequest;
 import p455w0rd.wct.sync.packets.PacketEmptyTrash;
@@ -73,7 +74,9 @@ public class WCTPacketHandlerBase {
 
 			PACKET_SET_IN_RANGE(PacketSetInRange.class),
 
-			PACKET_SET_AUTOCONSUME_BOOSTERS(PacketSetAutoConsumeBoosters.class);
+			PACKET_SET_AUTOCONSUME_BOOSTERS(PacketSetAutoConsumeBoosters.class),
+
+			PACKET_BAUBLE_SYNC(PacketBaubleSync.class);
 
 		private final Class<? extends WCTPacket> packetClass;
 		private final Constructor<? extends WCTPacket> packetConstructor;

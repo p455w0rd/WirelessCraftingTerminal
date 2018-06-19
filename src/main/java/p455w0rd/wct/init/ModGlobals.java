@@ -15,8 +15,6 @@
  */
 package p455w0rd.wct.init;
 
-import baubles.common.Baubles;
-
 public class ModGlobals {
 
 	public static final String MODID = "wct";
@@ -25,7 +23,7 @@ public class ModGlobals {
 	public static final String SERVER_PROXY = "p455w0rd.wct.proxy.CommonProxy";
 	public static final String CLIENT_PROXY = "p455w0rd.wct.proxy.ClientProxy";
 	public static final String GUI_FACTORY = "p455w0rd.wct.client.gui.GuiFactory";
-	public static final String DEP_LIST = "required-after:appliedenergistics2@[rv5-beta-1,);required-after:p455w0rdslib@[2.0.22,);after:" + Baubles.MODID + ";after:mousetweaks;after:itemscroller";
+	public static final String DEP_LIST = "required-after:appliedenergistics2@[rv5-beta-1,);required-after:p455w0rdslib@[2.0.22,);after:baubles;after:mousetweaks;after:itemscroller";
 	public static final String CONFIG_FILE = "config/WirelessCraftingTerminal.cfg";
 
 }

@@ -926,7 +926,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	@Override
 	public void onContainerClosed(final EntityPlayer player) {
 		writeToNBT();
-		super.onContainerClosed(player);
+		//super.onContainerClosed(player);
 		if (monitor != null) {
 			monitor.removeListener(this);
 		}
@@ -1004,6 +1004,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		//newNBT.setTag("ViewCells", viewCell.serializeNBT());
 		viewCell.writeToNBT(newNBT, "ViewCells");
 		containerstack.setTagCompound(newNBT);
+		if (Mods.BAUBLES.isLoaded()) {
+			Baubles.sync(getPlayerInv().player, containerstack);
+		}
 	}
 
 	public ItemStack getWirelessTerminal() {
