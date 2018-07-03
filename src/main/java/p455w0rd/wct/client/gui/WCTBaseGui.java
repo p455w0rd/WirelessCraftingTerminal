@@ -29,6 +29,9 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -53,6 +56,9 @@ import appeng.container.slot.SlotInaccessible;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.core.AEConfig;
 import appeng.core.localization.ButtonToolTips;
+import appeng.fluids.client.render.FluidStackSizeRenderer;
+import appeng.fluids.container.slots.IFluidSlot;
+import appeng.fluids.container.slots.IMEFluidSlot;
 import appeng.helpers.InventoryAction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -61,6 +67,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -71,6 +79,11 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
@@ -79,7 +92,6 @@ import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.container.slot.SlotOutput;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
-import p455w0rd.wct.container.slot.SlotSingleItem;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.JEI;
@@ -99,6 +111,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 	private Slot bl_clicked;
 	public boolean subGui;
 	private final StackSizeRenderer stackSizeRenderer = new StackSizeRenderer();
+	private final FluidStackSizeRenderer fluidStackSizeRenderer = new FluidStackSizeRenderer();
 
 	public WCTBaseGui(final Container container) {
 		super(container);
@@ -242,7 +255,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 		for (final Slot slot : slots) {
 			if (slot instanceof OptionalSlotFake) {
 				final OptionalSlotFake fs = (OptionalSlotFake) slot;
-				if (fs.renderDisabled()) {
+				if (fs.isRenderDisabled()) {
 					if (fs.isEnabled()) {
 						this.drawTexturedModalRect(ox + fs.xPos - 1, oy + fs.yPos - 1, fs.getSourceX() - 1, fs.getSourceY() - 1, 18, 18);
 					}
@@ -499,13 +512,9 @@ public abstract class WCTBaseGui extends GuiContainer {
 						if (s instanceof AppEngSlot && ((AppEngSlot) s).getItemHandler() instanceof InvWrapper) {
 							slotInv = ((InvWrapper) ((AppEngSlot) s).getItemHandler()).getInv();
 						}
-						if (slotInv == playerInv) {
-							if (40 - s.getSlotIndex() == j) {
-								//disable hotbar key-swapping WCT
-								if (!s.canTakeStack(mc.player) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
-									return false;
-								}
-							}
+						//disable hotbar key-swapping WCT
+						if (!s.canTakeStack(mc.player) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
+							return false;
 						}
 					}
 					if (theSlot.getSlotStackLimit() == 64) {
@@ -596,11 +605,45 @@ public abstract class WCTBaseGui extends GuiContainer {
 				}
 				zLevel = 0.0F;
 				itemRender.zLevel = 0.0F;
-				super.drawSlot(new SlotSingleItem(s));
+				//super.drawSlot(new SlotSingleItem(s));
+				super.drawSlot(new Size1Slot((SlotME) s));
 				stackSizeRenderer.renderStackSize(fontRenderer, ((SlotME) s).getAEStack(), s.getStack(), s.xPos, s.yPos);
 			}
 			catch (final Exception err) {
 			}
+			return;
+		}
+		else if (s instanceof IFluidSlot && ((IFluidSlot) s).shouldRenderAsFluid()) {
+			final IFluidSlot slot = (IFluidSlot) s;
+			final FluidStack fs = slot.getFluidStack();
+
+			if (fs != null && isPowered()) {
+				GlStateManager.disableLighting();
+				GlStateManager.disableBlend();
+				Fluid fluid = fs.getFluid();
+				Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+				TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluid.getStill().toString());
+
+				// Set color for dynamic fluids
+				// Convert int color to RGB
+				float red = (fluid.getColor() >> 16 & 255) / 255.0F;
+				float green = (fluid.getColor() >> 8 & 255) / 255.0F;
+				float blue = (fluid.getColor() & 255) / 255.0F;
+				GlStateManager.color(red, green, blue);
+
+				this.drawTexturedModalRect(s.xPos, s.yPos, sprite, 16, 16);
+				GlStateManager.enableLighting();
+				GlStateManager.enableBlend();
+
+				if (s instanceof IMEFluidSlot) {
+					final IMEFluidSlot meFluidSlot = (IMEFluidSlot) s;
+					fluidStackSizeRenderer.renderStackSize(fontRenderer, meFluidSlot.getAEFluidStack(), s.xPos, s.yPos);
+				}
+			}
+			else if (!isPowered()) {
+				drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);
+			}
+
 			return;
 		}
 		else {
@@ -760,6 +803,109 @@ public abstract class WCTBaseGui extends GuiContainer {
 		}
 		else {
 			return Keyboard.isKeyDown(15);
+		}
+	}
+
+	class Size1Slot extends SlotItemHandler {
+
+		private final SlotItemHandler delegate;
+
+		public Size1Slot(SlotItemHandler delegate) {
+			super(delegate.getItemHandler(), delegate.getSlotIndex(), delegate.xPos, delegate.yPos);
+			this.delegate = delegate;
+		}
+
+		/**
+		 * Helper fnct to get the stack in the slot.
+		 */
+		@Override
+		@Nonnull
+		public ItemStack getStack() {
+			ItemStack orgStack = delegate.getStack();
+			if (!orgStack.isEmpty()) {
+				ItemStack modifiedStack = orgStack.copy();
+				modifiedStack.setCount(1);
+				return modifiedStack;
+			}
+
+			return ItemStack.EMPTY;
+		}
+
+		/**
+		 * Returns if this slot contains a stack.
+		 */
+		@Override
+		public boolean getHasStack() {
+			return delegate.getHasStack();
+		}
+
+		/**
+		 * returns true if the slot exists in the given inventory and location
+		 */
+		@Override
+		public boolean isHere(IInventory inv, int slotIn) {
+			return delegate.isHere(inv, slotIn);
+		}
+
+		/**
+		 * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1 in the case of
+		 * armor slots)
+		 */
+		@Override
+		public int getSlotStackLimit() {
+			return delegate.getSlotStackLimit();
+		}
+
+		@Override
+		public int getItemStackLimit(ItemStack stack) {
+			return delegate.getItemStackLimit(stack);
+		}
+
+		@Override
+		@Nullable
+		@SideOnly(Side.CLIENT)
+		public String getSlotTexture() {
+			return delegate.getSlotTexture();
+		}
+
+		/**
+		 * Return whether this slot's stack can be taken from this slot.
+		 */
+		@Override
+		public boolean canTakeStack(EntityPlayer playerIn) {
+			return delegate.canTakeStack(playerIn);
+		}
+
+		/**
+		 * Actualy only call when we want to render the white square effect over the slots. Return always True, except for the
+		 * armor slot of the Donkey/Mule (we can't interact with the Undead and Skeleton horses)
+		 */
+		@Override
+		@SideOnly(Side.CLIENT)
+		public boolean isEnabled() {
+			return delegate.isEnabled();
+		}
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public ResourceLocation getBackgroundLocation() {
+			return delegate.getBackgroundLocation();
+		}
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public TextureAtlasSprite getBackgroundSprite() {
+			return delegate.getBackgroundSprite();
+		}
+
+		@Override
+		public int getSlotIndex() {
+			return delegate.getSlotIndex();
+		}
+
+		@Override
+		public boolean isSameInventory(Slot other) {
+			return delegate.isSameInventory(other);
 		}
 	}
 

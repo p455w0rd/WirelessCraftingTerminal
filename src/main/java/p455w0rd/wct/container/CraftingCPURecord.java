@@ -18,7 +18,6 @@ package p455w0rd.wct.container;
 import javax.annotation.Nonnull;
 
 import appeng.api.networking.crafting.ICraftingCPU;
-import appeng.util.ItemSorters;
 
 public class CraftingCPURecord implements Comparable<CraftingCPURecord> {
 
@@ -36,11 +35,11 @@ public class CraftingCPURecord implements Comparable<CraftingCPURecord> {
 
 	@Override
 	public int compareTo(@Nonnull final CraftingCPURecord o) {
-		final int a = ItemSorters.compareLong(o.getProcessors(), getProcessors());
+		final int a = Long.compare(o.getProcessors(), getProcessors());
 		if (a != 0) {
 			return a;
 		}
-		return ItemSorters.compareLong(o.getSize(), getSize());
+		return Long.compare(o.getSize(), getSize());
 	}
 
 	public ICraftingCPU getCpu() {

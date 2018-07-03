@@ -114,7 +114,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	public boolean showDurabilityBar(ItemStack is) {
 		double aeCurrPower = getAECurrentPower(is);
 		double aeMaxPower = getAEMaxPower(is);
-		if ((int) aeCurrPower >= (int) aeMaxPower) {
+		if ((int) aeCurrPower >= (int) aeMaxPower - 2) {
 			return false;
 		}
 		if (WCTUtils.isWCTCreative(is)) {
