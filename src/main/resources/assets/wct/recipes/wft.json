@@ -1,0 +1,24 @@
+{
+  "conditions": [
+    {
+      "type": "wct:recipes_enabled"
+    }
+  ],
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "item": "appliedenergistics2:wireless_terminal"
+    },
+    {
+      "item": "appliedenergistics2:material",
+      "data": 9
+    },
+    {
+      "item": "appliedenergistics2:part",
+      "data": 520
+    }
+  ],
+  "result": {
+    "item": "wct:wft"
+  }
+}

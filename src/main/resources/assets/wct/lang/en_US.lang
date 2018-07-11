@@ -72,6 +72,7 @@ gui.magnetmode=Magnet Mode
 
 // JEI
 jei.wct.desc=A wireless version of the AE2 Crafting Terminal. To function, it needs to be linked to a ME network via a Security Terminal. A keybind can be set in Options->Controls to open the GUI.
+jei.wft.desc=A wireless version of the AE2 Fluid Terminal. To function, it needs to be linked to a ME network via a Security Terminal. A keybind can be set in Options->Controls to open the GUI.
 jei.wct_bauble.desc=Can be worn on the head as a Bauble
 jei.magnet_card.desc=A magnet that can automatically insert items into the connected ME network. Crouch+right-click to change modes (modes can also be switched via keybind). Right-click to open filter GUI (this can also be keybound).
 jei.booster_old.desc=Insert an Infinity Booster Card into the appropriate slot in the WCT GUI to give infinite range to the WCT.

@@ -72,6 +72,7 @@ public class JEI implements IModPlugin {
 		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wct_bauble.desc" : "";
 		String boosterDescKey = ModConfig.USE_OLD_INFINTY_MECHANIC ? "jei.booster_old.desc" : "jei.booster.desc";
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), ItemStack.class, "jei.wct.desc", wctBaublesDescKey);
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WFT)), ItemStack.class, "jei.wft.desc", wctBaublesDescKey);
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.MAGNET_CARD)), ItemStack.class, "jei.magnet_card.desc");
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.BOOSTER_CARD)), ItemStack.class, boosterDescKey);
 	}
