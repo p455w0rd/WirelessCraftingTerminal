@@ -45,7 +45,6 @@ import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 import p455w0rd.wct.util.WCTUtils;
-import p455w0rdslib.util.EasyMappings;
 import yalter.mousetweaks.api.MouseTweaksIgnore;
 
 @MouseTweaksIgnore
@@ -89,7 +88,7 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		guiLeft = (width - xSize) / 2;
 		guiTop = (height - ySize) / 2;
 
-		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
+		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(79, offsetX - 1), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
 		searchField.setMaxStringLength(25);
 		searchField.setTextColor(0xFFFFFF);
@@ -105,7 +104,7 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		for (int y = 0; y < rows; y++) {
 			for (int x = 0; x < perRow; x++) {
-				SlotFluidME slot = new SlotFluidME(new InternalFluidSlotME(repo, x + y * perRow, offsetX + x * 18, 18 + y * 18));
+				SlotFluidME slot = new SlotFluidME(new InternalFluidSlotME(repo, x + y * perRow, offsetX - 1 + x * 18, 18 + y * 18));
 				getMeFluidSlots().add(slot);
 				inventorySlots.inventorySlots.add(slot);
 			}
@@ -128,7 +127,7 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					}
 				}
 			}
-			if (!WCTUtils.isWCTCreative(wirelessTerm) && isPointInRegion(container.getBoosterSlot().xPos, container.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
+			if (!WCTUtils.isWFTCreative(wirelessTerm) && isPointInRegion(container.getBoosterSlot().xPos, container.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && mc.player.inventory.getItemStack().isEmpty()) {
 				String amountColor = infinityEnergyAmount < ModConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
 				drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
@@ -160,7 +159,7 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 
 		this.drawTexturedModalRect(offsetX, offsetY + 16 + 6 * 18, 0, 106 - 18 - 18 + 8, x_width, 99 + 77);
 		if (ModConfig.WCT_BOOSTER_ENABLED && !WCTUtils.isWFTCreative(WCTUtils.getFluidTerm(Minecraft.getMinecraft().player.inventory))) {
-			drawTexturedModalRect(guiLeft + 151, (guiTop + rows * 18) + 18, 237, 237, 19, 19);
+			drawTexturedModalRect(guiLeft + 150, (guiTop + rows * 18) + 18, 237, 237, 19, 19);
 		}
 		if (searchField != null) {
 			searchField.drawTextBox();

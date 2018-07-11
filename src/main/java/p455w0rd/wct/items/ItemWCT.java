@@ -325,16 +325,13 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	private void rangeCheck(ItemStack wirelessTerm, EntityPlayerMP player) {
 		boolean inRange = WCTUtils.isInRangeOfWAP(wirelessTerm, player);
-		boolean currentValue = WCTUtils.isInRange(wirelessTerm);
-		if (inRange != currentValue) {
-			WCTUtils.setInRange(wirelessTerm, inRange);
-			ModNetworking.instance().sendTo(new PacketSetInRange(inRange), player);
-		}
+		WCTUtils.setInRange(wirelessTerm, inRange);
+		ModNetworking.instance().sendTo(new PacketSetInRange(inRange), player);
 	}
 
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
-		return BaubleType.HEAD;
+		return BaubleType.TRINKET;
 	}
 
 	@Override

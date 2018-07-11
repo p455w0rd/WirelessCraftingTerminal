@@ -678,19 +678,19 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			if (isInRange()) {
 				obj.extractAEPower(AEConfig.instance().wireless_getDrainRate(obj.getRange()), Actionable.MODULATE, PowerMultiplier.CONFIG);
 				if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
-					if (!WCTUtils.isInRange(getWirelessTerminal())) {
-						WCTUtils.setInRange(getWirelessTerminal(), true);
-						ModNetworking.instance().sendTo(new PacketSetInRange(true), (EntityPlayerMP) getPlayerInv().player);
-					}
+					//if (!WCTUtils.isInRange(getWirelessTerminal())) {
+					WCTUtils.setInRange(getWirelessTerminal(), true);
+					ModNetworking.instance().sendTo(new PacketSetInRange(true), (EntityPlayerMP) getPlayerInv().player);
+					//}
 				}
 			}
 			else {
 				obj.extractAEPower((int) (Math.min(500.0, AEConfig.instance().wireless_getDrainRate(obj.getRange()))), Actionable.MODULATE, PowerMultiplier.CONFIG);
 				if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
-					if (WCTUtils.isInRange(getWirelessTerminal())) {
-						WCTUtils.setInRange(getWirelessTerminal(), false);
-						ModNetworking.instance().sendTo(new PacketSetInRange(false), (EntityPlayerMP) getPlayerInv().player);
-					}
+					//if (WCTUtils.isInRange(getWirelessTerminal())) {
+					WCTUtils.setInRange(getWirelessTerminal(), false);
+					ModNetworking.instance().sendTo(new PacketSetInRange(false), (EntityPlayerMP) getPlayerInv().player);
+					//}
 					WCTUtils.drainInfinityEnergy(getWirelessTerminal(), getPlayerInv().player);
 				}
 			}
@@ -1264,7 +1264,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		if (getPowerSource() == null || obj == null) {
 			return input;
 		}
-		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
+		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), (IPortableCell) obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
 		if (ais == null) {
 			return ItemStack.EMPTY;
 		}

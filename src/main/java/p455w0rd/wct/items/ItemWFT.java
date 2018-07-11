@@ -119,7 +119,7 @@ public class ItemWFT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(final ItemStack is, final World world, final List<String> list, final ITooltipFlag advancedTooltips) {
-		if (entityPlayer == null || WCTUtils.getFluidGUIObject(is, entityPlayer) == null) {
+		if (entityPlayer == null) {
 			return;
 		}
 		String encKey = getEncryptionKey(is);
@@ -316,16 +316,13 @@ public class ItemWFT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	private void rangeCheck(ItemStack wirelessTerm, EntityPlayerMP player) {
 		boolean inRange = WCTUtils.isInRangeOfWAP(wirelessTerm, player);
-		boolean currentValue = WCTUtils.isInRange(wirelessTerm);
-		if (inRange != currentValue) {
-			WCTUtils.setInRange(wirelessTerm, inRange);
-			ModNetworking.instance().sendTo(new PacketSetInRange(inRange), player);
-		}
+		WCTUtils.setInRange(wirelessTerm, inRange);
+		ModNetworking.instance().sendTo(new PacketSetInRange(inRange), player);
 	}
 
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
-		return BaubleType.HEAD;
+		return BaubleType.TRINKET;
 	}
 
 	@Override

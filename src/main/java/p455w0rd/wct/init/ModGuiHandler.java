@@ -18,6 +18,8 @@ package p455w0rd.wct.init;
 import appeng.api.AEApi;
 import appeng.api.features.IWirelessTermHandler;
 import appeng.api.storage.ITerminalHost;
+import appeng.api.storage.data.IAEFluidStack;
+import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,7 +37,6 @@ import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.ContainerWFT;
-import p455w0rd.wct.helpers.WCTFluidGuiObject;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.util.WCTUtils;
 
@@ -120,7 +121,7 @@ public class ModGuiHandler implements IGuiHandler {
 		int y = pos.getY();
 		int z = pos.getZ();
 		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getWirelessTerm(player.inventory));
-		final WCTGuiObject terminal = wh == null ? null : new WCTGuiObject(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
+		final WCTGuiObject<IAEItemStack> terminal = wh == null ? null : new WCTGuiObject<IAEItemStack>(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
 		return terminal;
 	}
 
@@ -129,7 +130,7 @@ public class ModGuiHandler implements IGuiHandler {
 		int y = pos.getY();
 		int z = pos.getZ();
 		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getFluidTerm(player.inventory));
-		final WCTFluidGuiObject terminal = wh == null ? null : new WCTFluidGuiObject(wh, WCTUtils.getFluidTerm(player.inventory), player, world, x, y, z);
+		final WCTGuiObject<IAEFluidStack> terminal = wh == null ? null : new WCTGuiObject<IAEFluidStack>(wh, WCTUtils.getFluidTerm(player.inventory), player, world, x, y, z);
 		return terminal;
 	}
 

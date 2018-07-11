@@ -59,7 +59,7 @@ import p455w0rd.wct.util.WCTUtils;
  * @author p455w0rd
  *
  */
-public class WCTFluidGuiObject implements ITerminalHost, IMEMonitor<IAEFluidStack>, IEnergySource, IGuiItemObject, IInventorySlotAware, WCTIActionHost {
+public class WCTFluidGuiObjectOld implements ITerminalHost, IMEMonitor<IAEFluidStack>, IEnergySource, IGuiItemObject, IInventorySlotAware, WCTIActionHost {
 
 	private final ItemStack effectiveItem;
 	private final IWirelessTermHandler wth;
@@ -73,7 +73,7 @@ public class WCTFluidGuiObject implements ITerminalHost, IMEMonitor<IAEFluidStac
 	private double myRange = Double.MAX_VALUE;
 	private final int inventorySlot;
 
-	public WCTFluidGuiObject(final IWirelessTermHandler wh, final ItemStack is, final EntityPlayer ep, final World w, final int x, final int y, final int z) {
+	public WCTFluidGuiObjectOld(final IWirelessTermHandler wh, final ItemStack is, final EntityPlayer ep, final World w, final int x, final int y, final int z) {
 		encryptionKey = wh.getEncryptionKey(is);
 		effectiveItem = is;
 		myPlayer = ep;

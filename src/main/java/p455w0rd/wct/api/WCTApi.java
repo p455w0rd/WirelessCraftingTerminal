@@ -45,4 +45,6 @@ public abstract class WCTApi {
 
 	public abstract void openWirelessCraftingTerminalGui(EntityPlayer player);
 
+	public abstract void openWirelessFluidTerminalGui(EntityPlayer player);
+
 }

@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 
 import appeng.api.implementations.tiles.IWirelessAccessPoint;
+import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -48,7 +49,6 @@ import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.ContainerWFT;
-import p455w0rd.wct.helpers.WCTFluidGuiObject;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
@@ -304,18 +304,20 @@ public class WCTUtils {
 	}
 
 	public static List<IWirelessAccessPoint> getWAPs(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		if (isAnyWCT(wirelessTerm)) {
-			WCTGuiObject object = getGUIObject(wirelessTerm, player);
+		if (isAnyWCT(wirelessTerm) || isAnyWFT(wirelessTerm)) {
+			WCTGuiObject<?> object = getGUIObject(wirelessTerm, player);
 			if (object != null) {
 				return object.getWAPs();
 			}
 		}
+		/*
 		else if (isAnyWFT(wirelessTerm)) {
 			WCTFluidGuiObject object = getFluidGUIObject(wirelessTerm, player);
 			if (object != null) {
 				return object.getWAPs();
 			}
 		}
+		*/
 		return Collections.emptyList();
 	}
 
@@ -328,52 +330,62 @@ public class WCTUtils {
 		return null;
 	}
 	*/
-	public static WCTGuiObject getGUIObject(EntityPlayer player) {
+	public static WCTGuiObject<?> getGUIObject(EntityPlayer player) {
 		return getGUIObject(null, player);
 	}
 
-	public static WCTGuiObject getGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		//if (wirelessTerm == null) {
-		if (player.openContainer instanceof ContainerWCT || wirelessTerm == null) {
-			ContainerWCT c = (ContainerWCT) player.openContainer;
-			if (c.getObject() != null && c.getObject() instanceof WCTGuiObject) {
-				return (WCTGuiObject) c.getObject();
+	public static WCTGuiObject<?> getGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
+		if (wirelessTerm == null) {
+			if (player.openContainer instanceof ContainerWCT) {
+				ContainerWCT c = (ContainerWCT) player.openContainer;
+				if (c.getObject() != null) {
+					return (WCTGuiObject<?>) c.getObject();
+				}
+			}
+			else if (player.openContainer instanceof ContainerWFT) {
+				ContainerWFT c = (ContainerWFT) player.openContainer;
+				if (c.getObject() != null) {
+					return (WCTGuiObject<?>) c.getObject();
+				}
 			}
 		}
-		//}
 		else {
 			if (wirelessTerm.getItem() instanceof IWirelessCraftingTermHandler) {
 				if (player != null && player.getEntityWorld() != null) {
-					return new WCTGuiObject((IWirelessCraftingTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+					return new WCTGuiObject<IAEItemStack>((IWirelessCraftingTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
 				}
+			}
+			else if (wirelessTerm.getItem() instanceof IWirelessFluidTermHandler) {
+				return new WCTGuiObject<IAEItemStack>((IWirelessFluidTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
 			}
 		}
 		return null;
 	}
 
-	public static WCTFluidGuiObject getFluidGUIObject(EntityPlayer player) {
-		return getFluidGUIObject(null, player);
-	}
-
-	public static WCTFluidGuiObject getFluidGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		//if (wirelessTerm == null) {
-		if (player.openContainer instanceof ContainerWFT || wirelessTerm == null) {
-			ContainerWFT c = (ContainerWFT) player.openContainer;
-			if (c.getObject() != null && c.getObject() instanceof WCTFluidGuiObject) {
-				return (WCTFluidGuiObject) c.getObject();
-			}
+	/*
+		public static WCTFluidGuiObject getFluidGUIObject(EntityPlayer player) {
+			return getFluidGUIObject(null, player);
 		}
-		//}
-		else {
-			if (wirelessTerm.getItem() instanceof IWirelessFluidTermHandler) {
-				if (player != null && player.getEntityWorld() != null) {
-					return new WCTFluidGuiObject((IWirelessFluidTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+
+		public static WCTFluidGuiObject getFluidGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
+			//if (wirelessTerm == null) {
+			if (player.openContainer instanceof ContainerWFT || wirelessTerm == null) {
+				ContainerWFT c = (ContainerWFT) player.openContainer;
+				if (c.getObject() != null && c.getObject() instanceof WCTFluidGuiObject) {
+					return (WCTFluidGuiObject) c.getObject();
 				}
 			}
+			//}
+			else {
+				if (wirelessTerm.getItem() instanceof IWirelessFluidTermHandler) {
+					if (player != null && player.getEntityWorld() != null) {
+						return new WCTFluidGuiObject((IWirelessFluidTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+					}
+				}
+			}
+			return null;
 		}
-		return null;
-	}
-
+	*/
 	public static void setInfinityEnergy(@Nonnull ItemStack wirelessTerm, int amount) {
 		if (!isWCTCreative(wirelessTerm) || !isWFTCreative(wirelessTerm)) {
 			NBTTagCompound nbt = ensureTag(wirelessTerm);

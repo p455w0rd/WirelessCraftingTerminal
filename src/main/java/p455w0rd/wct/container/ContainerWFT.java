@@ -161,15 +161,22 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 		else {
 			monitor = null;
 		}
+
+		for (int i = 0; i < getPlayerInv().getSizeInventory(); i++) {
+			ItemStack currStack = getPlayerInv().getStackInSlot(i);
+			if (!currStack.isEmpty() && currStack == fluidTerminal) {
+				lockPlayerInventorySlot(i);
+			}
+		}
 		bindPlayerInventory(player.inventory, 8, 222 - 90);
 
 		if (ModConfig.WCT_BOOSTER_ENABLED && !WCTUtils.isWFTCreative(getFluidTerminal())) {
 			if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
-				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 153, 110));
+				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 152, 110));
 				boosterSlot.setContainer(this);
 			}
 			else {
-				addSlotToContainer(boosterSlot = new SlotBoosterEnergy(153, 110));
+				addSlotToContainer(boosterSlot = new SlotBoosterEnergy(152, 110));
 				boosterSlot.setContainer(this);
 			}
 		}
@@ -318,19 +325,19 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 				if (isInRange()) {
 					obj.extractAEPower(AEConfig.instance().wireless_getDrainRate(obj.getRange()), Actionable.MODULATE, PowerMultiplier.CONFIG);
 					if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
-						if (!WCTUtils.isInRange(getFluidTerminal())) {
-							WCTUtils.setInRange(getFluidTerminal(), true);
-							ModNetworking.instance().sendTo(new PacketSetInRange(true), (EntityPlayerMP) getPlayerInv().player);
-						}
+						//if (!WCTUtils.isInRange(getFluidTerminal())) {
+						WCTUtils.setInRange(getFluidTerminal(), true);
+						ModNetworking.instance().sendTo(new PacketSetInRange(true), (EntityPlayerMP) getPlayerInv().player);
+						//}
 					}
 				}
 				else {
 					obj.extractAEPower((int) (Math.min(500.0, AEConfig.instance().wireless_getDrainRate(obj.getRange()))), Actionable.MODULATE, PowerMultiplier.CONFIG);
 					if (!ModConfig.USE_OLD_INFINTY_MECHANIC) {
-						if (WCTUtils.isInRange(getFluidTerminal())) {
-							WCTUtils.setInRange(getFluidTerminal(), false);
-							ModNetworking.instance().sendTo(new PacketSetInRange(false), (EntityPlayerMP) getPlayerInv().player);
-						}
+						//if (WCTUtils.isInRange(getFluidTerminal())) {
+						WCTUtils.setInRange(getFluidTerminal(), false);
+						ModNetworking.instance().sendTo(new PacketSetInRange(false), (EntityPlayerMP) getPlayerInv().player);
+						//}
 						WCTUtils.drainInfinityEnergy(getFluidTerminal(), getPlayerInv().player);
 					}
 				}

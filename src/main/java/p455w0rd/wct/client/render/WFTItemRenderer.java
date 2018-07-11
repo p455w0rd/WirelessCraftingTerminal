@@ -45,7 +45,7 @@ import net.minecraftforge.client.model.pipeline.LightUtil;
  * @author p455w0rd
  *
  */
-public class WCTItemRenderer extends TileEntityItemStackRenderer {
+public class WFTItemRenderer extends TileEntityItemStackRenderer {
 
 	public static ItemLayerWrapper model;
 	public static TransformType transformType;

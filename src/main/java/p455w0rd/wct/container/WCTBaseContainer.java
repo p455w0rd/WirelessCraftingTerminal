@@ -27,6 +27,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.IMEMonitor;
+import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.container.AEBaseContainer;
 import appeng.container.guisync.SyncData;
@@ -60,12 +61,12 @@ import p455w0rd.wct.sync.packets.PacketValueConfig;
 
 public class WCTBaseContainer extends AEBaseContainer {
 
-	public WCTGuiObject obj;
+	public WCTGuiObject<?> obj;
 	protected IMEMonitor<IAEItemStack> monitor;
 
 	public WCTBaseContainer(final InventoryPlayer ip, final Object anchor) {
 		super(ip, null, null);
-		obj = anchor instanceof WCTGuiObject ? (WCTGuiObject) anchor : null;
+		obj = anchor instanceof WCTGuiObject ? (WCTGuiObject<?>) anchor : null;
 
 		if (obj == null) {
 			setValidContainer(false);
@@ -79,20 +80,16 @@ public class WCTBaseContainer extends AEBaseContainer {
 		return listeners;
 	}
 
-	protected static WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	protected static WCTGuiObject<?> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (!it.isEmpty()) {
 			IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh instanceof IWirelessCraftingTermHandler) {
-				wh = wh;
+				return new WCTGuiObject<IAEItemStack>(wh, it, player, w, x, y, z);
 			}
 			if (wh instanceof IWirelessFluidTermHandler) {
-				wh = wh;
-			}
-			if (wh != null) {
-				return new WCTGuiObject(wh, it, player, w, x, y, z);
+				return new WCTGuiObject<IAEFluidStack>(wh, it, player, w, x, y, z);
 			}
 		}
-
 		return null;
 	}
 

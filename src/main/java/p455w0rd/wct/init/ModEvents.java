@@ -64,6 +64,7 @@ import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
 import p455w0rd.wct.client.render.ItemLayerWrapper;
 import p455w0rd.wct.client.render.WCTItemRenderer;
+import p455w0rd.wct.client.render.WFTItemRenderer;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
@@ -189,17 +190,21 @@ public class ModEvents {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelBake(ModelBakeEvent event) {
-		IBakedModel testModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
-		WCTItemRenderer.model = new ItemLayerWrapper(testModel);
+		IBakedModel wctModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
+		WCTItemRenderer.model = new ItemLayerWrapper(wctModel);
+		IBakedModel wftModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WFT.getRegistryName(), "inventory"));
+		WFTItemRenderer.model = new ItemLayerWrapper(wftModel);
 		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"), WCTItemRenderer.model);
+		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.WFT.getRegistryName(), "inventory"), WFTItemRenderer.model);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelRegister(ModelRegistryEvent event) {
-		//ModelLoader.setCustomModelResourceLocation(ModItems.WCT, 0, new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
 		ModItems.WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
 		ModItems.CREATIVE_WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
+		ModItems.WFT.setTileEntityItemStackRenderer(new WFTItemRenderer());
+		ModItems.CREATIVE_WFT.setTileEntityItemStackRenderer(new WFTItemRenderer());
 	}
 
 	@SubscribeEvent

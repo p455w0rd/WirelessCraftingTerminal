@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.relauncher.Side;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
@@ -78,10 +79,28 @@ public class WCTAPIImpl extends WCTApi {
 		}
 	}
 
+	@Override
+	public void openWirelessFluidTerminalGui(final EntityPlayer player) {
+		if ((player == null) || (player instanceof FakePlayer) || (player instanceof EntityPlayerMP) || FMLCommonHandler.instance().getSide() == Side.SERVER) {
+			return;
+		}
+		ItemStack is = WCTUtils.getFluidTerm(player.inventory);
+		if (is == null) {
+			return;
+		}
+		if (isTerminalLinked(is)) {
+			ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WFT));
+		}
+	}
+
 	private boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
 		String sourceKey = "";
 		if (wirelessTerminalItemstack.getItem() instanceof IWirelessCraftingTerminalItem && wirelessTerminalItemstack.hasTagCompound()) {
 			sourceKey = ((IWirelessCraftingTerminalItem) wirelessTerminalItemstack.getItem()).getEncryptionKey(wirelessTerminalItemstack);
+			return (sourceKey != null) && (!sourceKey.isEmpty());
+		}
+		else if (wirelessTerminalItemstack.getItem() instanceof IWirelessFluidTerminalItem && wirelessTerminalItemstack.hasTagCompound()) {
+			sourceKey = ((IWirelessFluidTerminalItem) wirelessTerminalItemstack.getItem()).getEncryptionKey(wirelessTerminalItemstack);
 			return (sourceKey != null) && (!sourceKey.isEmpty());
 		}
 		return false;

@@ -82,11 +82,9 @@ public class Baubles {
 				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
 					baubles.setStackInSlot(i, wirelessTerm);
 					baubles.setChanged(i, true);
-					//return baubles.getStackInSlot(i);
 				}
 			}
 		}
-		//return ItemStack.EMPTY;
 	}
 
 	public static int getWCTBaubleSlotIndex(EntityPlayer player) {
@@ -151,6 +149,10 @@ public class Baubles {
 				}
 			}
 		}
+	}
+
+	public enum BaubleSlotType {
+			NECKLACE, RING1, RING2
 	}
 
 }
