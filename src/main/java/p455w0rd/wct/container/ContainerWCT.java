@@ -32,7 +32,6 @@ import appeng.api.config.SortDir;
 import appeng.api.config.SortOrder;
 import appeng.api.config.ViewItems;
 import appeng.api.features.IWirelessTermHandler;
-import appeng.api.implementations.guiobjects.IPortableCell;
 import appeng.api.implementations.tiles.IViewCellStorage;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridHost;
@@ -42,6 +41,7 @@ import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IBaseMonitor;
+import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.ITerminalHost;
 import appeng.api.storage.channels.IItemStorageChannel;
@@ -168,7 +168,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			if (monitor != null) {
 				monitor.addListener(this, null);
 				setCellInventory(monitor);
-				if (obj instanceof IPortableCell) {
+				if (obj instanceof IEnergySource) {
 					setPowerSource(obj);
 				}
 				else if (obj instanceof IGridHost || obj instanceof IActionHost) {
@@ -1260,11 +1260,12 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		return ItemStack.EMPTY;
 	}
 
+	@SuppressWarnings("unchecked")
 	private ItemStack shiftStoreItem(final ItemStack input) {
 		if (getPowerSource() == null || obj == null) {
 			return input;
 		}
-		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), (IPortableCell) obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
+		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), (IMEMonitor<IAEItemStack>) obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
 		if (ais == null) {
 			return ItemStack.EMPTY;
 		}
