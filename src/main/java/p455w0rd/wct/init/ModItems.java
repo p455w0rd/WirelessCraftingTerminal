@@ -26,6 +26,8 @@ import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemWCT;
 import p455w0rd.wct.items.ItemWCTCreative;
+import p455w0rd.wct.items.ItemWFT;
+import p455w0rd.wct.items.ItemWFTCreative;
 
 /**
  * @author p455w0rd
@@ -39,12 +41,16 @@ public class ModItems {
 	public static ItemWCTCreative CREATIVE_WCT;
 	public static ItemMagnet MAGNET_CARD;
 	public static ItemInfinityBooster BOOSTER_CARD;
+	public static ItemWFT WFT;
+	public static ItemWFTCreative CREATIVE_WFT;
 
 	public static void preInit() {
 		ITEM_LIST.add(WCT = new ItemWCT());
 		ITEM_LIST.add(CREATIVE_WCT = new ItemWCTCreative());
 		ITEM_LIST.add(MAGNET_CARD = new ItemMagnet());
 		ITEM_LIST.add(BOOSTER_CARD = new ItemInfinityBooster());
+		ITEM_LIST.add(WFT = new ItemWFT());
+		ITEM_LIST.add(CREATIVE_WFT = new ItemWFTCreative());
 	}
 
 	@SideOnly(Side.CLIENT)

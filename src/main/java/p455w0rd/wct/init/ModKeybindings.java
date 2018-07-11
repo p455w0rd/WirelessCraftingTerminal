@@ -29,14 +29,17 @@ public class ModKeybindings {
 	public static KeyBinding openTerminal;
 	public static KeyBinding openMagnetFilter;
 	public static KeyBinding changeMagnetMode;
+	public static KeyBinding openFluidTerminal;
 
 	public static void preInit() {
 		openTerminal = new KeyBinding("key.open_terminal.desc", Keyboard.CHAR_NONE, "key.categories.wct");
 		openMagnetFilter = new KeyBinding("key.open_magnet.desc", Keyboard.CHAR_NONE, "key.categories.wct");
 		changeMagnetMode = new KeyBinding("key.switch_magnet_mode.desc", Keyboard.CHAR_NONE, "key.categories.wct");
+		openFluidTerminal = new KeyBinding("key.open_fluid_terminal.desc", Keyboard.CHAR_NONE, "key.categories.wct");
 		ClientRegistry.registerKeyBinding(openTerminal);
 		ClientRegistry.registerKeyBinding(openMagnetFilter);
 		ClientRegistry.registerKeyBinding(changeMagnetMode);
+		ClientRegistry.registerKeyBinding(openFluidTerminal);
 	}
 
 }

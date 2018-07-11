@@ -21,7 +21,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.client.gui.GuiWCT;
+import p455w0rd.wct.client.gui.GuiWFT;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.ContainerWFT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
@@ -64,9 +66,21 @@ public class PacketSyncInfinityEnergy extends WCTPacket {
 				wctGUI.setWirelessTerminal(wirelessTerm);
 			}
 		}
+		else if (player.openContainer instanceof ContainerWFT) {
+			ContainerWFT container = (ContainerWFT) player.openContainer;
+			ItemStack wirelessTerm = container.getFluidTerminal();
+			WCTUtils.setInfinityEnergy(wirelessTerm, infinityEnergy);
+			if (Minecraft.getMinecraft().currentScreen instanceof GuiWFT) {
+				GuiWFT wftGUI = (GuiWFT) Minecraft.getMinecraft().currentScreen;
+				wftGUI.setFluidTerminal(wirelessTerm);
+			}
+		}
 		else {
 			if (!WCTUtils.getWirelessTerm(player.inventory).isEmpty()) {
 				WCTUtils.setInfinityEnergy(WCTUtils.getWirelessTerm(player.inventory), infinityEnergy);
+			}
+			if (!WCTUtils.getFluidTerm(player.inventory).isEmpty()) {
+				WCTUtils.setInfinityEnergy(WCTUtils.getFluidTerm(player.inventory), infinityEnergy);
 			}
 		}
 	}

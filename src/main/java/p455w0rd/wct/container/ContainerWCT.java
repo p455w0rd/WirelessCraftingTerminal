@@ -783,6 +783,10 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		}
 	}
 
+	protected boolean isInRange() {
+		return obj.rangeCheck(hasInfiniteRange());
+	}
+
 	private boolean hasInfiniteRange() {
 		return WCTUtils.hasInfiniteRange(containerstack);
 	}
@@ -800,7 +804,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 
 	public AppEngSlot getBoosterSlot() {
 		return boosterSlot instanceof SlotBooster ? boosterSlot : boosterSlot instanceof SlotBoosterEnergy ? boosterSlot : null;
-
 	}
 
 	public boolean isMagnetInstalled() {
@@ -861,10 +864,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			return distanceToWap <= wapRange;
 		}
 		return false;
-	}
-
-	protected boolean isInRange() {
-		return obj.rangeCheck(hasInfiniteRange());
 	}
 
 	protected boolean networkIsPowered() {

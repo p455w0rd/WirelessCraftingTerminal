@@ -23,6 +23,8 @@ import appeng.core.AEConfig;
 import appeng.integration.Integrations;
 import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityItem;
@@ -39,6 +41,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,6 +62,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.client.render.BaubleRenderDispatcher;
+import p455w0rd.wct.client.render.ItemLayerWrapper;
+import p455w0rd.wct.client.render.WCTItemRenderer;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
@@ -178,6 +184,22 @@ public class ModEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onMouseEvent(MouseEvent event) {
 		WCTUtils.handleKeybind();
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onModelBake(ModelBakeEvent event) {
+		IBakedModel testModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
+		WCTItemRenderer.model = new ItemLayerWrapper(testModel);
+		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"), WCTItemRenderer.model);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onModelRegister(ModelRegistryEvent event) {
+		//ModelLoader.setCustomModelResourceLocation(ModItems.WCT, 0, new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
+		ModItems.WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
+		ModItems.CREATIVE_WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
 	}
 
 	@SubscribeEvent

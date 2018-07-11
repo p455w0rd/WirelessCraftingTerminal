@@ -25,19 +25,21 @@ import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
 import appeng.api.features.ILocatable;
 import appeng.api.features.IWirelessTermHandler;
-import appeng.api.implementations.guiobjects.IPortableCell;
+import appeng.api.implementations.guiobjects.IGuiItemObject;
 import appeng.api.implementations.tiles.IWirelessAccessPoint;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridHost;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IMachineSet;
+import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IMEMonitorHandlerReceiver;
 import appeng.api.storage.IStorageChannel;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.ITerminalHost;
+import appeng.api.storage.channels.IFluidStorageChannel;
+import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
 import appeng.api.util.AECableType;
@@ -49,11 +51,15 @@ import appeng.tile.networking.TileWireless;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.util.WCTUtils;
 
-public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIActionHost {
+/**
+ * @author p455w0rd
+ *
+ */
+public class WCTFluidGuiObject implements ITerminalHost, IMEMonitor<IAEFluidStack>, IEnergySource, IGuiItemObject, IInventorySlotAware, WCTIActionHost {
 
 	private final ItemStack effectiveItem;
 	private final IWirelessTermHandler wth;
@@ -61,13 +67,13 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	private final EntityPlayer myPlayer;
 	private IGrid targetGrid;
 	private IStorageGrid sg;
-	private IMEMonitor<IAEItemStack> itemStorage;
+	private IMEMonitor<IAEFluidStack> itemStorage;
 	private IWirelessAccessPoint myWap;
 	private double sqRange = Double.MAX_VALUE;
 	private double myRange = Double.MAX_VALUE;
 	private final int inventorySlot;
 
-	public WCTGuiObject(final IWirelessTermHandler wh, final ItemStack is, final EntityPlayer ep, final World w, final int x, final int y, final int z) {
+	public WCTFluidGuiObject(final IWirelessTermHandler wh, final ItemStack is, final EntityPlayer ep, final World w, final int x, final int y, final int z) {
 		encryptionKey = wh.getEncryptionKey(is);
 		effectiveItem = is;
 		myPlayer = ep;
@@ -89,7 +95,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 				if (targetGrid != null) {
 					sg = targetGrid.getCache(IStorageGrid.class);
 					if (sg != null) {
-						itemStorage = sg.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
+						itemStorage = sg.getInventory(AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class));
 					}
 				}
 			}
@@ -142,14 +148,14 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public void addListener(final IMEMonitorHandlerReceiver<IAEItemStack> l, final Object verificationToken) {
+	public void addListener(final IMEMonitorHandlerReceiver<IAEFluidStack> l, final Object verificationToken) {
 		if (itemStorage != null) {
 			itemStorage.addListener(l, verificationToken);
 		}
 	}
 
 	@Override
-	public void removeListener(final IMEMonitorHandlerReceiver<IAEItemStack> l) {
+	public void removeListener(final IMEMonitorHandlerReceiver<IAEFluidStack> l) {
 		if (itemStorage != null) {
 			itemStorage.removeListener(l);
 		}
@@ -160,7 +166,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	 */
 	@Override
 	@Deprecated
-	public IItemList<IAEItemStack> getAvailableItems(final IItemList<IAEItemStack> out) {
+	public IItemList<IAEFluidStack> getAvailableItems(final IItemList<IAEFluidStack> out) {
 		if (itemStorage != null) {
 			return itemStorage.getAvailableItems(out);
 		}
@@ -168,7 +174,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public IItemList<IAEItemStack> getStorageList() {
+	public IItemList<IAEFluidStack> getStorageList() {
 		if (itemStorage != null) {
 			return itemStorage.getStorageList();
 		}
@@ -184,7 +190,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public boolean isPrioritized(final IAEItemStack input) {
+	public boolean isPrioritized(final IAEFluidStack input) {
 		if (itemStorage != null) {
 			return itemStorage.isPrioritized(input);
 		}
@@ -192,7 +198,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public boolean canAccept(final IAEItemStack input) {
+	public boolean canAccept(final IAEFluidStack input) {
 		if (itemStorage != null) {
 			return itemStorage.canAccept(input);
 		}
@@ -221,7 +227,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public IAEItemStack injectItems(final IAEItemStack input, final Actionable type, final IActionSource src) {
+	public IAEFluidStack injectItems(final IAEFluidStack input, final Actionable type, final IActionSource src) {
 		if (itemStorage != null) {
 			return itemStorage.injectItems(input, type, src);
 		}
@@ -229,7 +235,7 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public IAEItemStack extractItems(final IAEItemStack request, final Actionable mode, final IActionSource src) {
+	public IAEFluidStack extractItems(final IAEFluidStack request, final Actionable mode, final IActionSource src) {
 		if (itemStorage != null) {
 			return itemStorage.extractItems(request, mode, src);
 		}
@@ -237,11 +243,11 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	}
 
 	@Override
-	public IStorageChannel<IAEItemStack> getChannel() {
+	public IStorageChannel<IAEFluidStack> getChannel() {
 		if (itemStorage != null) {
 			return itemStorage.getChannel();
 		}
-		return AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
+		return AEApi.instance().storage().getStorageChannel(IFluidStorageChannel.class);
 	}
 
 	@Override
@@ -277,8 +283,8 @@ public class WCTGuiObject implements IPortableCell, IInventorySlotAware, WCTIAct
 	public IGridNode getActionableNode() {
 		boolean ignoreRange = false;
 		if (!effectiveItem.isEmpty() && WCTUtils.isAnyWCT(effectiveItem)) {
-			if (effectiveItem.getItem() instanceof IWirelessCraftingTerminalItem) {
-				IWirelessCraftingTerminalItem item = (IWirelessCraftingTerminalItem) effectiveItem.getItem();
+			if (effectiveItem.getItem() instanceof IWirelessFluidTerminalItem) {
+				IWirelessFluidTerminalItem item = (IWirelessFluidTerminalItem) effectiveItem.getItem();
 				ignoreRange = item.checkForBooster(effectiveItem);
 			}
 		}

@@ -19,6 +19,7 @@ package p455w0rd.wct.client.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.item.ItemStack;
@@ -62,8 +63,16 @@ public class RenderLayerWCT implements IBaubleRender {
 
 		GlStateManager.translate(0.0F, 7.0F * 0.0625F, 4.0F * 0.0625F);
 		GlStateManager.scale(0.5F, 0.5F, 0.75F);
-		Minecraft.getMinecraft().getItemRenderer().renderItem(entitylivingbaseIn, piece, TransformType.NONE);
 
+		float pbx = OpenGlHelper.lastBrightnessX;
+		float pby = OpenGlHelper.lastBrightnessY;
+		if (piece.getItem().hasEffect(piece)) {
+			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
+		}
+		Minecraft.getMinecraft().getItemRenderer().renderItem(entitylivingbaseIn, piece, TransformType.NONE);
+		if (piece.getItem().hasEffect(piece)) {
+			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, pbx, pby);
+		}
 		GlStateManager.popMatrix();
 	}
 

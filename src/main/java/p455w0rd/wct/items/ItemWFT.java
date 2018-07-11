@@ -20,7 +20,6 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 
 import appeng.api.config.Actionable;
-import appeng.api.config.PowerMultiplier;
 import appeng.api.config.PowerUnits;
 import appeng.api.config.Settings;
 import appeng.api.config.SortDir;
@@ -55,7 +54,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IBaubleItem;
 import p455w0rd.wct.api.IBaubleRender;
 import p455w0rd.wct.api.IModelHolder;
-import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.client.render.RenderLayerWCT;
 import p455w0rd.wct.client.render.StackSizeRenderer.ReadableNumberConverter;
 import p455w0rd.wct.init.ModConfig;
@@ -69,21 +68,15 @@ import p455w0rd.wct.util.WCTUtils;
  * @author p455w0rd
  *
  */
-@Optional.InterfaceList(value = {
-
-		@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
-})
-public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWirelessCraftingTerminalItem, IBaubleItem {
-
-	public static double GLOBAL_POWER_MULTIPLIER = PowerMultiplier.CONFIG.multiplier;
+public class ItemWFT extends AEBasePoweredItem implements IModelHolder, IWirelessFluidTerminalItem, IBaubleItem {
 
 	private EntityPlayer entityPlayer;
 
-	public ItemWCT() {
-		this("wct");
+	public ItemWFT() {
+		this("wft");
 	}
 
-	public ItemWCT(String name) {
+	public ItemWFT(String name) {
 		super(ModConfig.WCT_MAX_POWER);
 		setRegistryName(name);
 		setUnlocalizedName(name);
@@ -96,7 +89,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition());
+			ModGuiHandler.open(ModGuiHandler.GUI_WFT, player, world, player.getPosition());
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		if (getAECurrentPower(item) <= 0 && !world.isRemote) {
@@ -117,7 +110,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if ((int) aeCurrPower >= (int) aeMaxPower - 2) {
 			return false;
 		}
-		if (WCTUtils.isWCTCreative(is)) {
+		if (WCTUtils.isWFTCreative(is)) {
 			return false;
 		}
 		return true;
@@ -126,7 +119,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(final ItemStack is, final World world, final List<String> list, final ITooltipFlag advancedTooltips) {
-		if (entityPlayer == null || WCTUtils.getGUIObject(is, entityPlayer) == null) {
+		if (entityPlayer == null || WCTUtils.getFluidGUIObject(is, entityPlayer) == null) {
 			return;
 		}
 		String encKey = getEncryptionKey(is);
@@ -141,7 +134,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			pctTxtColor = TextFormatting.RED + "";
 		}
 		list.add(TextFormatting.AQUA + "==============================");
-		if (WCTUtils.isWCTCreative(is)) {
+		if (WCTUtils.isWFTCreative(is)) {
 			list.add(GuiText.StoredEnergy.getLocal() + ": " + TextFormatting.GREEN + "" + I18n.format("tooltip.infinite.desc"));
 		}
 		else {
@@ -152,7 +145,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
 		}
 		list.add("Link Status: " + linked);
-		String magnetStatus = (WCTUtils.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
+
 		if (ModConfig.WCT_BOOSTER_ENABLED) {
 			if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
 				list.add(I18n.format("item.infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
@@ -170,15 +163,14 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 				}
 				String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
 				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
-				String infinityEnergyString = WCTUtils.isWCTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount));
+				String infinityEnergyString = WCTUtils.isWFTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount));
 				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
 			}
 		}
-		list.add(I18n.format("item.magnet_card.name") + ": " + magnetStatus);
 	}
 
 	@Override
-	public boolean isWirelessCraftingEnabled(final ItemStack wirelessTerminal) {
+	public boolean isWirelessFluidEnabled(final ItemStack wirelessTerminal) {
 		return true;
 	}
 
@@ -294,7 +286,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 	@SideOnly(Side.CLIENT)
 	@Override
 	public boolean hasEffect(ItemStack is) {
-		if (WCTUtils.isWCTCreative(is)) {
+		if (WCTUtils.isWFTCreative(is)) {
 			return true;
 		}
 		if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
@@ -312,7 +304,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		if (entityPlayer == null) {
 			entityPlayer = p;
 		}
-		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
+		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessFluidTerminalItem)) {
 			return;
 		}
 
@@ -320,7 +312,6 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 			rangeCheck(wirelessTerminal, (EntityPlayerMP) p);
 		}
 		WCTUtils.isBoosterInstalled(wirelessTerminal);
-		WCTUtils.isMagnetInstalled(wirelessTerminal);
 	}
 
 	private void rangeCheck(ItemStack wirelessTerm, EntityPlayerMP player) {

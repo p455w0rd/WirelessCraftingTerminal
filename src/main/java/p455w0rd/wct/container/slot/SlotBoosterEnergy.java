@@ -27,6 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.ContainerWFT;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
@@ -74,13 +75,25 @@ public class SlotBoosterEnergy extends AppEngSlot {
 
 	@Override
 	public void putStack(final ItemStack stack) {
-		if (thisContainer != null && (thisContainer instanceof ContainerWCT)) {
-			ContainerWCT c = (ContainerWCT) thisContainer;
-			WCTUtils.addInfinityBoosters(c.getWirelessTerminal(), stack);
-			c.detectAndSendChanges();
-			for (IContainerListener listener : c.getListeners()) {
-				if (listener instanceof EntityPlayerMP) {
-					ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(((ContainerWCT) thisContainer).getWirelessTerminal())), (EntityPlayerMP) listener);
+		if (thisContainer != null) {
+			if (thisContainer instanceof ContainerWCT) {
+				ContainerWCT c = (ContainerWCT) thisContainer;
+				WCTUtils.addInfinityBoosters(c.getWirelessTerminal(), stack);
+				c.detectAndSendChanges();
+				for (IContainerListener listener : c.getListeners()) {
+					if (listener instanceof EntityPlayerMP) {
+						ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(((ContainerWCT) thisContainer).getWirelessTerminal())), (EntityPlayerMP) listener);
+					}
+				}
+			}
+			else if (thisContainer instanceof ContainerWFT) {
+				ContainerWFT c = (ContainerWFT) thisContainer;
+				WCTUtils.addInfinityBoosters(c.getFluidTerminal(), stack);
+				c.detectAndSendChanges();
+				for (IContainerListener listener : c.getListeners()) {
+					if (listener instanceof EntityPlayerMP) {
+						ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(((ContainerWFT) thisContainer).getFluidTerminal())), (EntityPlayerMP) listener);
+					}
 				}
 			}
 		}

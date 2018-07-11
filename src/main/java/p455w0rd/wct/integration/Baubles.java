@@ -27,6 +27,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotAEBauble;
 import p455w0rd.wct.init.ModNetworking;
@@ -48,6 +49,22 @@ public class Baubles {
 					continue;
 				}
 				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessCraftingTerminalItem) {
+					return baubles.getStackInSlot(i);
+				}
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	@Nonnull
+	public static ItemStack getWFTBauble(EntityPlayer player) {
+		if (player.hasCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null)) {
+			IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+			for (int i = 0; i < baubles.getSlots(); i++) {
+				if (baubles.getStackInSlot(i).isEmpty()) {
+					continue;
+				}
+				if (baubles.getStackInSlot(i).getItem() instanceof IWirelessFluidTerminalItem) {
 					return baubles.getStackInSlot(i);
 				}
 			}

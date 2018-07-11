@@ -22,6 +22,7 @@ import java.util.List;
 
 import appeng.api.AEApi;
 import appeng.api.config.SecurityPermissions;
+import appeng.api.features.IWirelessTermHandler;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.networking.security.ISecurityGrid;
@@ -46,6 +47,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTermHandler;
+import p455w0rd.wct.api.IWirelessFluidTermHandler;
 import p455w0rd.wct.api.networking.security.WCTIActionHost;
 import p455w0rd.wct.api.networking.security.WCTPlayerSource;
 import p455w0rd.wct.container.slot.SlotPlayerHotBar;
@@ -79,7 +81,13 @@ public class WCTBaseContainer extends AEBaseContainer {
 
 	protected static WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (!it.isEmpty()) {
-			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			if (wh instanceof IWirelessCraftingTermHandler) {
+				wh = wh;
+			}
+			if (wh instanceof IWirelessFluidTermHandler) {
+				wh = wh;
+			}
 			if (wh != null) {
 				return new WCTGuiObject(wh, it, player, w, x, y, z);
 			}
@@ -256,7 +264,8 @@ public class WCTBaseContainer extends AEBaseContainer {
 	public void onUpdate(final String field, final Object oldValue, final Object newValue) {
 	}
 
-	public WCTGuiObject getObject() {
+	public Object getObject() {
 		return obj;
 	}
+
 }

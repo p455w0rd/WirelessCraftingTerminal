@@ -39,6 +39,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
+import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.client.me.InternalSlotME;
@@ -57,7 +58,6 @@ import appeng.container.slot.SlotRestrictedInput;
 import appeng.core.AEConfig;
 import appeng.core.localization.ButtonToolTips;
 import appeng.fluids.client.render.FluidStackSizeRenderer;
-import appeng.fluids.container.slots.IFluidSlot;
 import appeng.fluids.container.slots.IMEFluidSlot;
 import appeng.helpers.InventoryAction;
 import net.minecraft.client.Minecraft;
@@ -80,7 +80,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
@@ -207,6 +206,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 	protected void drawTooltip(int x, int y, String message) {
 		String[] lines = message.split("\n");
 		this.drawTooltip(x, y, Arrays.asList(lines));
+		GlStateManager.disableLighting();
 	}
 
 	protected void drawTooltip(int x, int y, List<String> lines) {
@@ -580,7 +580,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 	}
 
 	protected String getGuiDisplayName(final String in) {
-		return hasCustomInventoryName() ? getInventoryName() : in;
+		return in;//hasCustomInventoryName() ? getInventoryName() : in;
 	}
 
 	private boolean hasCustomInventoryName() {
@@ -613,16 +613,16 @@ public abstract class WCTBaseGui extends GuiContainer {
 			}
 			return;
 		}
-		else if (s instanceof IFluidSlot && ((IFluidSlot) s).shouldRenderAsFluid()) {
-			final IFluidSlot slot = (IFluidSlot) s;
-			final FluidStack fs = slot.getFluidStack();
+		else if (s instanceof IMEFluidSlot && ((IMEFluidSlot) s).shouldRenderAsFluid()) {
+			final IMEFluidSlot slot = (IMEFluidSlot) s;
+			final IAEFluidStack fs = slot.getAEFluidStack();
 
 			if (fs != null && isPowered()) {
 				GlStateManager.disableLighting();
 				GlStateManager.disableBlend();
-				Fluid fluid = fs.getFluid();
+				final Fluid fluid = fs.getFluid();
 				Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-				TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluid.getStill().toString());
+				final TextureAtlasSprite sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(fluid.getStill().toString());
 
 				// Set color for dynamic fluids
 				// Convert int color to RGB
@@ -635,10 +635,10 @@ public abstract class WCTBaseGui extends GuiContainer {
 				GlStateManager.enableLighting();
 				GlStateManager.enableBlend();
 
-				if (s instanceof IMEFluidSlot) {
-					final IMEFluidSlot meFluidSlot = (IMEFluidSlot) s;
-					fluidStackSizeRenderer.renderStackSize(fontRenderer, meFluidSlot.getAEFluidStack(), s.xPos, s.yPos);
-				}
+				//if (s instanceof IMEFluidSlot) {
+				//final IMEFluidSlot meFluidSlot = (IMEFluidSlot) s;
+				fluidStackSizeRenderer.renderStackSize(fontRenderer, fs, s.xPos, s.yPos);
+				//}
 			}
 			else if (!isPowered()) {
 				drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);

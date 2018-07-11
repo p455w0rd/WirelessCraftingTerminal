@@ -26,7 +26,6 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.input.Keyboard;
 
-import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.tiles.IWirelessAccessPoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,9 +41,14 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.IWirelessFluidTermHandler;
+import p455w0rd.wct.api.IWirelessFluidTerminalItem;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.ContainerWFT;
+import p455w0rd.wct.helpers.WCTFluidGuiObject;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModGuiHandler;
@@ -72,6 +76,17 @@ public class WCTUtils {
 
 	public static NonNullList<ItemStack> getWirelessTerminals(EntityPlayer player) {
 		NonNullList<ItemStack> terminalList = NonNullList.<ItemStack>create();
+		for (ItemStack stack : getCraftingTerminals(player)) {
+			terminalList.add(stack);
+		}
+		for (ItemStack stack : getFluidTerminals(player)) {
+			terminalList.add(stack);
+		}
+		return terminalList;
+	}
+
+	public static NonNullList<ItemStack> getCraftingTerminals(EntityPlayer player) {
+		NonNullList<ItemStack> terminalList = NonNullList.<ItemStack>create();
 		InventoryPlayer playerInventory = player.inventory;
 		for (ItemStack wirelessTerm : playerInventory.mainInventory) {
 			if (isAnyWCT(wirelessTerm)) {
@@ -81,6 +96,22 @@ public class WCTUtils {
 		if (Mods.BAUBLES.isLoaded()) {
 			if (!Baubles.getWCTBauble(player).isEmpty()) {
 				terminalList.add(Baubles.getWCTBauble(player));
+			}
+		}
+		return terminalList;
+	}
+
+	public static NonNullList<ItemStack> getFluidTerminals(EntityPlayer player) {
+		NonNullList<ItemStack> terminalList = NonNullList.<ItemStack>create();
+		InventoryPlayer playerInventory = player.inventory;
+		for (ItemStack fluidTerm : playerInventory.mainInventory) {
+			if (isAnyWFT(fluidTerm)) {
+				terminalList.add(fluidTerm);
+			}
+		}
+		if (Mods.BAUBLES.isLoaded()) {
+			if (!Baubles.getWFTBauble(player).isEmpty()) {
+				terminalList.add(Baubles.getWFTBauble(player));
 			}
 		}
 		return terminalList;
@@ -112,6 +143,34 @@ public class WCTUtils {
 			}
 		}
 		return wirelessTerm;
+	}
+
+	@Nonnull
+	public static ItemStack getFluidTerm(InventoryPlayer playerInv) {
+		if (!playerInv.player.getHeldItemMainhand().isEmpty() && playerInv.player.getHeldItemMainhand().getItem() instanceof IWirelessFluidTerminalItem) {
+			return playerInv.player.getHeldItemMainhand();
+		}
+		ItemStack fluidTerm = ItemStack.EMPTY;
+		if (Mods.BAUBLES.isLoaded()) {
+			fluidTerm = Baubles.getWFTBauble(playerInv.player);
+		}
+		if (fluidTerm.isEmpty()) {
+			int invSize = playerInv.getSizeInventory();
+			if (invSize <= 0) {
+				return ItemStack.EMPTY;
+			}
+			for (int i = 0; i < invSize; ++i) {
+				ItemStack item = playerInv.getStackInSlot(i);
+				if (item.isEmpty()) {
+					continue;
+				}
+				if (item.getItem() instanceof IWirelessFluidTerminalItem) {
+					fluidTerm = item;
+					break;
+				}
+			}
+		}
+		return fluidTerm;
 	}
 
 	public static boolean shouldConsumeBoosters(ItemStack wirelessTerminal) {
@@ -150,7 +209,7 @@ public class WCTUtils {
 
 	public static boolean isInRange(ItemStack wirelessTerm) {
 		NBTTagCompound nbt = ensureTag(wirelessTerm);
-		return (nbt.hasKey(IN_RANGE_NBT) && nbt.getBoolean(IN_RANGE_NBT)) || isWCTCreative(wirelessTerm);
+		return (nbt.hasKey(IN_RANGE_NBT) && nbt.getBoolean(IN_RANGE_NBT)) || (isWCTCreative(wirelessTerm) || isWFTCreative(wirelessTerm));
 	}
 
 	public static ItemStack addInfinityBoosters(@Nonnull ItemStack wirelessTerm, ItemStack boosterCardStack) {
@@ -177,10 +236,10 @@ public class WCTUtils {
 
 	public static boolean hasInfiniteRange(@Nonnull ItemStack wirelessTerm) {
 		if (ModConfig.USE_OLD_INFINTY_MECHANIC) {
-			return isBoosterInstalled(wirelessTerm) || isWCTCreative(wirelessTerm);
+			return isBoosterInstalled(wirelessTerm) || (isWCTCreative(wirelessTerm) || isWFTCreative(wirelessTerm));
 		}
 		else {
-			return hasInfinityEnergy(wirelessTerm) || isWCTCreative(wirelessTerm);
+			return hasInfinityEnergy(wirelessTerm) || (isWCTCreative(wirelessTerm) || isWFTCreative(wirelessTerm));
 		}
 	}
 
@@ -188,11 +247,15 @@ public class WCTUtils {
 		if (ensureTag(wirelessTerm).hasKey(INFINITY_ENERGY_NBT)) {
 			return getInfinityEnergy(wirelessTerm) > 0 && ModConfig.WCT_BOOSTER_ENABLED;
 		}
-		return isWCTCreative(wirelessTerm);
+		return (isWCTCreative(wirelessTerm) || isWFTCreative(wirelessTerm));
 	}
 
 	public static boolean isAnyWCT(@Nonnull ItemStack wirelessTerm) {
 		return wirelessTerm.getItem() == ModItems.WCT || wirelessTerm.getItem() == ModItems.CREATIVE_WCT || wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem;
+	}
+
+	public static boolean isAnyWFT(@Nonnull ItemStack wirelessTerm) {
+		return wirelessTerm.getItem() == ModItems.WFT || wirelessTerm.getItem() == ModItems.CREATIVE_WFT || wirelessTerm.getItem() instanceof IWirelessFluidTerminalItem;
 	}
 
 	public static boolean isInRangeOfWAP(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
@@ -241,9 +304,17 @@ public class WCTUtils {
 	}
 
 	public static List<IWirelessAccessPoint> getWAPs(@Nonnull ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		WCTGuiObject object = getGUIObject(wirelessTerm, player);
-		if (object != null) {
-			return object.getWAPs();
+		if (isAnyWCT(wirelessTerm)) {
+			WCTGuiObject object = getGUIObject(wirelessTerm, player);
+			if (object != null) {
+				return object.getWAPs();
+			}
+		}
+		else if (isAnyWFT(wirelessTerm)) {
+			WCTFluidGuiObject object = getFluidGUIObject(wirelessTerm, player);
+			if (object != null) {
+				return object.getWAPs();
+			}
 		}
 		return Collections.emptyList();
 	}
@@ -265,15 +336,38 @@ public class WCTUtils {
 		//if (wirelessTerm == null) {
 		if (player.openContainer instanceof ContainerWCT || wirelessTerm == null) {
 			ContainerWCT c = (ContainerWCT) player.openContainer;
-			if (c.getObject() != null) {
-				return c.getObject();
+			if (c.getObject() != null && c.getObject() instanceof WCTGuiObject) {
+				return (WCTGuiObject) c.getObject();
 			}
 		}
 		//}
 		else {
-			if (wirelessTerm.getItem() instanceof IWirelessTermHandler) {
+			if (wirelessTerm.getItem() instanceof IWirelessCraftingTermHandler) {
 				if (player != null && player.getEntityWorld() != null) {
-					return new WCTGuiObject((IWirelessTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+					return new WCTGuiObject((IWirelessCraftingTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
+				}
+			}
+		}
+		return null;
+	}
+
+	public static WCTFluidGuiObject getFluidGUIObject(EntityPlayer player) {
+		return getFluidGUIObject(null, player);
+	}
+
+	public static WCTFluidGuiObject getFluidGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
+		//if (wirelessTerm == null) {
+		if (player.openContainer instanceof ContainerWFT || wirelessTerm == null) {
+			ContainerWFT c = (ContainerWFT) player.openContainer;
+			if (c.getObject() != null && c.getObject() instanceof WCTFluidGuiObject) {
+				return (WCTFluidGuiObject) c.getObject();
+			}
+		}
+		//}
+		else {
+			if (wirelessTerm.getItem() instanceof IWirelessFluidTermHandler) {
+				if (player != null && player.getEntityWorld() != null) {
+					return new WCTFluidGuiObject((IWirelessFluidTermHandler) wirelessTerm.getItem(), wirelessTerm, player, player.getEntityWorld(), player.getPosition().getX(), player.getPosition().getY(), player.getPosition().getZ());
 				}
 			}
 		}
@@ -281,7 +375,7 @@ public class WCTUtils {
 	}
 
 	public static void setInfinityEnergy(@Nonnull ItemStack wirelessTerm, int amount) {
-		if (!isWCTCreative(wirelessTerm)) {
+		if (!isWCTCreative(wirelessTerm) || !isWFTCreative(wirelessTerm)) {
 			NBTTagCompound nbt = ensureTag(wirelessTerm);
 			nbt.setInteger(INFINITY_ENERGY_NBT, amount);
 			wirelessTerm.setTagCompound(nbt);
@@ -290,15 +384,15 @@ public class WCTUtils {
 
 	public static int getInfinityEnergy(@Nonnull ItemStack wirelessTerm) {
 		NBTTagCompound nbt = ensureTag(wirelessTerm);
-		if (!nbt.hasKey(INFINITY_ENERGY_NBT) && !isWCTCreative(wirelessTerm)) {
+		if (!nbt.hasKey(INFINITY_ENERGY_NBT) && (!isWCTCreative(wirelessTerm) || !isWFTCreative(wirelessTerm))) {
 			nbt.setInteger(INFINITY_ENERGY_NBT, 0);
 		}
-		return isWCTCreative(wirelessTerm) ? Integer.MAX_VALUE : nbt.getInteger(INFINITY_ENERGY_NBT);
+		return (isWCTCreative(wirelessTerm) || isWFTCreative(wirelessTerm)) ? Integer.MAX_VALUE : nbt.getInteger(INFINITY_ENERGY_NBT);
 	}
 
 	public static void drainInfinityEnergy(@Nonnull ItemStack wirelessTerm, EntityPlayer player) {
 		if (player instanceof EntityPlayerMP) {
-			if (!ModConfig.USE_OLD_INFINTY_MECHANIC && !isWCTCreative(wirelessTerm)) {
+			if (!ModConfig.USE_OLD_INFINTY_MECHANIC && (!isWCTCreative(wirelessTerm) || !isWFTCreative(wirelessTerm))) {
 				int current = getInfinityEnergy(wirelessTerm);
 				if (!isInRangeOfWAP(wirelessTerm, player)) {
 					int reducedAmount = current - INFINITY_ENERGY_DRAIN;
@@ -420,6 +514,10 @@ public class WCTUtils {
 
 	public static boolean isWCTCreative(ItemStack wirelessTerm) {
 		return !wirelessTerm.isEmpty() && wirelessTerm.getItem() == ModItems.CREATIVE_WCT;
+	}
+
+	public static boolean isWFTCreative(ItemStack fluidTerm) {
+		return !fluidTerm.isEmpty() && fluidTerm.getItem() == ModItems.CREATIVE_WFT;
 	}
 
 	public static ItemStack setCreativeWCT(ItemStack wirelessTerm, boolean makeCreative) {
@@ -556,6 +654,21 @@ public class WCTUtils {
 					ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
 				}
 				ItemMagnet.switchMagnetMode(magnetItem);
+			}
+		}
+		else if (ModKeybindings.openFluidTerminal.getKeyCode() != Keyboard.CHAR_NONE && ModKeybindings.openFluidTerminal.isPressed()) {
+			ItemStack is = WCTUtils.getFluidTerm(p.inventory);
+			if (is.isEmpty()) {
+				return;
+			}
+			IWirelessFluidTerminalItem fluidTerm = (IWirelessFluidTerminalItem) is.getItem();
+			if (fluidTerm != null && fluidTerm.isWirelessFluidEnabled(is)) {
+				if (!(p.openContainer instanceof ContainerWCT)) {
+					ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WFT));
+				}
+				else {
+					p.closeScreen();
+				}
 			}
 		}
 	}

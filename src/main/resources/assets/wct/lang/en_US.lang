@@ -1,6 +1,8 @@
 // Items
 item.wct.name=Wireless Crafting Terminal
+item.wft.name=Wirless Fluid Terminal
 item.wct_creative.name=Creative Wireless Crafting Terminal
+item.wft_creative.name=Creative Wireless Fluid Treminal
 item.magnet_card.name=Magnet Card
 item.infinity_booster_card.name=Infinity Booster Card
 
@@ -50,6 +52,7 @@ chatmessages.magnet_init.desc=You must first right-click with the Magnet Card in
 
 // Keybindings
 key.open_terminal.desc=Open Wireless Crafting Terminal
+key.open_fluid_terminal.desc=Open Wireless Fluid Terminal
 key.open_magnet.desc=Open Magnet Card Filter GUI
 key.switch_magnet_mode.desc=Activate/Deactivate Magnet Card
 key.categories.wct=Wireless Crafting Terminal 2

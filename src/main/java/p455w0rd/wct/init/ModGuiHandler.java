@@ -16,23 +16,26 @@
 package p455w0rd.wct.init;
 
 import appeng.api.AEApi;
+import appeng.api.features.IWirelessTermHandler;
 import appeng.api.storage.ITerminalHost;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import p455w0rd.wct.WCT;
-import p455w0rd.wct.api.IWirelessCraftingTermHandler;
 import p455w0rd.wct.client.gui.GuiCraftAmount;
 import p455w0rd.wct.client.gui.GuiCraftConfirm;
 import p455w0rd.wct.client.gui.GuiCraftingStatus;
 import p455w0rd.wct.client.gui.GuiMagnet;
 import p455w0rd.wct.client.gui.GuiWCT;
+import p455w0rd.wct.client.gui.GuiWFT;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.container.ContainerMagnet;
 import p455w0rd.wct.container.ContainerWCT;
+import p455w0rd.wct.container.ContainerWFT;
+import p455w0rd.wct.helpers.WCTFluidGuiObject;
 import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.util.WCTUtils;
 
@@ -47,11 +50,12 @@ public class ModGuiHandler implements IGuiHandler {
 	public static final int GUI_CRAFT_AMOUNT = 2;
 	public static final int GUI_CRAFTING_STATUS = 3;
 	public static final int GUI_MAGNET = 4;
+	public static final int GUI_WFT = 5;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != GUI_MAGNET) {
-			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
+		if (ID != GUI_MAGNET && ID != GUI_WFT) {
+			ITerminalHost terminal = getCraftingTerminal(player, world, new BlockPos(x, y, z));
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
 					return new ContainerWCT(player, terminal);
@@ -73,44 +77,59 @@ public class ModGuiHandler implements IGuiHandler {
 		if (ID == GUI_MAGNET) {
 			return new ContainerMagnet(player, player.inventory);
 		}
+		if (ID == GUI_WFT) {
+			return new ContainerWFT(player, getFluidTerminal(player, world, new BlockPos(x, y, z)));
+		}
 		return null;
 	}
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != GUI_MAGNET) {
-			ITerminalHost terminal = getTerminal(player, world, new BlockPos(x, y, z));
-			if (terminal != null) {
+		if (ID != GUI_MAGNET && ID != GUI_WFT) {
+			ITerminalHost craftingTerminal = getCraftingTerminal(player, world, new BlockPos(x, y, z));
+			if (craftingTerminal != null) {
 				if (ID == GUI_WCT) {
 					GuiWCT.setSwitchingGuis(false);
-					return new GuiWCT(new ContainerWCT(player, terminal));
+					return new GuiWCT(new ContainerWCT(player, craftingTerminal));
 				}
 
 				if (ID == GUI_CRAFTING_STATUS) {
-					return new GuiCraftingStatus(player.inventory, terminal);
+					return new GuiCraftingStatus(player.inventory, craftingTerminal);
 				}
 
 				if (ID == GUI_CRAFT_AMOUNT) {
-					return new GuiCraftAmount(player.inventory, terminal);
+					return new GuiCraftAmount(player.inventory, craftingTerminal);
 				}
 
 				if (ID == GUI_CRAFT_CONFIRM) {
-					return new GuiCraftConfirm(player.inventory, terminal);
+					return new GuiCraftConfirm(player.inventory, craftingTerminal);
 				}
 			}
 		}
 		if (ID == GUI_MAGNET) {
 			return new GuiMagnet(new ContainerMagnet(player, player.inventory), WCTUtils.getMagnet(player.inventory));
 		}
+		if (ID == GUI_WFT) {
+			return new GuiWFT(new ContainerWFT(player, getFluidTerminal(player, world, new BlockPos(x, y, z))));
+		}
 		return null;
 	}
 
-	private ITerminalHost getTerminal(EntityPlayer player, World world, BlockPos pos) {
+	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos) {
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
-		final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getWirelessTerm(player.inventory));
+		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getWirelessTerm(player.inventory));
 		final WCTGuiObject terminal = wh == null ? null : new WCTGuiObject(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
+		return terminal;
+	}
+
+	private ITerminalHost getFluidTerminal(EntityPlayer player, World world, BlockPos pos) {
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
+		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getFluidTerm(player.inventory));
+		final WCTFluidGuiObject terminal = wh == null ? null : new WCTFluidGuiObject(wh, WCTUtils.getFluidTerm(player.inventory), player, world, x, y, z);
 		return terminal;
 	}
 

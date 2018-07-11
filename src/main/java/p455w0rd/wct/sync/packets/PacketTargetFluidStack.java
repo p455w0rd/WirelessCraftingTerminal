@@ -15,44 +15,57 @@
  */
 package p455w0rd.wct.sync.packets;
 
+import appeng.fluids.util.AEFluidStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import p455w0rd.wct.container.ContainerWFT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
  *
  */
-public class PacketSetInRange extends WCTPacket {
+public class PacketTargetFluidStack extends WCTPacket {
+	private AEFluidStack stack;
 
-	boolean isInRange;
-
-	public PacketSetInRange(final ByteBuf stream) {
-		isInRange = stream.readBoolean();
+	// automatic.
+	public PacketTargetFluidStack(final ByteBuf stream) {
+		try {
+			if (stream.readableBytes() > 0) {
+				stack = (AEFluidStack) AEFluidStack.fromPacket(stream);
+			}
+			else {
+				stack = null;
+			}
+		}
+		catch (Exception ex) {
+			stack = null;
+		}
 	}
 
 	// api
-	public PacketSetInRange(boolean inRange) {
-		isInRange = inRange;
+	public PacketTargetFluidStack(AEFluidStack stack) {
+
+		this.stack = stack;
+
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(getPacketID());
-		data.writeBoolean(isInRange);
+		if (stack != null) {
+			try {
+				stack.writeToPacket(data);
+			}
+			catch (Exception ex) {
+			}
+		}
 		configureWrite(data);
 	}
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-	}
-
-	@Override
-	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
-		for (ItemStack wirelessTerm : WCTUtils.getWirelessTerminals(player)) {
-			WCTUtils.setInRange(wirelessTerm, isInRange);
+		if (player.openContainer instanceof ContainerWFT) {
+			((ContainerWFT) player.openContainer).setTargetStack(stack);
 		}
 	}
-
 }
