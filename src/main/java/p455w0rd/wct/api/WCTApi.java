@@ -43,6 +43,8 @@ public abstract class WCTApi {
 
 	public abstract boolean isInfinityBoosterCardEnabled();
 
+	public abstract boolean isOldInfinityMechanicEnabled();
+
 	public abstract void openWirelessCraftingTerminalGui(EntityPlayer player);
 
 	public abstract void openWirelessFluidTerminalGui(EntityPlayer player);

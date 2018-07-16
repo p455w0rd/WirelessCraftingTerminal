@@ -11,7 +11,8 @@ buildscript {
 	}
 }
 
-apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
 
 version = "1.12.2-" + getVersion("VERSION")
 group = "p455w0rd"
@@ -26,7 +27,7 @@ minecraft {
 }
 
 repositories {
-	mavenCentral()
+	
 	maven {
 		name = "progwml6"
 		url = "http://dvs1.progwml6.com/files/maven"
@@ -69,8 +70,70 @@ task apiJar(type: Jar) {
 	from sourceSets.api.allJava
 }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
 artifacts {
 	archives apiJar
+	archives sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (project.hasProperty("local_maven") || (project.hasProperty("maven_user") && project.hasProperty("maven_pass"))) {
+				if (project.hasProperty("maven_pass")) {
+					println "Uploading to remote maven."
+					repository(url: "http://maven_upload.covers1624.net/") {
+						authentication(userName: project.getProperty("maven_user"), password: project.getProperty("maven_pass"))
+					}
+				} else {
+					println "Uploading to local maven."
+					repository(url: "file://${local_maven}/.m2/repository")
+				}
+                pom {
+                    groupId = project.group
+                    // Force the maven upload to use the <mcversion>-<version> syntax preferred at files
+                    artifactId = project.archivesBaseName
+                    project {
+                        name project.archivesBaseName
+                        packaging 'jar'
+                        description 'WirelessCraftingTerminal 2'
+                        url 'https://github.com/p455w0rd/WirelessCraftingTerminal'
+
+                        scm {
+                            url 'https://github.com/p455w0rd/WirelessCraftingTerminal'
+                            connection 'scm:git:git://github.com/p455w0rd/WirelessCraftingTerminal.git'
+                            developerConnection 'scm:git:git@github.com:p455w0rd/WirelessCraftingTerminal.git'
+                        }
+
+                        issueManagement {
+                            system 'github'
+                            url 'https://github.com/p455w0rd/WirelessCraftingTerminal/issues'
+                        }
+
+                        licenses {
+                            license {
+                                name 'MIT'
+                                url 'https://opensource.org/licenses/MIT'
+                                distribution 'repo'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'TheRealp455w0rd'
+                                name 'Mike Balser'
+                                roles { role 'developer' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 processResources {

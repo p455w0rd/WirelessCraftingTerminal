@@ -79,17 +79,52 @@ If you are only doing single file pull requests, GitHub supports using a quick w
 
 * The API is very simple
 
+# Wireless Crafting Terminal
 To make your item a Wireless Crafting Terminal variant, register like normal with AE2 and implement
 `net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem`
 
 To open the WCT Gui from said item, use
-`WCTApi.instance().interact().openWirelessCraftingTerminalGui(EntityPlayer player);`
+`WCTApi.instance().openWirelessCraftingTerminalGui(EntityPlayer player);`
+
+# Wireless Fluid Terminal
+To make your item a Wireless Fluid Terminal variant, register like normal with AE2 and implement
+`net.p455w0rd.wirelesscraftingterminal.api.IWirelessFluidTerminalItem`
+
+To open the WCT Gui from said item, use
+`WCTApi.instance().openWirelessFluidTerminalGui(EntityPlayer player);`
+
+# WCT Configs
+To check if the Infinity Booster Card is enabled in WCT configs, use
+`WCTApi.instance().isInfinityBoosterCardEnabled()`
+
+To check if the old infinite range mechanic option is enabled, use
+`WCTApi.instance().isOldInfinityMechanicEnabled()`
+
+### Maven
+
+When compiling against the WCT API you can use gradle dependencies, just add
+
+	repositories {
+		maven {
+			name = "covers Maven"
+			url = "http://maven.covers1624.net"
+		}
+	}
+
+    dependencies {
+        compile "p455w0rd:WirelessCraftingTerminal:<VERSION>:api"
+    }
+	
+
+or add the compile line to your existing dependencies task to your build.gradle
+
+An example string would be `p455w0rd:WirelessCraftingTerminal:1.12.2-3.10.77:api` for the API only or `p455w0rd:WirelessCraftingTerminal:1.12.2-3.10.77`  for the whole mod.
 
 ## Wireless Crafting Terminal Localization
 
 ### English Text
 
-`en_US` is included in this repository, fixes to typos are welcome.
+`en_us` is included in this repository, fixes to typos are welcome.
 
 ### Encoding
 

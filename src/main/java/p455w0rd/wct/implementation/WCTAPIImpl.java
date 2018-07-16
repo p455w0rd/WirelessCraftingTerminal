@@ -66,6 +66,11 @@ public class WCTAPIImpl extends WCTApi {
 	}
 
 	@Override
+	public boolean isOldInfinityMechanicEnabled() {
+		return ModConfig.USE_OLD_INFINTY_MECHANIC;
+	}
+
+	@Override
 	public void openWirelessCraftingTerminalGui(final EntityPlayer player) {
 		if ((player == null) || (player instanceof FakePlayer) || (player instanceof EntityPlayerMP) || FMLCommonHandler.instance().getSide() == Side.SERVER) {
 			return;
