@@ -110,7 +110,7 @@ When compiling against the WCT API you can use gradle dependencies, just add
 	}
 
     dependencies {
-        compile "p455w0rd:WirelessCraftingTerminal:<VERSION>:api"
+        compile "p455w0rd:WirelessCraftingTerminal:<MC_VERSION>-<MOD_VERSION>:api"
     }
 	
 
