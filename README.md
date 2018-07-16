@@ -77,23 +77,21 @@ If you are only doing single file pull requests, GitHub supports using a quick w
 
 ## Wireless Crafting Terminal API
 
-* The API is very simple
-
-# Wireless Crafting Terminal
+### Wireless Crafting Terminal
 To make your item a Wireless Crafting Terminal variant, register like normal with AE2 and implement
 `net.p455w0rd.wirelesscraftingterminal.api.IWirelessCraftingTerminalItem`
 
 To open the WCT Gui from said item, use
 `WCTApi.instance().openWirelessCraftingTerminalGui(EntityPlayer player);`
 
-# Wireless Fluid Terminal
+### Wireless Fluid Terminal
 To make your item a Wireless Fluid Terminal variant, register like normal with AE2 and implement
 `net.p455w0rd.wirelesscraftingterminal.api.IWirelessFluidTerminalItem`
 
 To open the WCT Gui from said item, use
 `WCTApi.instance().openWirelessFluidTerminalGui(EntityPlayer player);`
 
-# WCT Configs
+### WCT Configs
 To check if the Infinity Booster Card is enabled in WCT configs, use
 `WCTApi.instance().isInfinityBoosterCardEnabled()`
 
