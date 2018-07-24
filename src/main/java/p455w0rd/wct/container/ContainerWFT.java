@@ -453,11 +453,12 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 
 	@Override
 	public void doAction(EntityPlayerMP player, InventoryAction action, int slot, long id) {
-		if (action != InventoryAction.FILL_ITEM && action != InventoryAction.EMPTY_ITEM) {
+		if (action != InventoryAction.FILL_ITEM && action != InventoryAction.EMPTY_ITEM && action != InventoryAction.SHIFT_CLICK && action != InventoryAction.ROLL_DOWN && action != InventoryAction.ROLL_UP) {
 			super.doAction(player, action, slot, id);
 			return;
 		}
 		ItemStack held = player.inventory.getItemStack();
+		//if (!held.isEmpty()) {
 		if (held.getCount() > 1) {
 			// only support stacksize 1 for now
 			return;
@@ -469,14 +470,12 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 		}
 		boolean isBucket = held.getItem() == Items.BUCKET || held.getItem() == Items.WATER_BUCKET || held.getItem() == Items.LAVA_BUCKET || held.getItem() == Items.MILK_BUCKET || held.getItem() == ForgeModContainer.getInstance().universalBucket;
 
-		if (action == InventoryAction.FILL_ITEM && clientRequestedTargetFluid != null) {
+		if ((action == InventoryAction.FILL_ITEM || action == InventoryAction.ROLL_UP) && clientRequestedTargetFluid != null) {
 			AEFluidStack stack = (AEFluidStack) clientRequestedTargetFluid.copy();
-
+			IAEItemStack bucket = AEItemStack.fromItemStack(new ItemStack(Items.BUCKET));
+			IAEItemStack bucketInSystem = Platform.poweredExtraction(getPowerSource(), obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)), bucket, getActionSource(), Actionable.SIMULATE);
 			if (held.isEmpty()) {
-				IAEItemStack bucket = AEItemStack.fromItemStack(new ItemStack(Items.BUCKET));
-				IAEItemStack bucketInSystem = Platform.poweredExtraction(getPowerSource(), obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)), bucket, getActionSource(), Actionable.SIMULATE);
 				if (bucketInSystem != null) {
-					Platform.poweredExtraction(getPowerSource(), obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)), bucket, getActionSource(), Actionable.MODULATE);
 					held = bucketInSystem.createItemStack();
 					fh = FluidUtil.getFluidHandler(held);
 					isBucket = true;
@@ -493,6 +492,11 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 			// Check how much we can store in the item
 			stack.setStackSize(Integer.MAX_VALUE);
 			int amountAllowed = fh.fill(stack.getFluidStack(), false);
+			if (action == InventoryAction.ROLL_UP) {
+				IAEFluidStack tmpStack = stack.copy();
+				tmpStack.setStackSize(Fluid.BUCKET_VOLUME);
+				amountAllowed = fh.fill(tmpStack.getFluidStack(), false);;
+			}
 			stack.setStackSize(amountAllowed);
 
 			// Check if we can pull out of the system
@@ -510,15 +514,19 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 			}
 
 			// Actually fill
+			if (held.isEmpty() && isBucket) {
+				Platform.poweredExtraction(getPowerSource(), obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)), bucket, getActionSource(), Actionable.MODULATE);
+
+			}
 			fh.fill(pulled.getFluidStack(), true);
 
 			player.inventory.setItemStack(fh.getContainer());
 			updateHeld(player);
 		}
-		else if (action == InventoryAction.EMPTY_ITEM && fh != null) {
+		else if ((action == InventoryAction.EMPTY_ITEM || action == InventoryAction.ROLL_DOWN) && fh != null) {
 
 			// See how much we can drain from the item
-			FluidStack extract = fh.drain(Integer.MAX_VALUE, false);
+			FluidStack extract = fh.drain(action == InventoryAction.ROLL_DOWN ? Fluid.BUCKET_VOLUME : Integer.MAX_VALUE, false);
 			if (extract == null || extract.amount < 1) {
 				return;
 			}
@@ -541,6 +549,44 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 
 			player.inventory.setItemStack(fh.getContainer());
 			updateHeld(player);
+		}
+		//}
+		else if (action == InventoryAction.EMPTY_ITEM && fh == null) {
+			if (player.inventory.getItemStack().isEmpty()) {
+				ItemStack stack = inventorySlots.get(slot).getStack();
+				fh = FluidUtil.getFluidHandler(stack);
+				if (fh != null) {
+
+					FluidStack extract = fh.drain(Integer.MAX_VALUE, false);
+					if (extract == null || extract.amount < 1) {
+						return;
+					}
+					IAEFluidStack notPushed = Platform.poweredInsert(getPowerSource(), monitor, AEFluidStack.fromFluidStack(extract), getActionSource(), Actionable.SIMULATE);
+					if (isBucket && notPushed != null && notPushed.getStackSize() > 0) {
+						// We can't push enough for the bucket
+						return;
+					}
+
+					IAEFluidStack notInserted = Platform.poweredInsert(getPowerSource(), monitor, AEFluidStack.fromFluidStack(extract), getActionSource());
+					if (notInserted != null && notInserted.getStackSize() > 0) {
+						// Only try to extract the amount we DID insert
+						extract.amount -= Math.toIntExact(notInserted.getStackSize());
+					}
+
+					// Actually drain
+					fh.drain(extract, true);
+
+					inventorySlots.get(slot).putStack(fh.getContainer());
+					//player.inventory.setItemStack(fh.getContainer());
+					//updateHeld(player);
+				}
+			}
+		}
+		else {
+			if (action == InventoryAction.ROLL_DOWN) {
+
+			}
+			System.out.println(action);
 		}
 	}
 

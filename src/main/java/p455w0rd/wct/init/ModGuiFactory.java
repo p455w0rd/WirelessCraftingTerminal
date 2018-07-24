@@ -13,23 +13,42 @@
  * You should have received a copy of the MIT License along with Wireless
  * Crafting Terminal. If not, see <https://opensource.org/licenses/MIT>.
  */
-package p455w0rd.wct.integration;
+package p455w0rd.wct.init;
 
-import com.google.common.collect.Lists;
+import java.util.Set;
 
-import p455w0rd.wct.init.ModIntegration.Mods;
+import javax.annotation.Nullable;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.fml.client.IModGuiFactory;
+import p455w0rd.wct.client.gui.GuiModConfig;
 
 /**
  * @author p455w0rd
  *
  */
-public class ItemScroller {
+public class ModGuiFactory implements IModGuiFactory {
 
-	public static void blackListSlots() {
-		if (Mods.ITEMSCROLLER.isLoaded()) {
-			//fi.dy.masa.itemscroller.config.Configs.SLOT_BLACKLIST.addAll(Lists.<String>newArrayList("p455w0rd.wct.client.me.SlotME", "p455w0rd.wct.container.slot.SlotBooster", "p455w0rd.wct.container.slot.SlotMagnet"));
-			fi.dy.masa.itemscroller.config.Configs.GUI_BLACKLIST.addAll(Lists.<String>newArrayList("p455w0rd.wct.client.gui.GuiWCT", "p455w0rd.wct.client.gui.GuiWFT"));
-		}
+	@Override
+	public void initialize(Minecraft minecraftInstance) {
+
+	}
+
+	@Override
+	public boolean hasConfigGui() {
+		return true;
+	}
+
+	@Override
+	public GuiScreen createConfigGui(GuiScreen parentScreen) {
+		return new GuiModConfig(parentScreen);
+	}
+
+	@Nullable
+	@Override
+	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+		return null;
 	}
 
 }

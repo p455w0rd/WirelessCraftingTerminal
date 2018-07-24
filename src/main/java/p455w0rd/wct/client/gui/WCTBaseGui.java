@@ -155,7 +155,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 		}
 	}
 
-	private List<Slot> getInventorySlots() {
+	protected List<Slot> getInventorySlots() {
 		return inventorySlots.inventorySlots;
 	}
 
@@ -333,13 +333,13 @@ public abstract class WCTBaseGui extends GuiContainer {
 					if (mouseButton == 6) {
 						return; // prevent weird double clicks..
 					}
-
+		
 					try {
 						NetworkHandler.instance().sendToServer(((SlotPatternTerm) slot).getRequest(isShiftKeyDown()));
 					}
 					catch (final IOException e) {
 					}
-
+		
 				}
 				*/
 		else if (slot instanceof SlotCraftingTerm) {

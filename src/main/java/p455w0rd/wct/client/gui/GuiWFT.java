@@ -28,12 +28,15 @@ import appeng.util.Platform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Loader;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.MEGuiTextField;
@@ -222,6 +225,38 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 	}
 
 	@Override
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+
+		final int i = Mouse.getEventDWheel();
+		if (i != 0 && isShiftKeyDown()) {
+			final int x = Mouse.getEventX() * width / mc.displayWidth;
+			final int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+			mouseWheelEvent(x, y, i / Math.abs(i));
+		}
+	}
+
+	private void mouseWheelEvent(final int x, final int y, final int wheel) {
+		final Slot slot = getSlot(x, y);
+		if (slot instanceof SlotFluidME) {
+			final IAEFluidStack stack = ((SlotFluidME) slot).getAEFluidStack();
+
+			if (inventorySlots instanceof ContainerWFT) {
+				//if (stack != null) {
+				((ContainerWFT) inventorySlots).setTargetStack(stack);
+				//}
+				final InventoryAction direction = wheel > 0 ? InventoryAction.ROLL_DOWN : InventoryAction.ROLL_UP;
+				final int times = Math.abs(wheel);
+				final int inventorySize = getInventorySlots().size();
+				for (int h = 0; h < times; h++) {
+					final PacketInventoryAction p = new PacketInventoryAction(direction, inventorySize, 0);
+					ModNetworking.instance().sendToServer(p);
+				}
+			}
+		}
+	}
+
+	@Override
 	protected void handleMouseClick(Slot slot, int slotIdx, int mouseButton, ClickType clickType) {
 		if (slot instanceof SlotFluidME) {
 			final SlotFluidME meSlot = (SlotFluidME) slot;
@@ -230,18 +265,33 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 				// TODO: Allow more options
 				if (mouseButton == 0 && meSlot.getHasStack()) {
 					container.setTargetStack(meSlot.getAEFluidStack());
-					AELog.debug("mouse0 GUI STACK SIZE %s", meSlot.getAEFluidStack().getStackSize());
 					ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.FILL_ITEM, slot.slotNumber, 0));
 				}
 				else {
 					container.setTargetStack(meSlot.getAEFluidStack());
-					if (meSlot.getAEFluidStack() != null) {
-						AELog.debug("mouse1 GUI STACK SIZE %s", meSlot.getAEFluidStack().getStackSize());
-					}
 					ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.EMPTY_ITEM, slot.slotNumber, 0));
 				}
 			}
+			else {
+				System.out.println(clickType);
+			}
 			return;
+		}
+		else {
+			if (clickType == ClickType.QUICK_MOVE) {
+				EntityPlayer player = Minecraft.getMinecraft().player;
+				if (slot.getHasStack()) {
+					ItemStack stack = slot.getStack();
+					//boolean isBucket = stack.getItem() == Items.BUCKET || stack.getItem() == Items.WATER_BUCKET || stack.getItem() == Items.LAVA_BUCKET || stack.getItem() == Items.MILK_BUCKET || stack.getItem() == ForgeModContainer.getInstance().universalBucket;
+					IFluidHandlerItem fh = FluidUtil.getFluidHandler(stack);
+					if (!stack.isEmpty() && fh != null) {
+						if (fh != null && fh.getTankProperties()[0].getContents().amount > 0) {
+							ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.SHIFT_CLICK, slot.slotNumber, 0));
+						}
+					}
+				}
+			}
+			//System.out.println(clickType);
 		}
 		super.handleMouseClick(slot, slotIdx, mouseButton, clickType);
 	}

@@ -1079,7 +1079,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 							return ItemStack.EMPTY;
 						}
 					}
-					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis)) {
+					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis) && ModConfig.SHIFT_CLICK_BAUBLES) {
 						if (mergeItemStack(tis.copy(), getBaublesIndex(), getBaublesIndex() + 7, false)) {
 							if (tis.getCount() > 1) {
 								tis.shrink(1);

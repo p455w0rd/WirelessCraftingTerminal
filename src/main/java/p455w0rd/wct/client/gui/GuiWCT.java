@@ -440,10 +440,6 @@ public class GuiWCT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 		}
 	}
 
-	private List<Slot> getInventorySlots() {
-		return inventorySlots.inventorySlots;
-	}
-
 	int getMaxRows() {
 		return AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE) == TerminalStyle.SMALL ? 6 : Integer.MAX_VALUE;
 	}

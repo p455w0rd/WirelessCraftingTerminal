@@ -31,7 +31,7 @@ public class ModConfig {
 
 	public static Configuration CONFIG;
 	private static final String DEF_CAT = "General";
-	private static final String CLIENT_CAT = "Client Configs";
+	public static final String CLIENT_CAT = "Client Configs";
 
 	public static boolean WCT_BOOSTER_ENABLED = true;
 	public static boolean USE_OLD_INFINTY_MECHANIC = false;
@@ -47,6 +47,7 @@ public class ModConfig {
 	public static int INFINTY_ENERGY_LOW_WARNING_AMOUNT = 5000;
 	public static boolean WCT_ENDERMAN_DROP_BOOSTERS = true;
 	public static int WCT_ENDERMAN_BOOSTER_DROP_CHANCE = 5;
+	public static boolean SHIFT_CLICK_BAUBLES = true;
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
@@ -73,7 +74,7 @@ public class ModConfig {
 		INFINITY_ENERGY_PER_BOOSTER_CARD = CONFIG.getInt("InfinityEnergyPerBooster", DEF_CAT, 100, 5, 1000, "Amount of Infinity Energy 1 Infinity Booster Card will convert to");
 		INFINITY_ENERGY_DRAIN = CONFIG.getInt("InfinityEnergyDrainAmount", DEF_CAT, 15, 5, 100, "Amount of Infinity Energy Consumed every 10 ticks when not in range of a WAP");
 		INFINTY_ENERGY_LOW_WARNING_AMOUNT = CONFIG.getInt("InfinityEnergyWarningAmount", CLIENT_CAT, 5000, 10, 1000000, "WCT will show a warning when Infinty Energy drops below this point and infinite range is active");
-
+		SHIFT_CLICK_BAUBLES = CONFIG.getBoolean("ShiftClickBaubles", CLIENT_CAT, true, "Will shift-click a bauble try to put said bauble in a bauble slot before trying to store in system");
 		if (CONFIG.hasChanged()) {
 			CONFIG.save();
 		}
