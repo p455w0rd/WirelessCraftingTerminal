@@ -20,7 +20,7 @@ archivesBaseName = "WirelessCraftingTerminal"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-	version = "1.12.2-14.23.4.2707"
+	version = "1.12.2-14.23.4.2739"
 	
 	replaceIn "README.md"
 	replace "<VERSION>", project.version
@@ -64,7 +64,7 @@ dependencies {
 	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
 	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv6-alpha-2"
+	deobfCompile "appeng:appliedenergistics2:rv6-alpha-3"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
 }
 
