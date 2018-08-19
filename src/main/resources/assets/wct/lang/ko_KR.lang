@@ -1,0 +1,79 @@
+// Items
+item.wct.name=무선 조합 터미널
+item.wft.name=무선 액체 터미널
+item.wct_creative.name=크리에이티브 무선 조합 터미널
+item.wft_creative.name=크리에이티브 무선 액체 터미널
+item.magnet_card.name=자석 카드
+item.infinity_booster_card.name=무한 부스터 카드
+
+// Crative Tab
+itemGroup.wct=무선 조합 터미널
+
+// Blocks
+tile.advanced_charger.name=고급 충전기
+
+// Tooltips
+tooltip.press_shift.desc=<Shift를 누르세요.>
+tooltip.magnet.desc=아이템을 AE 네트워크에 자동으로 삽입하는 자석입니다.
+tooltip.magnet_set_filter.desc=필터를 설치하려면 우클릭하세요.
+tooltip.or_press.desc=또는 누르세요.
+tooltip.press.desc=얍력
+tooltip.status.desc=상태
+tooltip.active.desc=활성화
+tooltip.inactive.desc=비활성화
+tooltip.to_switch.desc=모드 전환
+tooltip.magnet_active_1.desc=인벤토리에 추가된 엑스트라 아이템
+tooltip.magnet_active_2.desc=땅에 남은 엑스트라 아이템
+tooltip.magnet_whitelisting.desc=화이트리스트
+tooltip.magnet_blacklisting.desc=블랙리스트
+tooltip.filter_mode.desc=필터 모드
+tooltip.not.desc=없음
+tooltip.ignoring.desc=무시
+tooltip.nbt.desc=NBT
+tooltip.meta.desc=메타 데이터
+tooltip.oredict.desc=광물 사전
+tooltip.using.desc=사용
+tooltip.filtered_items.desc=필터된 아이템
+tooltip.only_works.desc=무선 조합 터미널 슬롯에 있을 때만 작업합니다!
+tooltip.installed.desc=설치
+tooltip.infinite_range.desc=무한 범위
+tooltip.infinity_energy.desc=무한 에너지
+tooltip.units.desc=유닛
+tooltip.in_wap_range.desc=(WAP 범위 내)
+tooltip.out_of.desc=외부
+tooltip.infinity_energy_low.desc=무한 에너지가 낮습니다!
+tooltip.creative.desc=크리에이티브
+tooltip.infinite.desc=무한
+
+// Chat Messages
+chatmessages.magnet_deactivated.desc=자석 카드가 비활성화되었습니다.
+chatmessages.magnet_activated.desc=자석 카드가 활성화되었습니다.
+chatmessages.magnet_init.desc=키바인드를 사용하기 전에 손에 있는 자석 카드로 우클릭 하세요!
+
+// Keybindings
+key.open_terminal.desc=무선 조합 터미널 열기
+key.open_fluid_terminal.desc=무선 액체 터미널 열기
+key.open_magnet.desc=자석 카드 필터 GUI 열기
+key.switch_magnet_mode.desc=자석 카드 활성화/비활성화
+key.categories.wct=무선 조합 터미널
+
+// GUI
+gui.title.magnet_filter=자석 필터
+gui.emptytrash=쓰레기 비우기
+gui.emptytrash.desc=쓰레기 슬롯에 있는 내용을 삭제합니다.
+gui.openmagnetgui=자석 필터 GUI 열기
+gui.openmagnetgui.desc=자석 카드 필터를 엽니다.
+gui.openmagnetgui.desc2=GUI에 필터가능한 아이템을 설정합니다.
+gui.consumeboosters=자동소비 부스터
+gui.dontconsumeboosters.desc=무한 부스터 카드를 소비하지 않습니다.
+gui.consumeboosters.desc=자동소비 무한 부스터
+gui.consumeboosters.desc2=들거나 인벤토리에 있을 때 카드가 작용합니다.
+gui.magnetmode=자석 모드
+
+// JEI
+jei.wct.desc=AE2 조합 터미널의 무선판입니다. 기능하려면 보안 터미널을 통해 ME 네트워크에 연결해야 합니다. 설정->조절에서 키바인드를 설정하여 GUI를 열 수 있습니다.
+jei.wft.desc=AE2 액체 터미널의 무선판입니다. 기능하려면 보안 터미널을 통해 ME 네트워크에 연결해야 합니다. 설정->조절에서 키바인드를 설정하여 GUI를 열 수 있습니다.
+jei.wct_bauble.desc=바블처럼 머리에 착용 가능합니다.
+jei.magnet_card.desc=연결된 ME 네트워크에 아이템을 자동으로 삽입할 수 있는 자석입니다. 크라우치+우클릭으로 모드를 변경합니다(키바인드를 통해 코드를 전환할 수도 있습니다). 우클릭하여 필터 GUI를 엽니다(키 바인딩될 수도 있습니다).
+jei.booster_old.desc=WCT GUI의 해당 슬롯에 무한 부스터 카드를 삽입하여 WCT에 무한 범위를 지정합니다.
+jei.booster.desc=최대 21억 4천만 개를 WCT의 해당 슬롯에 삽입하여 WAP 범위 외부 및 치수 전체에서 WCT를 사용할 수 있는 내부 무한 에너지를 추가합니다.
