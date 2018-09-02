@@ -14,16 +14,13 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
 
-version = "1.12.2-" + getVersion("VERSION")
+version = "1.12.2-" + getVersion()
 group = "p455w0rd"
 archivesBaseName = "WirelessCraftingTerminal"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-	version = "1.12.2-14.23.4.2739"
-	
-	replaceIn "README.md"
-	replace "<VERSION>", project.version
+	version = "1.12.2-14.23.4.2747"
 	
 	runDir = "run"
 	mappings = "snapshot_20171003"
@@ -64,7 +61,7 @@ dependencies {
 	//deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
 	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv6-alpha-3"
+	deobfCompile "appeng:appliedenergistics2:rv6-alpha-4"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
 }
 
@@ -154,11 +151,11 @@ processResources {
 	}
 }
 
-String getVersion(String type) {
+String getVersion() {
 	String major = "0";
 	String revision = "0";
 	String patch = "0";
-	String prefix = "public static final String $type = \"";
+	String prefix = "public static final String VERSION = \"";
 	File file = file("src/main/java/p455w0rd/wct/init/ModGlobals.java")
 	file.eachLine { String s ->
 		s = s.trim();

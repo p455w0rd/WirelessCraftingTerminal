@@ -74,7 +74,7 @@ public class ModConfig {
 		INFINITY_ENERGY_PER_BOOSTER_CARD = CONFIG.getInt("InfinityEnergyPerBooster", DEF_CAT, 100, 5, 1000, "Amount of Infinity Energy 1 Infinity Booster Card will convert to");
 		INFINITY_ENERGY_DRAIN = CONFIG.getInt("InfinityEnergyDrainAmount", DEF_CAT, 15, 5, 100, "Amount of Infinity Energy Consumed every 10 ticks when not in range of a WAP");
 		INFINTY_ENERGY_LOW_WARNING_AMOUNT = CONFIG.getInt("InfinityEnergyWarningAmount", CLIENT_CAT, 5000, 10, 1000000, "WCT will show a warning when Infinty Energy drops below this point and infinite range is active");
-		SHIFT_CLICK_BAUBLES = CONFIG.getBoolean("ShiftClickBaubles", CLIENT_CAT, true, "Will shift-click a bauble try to put said bauble in a bauble slot before trying to store in system");
+		SHIFT_CLICK_BAUBLES = CONFIG.getBoolean("ShiftClickBaubles", CLIENT_CAT, true, "Will shift-clicking a bauble try to put said bauble in a bauble slot before trying to store in system");
 		if (CONFIG.hasChanged()) {
 			CONFIG.save();
 		}

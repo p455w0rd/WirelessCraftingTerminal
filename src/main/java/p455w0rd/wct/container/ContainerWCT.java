@@ -428,7 +428,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 					ais.setStackSize(ais.getStackSize() - myItem.getCount());
 				}
 
-				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					adp.addItems(ais.createItemStack());
 				}
@@ -447,7 +447,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				ais.setStackSize(1);
 				final IAEItemStack extracted = ais.copy();
 
-				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais == null) {
 					final InventoryAdaptor ia = new AdaptorItemHandler(new WrapperCursorItemHandler(player.inventory));
 
@@ -483,7 +483,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (liftQty > 0) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(1);
-					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						final InventoryAdaptor ia = new AdaptorItemHandler(new WrapperCursorItemHandler(player.inventory));
 
@@ -506,7 +506,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 				if (slotItem != null) {
 					IAEItemStack ais = slotItem.copy();
 					ais.setStackSize(ais.createItemStack().getMaxStackSize());
-					ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
+					ais = Platform.poweredExtraction(getPowerSource(), getCellInventory(), ais, getActionSource());
 					if (ais != null) {
 						player.inventory.setItemStack(ais.createItemStack());
 					}
@@ -519,7 +519,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 			}
 			else {
 				IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(player.inventory.getItemStack());
-				ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
+				ais = Platform.poweredInsert(getPowerSource(), getCellInventory(), ais, getActionSource());
 				if (ais != null) {
 					player.inventory.setItemStack(ais.createItemStack());
 				}
@@ -1080,7 +1080,9 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 						}
 					}
 					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis) && ModConfig.SHIFT_CLICK_BAUBLES) {
-						if (mergeItemStack(tis.copy(), getBaublesIndex(), getBaublesIndex() + 7, false)) {
+						ItemStack tisCopy = tis.copy();
+						tisCopy.setCount(1);
+						if (mergeItemStack(tisCopy, getBaublesIndex(), getBaublesIndex() + 7, false)) {
 							if (tis.getCount() > 1) {
 								tis.shrink(1);
 							}
@@ -1265,7 +1267,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		if (getPowerSource() == null || obj == null) {
 			return input;
 		}
-		final IAEItemStack ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(getPowerSource(), (IMEMonitor<IAEItemStack>) obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
+		final IAEItemStack ais = Platform.poweredInsert(getPowerSource(), (IMEMonitor<IAEItemStack>) obj, AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createStack(input), getActionSource());
 		if (ais == null) {
 			return ItemStack.EMPTY;
 		}

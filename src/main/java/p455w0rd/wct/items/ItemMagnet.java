@@ -35,6 +35,7 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
+import appeng.util.Platform;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -81,14 +82,10 @@ import p455w0rdslib.util.ItemUtils;
 public class ItemMagnet extends ItemBase {
 
 	private int distanceFromPlayer;
-	private WCTGuiObject obj;
-	//private IPortableCell civ;
+	private WCTGuiObject<IAEItemStack> obj;
 	private IEnergySource powerSrc;
-	//private IMEMonitor<IAEItemStack> monitor;
-	//private IMEInventoryHandler<IAEItemStack> cellInv;
 	private IActionSource mySrc;
 	private ItemStack thisItemStack = ItemStack.EMPTY;
-	private int pickupTimer = 0;
 
 	private static final String name = "magnet_card";
 
@@ -366,7 +363,6 @@ public class ItemMagnet extends ItemBase {
 			int xpAmount = xpToGet.xpValue;
 			xpToGet.setDead();
 			world.playSound((EntityPlayer) null, xpToGet.posX, xpToGet.posY, xpToGet.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
-			//player.onItemPickup(xpToGet, 1);
 			ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantments.MENDING, player);
 			if (!itemstack.isEmpty() && itemstack.isItemDamaged()) {
 				int i = Math.min(xpToDurability(xpAmount), itemstack.getItemDamage());
@@ -509,7 +505,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	private boolean doInject(IAEItemStack ais, int stackSize, EntityPlayer player, EntityItem itemToGet, @Nonnull ItemStack itemStackToGet, World world) {
-		ais = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).poweredInsert(powerSrc, obj, ais, mySrc);
+		ais = Platform.poweredInsert(powerSrc, obj, ais, mySrc);
 		if (ais != null && !WCTUtils.getMagnet(player.inventory).isEmpty() && WCTUtils.getMagnet(player.inventory).getItemDamage() != 2) {
 			player.onItemPickup(itemToGet, stackSize);
 			player.inventory.addItemStackToInventory(itemStackToGet);
@@ -518,25 +514,6 @@ public class ItemMagnet extends ItemBase {
 		return ais == null;
 	}
 
-	/*
-	private boolean isBoosterInstalled(@Nonnull ItemStack wirelessTerm) {
-		if (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem) {
-			if (wirelessTerm.hasTagCompound()) {
-				NBTTagList boosterNBTList = wirelessTerm.getTagCompound().getTagList("BoosterSlot", 10);
-				if (boosterNBTList != null) {
-					NBTTagCompound boosterTagCompound = boosterNBTList.getCompoundTagAt(0);
-					if (boosterTagCompound != null) {
-						ItemStack boosterCard = new ItemStack(boosterTagCompound);
-						if (boosterCard != null && !boosterCard.isEmpty()) {
-							return (boosterCard.getItem() == ModItems.BOOSTER_CARD);
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-	*/
 	// true=whitelist (default:whitelist)
 	private boolean getMode(@Nonnull ItemStack magnetItem) {
 		if (magnetItem.getItem() == ModItems.MAGNET_CARD) {
@@ -550,11 +527,11 @@ public class ItemMagnet extends ItemBase {
 		return true;
 	}
 
-	private WCTGuiObject getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	private WCTGuiObject<IAEItemStack> getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (!it.isEmpty()) {
 			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
-				return new WCTGuiObject(wh, it, player, w, x, y, z);
+				return new WCTGuiObject<IAEItemStack>(wh, it, player, w, x, y, z);
 			}
 		}
 
