@@ -40,7 +40,7 @@ public class RandomUtils {
 	}
 
 	public static ItemStack getWirelessTerm(InventoryPlayer playerInv) {
-		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof IWirelessCraftingTerminalItem) {
+		if (playerInv.player != null && playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof IWirelessCraftingTerminalItem) {
 			return playerInv.player.getHeldItem();
 		}
 		ItemStack wirelessTerm = null;
@@ -63,7 +63,7 @@ public class RandomUtils {
 
 	public static ItemStack getMagnet(InventoryPlayer playerInv) {
 		// Is player holding a Magnet Card?
-		if (playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemMagnet) {
+		if (playerInv.player != null && playerInv.player.getHeldItem() != null && playerInv.player.getHeldItem().getItem() instanceof ItemMagnet) {
 			return playerInv.player.getHeldItem();
 		}
 		// if not true, try to return first magnet card from first
