@@ -71,7 +71,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -82,6 +81,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
@@ -95,7 +95,6 @@ import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.integration.JEI;
 import p455w0rd.wct.sync.packets.PacketInventoryAction;
-import p455w0rd.wct.sync.packets.PacketSwapSlots;
 import p455w0rd.wct.util.WCTUtils;
 
 public abstract class WCTBaseGui extends GuiContainer {
@@ -496,6 +495,7 @@ public abstract class WCTBaseGui extends GuiContainer {
 		super.handleMouseClick(slot, slotIdx, mouseButton, clickType);
 	}
 
+	//disable hotbar key-swapping WCT
 	@Override
 	protected boolean checkHotbarKeys(final int keyCode) {
 		final Slot theSlot = getSlotUnderMouse();
@@ -506,29 +506,12 @@ public abstract class WCTBaseGui extends GuiContainer {
 			for (int j = 0; j < 9; ++j) {
 				if (keyCode == mc.gameSettings.keyBindsHotbar[j].getKeyCode()) {
 					final List<Slot> slots = inventorySlots.inventorySlots;
-					InventoryPlayer playerInv = mc.player.inventory;
 					for (final Slot s : slots) {
-						IInventory slotInv = s.inventory;
 						if (s instanceof AppEngSlot && ((AppEngSlot) s).getItemHandler() instanceof InvWrapper) {
-							slotInv = ((InvWrapper) ((AppEngSlot) s).getItemHandler()).getInv();
-						}
-						//disable hotbar key-swapping WCT
-						if (!s.canTakeStack(mc.player) || (s.getStack().getItem() instanceof IWirelessCraftingTerminalItem)) {
-							return false;
-						}
-					}
-					if (theSlot.getSlotStackLimit() == 64) {
-						handleMouseClick(theSlot, theSlot.slotNumber, j, ClickType.SWAP);
-						return true;
-					}
-					else {
-						for (final Slot s : slots) {
-							IInventory slotInv = s.inventory;
-							if (s instanceof AppEngSlot && ((AppEngSlot) s).getItemHandler() instanceof InvWrapper) {
-								slotInv = ((InvWrapper) ((AppEngSlot) s).getItemHandler()).getInv();
-							}
-							if (40 - s.getSlotIndex() == j && slotInv == playerInv) {
-								ModNetworking.instance().sendToServer(new PacketSwapSlots(s.slotNumber, theSlot.slotNumber));
+							IItemHandler inv = ((AppEngSlot) s).getItemHandler();
+							ItemStack pullingStack = inv.getStackInSlot(j);
+							if (!(pullingStack.getItem() instanceof IWirelessCraftingTerminalItem)) {
+								handleMouseClick(theSlot, theSlot.slotNumber, j, ClickType.SWAP);
 								return true;
 							}
 						}

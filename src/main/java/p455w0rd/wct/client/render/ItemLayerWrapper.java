@@ -82,7 +82,6 @@ public class ItemLayerWrapper implements IBakedModel {
 	@Override
 	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(TransformType type) {
 		WCTItemRenderer.transformType = type;
-		//You can use a field on your TileEntityItemStackRenderer to store this TransformType for use in renderByItem, this method is always called before it.
 		return Pair.of(this, internal.handlePerspective(type).getRight());
 	}
 

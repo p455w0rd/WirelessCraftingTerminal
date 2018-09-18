@@ -35,8 +35,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.Loader;
 import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.client.gui.widgets.MEGuiTextField;
@@ -268,8 +270,10 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.FILL_ITEM, slot.slotNumber, 0));
 				}
 				else {
-					container.setTargetStack(meSlot.getAEFluidStack());
-					ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.EMPTY_ITEM, slot.slotNumber, 0));
+					if (!mc.player.inventory.getItemStack().isEmpty()) {
+						container.setTargetStack(meSlot.getAEFluidStack());
+						ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.EMPTY_ITEM, slot.slotNumber, 0));
+					}
 				}
 			}
 			else {
@@ -285,8 +289,14 @@ public class GuiWFT extends WCTBaseGui implements ISortSource, IConfigManagerHos
 					//boolean isBucket = stack.getItem() == Items.BUCKET || stack.getItem() == Items.WATER_BUCKET || stack.getItem() == Items.LAVA_BUCKET || stack.getItem() == Items.MILK_BUCKET || stack.getItem() == ForgeModContainer.getInstance().universalBucket;
 					IFluidHandlerItem fh = FluidUtil.getFluidHandler(stack);
 					if (!stack.isEmpty() && fh != null) {
-						if (fh != null && fh.getTankProperties()[0].getContents().amount > 0) {
-							ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.SHIFT_CLICK, slot.slotNumber, 0));
+						if (fh != null) {
+							IFluidTankProperties props = fh.getTankProperties()[0];
+							if (props != null) {
+								FluidStack fStack = props.getContents();
+								if (fStack != null && fStack.amount > 0) {
+									ModNetworking.instance().sendToServer(new PacketInventoryAction(InventoryAction.SHIFT_CLICK, slot.slotNumber, 0));
+								}
+							}
 						}
 					}
 				}

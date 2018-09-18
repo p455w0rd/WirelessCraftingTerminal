@@ -514,9 +514,8 @@ public class ContainerWFT extends WCTBaseContainer implements IConfigManagerHost
 			}
 
 			// Actually fill
-			if (held.isEmpty() && isBucket) {
+			if ((held.isEmpty() || held.getItem() == Items.BUCKET) && isBucket) {
 				Platform.poweredExtraction(getPowerSource(), obj.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)), bucket, getActionSource(), Actionable.MODULATE);
-
 			}
 			fh.fill(pulled.getFluidStack(), true);
 

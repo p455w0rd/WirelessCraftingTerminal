@@ -15,11 +15,8 @@
  */
 package p455w0rd.wct.client.gui.widgets;
 
-import org.lwjgl.opengl.GL11;
-
 import appeng.client.gui.widgets.IScrollSource;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import p455w0rd.wct.client.gui.GuiWCT;
+import net.minecraft.client.renderer.GlStateManager;
 import p455w0rd.wct.client.gui.WCTBaseGui;
 
 public class GuiScrollbar implements IScrollSource {
@@ -34,16 +31,10 @@ public class GuiScrollbar implements IScrollSource {
 	private int minScroll = 0;
 	private int currentScroll = 0;
 
-	public void draw(final GuiContainer g) {
-		if (g instanceof GuiWCT) {
-			((GuiWCT) g).bindTexture("minecraft", "gui/container/creative_inventory/tabs.png");
+	public void draw(final WCTBaseGui g) {
+		g.bindTexture("minecraft", "gui/container/creative_inventory/tabs.png");
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
-		}
-		else if (g instanceof WCTBaseGui) {
-			((WCTBaseGui) g).bindTexture("minecraft", "gui/container/creative_inventory/tabs.png");
-		}
-
-		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		if (getRange() == 0) {
 			g.drawTexturedModalRect(displayX, displayY, 232 + width, 0, width, 15);
 		}
@@ -114,7 +105,7 @@ public class GuiScrollbar implements IScrollSource {
 		return currentScroll;
 	}
 
-	public void click(final GuiContainer aeBaseGui, final int x, final int y) {
+	public void click(final WCTBaseGui aeBaseGui, final int x, final int y) {
 		if (getRange() == 0) {
 			return;
 		}
