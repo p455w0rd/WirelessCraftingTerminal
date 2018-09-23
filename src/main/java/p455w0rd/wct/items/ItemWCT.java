@@ -49,7 +49,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IBaubleItem;
@@ -88,7 +87,6 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 		setRegistryName(name);
 		setUnlocalizedName(name);
 		setMaxStackSize(1);
-		ForgeRegistries.ITEMS.register(this);
 		setCreativeTab(ModCreativeTab.CREATIVE_TAB);
 	}
 
@@ -331,7 +329,7 @@ public class ItemWCT extends AEBasePoweredItem implements IModelHolder, IWireles
 
 	@Override
 	public BaubleType getBaubleType(ItemStack itemstack) {
-		return BaubleType.TRINKET;
+		return BaubleType.HEAD;
 	}
 
 	@Override

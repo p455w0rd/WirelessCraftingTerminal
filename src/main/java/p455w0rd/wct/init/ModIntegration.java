@@ -25,7 +25,7 @@ import p455w0rd.wct.integration.ItemScroller;
  */
 public class ModIntegration {
 
-	public static void preInit() {
+	public static void init() {
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.WCT);
 		AEApi.instance().registries().charger().addChargeRate(ModItems.WCT, ModConfig.WCT_MAX_POWER);
 		AEApi.instance().registries().wireless().registerWirelessHandler(ModItems.CREATIVE_WCT);

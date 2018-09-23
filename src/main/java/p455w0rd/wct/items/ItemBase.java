@@ -21,7 +21,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.wct.api.IModelHolder;
@@ -39,7 +38,6 @@ public class ItemBase extends Item implements IModelHolder {
 		this.name = name;
 		setRegistryName(this.name);
 		setUnlocalizedName(this.name);
-		ForgeRegistries.ITEMS.register(this);
 		setMaxStackSize(64);
 		setCreativeTab(ModCreativeTab.CREATIVE_TAB);
 	}

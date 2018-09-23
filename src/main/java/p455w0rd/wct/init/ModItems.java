@@ -15,12 +15,14 @@
  */
 package p455w0rd.wct.init;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.IForgeRegistry;
 import p455w0rd.wct.api.IModelHolder;
 import p455w0rd.wct.items.ItemInfinityBooster;
 import p455w0rd.wct.items.ItemMagnet;
@@ -35,27 +37,30 @@ import p455w0rd.wct.items.ItemWFTCreative;
  */
 public class ModItems {
 
-	private static List<Item> ITEM_LIST = new ArrayList<Item>();
+	public static final ItemWCT WCT = new ItemWCT();
+	public static final ItemWCTCreative CREATIVE_WCT = new ItemWCTCreative();
+	public static final ItemMagnet MAGNET_CARD = new ItemMagnet();
+	public static final ItemInfinityBooster BOOSTER_CARD = new ItemInfinityBooster();
+	public static final ItemWFT WFT = new ItemWFT();
+	public static final ItemWFTCreative CREATIVE_WFT = new ItemWFTCreative();
 
-	public static ItemWCT WCT;
-	public static ItemWCTCreative CREATIVE_WCT;
-	public static ItemMagnet MAGNET_CARD;
-	public static ItemInfinityBooster BOOSTER_CARD;
-	public static ItemWFT WFT;
-	public static ItemWFTCreative CREATIVE_WFT;
+	private static final List<Item> ITEM_LIST = Lists.newArrayList(WCT, CREATIVE_WCT, MAGNET_CARD, BOOSTER_CARD, WFT, CREATIVE_WFT);
 
-	public static void preInit() {
-		ITEM_LIST.add(WCT = new ItemWCT());
-		ITEM_LIST.add(CREATIVE_WCT = new ItemWCTCreative());
-		ITEM_LIST.add(MAGNET_CARD = new ItemMagnet());
-		ITEM_LIST.add(BOOSTER_CARD = new ItemInfinityBooster());
-		ITEM_LIST.add(WFT = new ItemWFT());
-		ITEM_LIST.add(CREATIVE_WFT = new ItemWFTCreative());
+	public static final List<Item> getList() {
+		return ITEM_LIST;
+	}
+
+	private static final Item[] getArray() {
+		return getList().toArray(new Item[getList().size()]);
+	}
+
+	public static final void register(IForgeRegistry<Item> registry) {
+		registry.registerAll(getArray());
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static void preInitModels() {
-		for (Item item : ITEM_LIST) {
+	public static final void initModels() {
+		for (Item item : getList()) {
 			if (item instanceof IModelHolder) {
 				((IModelHolder) item).initModel();
 			}

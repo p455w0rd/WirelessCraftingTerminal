@@ -142,6 +142,7 @@ public class Baubles {
 				ItemStack currentStack = inv.getStackInSlot(i);
 				if (currentStack.getItem() instanceof IBauble) {
 					IBauble bauble = (IBauble) currentStack.getItem();
+					BaubleType type = bauble.getBaubleType(currentStack);
 					if (bauble.getBaubleType(currentStack) == BaubleType.HEAD && WCTUtils.isAnyWCT(currentStack)) {
 						updateWCTBauble(player, stack);
 						ModNetworking.instance().sendTo(new PacketBaubleSync(stack), (EntityPlayerMP) player);

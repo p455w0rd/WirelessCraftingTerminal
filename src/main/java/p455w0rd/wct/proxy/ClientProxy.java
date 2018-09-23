@@ -20,7 +20,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import p455w0rd.wct.init.ModCreativeTab;
 import p455w0rd.wct.init.ModIntegration;
-import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModKeybindings;
 
 /**
@@ -32,7 +31,6 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(FMLPreInitializationEvent e) {
 		super.preInit(e);
-		ModItems.preInitModels();
 		ModKeybindings.preInit();
 		ModCreativeTab.preInit();
 	}

@@ -261,6 +261,7 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		if (Mods.BAUBLES.isLoaded()) {
 			Baubles.addBaubleSlots(this, player);
 		}
+
 		readNBT();
 		onCraftMatrixChanged(new WrapperInvItemHandler(getInventoryByName("crafting")));
 		((IWirelessCraftingTerminalItem) containerstack.getItem()).checkForBooster(containerstack);
@@ -925,7 +926,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 	@Override
 	public void onContainerClosed(final EntityPlayer player) {
 		writeToNBT();
-		//super.onContainerClosed(player);
 		if (monitor != null) {
 			monitor.removeListener(this);
 		}
@@ -1000,7 +1000,6 @@ public class ContainerWCT extends WCTBaseContainer implements IConfigManagerHost
 		newNBT.setTag("MagnetSlot", magnetInventory.serializeNBT());
 		newNBT.setTag("TrashSlot", trashInventory.serializeNBT());
 		newNBT.setTag("CraftingMatrix", craftingGrid.serializeNBT());
-		//newNBT.setTag("ViewCells", viewCell.serializeNBT());
 		viewCell.writeToNBT(newNBT, "ViewCells");
 		containerstack.setTagCompound(newNBT);
 		if (Mods.BAUBLES.isLoaded()) {
