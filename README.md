@@ -22,12 +22,10 @@
 An OP addon to an already OP mod =]
 Adds a Wireless Terminal version of the AE2 Crafting Terminal with the ability to install upgrades
 
-Currently in BETA! I need testers! Drop me a line on [IRC](#contact) or [Twitter](#contact)
-
 ## Contact
 
-* [Website](http://p455w0rd.net/mc/)
-* [IRC #p455w0rdCraft on esper.net](http://webchat.esper.net/?channels=p455w0rdCraft&prompt=1)
+* [Website](https://p455w0rd.net/)
+* [Discord](https://p455w0rd.net/discord)
 * [GitHub](https://github.com/p455w0rd/WirelessCraftingTerminal)
 * [Twitter](https://twitter.com/TheRealp455w0rd)
 
@@ -39,11 +37,11 @@ I'm just glad I could help make another person's life better in some way.
 
 ## Downloads
 
-* Both the RV2 and RV3 versions are available on [CurseForge](http://minecraft.curseforge.com/projects/wireless-crafting-terminal)
+* Current version is available on [CurseForge](http://minecraft.curseforge.com/projects/wireless-crafting-terminal)
 
 ## Installation
 
-You install this mod by putting it into the `minecraft/mods/` folder. It requires that [AE2 RV3 Beta](http://ae-mod.info/Downloads/) (any build) also be installed.
+You install this mod by putting it into the `minecraft/mods/` folder. It requires that [AE2 RV6 Stable](http://ae-mod.info/Downloads/) also be installed.
 
 ## Issues/Feature Requests
 
@@ -64,10 +62,6 @@ Providing as many details as possible does help us to find and resolve the issue
 4. For core developer: Setup IDE
   - IntelliJ: Import into IDE and execute `gradlew genIntellijRuns` afterwards
   - Eclipse: execute `gradlew eclipse`
-5. For add-on developer: Core-Mod Detection
-  - In order to have FML detect AE and WCT from your dev environment, add the following VM Arguments to your run profile
-  - `-Dfml.coreMods.load=appeng.transformer.AppEngCore`
-  - `-Dfml.coreMods.load=net.p455w0rd.wirelesscraftingterminal.transformer.WCTCore`
 
 ## Contribution
 
@@ -84,19 +78,9 @@ To make your item a Wireless Crafting Terminal variant, register like normal wit
 To open the WCT Gui from said item, use
 `WCTApi.instance().openWirelessCraftingTerminalGui(EntityPlayer player);`
 
-### Wireless Fluid Terminal
-To make your item a Wireless Fluid Terminal variant, register like normal with AE2 and implement
-`net.p455w0rd.wirelesscraftingterminal.api.IWirelessFluidTerminalItem`
-
-To open the WCT Gui from said item, use
-`WCTApi.instance().openWirelessFluidTerminalGui(EntityPlayer player);`
 
 ### WCT Configs
-To check if the Infinity Booster Card is enabled in WCT configs, use
-`WCTApi.instance().isInfinityBoosterCardEnabled()`
-
-To check if the old infinite range mechanic option is enabled, use
-`WCTApi.instance().isOldInfinityMechanicEnabled()`
+Configs have been moved to [AE2WTLib](https://github.com/p455w0rd/AE2WirelessTerminalLibrary)
 
 ### Maven
 
@@ -137,5 +121,3 @@ I would love for someone to do translations for me =]
 Thanks to the following people for support, code, et al
  
 * Code/tutorials/general help: Notch, brandon3055, Techjar, AlgorythmX2, thatsIch, Nividica, squeek502, M3gaFr3ak, DrummerMC, cpw, LexManos, Pahimar, diesieben07, Wuppy, Jabelar, blay09, SirSengir, mezz
-
-* Contributors: condensedapple, TKH+

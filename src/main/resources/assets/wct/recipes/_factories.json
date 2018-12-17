@@ -1,8 +1,0 @@
-{
-	"conditions": {
-		"booster_enabled": "p455w0rd.wct.recipes.factories.conditions.BoosterRecipeEnabled",
-		"recipes_enabled": "p455w0rd.wct.recipes.factories.conditions.RecipesEnabled",
-		"infinity_mechanic_new": "p455w0rd.wct.recipes.factories.conditions.NewInfinityMechanic",
-		"infinity_mechanic_old": "p455w0rd.wct.recipes.factories.conditions.OldInfinityMechanic"
-	}
-}

@@ -16,14 +16,9 @@
 package p455w0rd.wct.proxy;
 
 import net.minecraftforge.fml.common.LoaderState;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import p455w0rd.wct.WCT;
-import p455w0rd.wct.init.ModConfig;
+import net.minecraftforge.fml.common.event.*;
 import p455w0rd.wct.init.ModIntegration;
 import p455w0rd.wct.init.ModNetworking;
-import p455w0rdslib.util.ChunkUtils;
 
 /**
  * @author p455w0rd
@@ -35,14 +30,12 @@ public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent e) {
 		WCT_STATE = LoaderState.PREINITIALIZATION;
-		ModConfig.preInit();
 		ModNetworking.preInit();
-		ChunkUtils.register(WCT.INSTANCE);
+		ModIntegration.preInit();
 	}
 
 	public void init(FMLInitializationEvent e) {
 		WCT_STATE = LoaderState.INITIALIZATION;
-		ModIntegration.init();
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {

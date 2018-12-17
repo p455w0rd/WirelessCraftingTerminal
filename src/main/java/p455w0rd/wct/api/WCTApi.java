@@ -29,7 +29,7 @@ public abstract class WCTApi {
 	public static WCTApi instance() {
 		if (WCTApi.api == null) {
 			try {
-				Class<?> clazz = Class.forName("p455w0rd.wct.implementation.WCTAPIImpl");
+				Class<?> clazz = Class.forName("p455w0rd.wct.init.ModAPIImpl");
 				Method instanceAccessor = clazz.getMethod("instance");
 				WCTApi.api = (WCTApi) instanceAccessor.invoke(null);
 			}
@@ -41,12 +41,9 @@ public abstract class WCTApi {
 		return WCTApi.api;
 	}
 
-	public abstract boolean isInfinityBoosterCardEnabled();
+	public abstract void openWCTGui(EntityPlayer player, boolean isBauble, int wctSlot);
 
-	public abstract boolean isOldInfinityMechanicEnabled();
-
-	public abstract void openWirelessCraftingTerminalGui(EntityPlayer player);
-
-	public abstract void openWirelessFluidTerminalGui(EntityPlayer player);
+	// use False and -1 for isWCTaBauble and wctSlot for held magnet item
+	public abstract void openMagnetGui(EntityPlayer player, boolean isWCTaBauble, int wctSlot);
 
 }

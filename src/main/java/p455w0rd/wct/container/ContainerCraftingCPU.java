@@ -34,15 +34,14 @@ import appeng.helpers.InventoryAction;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
 import appeng.tile.crafting.TileCraftingTile;
 import appeng.util.Platform;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.*;
 import net.minecraft.inventory.IContainerListener;
+import p455w0rd.ae2wtlib.container.ContainerWT;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
-public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject {
+public class ContainerCraftingCPU extends ContainerWT implements IMEMonitorHandlerReceiver<IAEItemStack>, ICustomNameObject {
 
 	private final IItemList<IAEItemStack> list = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 	private IGrid network;
@@ -52,8 +51,8 @@ public class ContainerCraftingCPU extends WCTBaseContainer implements IMEMonitor
 	@GuiSync(0)
 	public long eta = -1;
 
-	public ContainerCraftingCPU(final InventoryPlayer ip, final Object te) {
-		super(ip, te);
+	public ContainerCraftingCPU(final InventoryPlayer ip, final Object te, int wtSlot, boolean isWTBauble) {
+		super(ip, te, wtSlot, isWTBauble);
 		final IActionHost host = (IActionHost) (te instanceof IActionHost ? te : null);
 
 		if (host != null && host.getActionableNode() != null) {

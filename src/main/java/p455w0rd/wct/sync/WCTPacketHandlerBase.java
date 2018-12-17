@@ -22,25 +22,7 @@ import java.util.Map;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
-import p455w0rd.wct.sync.packets.PacketBaubleSync;
-import p455w0rd.wct.sync.packets.PacketConfigSync;
-import p455w0rd.wct.sync.packets.PacketCraftRequest;
-import p455w0rd.wct.sync.packets.PacketEmptyTrash;
-import p455w0rd.wct.sync.packets.PacketInventoryAction;
-import p455w0rd.wct.sync.packets.PacketJEIRecipe;
-import p455w0rd.wct.sync.packets.PacketMEFluidInventoryUpdate;
-import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
-import p455w0rd.wct.sync.packets.PacketMagnetFilter;
-import p455w0rd.wct.sync.packets.PacketOpenGui;
-import p455w0rd.wct.sync.packets.PacketSetAutoConsumeBoosters;
-import p455w0rd.wct.sync.packets.PacketSetInRange;
-import p455w0rd.wct.sync.packets.PacketSetMagnet;
-import p455w0rd.wct.sync.packets.PacketSwapSlots;
-import p455w0rd.wct.sync.packets.PacketSwitchGuis;
-import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
-import p455w0rd.wct.sync.packets.PacketTargetFluidStack;
-import p455w0rd.wct.sync.packets.PacketTargetItemStack;
-import p455w0rd.wct.sync.packets.PacketValueConfig;
+import p455w0rd.wct.sync.packets.*;
 
 public class WCTPacketHandlerBase {
 	private static final Map<Class<? extends WCTPacket>, PacketTypes> REVERSE_LOOKUP = new HashMap<Class<? extends WCTPacket>, WCTPacketHandlerBase.PacketTypes>();
@@ -62,27 +44,17 @@ public class WCTPacketHandlerBase {
 
 			PACKET_CRAFTING_REQUEST(PacketCraftRequest.class),
 
-			PACKET_MAGNETFILTER_MODE(PacketMagnetFilter.class),
+			PACKET_MAGNETFILTER_MODE_HELD(PacketMagnetFilterHeld.class),
 
-			PACKET_OPENWIRELESSTERM(PacketOpenGui.class),
+			PACKET_MAGNETFILTER_MODE_WCT(PacketMagnetFilterWCT.class),
 
-			PACKET_SWITCHMAGNETMODE(PacketSetMagnet.class),
+			PACKET_OPENGUI(PacketOpenGui.class),
 
-			PACKET_EMPTY_TRASH(PacketEmptyTrash.class),
+			PACKET_SWITCHMAGNETMODE_HELD(PacketSetMagnetHeld.class),
 
-			PACKET_SYNC_CONFIGS(PacketConfigSync.class),
+			PACKET_SWITCHMAGNETMODE_WCT(PacketSetMagnetWCT.class),
 
-			PACKET_SYNC_INFINITY_ENERGY(PacketSyncInfinityEnergy.class),
-
-			PACKET_SET_IN_RANGE(PacketSetInRange.class),
-
-			PACKET_SET_AUTOCONSUME_BOOSTERS(PacketSetAutoConsumeBoosters.class),
-
-			PACKET_BAUBLE_SYNC(PacketBaubleSync.class),
-
-			PACKET_ME_FLUID_INVENTORY_UPDATE(PacketMEFluidInventoryUpdate.class),
-
-			PACKET_TARGET_FLUID(PacketTargetFluidStack.class);
+			PACKET_SHIFTCRAFT(PacketSetShiftCraft.class);
 
 		private final Class<? extends WCTPacket> packetClass;
 		private final Constructor<? extends WCTPacket> packetConstructor;

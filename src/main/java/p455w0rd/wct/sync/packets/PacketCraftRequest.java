@@ -25,13 +25,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import p455w0rd.wct.api.networking.security.WCTIActionHost;
+import p455w0rd.ae2wtlib.api.networking.security.WTIActionHost;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 public class PacketCraftRequest extends WCTPacket {
 
@@ -61,8 +60,8 @@ public class PacketCraftRequest extends WCTPacket {
 		if (player.openContainer instanceof ContainerCraftAmount) {
 			final ContainerCraftAmount cca = (ContainerCraftAmount) player.openContainer;
 			final Object target = cca.getTarget();//.getTarget();
-			if (target instanceof WCTIActionHost) {
-				final WCTIActionHost ah = (WCTIActionHost) target;
+			if (target instanceof WTIActionHost) {
+				final WTIActionHost ah = (WTIActionHost) target;
 				final IGridNode gn = ah.getActionableNode(true);
 
 				if (gn == null) {
@@ -85,8 +84,7 @@ public class PacketCraftRequest extends WCTPacket {
 					int y = (int) player.posY;
 					int z = (int) player.posZ;
 
-					ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_CONFIRM, player, WCTUtils.world(player), new BlockPos(x, y, z));
-					//Platform.openGUI(player, null, cca.getOpenContext().getSide(), GuiBridge.GUI_CRAFTING_CONFIRM);
+					ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_CONFIRM, player, player.getEntityWorld(), new BlockPos(x, y, z), false, cca.isWTBauble(), cca.getWTSlot());
 
 					if (player.openContainer instanceof ContainerCraftConfirm) {
 						final ContainerCraftConfirm ccc = (ContainerCraftConfirm) player.openContainer;

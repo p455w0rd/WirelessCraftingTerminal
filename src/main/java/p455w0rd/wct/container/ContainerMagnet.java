@@ -15,27 +15,27 @@
  */
 package p455w0rd.wct.container;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.Nonnull;
 
 import appeng.util.Platform;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.wct.api.IWCTContainer;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.container.slot.SlotMagnetFilter;
 import p455w0rd.wct.inventory.WCTInventoryMagnetFilter;
+import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.util.MathUtils;
 
-public class ContainerMagnet extends Container {
+public class ContainerMagnet extends Container implements IWCTContainer {
 
 	public final InventoryPlayer inventoryPlayer;
 	public final ItemStack magnetItem;
@@ -45,22 +45,36 @@ public class ContainerMagnet extends Container {
 	private final Set<Slot> distributeSlotSet = new HashSet<Slot>();
 	private final int PLAYER_INV_START = 0, PLAYER_INV_END = 26, HOTBAR_START = 27, HOTBAR_END = 35, FILTERS_START = 36,
 			FILTERS_END = 62;
+	private final boolean isHeld;
+	private final boolean isWCTBauble;
+	private final int wctSlot;
+	private final ItemStack wirelessTerminal;
 
-	public ContainerMagnet(EntityPlayer player, InventoryPlayer inventoryPlayer) {
-		this.inventoryPlayer = inventoryPlayer;
-		magnetItem = WCTUtils.getMagnet(inventoryPlayer);
+	public ContainerMagnet(EntityPlayer player, boolean isHeld, boolean isWCTBauble, int wctSlot) {
+		inventoryPlayer = player.inventory;
+		this.isHeld = isHeld;
+		this.isWCTBauble = isWCTBauble;
+		this.wctSlot = wctSlot;
+		if (isHeld) {
+			magnetItem = ItemMagnet.getHeldMagnet(player);
+			wirelessTerminal = ItemStack.EMPTY;
+		}
+		else {
+			wirelessTerminal = isWCTBauble ? Baubles.getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
+			magnetItem = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
+		}
 		magnetInventory = new WCTInventoryMagnetFilter(magnetItem);
 		magnetInventory.setContainer(this);
 		// Add player inventory slots
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				addSlotToContainer(new Slot(this.inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 126 + i * 18));
+				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, j * 18 + 8, 126 + i * 18));
 			}
 		}
 
 		// Add hotbar slots
 		for (int i = 0; i < 9; ++i) {
-			addSlotToContainer(new Slot(this.inventoryPlayer, i, i * 18 + 8, 184));
+			addSlotToContainer(new Slot(inventoryPlayer, i, i * 18 + 8, 184));
 		}
 
 		// Add filter slots
@@ -76,6 +90,36 @@ public class ContainerMagnet extends Container {
 		if (Platform.isClient()) {
 			GuiWCT.setSwitchingGuis(false);
 		}
+	}
+
+	@Override
+	public EntityPlayer getPlayer() {
+		return inventoryPlayer.player;
+	}
+
+	@Override
+	public boolean isMagnetHeld() {
+		return isHeld;
+	}
+
+	@Override
+	public boolean isWTBauble() {
+		return isWCTBauble;
+	}
+
+	@Override
+	public int getWTSlot() {
+		return wctSlot;
+	}
+
+	@Override
+	public ItemStack getWirelessTerminal() {
+		return wirelessTerminal;
+	}
+
+	@Override
+	public ItemStack getMagnet() {
+		return magnetItem;
 	}
 
 	private boolean isInHotbar(int slotNum) {
@@ -260,12 +304,7 @@ public class ContainerMagnet extends Container {
 		return stack;
 	}
 
-	public boolean alwaysTrue(Slot slot) {
-		return true;
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static void setSlotStack(Set slotSet, int stackSizeSelector, @Nonnull ItemStack stackToResize, int currentSlotStackSize) {
+	public static void setSlotStack(Set<Slot> slotSet, int stackSizeSelector, @Nonnull ItemStack stackToResize, int currentSlotStackSize) {
 		switch (stackSizeSelector) {
 		case 0:
 			stackToResize.setCount(MathUtils.floor((float) stackToResize.getCount() / (float) slotSet.size()));
@@ -340,7 +379,7 @@ public class ContainerMagnet extends Container {
 			stackSize = slot.getSlotStackLimit();
 		}
 		ItemStack phantomStack = stackHeld.copy();
-		WCTUtils.removeTimerTags(phantomStack);
+		ItemMagnet.removeTimerTags(phantomStack);
 		phantomStack.setCount(stackSize);
 
 		slot.putStack(phantomStack);

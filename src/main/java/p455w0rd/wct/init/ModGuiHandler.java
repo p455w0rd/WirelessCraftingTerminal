@@ -15,29 +15,24 @@
  */
 package p455w0rd.wct.init;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import appeng.api.AEApi;
 import appeng.api.features.IWirelessTermHandler;
 import appeng.api.storage.ITerminalHost;
-import appeng.api.storage.data.IAEFluidStack;
+import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import p455w0rd.ae2wtlib.helpers.WTGuiObject;
+import p455w0rd.ae2wtlib.integration.Baubles;
 import p455w0rd.wct.WCT;
-import p455w0rd.wct.client.gui.GuiCraftAmount;
-import p455w0rd.wct.client.gui.GuiCraftConfirm;
-import p455w0rd.wct.client.gui.GuiCraftingStatus;
-import p455w0rd.wct.client.gui.GuiMagnet;
-import p455w0rd.wct.client.gui.GuiWCT;
-import p455w0rd.wct.client.gui.GuiWFT;
-import p455w0rd.wct.container.ContainerCraftAmount;
-import p455w0rd.wct.container.ContainerCraftConfirm;
-import p455w0rd.wct.container.ContainerCraftingStatus;
-import p455w0rd.wct.container.ContainerMagnet;
-import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.ContainerWFT;
-import p455w0rd.wct.helpers.WCTGuiObject;
+import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.client.gui.*;
+import p455w0rd.wct.container.*;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -46,99 +41,129 @@ import p455w0rd.wct.util.WCTUtils;
  */
 public class ModGuiHandler implements IGuiHandler {
 
+	private static final ModGuiHandler INSTANCE = new ModGuiHandler();
 	public static final int GUI_WCT = 0;
 	public static final int GUI_CRAFT_CONFIRM = 1;
 	public static final int GUI_CRAFT_AMOUNT = 2;
 	public static final int GUI_CRAFTING_STATUS = 3;
 	public static final int GUI_MAGNET = 4;
 	public static final int GUI_WFT = 5;
+	private static int slot = -1;
+	private static boolean isBauble = false;
+	private static boolean isMagnetHeld = false;
+
+	public static ModGuiHandler getInstance() {
+		return INSTANCE;
+	}
+
+	public static boolean isBauble() {
+		return isBauble;
+	}
+
+	public static void setIsBauble(boolean value) {
+		isBauble = value;
+	}
+
+	public static int getSlot() {
+		return slot;
+	}
+
+	public static void setSlot(int value) {
+		slot = value;
+	}
+
+	public static boolean isMagnetHeld() {
+		return isMagnetHeld;
+	}
+
+	public static void setMagnetHeld(boolean isHeld) {
+		isMagnetHeld = isHeld;
+	}
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != GUI_MAGNET && ID != GUI_WFT) {
-			ITerminalHost terminal = getCraftingTerminal(player, world, new BlockPos(x, y, z));
+		if (ID != GUI_MAGNET) {
+			ITerminalHost terminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
-					return new ContainerWCT(player, terminal);
+					return new ContainerWCT(player, terminal, getSlot(), isBauble());
 				}
 
 				if (ID == GUI_CRAFTING_STATUS) {
-					return new ContainerCraftingStatus(player.inventory, terminal);
+					return new ContainerCraftingStatus(player.inventory, terminal, getSlot(), isBauble());
 				}
 
 				if (ID == GUI_CRAFT_AMOUNT) {
-					return new ContainerCraftAmount(player.inventory, terminal);
+					return new ContainerCraftAmount(player.inventory, terminal, getSlot(), isBauble());
 				}
 
 				if (ID == GUI_CRAFT_CONFIRM) {
-					return new ContainerCraftConfirm(player.inventory, terminal);
+					return new ContainerCraftConfirm(player.inventory, terminal, isBauble(), getSlot());
 				}
 			}
 		}
 		if (ID == GUI_MAGNET) {
-			return new ContainerMagnet(player, player.inventory);
-		}
-		if (ID == GUI_WFT) {
-			return new ContainerWFT(player, getFluidTerminal(player, world, new BlockPos(x, y, z)));
+			return new ContainerMagnet(player, isMagnetHeld(), isBauble(), getSlot());
 		}
 		return null;
 	}
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (ID != GUI_MAGNET && ID != GUI_WFT) {
-			ITerminalHost craftingTerminal = getCraftingTerminal(player, world, new BlockPos(x, y, z));
+		if (ID != GUI_MAGNET) {
+			ITerminalHost craftingTerminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
 			if (craftingTerminal != null) {
 				if (ID == GUI_WCT) {
 					GuiWCT.setSwitchingGuis(false);
-					return new GuiWCT(new ContainerWCT(player, craftingTerminal));
+					return new GuiWCT(new ContainerWCT(player, craftingTerminal, getSlot(), isBauble()));
 				}
 
 				if (ID == GUI_CRAFTING_STATUS) {
-					return new GuiCraftingStatus(player.inventory, craftingTerminal);
+					return new GuiCraftingStatus(player.inventory, craftingTerminal, getSlot(), isBauble());
 				}
 
 				if (ID == GUI_CRAFT_AMOUNT) {
-					return new GuiCraftAmount(player.inventory, craftingTerminal);
+					return new GuiCraftAmount(player.inventory, craftingTerminal, getSlot(), isBauble());
 				}
 
 				if (ID == GUI_CRAFT_CONFIRM) {
-					return new GuiCraftConfirm(player.inventory, craftingTerminal);
+					return new GuiCraftConfirm(player.inventory, craftingTerminal, isBauble(), getSlot());
 				}
 			}
 		}
 		if (ID == GUI_MAGNET) {
-			return new GuiMagnet(new ContainerMagnet(player, player.inventory), WCTUtils.getMagnet(player.inventory));
-		}
-		if (ID == GUI_WFT) {
-			return new GuiWFT(new ContainerWFT(player, getFluidTerminal(player, world, new BlockPos(x, y, z))));
+			return new GuiMagnet(new ContainerMagnet(player, isMagnetHeld(), isBauble(), getSlot()));
 		}
 		return null;
 	}
 
-	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos) {
+	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos, boolean isBauble, int slot) {
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
-		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getWirelessTerm(player.inventory));
-		final WCTGuiObject<IAEItemStack> terminal = wh == null ? null : new WCTGuiObject<IAEItemStack>(wh, WCTUtils.getWirelessTerm(player.inventory), player, world, x, y, z);
+		ItemStack wirelessTerminal = ItemStack.EMPTY;
+		if (getSlot() >= 0) {
+			wirelessTerminal = isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot);
+		}
+		else {
+			Pair<Boolean, Pair<Integer, ItemStack>> firstTerm = WCTUtils.getFirstWirelessCraftingTerminal(player.inventory);
+			wirelessTerminal = firstTerm.getRight().getRight();
+			setSlot(firstTerm.getRight().getLeft());
+			setIsBauble(firstTerm.getLeft());
+		}
+		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(wirelessTerminal);
+		final WTGuiObject<IAEItemStack, IItemStorageChannel> terminal = wh == null ? null : new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, wirelessTerminal, player, world, x, y, z);
 		return terminal;
 	}
 
-	private ITerminalHost getFluidTerminal(EntityPlayer player, World world, BlockPos pos) {
+	public static void open(int ID, EntityPlayer player, World world, BlockPos pos, boolean isMagnetHeld, boolean isBauble, int slot) {
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
-		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(WCTUtils.getFluidTerm(player.inventory));
-		final WCTGuiObject<IAEFluidStack> terminal = wh == null ? null : new WCTGuiObject<IAEFluidStack>(wh, WCTUtils.getFluidTerm(player.inventory), player, world, x, y, z);
-		return terminal;
-	}
-
-	public static void open(int ID, EntityPlayer playerIn, World worldIn, BlockPos pos) {
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
-		playerIn.openGui(WCT.INSTANCE, ID, worldIn, x, y, z);
+		setIsBauble(isBauble);
+		setSlot(slot);
+		setMagnetHeld(isMagnetHeld);
+		player.openGui(WCT.INSTANCE, ID, world, x, y, z);
 	}
 
 }

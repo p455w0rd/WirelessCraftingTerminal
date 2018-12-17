@@ -1,9 +1,9 @@
 // Items
-item.wct.name=무선 조합 터미널
+item.wct:wct.name=무선 조합 터미널
 item.wft.name=무선 액체 터미널
-item.wct_creative.name=크리에이티브 무선 조합 터미널
+item.wct:wct_creative.name=크리에이티브 무선 조합 터미널
 item.wft_creative.name=크리에이티브 무선 액체 터미널
-item.magnet_card.name=자석 카드
+item.wct:magnet_card.name=자석 카드
 item.infinity_booster_card.name=무한 부스터 카드
 
 // Crative Tab

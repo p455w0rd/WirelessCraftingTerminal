@@ -30,13 +30,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import p455w0rd.ae2wtlib.container.ContainerWT;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 public class PacketInventoryAction extends WCTPacket {
 
@@ -118,42 +117,38 @@ public class PacketInventoryAction extends WCTPacket {
 			context = ((ContainerWCT) baseContainer).getOpenContext();
 		}
 
-		else if (sender.openContainer instanceof WCTBaseContainer) {
-			baseContainer = sender.openContainer;
-			context = ((WCTBaseContainer) baseContainer).getOpenContext();
-		}
-
 		if (action == InventoryAction.AUTO_CRAFT) {
-			//if( context != null )
-			//{
-			//final TileEntity te = context.getTile();
-
 			int x = (int) player.posX;
 			int y = (int) player.posY;
 			int z = (int) player.posZ;
-
-			ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_AMOUNT, player, WCTUtils.world(player), new BlockPos(x, y, z));
-
+			if (sender.openContainer instanceof ContainerWCT) {
+				ContainerWCT wctContainer = (ContainerWCT) sender.openContainer;
+				ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_AMOUNT, player, player.getEntityWorld(), new BlockPos(x, y, z), false, wctContainer.isWTBauble(), wctContainer.getWTSlot());
+			}
+			/*
+			else {
+				ModGuiHandler.open(ModGuiHandler.GUI_CRAFT_AMOUNT, player, WTUtils.world(player), new BlockPos(x, y, z));
+			}
+			*/
 			if (sender.openContainer instanceof ContainerCraftAmount) {
 				final ContainerCraftAmount cca = (ContainerCraftAmount) sender.openContainer;
 
-				if (baseContainer instanceof WCTBaseContainer) {
-					if (((WCTBaseContainer) baseContainer).getTargetStack() != null) {
-						cca.getCraftingItem().putStack(((WCTBaseContainer) baseContainer).getTargetStack().asItemStackRepresentation());
-						cca.setItemToCraft(((WCTBaseContainer) baseContainer).getTargetStack());
+				if (baseContainer instanceof ContainerWT) {
+					ContainerWT wtContainer = (ContainerWT) baseContainer;
+					if (wtContainer.getTargetStack() != null) {
+						cca.getCraftingItem().putStack(wtContainer.getTargetStack().asItemStackRepresentation());
+						cca.setItemToCraft(wtContainer.getTargetStack());
 					}
 				}
 
 				cca.detectAndSendChanges();
 			}
-			//}
 		}
 		else {
-			if (baseContainer instanceof WCTBaseContainer) {
-				((WCTBaseContainer) baseContainer).doAction(sender, action, slot, id);
-				((WCTBaseContainer) baseContainer).detectAndSendChanges();
+			if (baseContainer instanceof ContainerWCT) {
+				((ContainerWCT) baseContainer).doAction(sender, action, slot, id);
+				((ContainerWCT) baseContainer).detectAndSendChanges();
 			}
-
 		}
 	}
 

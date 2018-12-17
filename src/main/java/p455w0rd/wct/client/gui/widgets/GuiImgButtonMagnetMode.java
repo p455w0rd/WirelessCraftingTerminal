@@ -22,12 +22,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import p455w0rd.wct.api.IWCTContainer;
 import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.items.ItemMagnet;
-import p455w0rd.wct.util.WCTUtils;
+import p455w0rd.wct.items.ItemMagnet.MagnetFunctionMode;
+import p455w0rd.wct.sync.packets.PacketSetMagnetWCT;
 
 /**
  * @author p455w0rd
@@ -35,24 +37,25 @@ import p455w0rd.wct.util.WCTUtils;
  */
 public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 
-	private ItemStack wirelessTerminal = ItemStack.EMPTY;
-	private int currentValue = 0;
+	private MagnetFunctionMode currentValue = MagnetFunctionMode.INACTIVE;
+	final IWCTContainer container;
 	int iconIndex = 0;
 
-	public GuiImgButtonMagnetMode(final int x, final int y, ItemStack wirelessTerminal) {
+	public GuiImgButtonMagnetMode(final int x, final int y, IWCTContainer container) {
 		super(0, x, y, "");
+		this.container = container;
 		this.x = x;
 		this.y = y;
 		width = 16;
 		height = 16;
-		this.wirelessTerminal = wirelessTerminal;
-		currentValue = WCTUtils.getMagnetMode(wirelessTerminal);
+		currentValue = ItemMagnet.getMagnetFunctionMode(container.getMagnet());
 		visible = false;
 	}
 
 	public void setVisibility(final boolean vis) {
 		visible = vis;
 		enabled = vis;
+		currentValue = ItemMagnet.getMagnetFunctionMode(container.getMagnet());
 	}
 
 	@Override
@@ -72,13 +75,9 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	public int getCurrentValue() {
-		return currentValue;
-	}
-
 	@Override
 	public String getMessage() {
-		return I18n.format("gui.magnetmode") + "\n" + TextFormatting.GRAY + "" + ItemMagnet.getMessage(WCTUtils.getMagnetMode(getWirelessTerminal())).replace(" - ", "\n");
+		return I18n.format("gui.magnetmode") + "\n" + TextFormatting.GRAY + "" + currentValue.getMessage().replace(" - ", "\n");
 	}
 
 	@Override
@@ -106,17 +105,13 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 		return visible;
 	}
 
-	public ItemStack getWirelessTerminal() {
-		return wirelessTerminal == null ? ItemStack.EMPTY : WCTUtils.isAnyWCT(wirelessTerminal) ? wirelessTerminal : ItemStack.EMPTY;
-	}
-
 	public void cycleValue() {
-		ItemMagnet.switchMagnetMode(WCTUtils.getMagnet(getWirelessTerminal()));
-		currentValue = WCTUtils.getMagnetMode(getWirelessTerminal());
+		currentValue = ItemMagnet.cycleMagnetFunctionModeWCT(container.getPlayer(), container.getWTSlot(), container.isWTBauble());
+		ModNetworking.instance().sendToServer(new PacketSetMagnetWCT(currentValue));
 	}
 
 	public void renderGlint(Minecraft mc) {
-		if (currentValue <= 0) {
+		if (currentValue == MagnetFunctionMode.INACTIVE) {
 			return;
 		}
 		Color color = new Color(-8372020);
@@ -124,18 +119,14 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 		GlStateManager.enableBlend();
 		GlStateManager.depthFunc(514);
 		GlStateManager.depthMask(true);
-		float f1 = 0.1F;
-		GlStateManager.color(f1, f1, f1, 1.0F);
-
+		GlStateManager.color(0.1F, 0.1F, 0.1F, 1.0F);
 		for (int i = 0; i < 2; ++i) {
 			GlStateManager.disableLighting();
 			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_COLOR, GlStateManager.DestFactor.ONE);
-			float f2 = 0.76F;
 			GlStateManager.color(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue() / 255.0F, 1.0F);
 			GlStateManager.matrixMode(5890);
 			GlStateManager.loadIdentity();
-			float f3 = 0.00001F;
-			GlStateManager.scale(f3, f3, f3);
+			GlStateManager.scale(0.00001F, 0.00001F, 0.00001F);
 			GlStateManager.rotate(30.0F - i * 60.0F, 0.0F, 0.0F, 1.0F);
 			GlStateManager.translate(0.0F, Minecraft.getSystemTime() % 3000L / 3000.0F / 3.0F, 0.0F);
 			GlStateManager.matrixMode(5888);
@@ -143,7 +134,6 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 			//this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
 			this.drawTexturedModalRect(x, y, 16, 0, 16, 16);
 		}
-
 		GlStateManager.matrixMode(5890);
 		GlStateManager.loadIdentity();
 		GlStateManager.matrixMode(5888);

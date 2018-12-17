@@ -15,6 +15,8 @@
  */
 package p455w0rd.wct.client.gui.widgets;
 
+import static p455w0rd.ae2wtlib.api.WTApi.Constants.NBT.AUTOCONSUME_BOOSTER_NBT;
+
 import appeng.client.gui.widgets.ITooltip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -24,10 +26,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import p455w0rd.ae2wtlib.init.LibNetworking;
+import p455w0rd.ae2wtlib.sync.packets.PacketSetAutoConsumeBoosters;
 import p455w0rd.wct.init.ModGlobals;
-import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.sync.packets.PacketSetAutoConsumeBoosters;
-import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
@@ -57,12 +58,9 @@ public class GuiImgButtonBooster extends GuiButton implements ITooltip {
 	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, float partial) {
 		if (visible) {
 			hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-			//GlStateManager.pushMatrix();
 			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
 			this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
 			this.drawTexturedModalRect(x, y, (!getCurrentValue() ? 3 : 2) * 16, 0, 16, 16);
-			//GlStateManager.popMatrix();
-
 			mouseDragged(mc, mouseX, mouseY);
 		}
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -72,10 +70,10 @@ public class GuiImgButtonBooster extends GuiButton implements ITooltip {
 		if (!getWirelessTerminal().hasTagCompound()) {
 			getWirelessTerminal().setTagCompound(new NBTTagCompound());
 		}
-		if (!getWirelessTerminal().getTagCompound().hasKey(WCTUtils.AUTOCONSUME_BOOSTER_NBT)) {
+		if (!getWirelessTerminal().getTagCompound().hasKey(AUTOCONSUME_BOOSTER_NBT)) {
 			setValue(currentValue);
 		}
-		currentValue = getWirelessTerminal().getTagCompound().getBoolean(WCTUtils.AUTOCONSUME_BOOSTER_NBT);
+		currentValue = getWirelessTerminal().getTagCompound().getBoolean(AUTOCONSUME_BOOSTER_NBT);
 		return currentValue;
 	}
 
@@ -121,8 +119,8 @@ public class GuiImgButtonBooster extends GuiButton implements ITooltip {
 		if (!getWirelessTerminal().hasTagCompound()) {
 			getWirelessTerminal().setTagCompound(new NBTTagCompound());
 		}
-		getWirelessTerminal().getTagCompound().setBoolean(WCTUtils.AUTOCONSUME_BOOSTER_NBT, value);
-		ModNetworking.instance().sendToServer(new PacketSetAutoConsumeBoosters(value));
+		getWirelessTerminal().getTagCompound().setBoolean(AUTOCONSUME_BOOSTER_NBT, value);
+		LibNetworking.instance().sendToServer(new PacketSetAutoConsumeBoosters(value));
 	}
 
 }

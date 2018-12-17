@@ -16,10 +16,7 @@
 package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -28,9 +25,7 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.base.Joiner;
 
 import appeng.api.AEApi;
-import appeng.api.config.SortDir;
-import appeng.api.config.SortOrder;
-import appeng.api.config.ViewItems;
+import appeng.api.config.*;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
@@ -43,12 +38,14 @@ import appeng.util.ReadableNumberConverter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
+import p455w0rd.ae2wtlib.client.gui.GuiWT;
+import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
 import p455w0rd.wct.container.ContainerCraftingCPU;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
-public class GuiCraftingCPU extends WCTBaseGui implements ISortSource {
+public class GuiCraftingCPU extends GuiWT implements ISortSource {
+
 	private static final int GUI_HEIGHT = 184;
 	private static final int GUI_WIDTH = 238;
 
@@ -84,8 +81,8 @@ public class GuiCraftingCPU extends WCTBaseGui implements ISortSource {
 	private GuiButton cancel;
 	private int tooltip = -1;
 
-	public GuiCraftingCPU(final InventoryPlayer inventoryPlayer, final Object te) {
-		this(new ContainerCraftingCPU(inventoryPlayer, te));
+	public GuiCraftingCPU(final InventoryPlayer inventoryPlayer, final Object te, int wtSlot, boolean isWTBauble) {
+		this(new ContainerCraftingCPU(inventoryPlayer, te, wtSlot, isWTBauble));
 	}
 
 	protected GuiCraftingCPU(final ContainerCraftingCPU container) {

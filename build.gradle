@@ -20,7 +20,7 @@ archivesBaseName = "WirelessCraftingTerminal"
 sourceCompatibility = targetCompatibility = "1.8"
 
 minecraft {
-	version = "1.12.2-14.23.4.2760"
+	version = "1.12.2-14.23.5.2768"
 	
 	runDir = "run"
 	mappings = "snapshot_20171003"
@@ -60,9 +60,11 @@ dependencies {
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv6-beta-1"
+	deobfCompile "appeng:appliedenergistics2:rv6-stable-4"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.2.4:universal"
 	deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
+	deobfCompile "p455w0rd:p455w0rdslib:1.12.2-2.0.36"
+	deobfCompile "p455w0rd:AE2WTLib:1.12.2-1.0.1"
 }
 
 task apiJar(type: Jar) {
@@ -148,6 +150,13 @@ processResources {
 		
 	from (sourceSets.main.resources.srcDirs) {
 		exclude "mcmod.info"
+	}
+	rename '(.+_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+	manifest {
+	    attributes 'FMLAT': 'wct_at.cfg'
 	}
 }
 

@@ -20,10 +20,12 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.wct.init.ModConfig;
+import p455w0rd.ae2wtlib.init.LibConfig;
+import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModItems;
 
 /**
@@ -33,18 +35,23 @@ import p455w0rd.wct.init.ModItems;
 public class ItemWCTCreative extends ItemWCT {
 
 	public ItemWCTCreative() {
-		super("wct_creative");
+		super(new ResourceLocation(ModGlobals.MODID, "wct_creative"));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void initModel() {
-		ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
+		ModelLoader.setCustomModelResourceLocation(this, 0, getModelResource());
+	}
+
+	@Override
+	public ModelResourceLocation getModelResource() {
+		return new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory");
 	}
 
 	@Override
 	public double getAECurrentPower(final ItemStack wirelessTerm) {
-		return ModConfig.WCT_MAX_POWER;
+		return LibConfig.WT_MAX_POWER;
 	}
 
 	@Override
@@ -55,6 +62,11 @@ public class ItemWCTCreative extends ItemWCT {
 	@Override
 	protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
 		itemStacks.add(new ItemStack(this));
+	}
+
+	@Override
+	public boolean isCreative() {
+		return true;
 	}
 
 }

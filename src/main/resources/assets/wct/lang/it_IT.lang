@@ -1,7 +1,7 @@
 // Items
-item.wct.name=Terminale da Lavoro senza Fili
-item.wct_creative.name=Terminale da Lavoro senza Fili Creativo
-item.magnet_card.name=Carta Magnetica
+item.wct:wct.name=Terminale da Lavoro senza Fili
+item.wct:wct_creative.name=Terminale da Lavoro senza Fili Creativo
+item.wct:magnet_card.name=Carta Magnetica
 item.infinity_booster_card.name=Carta del potenziamento Infinito
 
 // Crative Tab

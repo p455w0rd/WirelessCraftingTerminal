@@ -15,15 +15,16 @@
  */
 package p455w0rd.wct.init;
 
+import p455w0rd.ae2wtlib.init.LibGlobals;
+
 public class ModGlobals {
 
 	public static final String MODID = "wct";
-	public static final String VERSION = "3.10.82";
+	public static final String VERSION = "3.11.83";
 	public static final String NAME = "Wireless Crafting Terminal";
 	public static final String SERVER_PROXY = "p455w0rd.wct.proxy.CommonProxy";
 	public static final String CLIENT_PROXY = "p455w0rd.wct.proxy.ClientProxy";
-	public static final String GUI_FACTORY = "p455w0rd.wct.init.ModGuiFactory";
-	public static final String DEP_LIST = "required-after:appliedenergistics2@[rv6-alpha-3,);required-after:p455w0rdslib@[2.0.22,);after:baubles;after:mousetweaks;after:itemscroller";
-	public static final String CONFIG_FILE = "config/WirelessCraftingTerminal.cfg";
+	public static final String DEP_LIST = "required-after:ae2wtlib@[1.0.1,);required-after:appliedenergistics2@[rv6-stable-4,);required-after:p455w0rdslib@[2.0.35,);after:baubles;after:mousetweaks;after:itemscroller";
+	public static final String CONFIG_FILE = LibGlobals.CONFIG_FILE;//"config/WirelessCraftingTerminal.cfg";
 
 }

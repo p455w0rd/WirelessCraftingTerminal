@@ -29,53 +29,51 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
-import p455w0rd.wct.client.gui.widgets.GuiTabButton;
-import p455w0rd.wct.client.gui.widgets.WCTGuiButton;
-import p455w0rd.wct.client.gui.widgets.WCTGuiCheckBox;
+import p455w0rd.wct.client.gui.widgets.*;
 import p455w0rd.wct.container.ContainerMagnet;
-import p455w0rd.wct.init.ModGlobals;
-import p455w0rd.wct.init.ModGuiHandler;
-import p455w0rd.wct.init.ModItems;
-import p455w0rd.wct.init.ModKeybindings;
-import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.sync.packets.PacketMagnetFilter;
-import p455w0rd.wct.sync.packets.PacketSwitchGuis;
-import p455w0rd.wct.util.WCTUtils;
+import p455w0rd.wct.init.*;
+import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.sync.packets.*;
 
 public class GuiMagnet extends GuiContainer {
 
 	private WCTGuiButton modeBtn;
-	public boolean mode = true;
+	public boolean listMode = true;
 	public boolean ignoreNBT = false;
 	public boolean ignoreMeta = false;
 	public boolean useOreDict = false;
-	private ItemStack magnetItem;
+	private ItemStack magnetItem = ItemStack.EMPTY;
 	private WCTGuiCheckBox ignoreNBTBox;
 	private WCTGuiCheckBox ignoreMetaBox;
 	private WCTGuiCheckBox useOreDictBox;
 	private GuiTabButton originalGuiBtn;
 	private ItemStack myIcon = null;
+	private final ContainerMagnet container;
 
-	public GuiMagnet(ContainerMagnet c, ItemStack magnetStack) {
+	public GuiMagnet(ContainerMagnet c) {
 		super(c);
+		container = c;
 		xSize = 176;
 		width = xSize;
 		ySize = 208;
 		height = ySize;
-		magnetItem = magnetStack;
+		magnetItem = c.magnetItem;
 		ItemStack is = new ItemStack(ModItems.WCT);
 		((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 		myIcon = is;
 		loadSettings();
 	}
 
+	public ContainerMagnet getContainer() {
+		return container;
+	}
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, final float partialTicks) {
+		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
 		for (final Object c : buttonList) {
@@ -117,7 +115,7 @@ public class GuiMagnet extends GuiContainer {
 	public void initGui() {
 		super.initGui();
 		buttonList.clear();
-		buttonList.add(modeBtn = new WCTGuiButton(0, guiLeft + 104, guiTop + 4, 64, 14, getLabel(mode)));
+		buttonList.add(modeBtn = new WCTGuiButton(0, guiLeft + 104, guiTop + 4, 64, 14, getLabel(listMode)));
 		buttonList.add(ignoreNBTBox = new WCTGuiCheckBox(1, guiLeft + 61, guiTop + 20, "Ignore NBT Data", ignoreNBT, 107));
 		buttonList.add(ignoreMetaBox = new WCTGuiCheckBox(2, guiLeft + 61, guiTop + 32, "Ignore Meta Data", ignoreMeta, 107));
 		buttonList.add(useOreDictBox = new WCTGuiCheckBox(3, guiLeft + 61, guiTop + 44, "Use Ore Dictionary", useOreDict, 107));
@@ -129,7 +127,7 @@ public class GuiMagnet extends GuiContainer {
 
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (keyCode == ModKeybindings.openMagnetFilter.getKeyCode()) {
+		if (keyCode == ModKeybindings.openTerminal.getKeyCode()) {
 			mc.player.closeScreen();
 		}
 		else {
@@ -146,36 +144,57 @@ public class GuiMagnet extends GuiContainer {
 			return;
 		}
 		if (!magnetItem.hasTagCompound()) {
-			ModNetworking.instance().sendToServer(new PacketMagnetFilter(0, true));
+			if (container.isMagnetHeld()) {
+				ModNetworking.instance().sendToServer(new PacketMagnetFilterHeld(0, true));
+			}
+			else {
+				ModNetworking.instance().sendToServer(new PacketMagnetFilterWCT(0, true, container.isWTBauble(), container.getWTSlot()));
+			}
 		}
-		mode = getMode(1);
-		ignoreNBT = getMode(2);
-		ignoreMeta = getMode(3);
-		useOreDict = getMode(4);
+		listMode = ItemMagnet.getItemMode(magnetItem, 1);
+		ignoreNBT = ItemMagnet.getItemMode(magnetItem, 2);
+		ignoreMeta = ItemMagnet.getItemMode(magnetItem, 3);
+		useOreDict = ItemMagnet.getItemMode(magnetItem, 4);
 	}
 
 	@Override
 	protected void actionPerformed(final GuiButton btn) {
-		//updateMode(0, true);
+		if (btn == originalGuiBtn) {
+			ModNetworking.instance().sendToServer(new PacketSwitchGuis(ModGuiHandler.GUI_WCT));
+			return;
+		}
+		int modeType = 0;
+		boolean newMode = false;
 		if (btn == modeBtn) {
-			btn.displayString = getLabel(!mode);
-			mode = !mode;
-			updateMode(1, mode);
+			listMode = !listMode;
+			modeType = 1;
+			newMode = listMode;
+			btn.displayString = getLabel(listMode);
+			ItemMagnet.setItemMode(magnetItem, 1, listMode);
 		}
 		if (btn == ignoreNBTBox) {
 			ignoreNBT = !ignoreNBT;
-			updateMode(2, ignoreNBT);
+			modeType = 2;
+			newMode = ignoreNBT;
+			ItemMagnet.setItemMode(magnetItem, 2, ignoreNBT);
 		}
 		if (btn == ignoreMetaBox) {
 			ignoreMeta = !ignoreMeta;
-			updateMode(3, ignoreMeta);
+			modeType = 3;
+			newMode = ignoreMeta;
+			ItemMagnet.setItemMode(magnetItem, 3, ignoreMeta);
 		}
 		if (btn == useOreDictBox) {
 			useOreDict = !useOreDict;
-			updateMode(4, useOreDict);
+			modeType = 4;
+			newMode = useOreDict;
+			ItemMagnet.setItemMode(magnetItem, 4, useOreDict);
 		}
-		if (btn == originalGuiBtn) {
-			ModNetworking.instance().sendToServer(new PacketSwitchGuis(ModGuiHandler.GUI_WCT));
+		if (container.isMagnetHeld()) {
+			ModNetworking.instance().sendToServer(new PacketMagnetFilterHeld(modeType, newMode));
+		}
+		else {
+			ModNetworking.instance().sendToServer(new PacketMagnetFilterWCT(modeType, newMode, container.isWTBauble(), container.getWTSlot()));
 		}
 	}
 
@@ -188,7 +207,7 @@ public class GuiMagnet extends GuiContainer {
 		if (mouseButton == 0) {
 			for (int i = 0; i < buttonList.size(); ++i) {
 				GuiButton guibutton = buttonList.get(i);
-
+		
 				if (guibutton.mousePressed(mc, mouseX, mouseY)) {
 					//net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre event = new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, this.buttonList);
 					//if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))
@@ -203,93 +222,6 @@ public class GuiMagnet extends GuiContainer {
 			}
 		}
 		*/
-	}
-
-	private void updateMode(int type, boolean mode) {
-		if (magnetItem != null) {
-			if (!magnetItem.hasTagCompound()) {
-				magnetItem.setTagCompound(new NBTTagCompound());
-			}
-			if (type == 0) {
-				magnetItem.getTagCompound().setBoolean("Initialized", mode);
-			}
-			else if (type == 1) {
-				magnetItem.getTagCompound().setBoolean("Whitelisting", mode);
-			}
-			else if (type == 2) {
-				magnetItem.getTagCompound().setBoolean("IgnoreNBT", mode);
-			}
-			else if (type == 3) {
-				magnetItem.getTagCompound().setBoolean("IgnoreMeta", mode);
-			}
-			else if (type == 4) {
-				magnetItem.getTagCompound().setBoolean("UseOreDict", mode);
-			}
-			else {
-				return;
-			}
-
-			if (WCTUtils.isMagnetInstalled(((ContainerMagnet) inventorySlots).inventoryPlayer)) {
-				ItemStack wct = WCTUtils.getWirelessTerm(((ContainerMagnet) inventorySlots).inventoryPlayer);
-				if (!wct.isEmpty() && wct.hasTagCompound()) {
-					NBTTagCompound newNBT = wct.getSubCompound("MagnetSlot");
-					if (newNBT != null) {
-						NBTTagList magnetNBTList = newNBT.getTagList("Items", 10);
-						if (magnetNBTList != null && !magnetNBTList.hasNoTags()) {
-							NBTTagCompound magnetNBTForm = magnetNBTList.getCompoundTagAt(0);
-							if (magnetNBTForm != null) {
-								NBTTagCompound newMagnetNBTForm = magnetItem.serializeNBT();
-								magnetNBTList.set(0, newMagnetNBTForm);
-							}
-							wct.getSubCompound("MagnetSlot").setTag("Items", magnetNBTList);
-						}
-					}
-				}
-			}
-		}
-		ModNetworking.instance().sendToServer(new PacketMagnetFilter(type, mode));
-	}
-
-	private boolean getMode(int type) {
-		if (!magnetItem.hasTagCompound()) {
-			magnetItem.setTagCompound(new NBTTagCompound());
-		}
-		NBTTagCompound nbtTC = magnetItem.getTagCompound();
-		if (type == 1) {
-			if (nbtTC.hasKey("Whitelisting")) {
-				return nbtTC.getBoolean("Whitelisting");
-			}
-			else {
-				return true;
-			}
-		}
-		else if (type == 2) {
-			if (nbtTC.hasKey("IgnoreNBT")) {
-				return nbtTC.getBoolean("IgnoreNBT");
-			}
-			else {
-				return false;
-			}
-		}
-		else if (type == 3) {
-			if (nbtTC.hasKey("IgnoreMeta")) {
-				return nbtTC.getBoolean("IgnoreMeta");
-			}
-			else {
-				return false;
-			}
-		}
-		else if (type == 4) {
-			if (nbtTC.hasKey("UseOreDict")) {
-				return nbtTC.getBoolean("UseOreDict");
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			return true;
-		}
 	}
 
 	public void bindTexture(final String file) {

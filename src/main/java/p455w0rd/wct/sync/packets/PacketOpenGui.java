@@ -23,29 +23,43 @@ import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 public class PacketOpenGui extends WCTPacket {
 
 	private final int whichGui;
+	private final int slot;
+	private final boolean isBauble;
 
-	// automatic.
 	public PacketOpenGui(final ByteBuf stream) {
 		whichGui = stream.readInt();
+		slot = stream.readInt();
+		isBauble = stream.readBoolean();
 	}
 
-	public PacketOpenGui(int gui) {
+	public PacketOpenGui(int gui, int slot, boolean isBauble) {
 		whichGui = gui;
+		this.slot = slot;
+		this.isBauble = isBauble;
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(getPacketID());
 		data.writeInt(gui);
+		data.writeInt(slot);
+		data.writeBoolean(isBauble);
 		configureWrite(data);
+		ModGuiHandler.setIsBauble(isBauble);
+		ModGuiHandler.setSlot(slot);
+	}
+
+	public PacketOpenGui(int gui) {
+		this(gui, -1, false);
 	}
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		if (player.openContainer instanceof ContainerPlayer) {
-			ModGuiHandler.open(whichGui, player, WCTUtils.world(player), new BlockPos((int) player.posX, (int) player.posY, (int) player.posZ));
+			if (slot >= 0) {
+				ModGuiHandler.open(whichGui, player, player.getEntityWorld(), new BlockPos((int) player.posX, (int) player.posY, (int) player.posZ), false, isBauble, slot);
+			}
 		}
 	}
 

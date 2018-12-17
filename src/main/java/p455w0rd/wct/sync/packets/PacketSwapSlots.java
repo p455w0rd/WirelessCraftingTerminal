@@ -19,7 +19,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -50,9 +49,6 @@ public class PacketSwapSlots extends WCTPacket {
 		if (player != null) {
 			if (player.openContainer instanceof ContainerWCT) {
 				((ContainerWCT) player.openContainer).swapSlotContents(slotA, slotB);
-			}
-			else if (player.openContainer instanceof WCTBaseContainer) {
-				((WCTBaseContainer) player.openContainer).swapSlotContents(slotA, slotB);
 			}
 		}
 	}

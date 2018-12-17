@@ -15,10 +15,7 @@
  */
 package p455w0rd.wct.sync.packets;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import javax.annotation.Nonnull;
 
@@ -48,17 +45,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.*;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
-import p455w0rd.wct.api.IWirelessCraftingTermHandler;
+import p455w0rd.ae2wtlib.api.ICustomWirelessTermHandler;
+import p455w0rd.ae2wtlib.helpers.WTGuiObject;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
-import p455w0rd.wct.helpers.WCTGuiObject;
+import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 public class PacketJEIRecipe extends WCTPacket {
 
@@ -98,11 +93,11 @@ public class PacketJEIRecipe extends WCTPacket {
 		configureWrite(data);
 	}
 
-	private WCTGuiObject getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	private WTGuiObject<IAEItemStack, IItemStorageChannel> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
-			final IWirelessCraftingTermHandler wh = (IWirelessCraftingTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
-				return new WCTGuiObject(wh, it, player, w, x, y, z);
+				return new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, it, player, w, x, y, z);
 			}
 		}
 
@@ -114,16 +109,18 @@ public class PacketJEIRecipe extends WCTPacket {
 		final EntityPlayerMP pmp = (EntityPlayerMP) player;
 		final Container con = pmp.openContainer;
 
-		if (con instanceof IContainerCraftingPacket) {
+		if (con instanceof IContainerCraftingPacket && con instanceof ContainerWCT) {
 			final IContainerCraftingPacket cct = (IContainerCraftingPacket) con;
 			IGridNode node = cct.getNetworkNode();
 			if (node == null) {
-				ItemStack wct = WCTUtils.getWirelessTerm(player.inventory);
+				ItemStack wct = ((ContainerWCT) con).getWirelessTerminal();
 				if (wct.isEmpty() || !(wct.getItem() instanceof IWirelessCraftingTerminalItem)) {
 					return;
 				}
-				WCTGuiObject obj = getGuiObject(wct, player, WCTUtils.world(player), (int) player.posX, (int) player.posY, (int) player.posZ);
-				node = obj.getActionableNode(((IWirelessCraftingTerminalItem) wct.getItem()).checkForBooster(wct));
+				WTGuiObject<IAEItemStack, IItemStorageChannel> obj = getGuiObject(wct, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+				if (obj != null) {
+					node = obj.getActionableNode(((IWirelessCraftingTerminalItem) wct.getItem()).checkForBooster(wct));
+				}
 			}
 
 			if (node != null) {

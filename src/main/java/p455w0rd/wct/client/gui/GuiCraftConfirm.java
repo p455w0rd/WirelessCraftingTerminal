@@ -37,15 +37,16 @@ import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.wct.client.gui.widgets.GuiScrollbar;
+import p455w0rd.ae2wtlib.client.gui.GuiWT;
+import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
+import p455w0rd.ae2wtlib.helpers.WTGuiObject;
 import p455w0rd.wct.container.ContainerCraftConfirm;
-import p455w0rd.wct.helpers.WCTGuiObject;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
 
-public class GuiCraftConfirm extends WCTBaseGui {
+public class GuiCraftConfirm extends GuiWT {
 
 	private final ContainerCraftConfirm ccc;
 
@@ -64,8 +65,8 @@ public class GuiCraftConfirm extends WCTBaseGui {
 	private int tooltip = -1;
 	InventoryPlayer inventoryPlayer;
 
-	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
-		super(new ContainerCraftConfirm(inventoryPlayer, te));
+	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te, boolean isBauble, int wctSlot) {
+		super(new ContainerCraftConfirm(inventoryPlayer, te, isBauble, wctSlot));
 		xSize = 238;
 		ySize = 206;
 
@@ -75,7 +76,7 @@ public class GuiCraftConfirm extends WCTBaseGui {
 		ccc = (ContainerCraftConfirm) inventorySlots;
 		this.inventoryPlayer = inventoryPlayer;
 
-		if (te instanceof WCTGuiObject) {
+		if (te instanceof WTGuiObject) {
 			OriginalGui = ModGuiHandler.GUI_WCT;
 		}
 

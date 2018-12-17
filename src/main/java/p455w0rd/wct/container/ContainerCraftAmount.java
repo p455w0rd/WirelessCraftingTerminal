@@ -29,17 +29,17 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.world.World;
-import p455w0rd.wct.api.networking.security.WCTIActionHost;
-import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.util.WCTUtils;
+import p455w0rd.ae2wtlib.api.networking.security.WTIActionHost;
+import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
+import p455w0rd.ae2wtlib.container.ContainerWT;
 
-public class ContainerCraftAmount extends WCTBaseContainer {
+public class ContainerCraftAmount extends ContainerWT {
 
 	private final Slot craftingItem;
 	private IAEItemStack itemToCreate;
 
-	public ContainerCraftAmount(final InventoryPlayer ip, final ITerminalHost te) {
-		super(ip, te);
+	public ContainerCraftAmount(final InventoryPlayer ip, final ITerminalHost te, int wtSlot, boolean isWTBauble) {
+		super(ip, te, wtSlot, isWTBauble);
 
 		craftingItem = new SlotInaccessible(new AppEngInternalInventory(null, 1), 0, 34, 53);
 		addSlotToContainer(getCraftingItem());
@@ -52,17 +52,17 @@ public class ContainerCraftAmount extends WCTBaseContainer {
 	}
 
 	public IGrid getGrid() {
-		final WCTIActionHost h = ((WCTIActionHost) getTarget());
+		final WTIActionHost h = ((WTIActionHost) getTarget());
 		return h.getActionableNode(true).getGrid();
 		//return obj2.getTargetGrid();
 	}
 
 	public World getWorld() {
-		return WCTUtils.world(WCTUtils.player(getPlayerInv()));
+		return getPlayer().getEntityWorld();
 	}
 
 	public IActionSource getActionSrc() {
-		return new WCTPlayerSource(getPlayerInv().player, (WCTIActionHost) getTarget());
+		return new WTPlayerSource(getPlayerInv().player, (WTIActionHost) getTarget());
 	}
 
 	public Slot getCraftingItem() {

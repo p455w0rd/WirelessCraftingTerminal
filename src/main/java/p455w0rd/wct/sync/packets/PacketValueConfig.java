@@ -37,7 +37,6 @@ import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.container.ContainerCraftingCPU;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.container.WCTBaseContainer;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -135,16 +134,10 @@ public class PacketValueConfig extends WCTPacket {
 			if (c instanceof ContainerWCT) {
 				((ContainerWCT) c).setCustomName(Value);
 			}
-			if (c instanceof WCTBaseContainer) {
-				((WCTBaseContainer) c).setCustomName(Value);
-			}
 		}
 		else if (Name.startsWith("SyncDat.")) {
 			if (c instanceof ContainerWCT) {
 				((ContainerWCT) c).stringSync(Integer.parseInt(Name.substring(8)), Value);
-			}
-			if (c instanceof WCTBaseContainer) {
-				((WCTBaseContainer) c).stringSync(Integer.parseInt(Name.substring(8)), Value);
 			}
 		}
 		else if (Name.equals("CraftingStatus") && Value.equals("Clear")) {

@@ -19,13 +19,14 @@ import appeng.util.Platform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import p455w0rd.wct.api.IWCTContainer;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
-import p455w0rd.wct.util.WCTUtils;
 
 public class PacketSwitchGuis extends WCTPacket {
 
@@ -54,11 +55,21 @@ public class PacketSwitchGuis extends WCTPacket {
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		World world = WCTUtils.world(player);
+		World world = player.getEntityWorld();
 		int x = (int) player.posX;
 		int y = (int) player.posY;
 		int z = (int) player.posZ;
-		ModGuiHandler.open(newGui, player, world, new BlockPos(x, y, z));
+		Container c = player.openContainer;
+		boolean isBauble = false;
+		boolean isHeld = false;
+		int slot = -1;
+		if (c instanceof IWCTContainer) {
+			IWCTContainer wctContainer = (IWCTContainer) c;
+			isBauble = wctContainer.isWTBauble();
+			slot = wctContainer.getWTSlot();
+			isHeld = wctContainer.isMagnetHeld();
+		}
+		ModGuiHandler.open(newGui, player, world, new BlockPos(x, y, z), isHeld, isBauble, slot);
 	}
 
 	@Override

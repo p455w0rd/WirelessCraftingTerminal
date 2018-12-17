@@ -19,7 +19,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import p455w0rd.wct.container.WCTBaseContainer;
+import p455w0rd.ae2wtlib.container.ContainerWT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -51,16 +51,16 @@ public class PacketProgressBar extends WCTPacket {
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;
-		if (c instanceof WCTBaseContainer) {
-			((WCTBaseContainer) c).updateFullProgressBar(id, value);
+		if (c instanceof ContainerWT) {
+			((ContainerWT) c).updateFullProgressBar(id, value);
 		}
 	}
 
 	@Override
 	public void clientPacketData(final INetworkInfo network, final WCTPacket packet, final EntityPlayer player) {
 		final Container c = player.openContainer;
-		if (c instanceof WCTBaseContainer) {
-			((WCTBaseContainer) c).updateFullProgressBar(id, value);
+		if (c instanceof ContainerWT) {
+			((ContainerWT) c).updateFullProgressBar(id, value);
 		}
 	}
 }

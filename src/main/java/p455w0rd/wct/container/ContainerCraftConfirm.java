@@ -28,10 +28,7 @@ import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
-import appeng.api.networking.crafting.ICraftingCPU;
-import appeng.api.networking.crafting.ICraftingGrid;
-import appeng.api.networking.crafting.ICraftingJob;
-import appeng.api.networking.crafting.ICraftingLink;
+import appeng.api.networking.crafting.*;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.IMEInventory;
@@ -42,25 +39,25 @@ import appeng.api.storage.data.IItemList;
 import appeng.container.guisync.GuiSync;
 import appeng.helpers.InventoryAction;
 import appeng.util.Platform;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.*;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import p455w0rd.wct.api.networking.security.WCTIActionHost;
-import p455w0rd.wct.api.networking.security.WCTPlayerSource;
-import p455w0rd.wct.helpers.WCTGuiObject;
+import p455w0rd.ae2wtlib.api.networking.security.WTIActionHost;
+import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
+import p455w0rd.ae2wtlib.container.ContainerWT;
+import p455w0rd.ae2wtlib.helpers.WTGuiObject;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
-import p455w0rd.wct.util.WCTUtils;
 
-public class ContainerCraftConfirm extends WCTBaseContainer {
+public class ContainerCraftConfirm extends ContainerWT {
 
 	public final ArrayList<CraftingCPURecord> cpus = new ArrayList<CraftingCPURecord>();
+	private int wctSlot = -1;
+	private boolean isBauble = false;
 	private Future<ICraftingJob> job;
 	private ICraftingJob result;
 	@GuiSync(0)
@@ -79,11 +76,11 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	public boolean noCPU = true;
 	@GuiSync(7)
 	public String myName = "";
-	//InventoryPlayer inventoryPlayer;
 
-	public ContainerCraftConfirm(final InventoryPlayer ip, final ITerminalHost te) {
-		super(ip, te);
-		//inventoryPlayer = ip;
+	public ContainerCraftConfirm(final InventoryPlayer ip, final ITerminalHost te, boolean isBauble, int wctSlot) {
+		super(ip, te, wctSlot, isBauble);
+		this.isBauble = isBauble;
+		this.wctSlot = wctSlot;
 	}
 
 	public void cycleCpu(final boolean next) {
@@ -260,7 +257,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 				}
 			}
 			catch (final Throwable e) {
-				WCTUtils.chatMessage(WCTUtils.player(getPlayerInv()), new TextComponentString("Error: " + e.toString()));
+				getPlayer().sendMessage(new TextComponentString("Error: " + e.toString()));
 				setValidContainer(false);
 				result = null;
 			}
@@ -271,7 +268,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	}
 
 	private IGrid getGrid() {
-		final WCTIActionHost h = ((WCTIActionHost) getTarget());
+		final WTIActionHost h = ((WTIActionHost) getTarget());
 		return h.getActionableNode(true).getGrid();
 		//return obj2.getTargetGrid();
 	}
@@ -299,8 +296,8 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	public void startJob() {
 		int originalGui = 0;
 
-		final WCTIActionHost ah = getActionHost(obj);
-		if (ah instanceof WCTGuiObject) {
+		final WTIActionHost ah = getActionHost(getGuiObject());
+		if (ah instanceof WTGuiObject) {
 			originalGui = ModGuiHandler.GUI_WCT;
 		}
 
@@ -311,21 +308,18 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 			if (g != null && originalGui == 0)// && this.getOpenContext() != null )
 			{
 				ModNetworking.instance().sendTo(new PacketSwitchGuis(originalGui), (EntityPlayerMP) getInventoryPlayer().player);
-
-				//final TileEntity te = this.getOpenContext().getTile();
-				//Platform.openGUI( this.getInventoryPlayer().player, te, this.getOpenContext().getSide(), originalGui );
 				EntityPlayerMP player = (EntityPlayerMP) getInventoryPlayer().player;
-				World world = WCTUtils.world(player);
+				World world = getWorld();
 				int x = (int) player.posX;
 				int y = (int) player.posY;
 				int z = (int) player.posZ;
-				ModGuiHandler.open(originalGui, player, world, new BlockPos(x, y, z));
+				ModGuiHandler.open(originalGui, player, world, new BlockPos(x, y, z), false, isBauble, wctSlot);
 			}
 		}
 	}
 
 	private IActionSource getActionSrc() {
-		return new WCTPlayerSource(getPlayerInv().player, (WCTIActionHost) getTarget());
+		return new WTPlayerSource(getPlayerInv().player, (WTIActionHost) getTarget());
 	}
 
 	@Override
@@ -347,7 +341,7 @@ public class ContainerCraftConfirm extends WCTBaseContainer {
 	}
 
 	public World getWorld() {
-		return WCTUtils.world(WCTUtils.player(getPlayerInv()));
+		return getPlayer().getEntityWorld();
 	}
 
 	public boolean isAutoStart() {

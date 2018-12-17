@@ -49,7 +49,8 @@ public class WCTGuiCheckBox extends GuiCheckBox {
 				color = 4210752;
 			}
 			if (isChecked) {
-				drawCenteredString(mc.fontRenderer, "✔", x + (width - boxWidth) + boxWidth / 2 + 1, y + 1, 0x00FF00);
+				//drawCenteredString(mc.fontRenderer, "✔", x + (width - boxWidth) + boxWidth / 2 + 1, y + 1, 0x00FF00);
+				drawCenteredString(mc.fontRenderer, "x", x + (width - boxWidth) + boxWidth / 2 + 1, y + 1, 0x00FF00);
 			}
 
 			drawStringNoShadow(mc.fontRenderer, displayString, x, y + 2, color);

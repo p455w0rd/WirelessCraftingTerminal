@@ -16,9 +16,7 @@
 package p455w0rd.wct.integration;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,16 +26,10 @@ import com.google.common.collect.Lists;
 import appeng.container.slot.SlotCraftingMatrix;
 import appeng.container.slot.SlotFakeCraftingMatrix;
 import appeng.util.Platform;
-import mezz.jei.api.IJeiHelpers;
-import mezz.jei.api.IJeiRuntime;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.*;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredientBlacklist;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
+import mezz.jei.api.ingredients.*;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
@@ -47,8 +39,9 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import p455w0rd.ae2wtlib.init.LibConfig;
+import p455w0rd.ae2wtlib.init.LibItems;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.init.ModConfig;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
@@ -65,16 +58,13 @@ public class JEI implements IModPlugin {
 	public void register(@Nonnull IModRegistry registry) {
 		IJeiHelpers helpers = registry.getJeiHelpers();
 		IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
-		if (!ModConfig.WCT_BOOSTER_ENABLED) {
-			blackList.addIngredientToBlacklist(new ItemStack(ModItems.BOOSTER_CARD));
+		if (!LibConfig.WT_BOOSTER_ENABLED) {
+			blackList.addIngredientToBlacklist(new ItemStack(LibItems.BOOSTER_CARD));
 		}
 		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<ContainerWCT>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
-		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wct_bauble.desc" : "";
-		String boosterDescKey = ModConfig.USE_OLD_INFINTY_MECHANIC ? "jei.booster_old.desc" : "jei.booster.desc";
-		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), ItemStack.class, "jei.wct.desc", wctBaublesDescKey);
-		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WFT)), ItemStack.class, "jei.wft.desc", wctBaublesDescKey);
-		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.MAGNET_CARD)), ItemStack.class, "jei.magnet_card.desc");
-		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.BOOSTER_CARD)), ItemStack.class, boosterDescKey);
+		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wt_bauble.desc" : "";
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), VanillaTypes.ITEM, "jei.wct.desc", wctBaublesDescKey);
+		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.MAGNET_CARD)), VanillaTypes.ITEM, "jei.magnet_card.desc");
 	}
 
 	@Override
@@ -168,10 +158,6 @@ public class JEI implements IModPlugin {
 
 			return null;
 		}
-	}
-
-	public static boolean isIngrediantOverlayActive() {
-		return mezz.jei.config.Config.isOverlayEnabled();
 	}
 
 }

@@ -15,9 +15,7 @@
  */
 package p455w0rd.wct.container;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -38,8 +36,8 @@ public class ContainerCraftingStatus extends ContainerCraftingCPU {
 	@GuiSync(7)
 	public String myName = "";
 
-	public ContainerCraftingStatus(final InventoryPlayer ip, final ITerminalHost te) {
-		super(ip, te);
+	public ContainerCraftingStatus(final InventoryPlayer ip, final ITerminalHost te, int wtSlot, boolean isWTBauble) {
+		super(ip, te, wtSlot, isWTBauble);
 	}
 
 	/*
@@ -47,7 +45,7 @@ public class ContainerCraftingStatus extends ContainerCraftingCPU {
 		public void detectAndSendChanges() {
 			final ICraftingGrid cc = getNetwork().getCache(ICraftingGrid.class);
 			final ImmutableSet<ICraftingCPU> cpuSet = cc.getCpus();
-
+	
 			int matches = 0;
 			boolean changed = false;
 			for (final ICraftingCPU c : cpuSet) {
@@ -57,18 +55,18 @@ public class ContainerCraftingStatus extends ContainerCraftingCPU {
 						found = true;
 					}
 				}
-
+	
 				final boolean matched = cpuMatches(c);
-
+	
 				if (matched) {
 					matches++;
 				}
-
+	
 				if (found == !matched) {
 					changed = true;
 				}
 			}
-
+	
 			if (changed || cpus.size() != matches) {
 				cpus.clear();
 				for (final ICraftingCPU c : cpuSet) {
@@ -76,12 +74,12 @@ public class ContainerCraftingStatus extends ContainerCraftingCPU {
 						cpus.add(new CraftingCPURecord(c.getAvailableStorage(), c.getCoProcessors(), c));
 					}
 				}
-
+	
 				sendCPUs();
 			}
-
+	
 			noCPU = cpus.isEmpty();
-
+	
 			super.detectAndSendChanges();
 		}
 	*/

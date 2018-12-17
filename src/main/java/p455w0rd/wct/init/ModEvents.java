@@ -15,66 +15,38 @@
  */
 package p455w0rd.wct.init;
 
-import java.util.Random;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import appeng.api.config.SearchBoxMode;
 import appeng.api.config.Settings;
 import appeng.core.AEConfig;
 import appeng.integration.Integrations;
-import appeng.tile.networking.TileController;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.entity.player.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.wct.WCT;
+import p455w0rd.ae2wtlib.api.WTApi;
+import p455w0rd.ae2wtlib.init.*;
+import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.sync.packets.PacketSyncInfinityEnergyInv;
 import p455w0rd.wct.client.gui.GuiWCT;
-import p455w0rd.wct.client.render.BaubleRenderDispatcher;
-import p455w0rd.wct.client.render.ItemLayerWrapper;
-import p455w0rd.wct.client.render.WCTItemRenderer;
-import p455w0rd.wct.client.render.WFTItemRenderer;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
-import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.packets.PacketConfigSync;
-import p455w0rd.wct.sync.packets.PacketSyncInfinityEnergy;
 import p455w0rd.wct.util.WCTUtils;
-import p455w0rdslib.capabilities.CapabilityChunkLoader;
-import p455w0rdslib.capabilities.CapabilityChunkLoader.ProviderTE;
 
 /**
  * @author p455w0rd
@@ -86,86 +58,27 @@ public class ModEvents {
 	public static long CLIENT_TICKS = 0L;
 	public static long SERVER_TICKS = 0L;
 
-	public static void preInit() {
-		//MinecraftForge.EVENT_BUS.register(new ModEvents());
-	}
-
 	@SubscribeEvent
 	public static void onItemRegistryReady(RegistryEvent.Register<Item> event) {
 		ModItems.register(event.getRegistry());
 	}
 
 	@SubscribeEvent
-	public static void attachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
-		if (event.getObject() instanceof TileController && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
-			TileController controller = (TileController) event.getObject();
-			event.addCapability(new ResourceLocation(ModGlobals.MODID, "chunkloader"), new ProviderTE(controller));
-		}
-	}
-
-	@SubscribeEvent
-	public static void onPlace(BlockEvent.PlaceEvent e) {
-		World world = e.getWorld();
-		BlockPos pos = e.getPos();
-		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
-			if (world.getTileEntity(pos) instanceof TileController) {
-				TileEntity tile = world.getTileEntity(pos);
-				if (tile.hasCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null)) {
-					tile.getCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null).attachChunkLoader(WCT.INSTANCE);
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public static void onBreak(BlockEvent.BreakEvent e) {
-		World world = e.getWorld();
-		BlockPos pos = e.getPos();
-		if (world != null && pos != null && world.getTileEntity(pos) != null && !world.isRemote && ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER) {
-			if (world.getTileEntity(pos) instanceof TileController) {
-				TileEntity tile = world.getTileEntity(pos);
-				if (tile.hasCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null)) {
-					tile.getCapability(CapabilityChunkLoader.CAPABILITY_CHUNKLOADER_TE, null).detachChunkLoader(WCT.INSTANCE);
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
 	public static void tickEvent(TickEvent.PlayerTickEvent e) {
 		EntityPlayer player = e.player;
-		IInventory playerInv = player.inventory;
-		ItemStack wirelessTerm = WCTUtils.getWirelessTerm((InventoryPlayer) playerInv);
+		if (!(player instanceof EntityPlayerMP)) {
+			return;
+		}
+		InventoryPlayer playerInv = player.inventory;
+		List<Pair<Boolean, Pair<Integer, ItemStack>>> terminals = WCTUtils.getCraftingTerminals(player);
 		int invSize = playerInv.getSizeInventory();
 		if (invSize <= 0) {
 			return;
 		}
-		if (player instanceof EntityPlayerMP && !ModConfig.USE_OLD_INFINTY_MECHANIC && !wirelessTerm.isEmpty() && WCTUtils.shouldConsumeBoosters(wirelessTerm)) {
-			for (int i = 0; i < invSize; ++i) {
-				ItemStack slotStack = playerInv.getStackInSlot(i);
-				if (!slotStack.isEmpty() && slotStack.getItem() == ModItems.BOOSTER_CARD) {
-					WCTUtils.addInfinityBoosters(wirelessTerm, slotStack);
-					ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerm)), (EntityPlayerMP) player);
-					playerInv.setInventorySlotContents(i, ItemStack.EMPTY);
-				}
-			}
-		}
-		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound()) {
-			NBTTagCompound magnetNBT = wirelessTerm.getSubCompound(WCTUtils.MAGNET_SLOT_NBT);
-			if (magnetNBT != null) {
-				NBTTagList tagList = magnetNBT.getTagList("Items", 10);
-				if (tagList != null && !tagList.hasNoTags()) {
-					NBTTagCompound magCompound = tagList.getCompoundTagAt(0);
-					if (magCompound != null) {
-						ItemStack magnetItem = new ItemStack(magCompound);
-						if (!magnetItem.isEmpty()) {
-							if (magnetItem.getItem() instanceof ItemMagnet) {
-								((ItemMagnet) magnetItem.getItem()).setItemStack(magnetItem);
-								((ItemMagnet) magnetItem.getItem()).doMagnet(magnetItem, WCTUtils.world(e.player), e.player, wirelessTerm);
-							}
-						}
-					}
-				}
+		for (int i = 0; i < terminals.size(); i++) {
+			ItemStack wct = terminals.get(i).getRight().getRight();
+			if (!ItemMagnet.getMagnetFromWCT(wct).isEmpty()) {
+				((ItemMagnet) ItemMagnet.getMagnetFromWCT(wct).getItem()).doMagnet(player, wct, terminals.get(i).getLeft(), terminals.get(i).getRight().getLeft());
 			}
 		}
 	}
@@ -196,64 +109,13 @@ public class ModEvents {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void onModelBake(ModelBakeEvent event) {
-		ModItems.initModels();
-		IBakedModel wctModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"));
-		WCTItemRenderer.model = new ItemLayerWrapper(wctModel);
-		IBakedModel wftModel = event.getModelRegistry().getObject(new ModelResourceLocation(ModItems.WFT.getRegistryName(), "inventory"));
-		WFTItemRenderer.model = new ItemLayerWrapper(wftModel);
-		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory"), WCTItemRenderer.model);
-		event.getModelRegistry().putObject(new ModelResourceLocation(ModItems.WFT.getRegistryName(), "inventory"), WFTItemRenderer.model);
+		ModItems.initModels(event);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void onModelRegister(ModelRegistryEvent event) {
-		ModItems.WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
-		ModItems.CREATIVE_WCT.setTileEntityItemStackRenderer(new WCTItemRenderer());
-		ModItems.WFT.setTileEntityItemStackRenderer(new WFTItemRenderer());
-		ModItems.CREATIVE_WFT.setTileEntityItemStackRenderer(new WFTItemRenderer());
-	}
-
-	@SubscribeEvent
-	public static void onMobDrop(LivingDropsEvent event) {
-		ItemStack stack = new ItemStack(ModItems.BOOSTER_CARD);
-		EntityItem drop = new EntityItem(event.getEntityLiving().getEntityWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ, stack);
-		if (event.getEntity() instanceof EntityDragon && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_DRAGON_DROPS_BOOSTER) {
-			event.getDrops().add(drop);
-		}
-
-		if (event.getEntity() instanceof EntityWither && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_WITHER_DROPS_BOOSTER) {
-			Random rand = event.getEntityLiving().getEntityWorld().rand;
-			int n = rand.nextInt(100);
-			if (n <= ModConfig.WCT_BOOSTER_DROP_CHANCE) {
-				event.getDrops().add(drop);
-			}
-		}
-
-		if (event.getEntity() instanceof EntityEnderman && ModConfig.WCT_BOOSTER_ENABLED && ModConfig.WCT_ENDERMAN_DROP_BOOSTERS) {
-			Random rand = event.getEntityLiving().getEntityWorld().rand;
-			int n = rand.nextInt(100);
-			if (n <= ModConfig.WCT_ENDERMAN_BOOSTER_DROP_CHANCE) {
-				event.getDrops().add(drop);
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onPlayerLogin(PlayerLoggedInEvent e) {
-		if (e.player instanceof EntityPlayerMP) {
-			final PacketConfigSync p = new PacketConfigSync(ModConfig.WCT_MAX_POWER, ModConfig.WCT_BOOSTER_ENABLED, ModConfig.WCT_MINETWEAKER_OVERRIDE, ModConfig.WCT_ENABLE_CONTROLLER_CHUNKLOADER, ModConfig.WCT_DRAGON_DROPS_BOOSTER);
-			ModNetworking.instance().sendTo((WCTPacket) p, (EntityPlayerMP) e.player);
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public static void onPlayerRenderPre(RenderPlayerEvent.Pre event) {
-		if (Mods.BAUBLES.isLoaded() && !BaubleRenderDispatcher.getRegistry().containsKey(event.getRenderer())) {
-			event.getRenderer().addLayer(new BaubleRenderDispatcher(event.getRenderer()));
-			BaubleRenderDispatcher.getRegistry().put(event.getRenderer(), null);
-		}
+		ModItems.registerTEISRs(event);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -277,14 +139,31 @@ public class ModEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onPickup(EntityItemPickupEvent e) {
 		if (e.getEntityPlayer() != null && e.getEntityPlayer() instanceof EntityPlayerMP) {
-			if (!ModConfig.USE_OLD_INFINTY_MECHANIC && e.getItem().getItem().getItem() == ModItems.BOOSTER_CARD) {
-				ItemStack wirelessTerminal = WCTUtils.getWirelessTerm(e.getEntityPlayer().inventory);
-				if (!wirelessTerminal.isEmpty() && WCTUtils.shouldConsumeBoosters(wirelessTerminal)) {
-					e.setCanceled(true);
-					ItemStack boosters = e.getItem().getItem().copy();
-					WCTUtils.addInfinityBoosters(wirelessTerminal, boosters);
-					ModNetworking.instance().sendTo(new PacketSyncInfinityEnergy(WCTUtils.getInfinityEnergy(wirelessTerminal)), (EntityPlayerMP) e.getEntityPlayer());
-					e.getItem().setDead();
+			if (!LibConfig.USE_OLD_INFINTY_MECHANIC && e.getItem().getItem().getItem() == LibItems.BOOSTER_CARD) {
+				if (Mods.BAUBLES.isLoaded()) {
+					for (Pair<Integer, ItemStack> termPair : Baubles.getAllWTBaubles(e.getEntityPlayer())) {
+						ItemStack wirelessTerminal = termPair.getRight();
+						if (!wirelessTerminal.isEmpty() && WTApi.instance().shouldConsumeBoosters(wirelessTerminal)) {
+							e.setCanceled(true);
+							ItemStack boosters = e.getItem().getItem().copy();
+							WTApi.instance().addInfinityBoosters(wirelessTerminal, boosters);
+							LibNetworking.instance().sendTo(new PacketSyncInfinityEnergyInv(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), true, termPair.getLeft()), (EntityPlayerMP) e.getEntityPlayer());
+							e.getItem().setDead();
+							return;
+						}
+					}
+				}
+				for (Pair<Boolean, Pair<Integer, ItemStack>> termPair : WCTUtils.getCraftingTerminals(e.getEntityPlayer())) {
+					ItemStack wirelessTerminal = termPair.getRight().getRight();
+					boolean shouldConsume = WTApi.instance().shouldConsumeBoosters(wirelessTerminal);
+					if (!wirelessTerminal.isEmpty() && shouldConsume) {
+						e.setCanceled(true);
+						ItemStack boosters = e.getItem().getItem().copy();
+						WTApi.instance().addInfinityBoosters(wirelessTerminal, boosters);
+						LibNetworking.instance().sendTo(new PacketSyncInfinityEnergyInv(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), false, termPair.getRight().getLeft()), (EntityPlayerMP) e.getEntityPlayer());
+						e.getItem().setDead();
+						return;
+					}
 				}
 			}
 		}

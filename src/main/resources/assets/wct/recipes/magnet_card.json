@@ -1,9 +1,4 @@
 {
-	"conditions": [
-		{
-			"type": "wct:recipes_enabled"
-		}
-	],
 	"type": "forge:ore_shaped",
 	"pattern": [
 		"abc",

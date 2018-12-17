@@ -26,17 +26,16 @@ import appeng.helpers.Reflected;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import p455w0rd.ae2wtlib.client.gui.GuiWT;
+import p455w0rd.ae2wtlib.helpers.WTGuiObject;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.container.ContainerCraftAmount;
-import p455w0rd.wct.helpers.WCTGuiObject;
-import p455w0rd.wct.init.ModGuiHandler;
-import p455w0rd.wct.init.ModItems;
-import p455w0rd.wct.init.ModNetworking;
+import p455w0rd.wct.init.*;
 import p455w0rd.wct.sync.packets.PacketCraftRequest;
 import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 
-public class GuiCraftAmount extends WCTBaseGui {
+public class GuiCraftAmount extends GuiWT {
 
 	private GuiNumberBox amountToCraft;
 	private GuiTabButton originalGuiBtn;
@@ -57,8 +56,8 @@ public class GuiCraftAmount extends WCTBaseGui {
 	private int originalGui;
 
 	@Reflected
-	public GuiCraftAmount(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
-		super(new ContainerCraftAmount(inventoryPlayer, te));
+	public GuiCraftAmount(final InventoryPlayer inventoryPlayer, final ITerminalHost te, int wtSlot, boolean isWTBauble) {
+		super(new ContainerCraftAmount(inventoryPlayer, te, wtSlot, isWTBauble));
 		ItemStack is = new ItemStack(ModItems.WCT);
 		((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 		myIcon = is;
@@ -86,7 +85,7 @@ public class GuiCraftAmount extends WCTBaseGui {
 		buttonList.add(next = new GuiButton(0, guiLeft + 128, guiTop + 51, 38, 20, GuiText.Next.getLocal()));
 		final Object target = ((ContainerCraftAmount) inventorySlots).getTarget();
 
-		if (target instanceof WCTGuiObject) {
+		if (target instanceof WTGuiObject) {
 			originalGui = ModGuiHandler.GUI_WCT;
 		}
 
