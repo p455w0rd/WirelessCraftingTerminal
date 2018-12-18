@@ -60,11 +60,10 @@ import net.minecraftforge.fml.relauncher.*;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
-import p455w0rd.ae2wtlib.api.ICustomWirelessTermHandler;
-import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
+import p455w0rd.ae2wtlib.api.*;
 import p455w0rd.ae2wtlib.container.ContainerWT;
-import p455w0rd.ae2wtlib.container.slot.SlotArmor;
-import p455w0rd.ae2wtlib.container.slot.SlotTrash;
+import p455w0rd.ae2wtlib.container.slot.*;
+import p455w0rd.ae2wtlib.container.slot.NullSlot;
 import p455w0rd.ae2wtlib.helpers.WTGuiObject;
 import p455w0rd.ae2wtlib.init.LibConfig;
 import p455w0rd.ae2wtlib.init.LibItems;
@@ -105,9 +104,23 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 	public ContainerWCT(EntityPlayer player, ITerminalHost hostIn, int slot, boolean isBauble) {
 		super(player.inventory, getActionHost(getGuiObject(isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)), slot, isBauble);
 
+		if (LibConfig.WT_BOOSTER_ENABLED && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
+			if (LibConfig.USE_OLD_INFINTY_MECHANIC) {
+				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20));
+				boosterSlot.setContainer(this);
+			}
+			else {
+				addSlotToContainer(boosterSlot = new SlotBoosterEnergy(134, -20));
+				boosterSlot.setContainer(this);
+			}
+		}
+		else {
+			addSlotToContainer(boosterSlot = new NullSlot());
+			boosterSlot.setContainer(this);
+		}
+
 		craftingInv = new InventoryCrafting(matrixContainer, 3, 3);
 		setCustomName("WCTContainer");
-		//host = hostIn;
 		setTerminalHost(hostIn);
 		initConfig(setClientConfigManager(new ConfigManager(this)));
 		if (Platform.isServer()) {
@@ -120,7 +133,6 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 					setPowerSource(getGuiObject());
 				}
 				else if (getGuiObject() instanceof IGridHost || getGuiObject() instanceof IActionHost) {
-					//final IGridNode node;
 					if (getGuiObject() instanceof IGridHost) {
 						networkNode = ((IGridHost) getGuiObject()).getGridNode(AEPartLocation.INTERNAL);
 					}

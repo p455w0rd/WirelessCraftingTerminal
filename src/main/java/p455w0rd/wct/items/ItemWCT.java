@@ -61,7 +61,7 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
 		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition(), false, false, player.inventory.currentItem);//getSlotFor(player.inventory, item));
+			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition(), false, false, player.inventory.currentItem);
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
 		if (getAECurrentPower(item) <= 0 && !world.isRemote) {
@@ -99,6 +99,9 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
 		}
 		list.add("Link Status: " + linked);
+		if (!doesPlayerHaveAccess(getPlayer(), is)) {
+			list.add(TextFormatting.ITALIC + "" + TextFormatting.RED + " No access to linked network!");
+		}
 		String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
 		if (LibConfig.WT_BOOSTER_ENABLED) {
 			if (LibConfig.USE_OLD_INFINTY_MECHANIC) {
@@ -121,7 +124,7 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
 			}
 		}
-		list.add(I18n.format("item.magnet_card.name") + ": " + magnetStatus);
+		list.add(I18n.format("item.wct:magnet_card.name") + ": " + magnetStatus);
 	}
 
 	@Override
