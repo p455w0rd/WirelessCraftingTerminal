@@ -65,8 +65,6 @@ import p455w0rd.ae2wtlib.container.ContainerWT;
 import p455w0rd.ae2wtlib.container.slot.*;
 import p455w0rd.ae2wtlib.container.slot.NullSlot;
 import p455w0rd.ae2wtlib.helpers.WTGuiObject;
-import p455w0rd.ae2wtlib.init.LibConfig;
-import p455w0rd.ae2wtlib.init.LibItems;
 import p455w0rd.ae2wtlib.integration.Baubles;
 import p455w0rd.ae2wtlib.inventory.WTInventoryTrash;
 import p455w0rd.wct.api.IWCTContainer;
@@ -104,8 +102,8 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 	public ContainerWCT(EntityPlayer player, ITerminalHost hostIn, int slot, boolean isBauble) {
 		super(player.inventory, getActionHost(getGuiObject(isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)), slot, isBauble);
 
-		if (LibConfig.WT_BOOSTER_ENABLED && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
-			if (LibConfig.USE_OLD_INFINTY_MECHANIC) {
+		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
+			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
 				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20));
 				boosterSlot.setContainer(this);
 			}
@@ -963,13 +961,17 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 							return ItemStack.EMPTY;
 						}
 					}
-					else if (tis.getItem() == LibItems.BOOSTER_CARD) {
+					else if (tis.getItem() == WTApi.instance().getBoosterCard()) {
 						if (mergeItemStack(tis.copy(), getBoosterIndex(), getBoosterIndex() + 1, false)) {
-							if (tis.getCount() > 1 && LibConfig.USE_OLD_INFINTY_MECHANIC) {
+							if (tis.getCount() > 1 && WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
 								tis.shrink(1);
 							}
 							else {
 								appEngSlot.clearStack();
+							}
+							if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
+								int currentInfinityEnergy = WTApi.instance().getInfinityEnergy(getWirelessTerminal());
+								WTApi.instance().getNetHandler().sendTo(WTApi.instance().getNetHandler().createInfinityEnergySyncPacket(currentInfinityEnergy, getPlayer().getUniqueID(), isWTBauble(), getWTSlot()), (EntityPlayerMP) getPlayer());
 							}
 							return ItemStack.EMPTY;
 						}
@@ -985,7 +987,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 							return ItemStack.EMPTY;
 						}
 					}
-					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis) && LibConfig.SHIFT_CLICK_BAUBLES) {
+					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis) && WTApi.instance().getConfig().shiftClickBaublesEnabled()) {
 						ItemStack tisCopy = tis.copy();
 						tisCopy.setCount(1);
 						if (mergeItemStack(tisCopy, getBaublesIndex(), getBaublesIndex() + 7, false)) {
@@ -1163,6 +1165,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 					}
 				}
 				appEngSlot.putStack(!tis.isEmpty() ? tis.copy() : ItemStack.EMPTY);
+				appEngSlot.onSlotChanged();
 			}
 		}
 		return ItemStack.EMPTY;

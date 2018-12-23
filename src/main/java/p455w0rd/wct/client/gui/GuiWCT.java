@@ -47,9 +47,6 @@ import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
 import p455w0rd.ae2wtlib.client.render.StackSizeRenderer.ReadableNumberConverter;
 import p455w0rd.ae2wtlib.container.ContainerWT;
 import p455w0rd.ae2wtlib.container.slot.SlotTrash;
-import p455w0rd.ae2wtlib.init.LibConfig;
-import p455w0rd.ae2wtlib.init.LibNetworking;
-import p455w0rd.ae2wtlib.sync.packets.PacketEmptyTrash;
 import p455w0rd.wct.client.gui.widgets.*;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingOutput;
@@ -75,7 +72,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private static final String BG_TEXTURE_BAUBLES = "gui/crafting_baubles.png";
 	private final ContainerWCT containerWCT;
 	private boolean isFullScreen, init = true, reInit, wasResized = false;
-	private GuiScrollbar scrollBar = null;
+	//private GuiScrollbar scrollBar = null;
 	public static int craftingGridOffsetX = 80;
 	public static int craftingGridOffsetY;
 
@@ -252,7 +249,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 				if (s != null) {
 					if (s.getHasStack()) {
 						containerWCT.getTrashSlot().clearStack();
-						LibNetworking.instance().sendToServer(new PacketEmptyTrash());
+						WTApi.instance().getNetHandler().sendToServer(WTApi.instance().getNetHandler().createEmptyTrashPacket());
 					}
 				}
 			}
@@ -535,7 +532,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 		buttonList.add(shiftCraftButton = new GuiImgButtonShiftCraft(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
 
-		if (!LibConfig.USE_OLD_INFINTY_MECHANIC && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
+		if (!WTApi.instance().getConfig().isOldInfinityMechanicEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
 			offset += 20;
 			buttonList.add(autoConsumeBoostersBox = new GuiImgButtonBooster(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
 		}
@@ -713,17 +710,17 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
-		if (LibConfig.WT_BOOSTER_ENABLED && !LibConfig.USE_OLD_INFINTY_MECHANIC) {
+		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
 			int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(getWirelessTerminal());
 			if (WTApi.instance().hasInfiniteRange(getWirelessTerminal())) {
 				if (!WTApi.instance().isInRangeOfWAP(getWirelessTerminal(), Minecraft.getMinecraft().player)) {
-					if (infinityEnergyAmount < LibConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT) {
+					if (infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount()) {
 						warning = TextFormatting.RED + "" + I18n.format("tooltip.infinity_energy_low.desc");
 					}
 				}
 			}
 			if (!WTApi.instance().isWTCreative(getWirelessTerminal()) && isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
-				String amountColor = infinityEnergyAmount < LibConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
+				String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
 				drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
 			}
@@ -765,7 +762,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		//draw view cells
 		drawTexturedModalRect(offsetX - 40, offsetY + 16 + rows * 18 + lowerTextureOffset + 119, 213, 0, 43, 52);
 
-		if (LibConfig.WT_BOOSTER_ENABLED && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
+		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
 			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
 		}
 

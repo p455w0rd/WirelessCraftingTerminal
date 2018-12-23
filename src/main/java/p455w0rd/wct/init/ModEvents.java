@@ -40,9 +40,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.init.*;
 import p455w0rd.ae2wtlib.integration.Baubles;
-import p455w0rd.ae2wtlib.sync.packets.PacketSyncInfinityEnergyInv;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
@@ -139,7 +137,7 @@ public class ModEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onPickup(EntityItemPickupEvent e) {
 		if (e.getEntityPlayer() != null && e.getEntityPlayer() instanceof EntityPlayerMP) {
-			if (!LibConfig.USE_OLD_INFINTY_MECHANIC && e.getItem().getItem().getItem() == LibItems.BOOSTER_CARD) {
+			if (!WTApi.instance().getConfig().isOldInfinityMechanicEnabled() && e.getItem().getItem().getItem() == WTApi.instance().getBoosterCard()) {
 				if (Mods.BAUBLES.isLoaded()) {
 					for (Pair<Integer, ItemStack> termPair : Baubles.getAllWTBaubles(e.getEntityPlayer())) {
 						ItemStack wirelessTerminal = termPair.getRight();
@@ -147,7 +145,7 @@ public class ModEvents {
 							e.setCanceled(true);
 							ItemStack boosters = e.getItem().getItem().copy();
 							WTApi.instance().addInfinityBoosters(wirelessTerminal, boosters);
-							LibNetworking.instance().sendTo(new PacketSyncInfinityEnergyInv(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), true, termPair.getLeft()), (EntityPlayerMP) e.getEntityPlayer());
+							WTApi.instance().getNetHandler().sendTo(WTApi.instance().getNetHandler().createInfinityEnergySyncPacket(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), true, termPair.getLeft()), (EntityPlayerMP) e.getEntityPlayer());
 							e.getItem().setDead();
 							return;
 						}
@@ -160,7 +158,7 @@ public class ModEvents {
 						e.setCanceled(true);
 						ItemStack boosters = e.getItem().getItem().copy();
 						WTApi.instance().addInfinityBoosters(wirelessTerminal, boosters);
-						LibNetworking.instance().sendTo(new PacketSyncInfinityEnergyInv(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), false, termPair.getRight().getLeft()), (EntityPlayerMP) e.getEntityPlayer());
+						WTApi.instance().getNetHandler().sendTo(WTApi.instance().getNetHandler().createInfinityEnergySyncPacket(WTApi.instance().getInfinityEnergy(wirelessTerminal), e.getEntityPlayer().getUniqueID(), true, termPair.getRight().getLeft()), (EntityPlayerMP) e.getEntityPlayer());
 						e.getItem().setDead();
 						return;
 					}

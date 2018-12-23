@@ -32,7 +32,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.client.render.StackSizeRenderer.ReadableNumberConverter;
-import p455w0rd.ae2wtlib.init.LibConfig;
 import p455w0rd.ae2wtlib.items.ItemWT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.init.ModGlobals;
@@ -99,17 +98,14 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
 		}
 		list.add("Link Status: " + linked);
-		if (!doesPlayerHaveAccess(getPlayer(), is)) {
-			list.add(TextFormatting.ITALIC + "" + TextFormatting.RED + " No access to linked network!");
-		}
 		String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
-		if (LibConfig.WT_BOOSTER_ENABLED) {
-			if (LibConfig.USE_OLD_INFINTY_MECHANIC) {
+		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
+			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
 				list.add(I18n.format("item.infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
 			}
 			else {
 				int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(is);
-				String amountColor = infinityEnergyAmount < LibConfig.INFINTY_ENERGY_LOW_WARNING_AMOUNT ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
+				String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String reasonString = "";
 				if (infinityEnergyAmount <= 0) {
 					reasonString = "(" + I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc") + ")";

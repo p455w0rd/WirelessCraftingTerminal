@@ -24,7 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.ae2wtlib.init.LibConfig;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModItems;
 
@@ -51,7 +51,7 @@ public class ItemWCTCreative extends ItemWCT {
 
 	@Override
 	public double getAECurrentPower(final ItemStack wirelessTerm) {
-		return LibConfig.WT_MAX_POWER;
+		return WTApi.instance().getConfig().getWTMaxPower();
 	}
 
 	@Override

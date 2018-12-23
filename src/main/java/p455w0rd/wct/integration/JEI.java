@@ -39,8 +39,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import p455w0rd.ae2wtlib.init.LibConfig;
-import p455w0rd.ae2wtlib.init.LibItems;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
@@ -58,8 +57,8 @@ public class JEI implements IModPlugin {
 	public void register(@Nonnull IModRegistry registry) {
 		IJeiHelpers helpers = registry.getJeiHelpers();
 		IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
-		if (!LibConfig.WT_BOOSTER_ENABLED) {
-			blackList.addIngredientToBlacklist(new ItemStack(LibItems.BOOSTER_CARD));
+		if (!WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
+			blackList.addIngredientToBlacklist(new ItemStack(WTApi.instance().getBoosterCard()));
 		}
 		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<ContainerWCT>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
 		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wt_bauble.desc" : "";

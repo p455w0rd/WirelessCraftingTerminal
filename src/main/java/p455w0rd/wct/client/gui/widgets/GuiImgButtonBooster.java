@@ -26,8 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import p455w0rd.ae2wtlib.init.LibNetworking;
-import p455w0rd.ae2wtlib.sync.packets.PacketSetAutoConsumeBoosters;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.init.ModGlobals;
 
 /**
@@ -120,7 +119,7 @@ public class GuiImgButtonBooster extends GuiButton implements ITooltip {
 			getWirelessTerminal().setTagCompound(new NBTTagCompound());
 		}
 		getWirelessTerminal().getTagCompound().setBoolean(AUTOCONSUME_BOOSTER_NBT, value);
-		LibNetworking.instance().sendToServer(new PacketSetAutoConsumeBoosters(value));
+		WTApi.instance().getNetHandler().sendToServer(WTApi.instance().getNetHandler().createAutoConsumeBoosterPacket(value));
 	}
 
 }

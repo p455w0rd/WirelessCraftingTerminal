@@ -62,10 +62,8 @@ import p455w0rd.ae2wtlib.api.ICustomWirelessTermHandler;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
 import p455w0rd.ae2wtlib.helpers.WTGuiObject;
-import p455w0rd.ae2wtlib.init.*;
 import p455w0rd.ae2wtlib.integration.Baubles;
 import p455w0rd.ae2wtlib.items.ItemBase;
-import p455w0rd.ae2wtlib.sync.packets.PacketSyncInfinityEnergyInv;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.init.*;
@@ -296,7 +294,6 @@ public class ItemMagnet extends ItemBase {
 			if (xpToGet.isDead || xpToGet.isInvisible()) {
 				continue;
 			}
-			//if (MinecraftForge.EVENT_BUS.post(new PlayerPickupXpEvent(player, xpToGet))) {
 			int xpAmount = xpToGet.xpValue;
 			xpToGet.setDead();
 			world.playSound((EntityPlayer) null, xpToGet.posX, xpToGet.posY, xpToGet.posZ, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.1F, 0.5F * ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
@@ -316,11 +313,11 @@ public class ItemMagnet extends ItemBase {
 		World world = player.getEntityWorld();
 		InventoryPlayer playerInv = player.inventory;
 		int invSize = playerInv.getSizeInventory();
-		if (invSize >= 0 && !LibConfig.USE_OLD_INFINTY_MECHANIC && !wirelessTerminal.isEmpty() && WTApi.instance().shouldConsumeBoosters(wirelessTerminal)) {
+		if (invSize >= 0 && !WTApi.instance().getConfig().isOldInfinityMechanicEnabled() && !wirelessTerminal.isEmpty() && WTApi.instance().shouldConsumeBoosters(wirelessTerminal)) {
 			ItemStack pickupStack = itemToGet.getItem();
-			if (!pickupStack.isEmpty() && pickupStack.getItem() == LibItems.BOOSTER_CARD) {
+			if (!pickupStack.isEmpty() && pickupStack.getItem() == WTApi.instance().getBoosterCard()) {
 				WTApi.instance().addInfinityBoosters(wirelessTerminal, pickupStack);
-				LibNetworking.instance().sendToDimension(new PacketSyncInfinityEnergyInv(WTApi.instance().getInfinityEnergy(wirelessTerminal), player.getUniqueID(), isWCTBauble, wctSlot), player.getEntityWorld().provider.getDimension());
+				WTApi.instance().getNetHandler().sendToDimension(WTApi.instance().getNetHandler().createInfinityEnergySyncPacket(WTApi.instance().getInfinityEnergy(wirelessTerminal), player.getUniqueID(), isWCTBauble, wctSlot), player.getEntityWorld().provider.getDimension());
 				return true;
 			}
 		}

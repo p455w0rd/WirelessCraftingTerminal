@@ -38,13 +38,13 @@ repositories {
 		url = "http://maven.tterrag.com"
 	}
 	maven {
+		name = "tterrag2"
+		url = "http://maven2.tterrag.com"
+	}
+	maven {
 		url "http://mobiusstrip.eu/maven"
 	}
 	maven {
-		 name = "epoxide"
-		 url = "http://maven.epoxide.xyz"
-	 }
-	 maven {
 		name = "tehnut"
 		url = "http://tehnut.info/maven"
 	}
@@ -56,15 +56,19 @@ repositories {
 dependencies {
 	deobfCompile "mezz.jei:jei_1.12.2:+"
 	//compile project(':appliedenergistics2')
-	deobfCompile "com.enderio.core:EnderCore:1.12.2-0.5.37"
+	deobfCompile "com.enderio.core:EnderCore:1.12.2-0.5.43"
+	deobfCompile ("com.enderio:EnderIO:1.12.2-5.0.38") {
+		transitive = false
+	}
+	deobfCompile "info.loenwind.autoconfig:AutoConfig:1.12.2-1.0.1"
+	deobfCompile "info.loenwind.autosave:AutoSave:1.12.2-1.0.8"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
-	deobfCompile "net.darkhax.tesla:Tesla-1.12:1.0.61"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
 	deobfCompile "appeng:appliedenergistics2:rv6-stable-4"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.2.4:universal"
 	deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
 	deobfCompile "p455w0rd:p455w0rdslib:1.12.2-2.0.36"
-	deobfCompile "p455w0rd:AE2WTLib:1.12.2-1.0.2"
+	deobfCompile "p455w0rd:AE2WTLib:1.12.2-1.0.5"
 }
 
 task apiJar(type: Jar) {
