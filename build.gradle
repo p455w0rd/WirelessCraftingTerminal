@@ -24,7 +24,7 @@ minecraft {
 	
 	runDir = "run"
 	mappings = "snapshot_20171003"
-	useDepAts = true
+//	useDepAts = true
 }
 
 repositories {
