@@ -22,7 +22,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.relauncher.Side;
-import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
@@ -61,7 +61,7 @@ public class ModAPIImpl extends WCTApi {
 		if ((player == null) || (player instanceof FakePlayer) || (player instanceof EntityPlayerMP) || FMLCommonHandler.instance().getSide() == Side.SERVER) {
 			return;
 		}
-		ItemStack is = isBauble ? Baubles.getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
+		ItemStack is = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
 		if (is.isEmpty()) {
 			return;
 		}

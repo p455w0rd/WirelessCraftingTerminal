@@ -38,7 +38,6 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.util.Platform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -53,16 +52,14 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
-import p455w0rd.ae2wtlib.api.ICustomWirelessTermHandler;
-import p455w0rd.ae2wtlib.api.WTApi;
+import p455w0rd.ae2wtlib.api.*;
 import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
-import p455w0rd.ae2wtlib.integration.Baubles;
 import p455w0rd.ae2wtlib.items.ItemBase;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
@@ -77,6 +74,7 @@ import p455w0rdslib.util.ItemUtils;
  * @author p455w0rd
  *
  */
+@SuppressWarnings("deprecation")
 public class ItemMagnet extends ItemBase {
 
 	public static final String MAGNET_SLOT_NBT = "MagnetSlot";
@@ -128,45 +126,45 @@ public class ItemMagnet extends ItemBase {
 	@SideOnly(Side.CLIENT)
 	public void addInformation(@Nonnull ItemStack is, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
 		list.add(color("aqua") + "==============================");
-		String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
+		String shift = I18n.translateToLocal("tooltip.press_shift.desc").replace("Shift", color("yellow") + color("bold") + color("italics") + "Shift" + color("gray"));
 		if (isShiftKeyDown()) {
 
-			String info = I18n.format("tooltip.magnet.desc");
+			String info = I18n.translateToLocal("tooltip.magnet.desc");
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(info, 37, "\n", false))) {
 				list.add(line.trim());
 			}
 
 			list.add("");
-			list.add(color("italics") + "" + I18n.format("tooltip.magnet_set_filter.desc"));
+			list.add(color("italics") + "" + I18n.translateToLocal("tooltip.magnet_set_filter.desc"));
 			/*
 			if (isActivated(itemStack)) {
 				String boundKey = ModKeybindings.openMagnetFilter.getDisplayName();
 				if (!boundKey.equals("NONE")) {
-					list.add(color("italics") + I18n.format("tooltip.or_press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey + "]");
+					list.add(color("italics") + I18n.translateToLocal("tooltip.or_press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey + "]");
 				}
 				String boundKey2 = ModKeybindings.changeMagnetMode.getDisplayName();
 				if (!boundKey2.equals("NONE")) {
-					list.add(color("italics") + I18n.format("tooltip.press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey2 + "] " + color("gray") + color("italics") + I18n.format("tooltip.to_switch.desc"));
+					list.add(color("italics") + I18n.translateToLocal("tooltip.press.desc") + " " + color("yellow") + color("bold") + "[" + boundKey2 + "] " + color("gray") + color("italics") + I18n.translateToLocal("tooltip.to_switch.desc"));
 				}
 			}
 			*/
 			list.add("");
-			String not = I18n.format("tooltip.not.desc");
-			list.add(I18n.format("tooltip.status.desc") + ": " + (isActivated(is) ? color("green") + I18n.format("tooltip.active.desc") : color("red") + not + " " + I18n.format("tooltip.active.desc")));
+			String not = I18n.translateToLocal("tooltip.not.desc");
+			list.add(I18n.translateToLocal("tooltip.status.desc") + ": " + (isActivated(is) ? color("green") + I18n.translateToLocal("tooltip.active.desc") : color("red") + not + " " + I18n.translateToLocal("tooltip.active.desc")));
 			MagnetFunctionMode mode = getMagnetFunctionMode(is);
 			if (mode != MagnetFunctionMode.INACTIVE) {
 				list.add(color("white") + "  " + mode.getMessage().replace("-", "\n  -"));
 			}
 
-			String white = I18n.format("tooltip.magnet_whitelisting.desc");
-			String black = I18n.format("tooltip.magnet_blacklisting.desc");
+			String white = I18n.translateToLocal("tooltip.magnet_whitelisting.desc");
+			String black = I18n.translateToLocal("tooltip.magnet_blacklisting.desc");
 
-			list.add(I18n.format("tooltip.filter_mode.desc") + ": " + color("white") + (getListMode(is) ? white : black));
+			list.add(I18n.translateToLocal("tooltip.filter_mode.desc") + ": " + color("white") + (getListMode(is) ? white : black));
 
-			String ignoring = I18n.format("tooltip.ignoring.desc");
-			String nbtData = I18n.format("tooltip.nbt.desc");
-			String metaData = I18n.format("tooltip.meta.desc");
-			String usingOreDict = I18n.format("tooltip.using.desc") + " " + I18n.format("tooltip.oredict.desc");
+			String ignoring = I18n.translateToLocal("tooltip.ignoring.desc");
+			String nbtData = I18n.translateToLocal("tooltip.nbt.desc");
+			String metaData = I18n.translateToLocal("tooltip.meta.desc");
+			String usingOreDict = I18n.translateToLocal("tooltip.using.desc") + " " + I18n.translateToLocal("tooltip.oredict.desc");
 
 			list.add((!doesMagnetUseOreDict(is) ? " " + not : color("green")) + " " + usingOreDict);
 			list.add((!doesMagnetIgnoreNBT(is) ? " " + not : color("green")) + " " + ignoring + " " + nbtData);
@@ -176,14 +174,14 @@ public class ItemMagnet extends ItemBase {
 
 			if (filteredItems != null) {
 				list.add("");
-				list.add(color("gray") + I18n.format("tooltip.filtered_items.desc") + ":");
+				list.add(color("gray") + I18n.translateToLocal("tooltip.filtered_items.desc") + ":");
 				for (int i = 0; i < filteredItems.size(); i++) {
 					list.add("  " + filteredItems.get(i).getDisplayName());
 				}
 			}
 
 			list.add("");
-			String onlyWorks = I18n.format("tooltip.only_works.desc");
+			String onlyWorks = I18n.translateToLocal("tooltip.only_works.desc");
 			for (String line : Splitter.on("\n").split(WordUtils.wrap(onlyWorks, 27, "\n", false))) {
 				list.add(color("white") + color("bold") + color("italics") + line.trim());
 			}
@@ -251,7 +249,7 @@ public class ItemMagnet extends ItemBase {
 				return;
 			}
 			int stackSize = itemStackToGet.getCount();
-			WTGuiObject<IAEItemStack, IItemStorageChannel> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+			WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
 			boolean ignoreRange = WTApi.instance().hasInfiniteRange(wirelessTerminal);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerminal);
 			if ((ignoreRange && hasAxxess) || (obj.rangeCheck() && hasAxxess)) {
@@ -321,7 +319,7 @@ public class ItemMagnet extends ItemBase {
 				return true;
 			}
 		}
-		WTGuiObject<IAEItemStack, IItemStorageChannel> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
 		IEnergySource powerSrc = obj;
 		IActionSource mySrc = new WTPlayerSource(player, obj);
 		ais = Platform.poweredInsert(powerSrc, obj, ais, mySrc);
@@ -423,7 +421,7 @@ public class ItemMagnet extends ItemBase {
 		if (player.capabilities.isCreativeMode) {
 			return true;
 		}
-		WTGuiObject<IAEItemStack, IItemStorageChannel> obj = getGuiObject(wirelessTerm, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerm, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
 		final IGrid g = obj.getTargetGrid();
 		if (g != null) {
 			if (requirePower) {
@@ -566,11 +564,11 @@ public class ItemMagnet extends ItemBase {
 		}
 	}
 
-	private WTGuiObject<IAEItemStack, IItemStorageChannel> getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	private WTGuiObject<IAEItemStack> getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (!it.isEmpty()) {
 			final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
-				return new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, it, player, w, x, y, z);
+				return (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, it, player);
 			}
 		}
 
@@ -657,7 +655,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static MagnetFunctionMode cycleMagnetFunctionModeWCT(EntityPlayer player, int wctSlot, boolean isBauble) {
-		ItemStack magnet = getMagnetFromWCT(isBauble ? Baubles.getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot));
+		ItemStack magnet = getMagnetFromWCT(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot));
 		if (player == null || magnet.isEmpty() || wctSlot < 0) {
 			return MagnetFunctionMode.INACTIVE;
 		}
@@ -710,7 +708,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static boolean isMagnetInstalled(EntityPlayer player, boolean isBauble, int slot) {
-		return isMagnetInstalled(isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot));
+		return isMagnetInstalled(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot));
 	}
 
 	public static boolean isMagnetInstalled(ItemStack wirelessTerm) {
@@ -748,9 +746,9 @@ public class ItemMagnet extends ItemBase {
 
 	public static enum MagnetFunctionMode {
 
-			INACTIVE(I18n.format("chatmessages.magnet_deactivated.desc")),
-			ACTIVE_KEEP_IN_INVENTORY(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_1.desc")),
-			ACTIVE_LEAVE_ON_GROUND(I18n.format("chatmessages.magnet_activated.desc") + " - " + I18n.format("tooltip.magnet_active_2.desc"));
+			INACTIVE(I18n.translateToLocal("chatmessages.magnet_deactivated.desc")),
+			ACTIVE_KEEP_IN_INVENTORY(I18n.translateToLocal("chatmessages.magnet_activated.desc") + " - " + I18n.translateToLocal("tooltip.magnet_active_1.desc")),
+			ACTIVE_LEAVE_ON_GROUND(I18n.translateToLocal("chatmessages.magnet_activated.desc") + " - " + I18n.translateToLocal("tooltip.magnet_active_2.desc"));
 
 		String message;
 		public static MagnetFunctionMode[] VALUES = new MagnetFunctionMode[] {

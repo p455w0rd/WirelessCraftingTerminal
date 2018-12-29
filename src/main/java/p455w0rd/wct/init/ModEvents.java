@@ -40,7 +40,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.integration.Baubles;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.items.ItemMagnet;
@@ -139,7 +138,7 @@ public class ModEvents {
 		if (e.getEntityPlayer() != null && e.getEntityPlayer() instanceof EntityPlayerMP) {
 			if (!WTApi.instance().getConfig().isOldInfinityMechanicEnabled() && e.getItem().getItem().getItem() == WTApi.instance().getBoosterCard()) {
 				if (Mods.BAUBLES.isLoaded()) {
-					for (Pair<Integer, ItemStack> termPair : Baubles.getAllWTBaubles(e.getEntityPlayer())) {
+					for (Pair<Integer, ItemStack> termPair : WTApi.instance().getBaublesUtility().getAllWTBaubles(e.getEntityPlayer())) {
 						ItemStack wirelessTerminal = termPair.getRight();
 						if (!wirelessTerminal.isEmpty() && WTApi.instance().shouldConsumeBoosters(wirelessTerminal)) {
 							e.setCanceled(true);

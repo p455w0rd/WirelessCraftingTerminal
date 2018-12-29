@@ -19,7 +19,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.sync.WCTPacket;
@@ -65,7 +65,7 @@ public class PacketMagnetFilterWCT extends WCTPacket {
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		ItemStack wirelessTerminal = isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot);
+		ItemStack wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot);
 		if (!wirelessTerminal.isEmpty() && wirelessTerminal.hasTagCompound()) {
 			ItemStack magnet = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
 			if (!magnet.isEmpty()) {

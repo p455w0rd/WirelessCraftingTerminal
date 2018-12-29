@@ -26,7 +26,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
-import p455w0rd.ae2wtlib.api.IModelHolder;
+import p455w0rd.ae2wtlib.api.client.IModelHolder;
 import p455w0rd.ae2wtlib.client.render.ItemLayerWrapper;
 import p455w0rd.ae2wtlib.client.render.WTItemRenderer;
 import p455w0rd.wct.items.*;

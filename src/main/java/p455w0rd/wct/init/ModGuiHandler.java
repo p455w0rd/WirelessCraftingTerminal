@@ -18,17 +18,14 @@ package p455w0rd.wct.init;
 import org.apache.commons.lang3.tuple.Pair;
 
 import appeng.api.AEApi;
-import appeng.api.features.IWirelessTermHandler;
 import appeng.api.storage.ITerminalHost;
-import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
-import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.api.*;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.*;
@@ -137,13 +134,14 @@ public class ModGuiHandler implements IGuiHandler {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos, boolean isBauble, int slot) {
 		int x = pos.getX();
 		int y = pos.getY();
 		int z = pos.getZ();
 		ItemStack wirelessTerminal = ItemStack.EMPTY;
-		if (getSlot() >= 0) {
-			wirelessTerminal = isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot);
+		if (slot >= 0) {
+			wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WTApi.instance().getWTBySlot(player, slot);
 		}
 		else {
 			Pair<Boolean, Pair<Integer, ItemStack>> firstTerm = WCTUtils.getFirstWirelessCraftingTerminal(player.inventory);
@@ -151,8 +149,8 @@ public class ModGuiHandler implements IGuiHandler {
 			setSlot(firstTerm.getRight().getLeft());
 			setIsBauble(firstTerm.getLeft());
 		}
-		final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(wirelessTerminal);
-		final WTGuiObject<IAEItemStack, IItemStorageChannel> terminal = wh == null ? null : new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, wirelessTerminal, player, world, x, y, z);
+		final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(wirelessTerminal);
+		final WTGuiObject<IAEItemStack> terminal = wh == null ? null : (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, wirelessTerminal, player);
 		return terminal;
 	}
 

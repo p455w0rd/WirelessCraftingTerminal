@@ -25,7 +25,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWCTContainer;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
@@ -60,7 +60,7 @@ public class ContainerMagnet extends Container implements IWCTContainer {
 			wirelessTerminal = ItemStack.EMPTY;
 		}
 		else {
-			wirelessTerminal = isWCTBauble ? Baubles.getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
+			wirelessTerminal = isWCTBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
 			magnetItem = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
 		}
 		magnetInventory = new WCTInventoryMagnetFilter(magnetItem);

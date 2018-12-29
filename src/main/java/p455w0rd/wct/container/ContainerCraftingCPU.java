@@ -36,7 +36,7 @@ import appeng.tile.crafting.TileCraftingTile;
 import appeng.util.Platform;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.IContainerListener;
-import p455w0rd.ae2wtlib.container.ContainerWT;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketMEInventoryUpdate;
 import p455w0rd.wct.sync.packets.PacketValueConfig;

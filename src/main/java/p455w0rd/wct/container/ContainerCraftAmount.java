@@ -29,9 +29,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.world.World;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
 import p455w0rd.ae2wtlib.api.networking.security.WTIActionHost;
 import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
-import p455w0rd.ae2wtlib.container.ContainerWT;
 
 public class ContainerCraftAmount extends ContainerWT {
 

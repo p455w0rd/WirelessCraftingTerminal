@@ -68,7 +68,7 @@ dependencies {
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.2.4:universal"
 	deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
 	deobfCompile "p455w0rd:p455w0rdslib:1.12.2-2.0.36"
-	deobfCompile "p455w0rd:AE2WTLib:1.12.2-1.0.5"
+	deobfCompile "p455w0rd:AE2WTLib:1.12.2-1.0.6"
 }
 
 task apiJar(type: Jar) {

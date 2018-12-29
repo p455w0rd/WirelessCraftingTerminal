@@ -38,8 +38,8 @@ import appeng.util.ReadableNumberConverter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.client.gui.GuiWT;
-import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
+import p455w0rd.ae2wtlib.api.WTApi;
+import p455w0rd.ae2wtlib.api.base.GuiWT;
 import p455w0rd.wct.container.ContainerCraftingCPU;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
@@ -90,9 +90,7 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 		craftingCpu = container;
 		ySize = GUI_HEIGHT;
 		xSize = GUI_WIDTH;
-
-		final GuiScrollbar scrollbar = new GuiScrollbar();
-		this.setScrollBar(scrollbar);
+		setScrollBar(WTApi.instance().createScrollbar());
 	}
 
 	public void clearItems() {

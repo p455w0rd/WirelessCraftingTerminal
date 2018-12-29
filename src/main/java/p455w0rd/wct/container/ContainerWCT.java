@@ -61,11 +61,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
 import p455w0rd.ae2wtlib.api.*;
-import p455w0rd.ae2wtlib.container.ContainerWT;
-import p455w0rd.ae2wtlib.container.slot.*;
-import p455w0rd.ae2wtlib.container.slot.NullSlot;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
-import p455w0rd.ae2wtlib.integration.Baubles;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
+import p455w0rd.ae2wtlib.container.slot.SlotTrash;
 import p455w0rd.ae2wtlib.inventory.WTInventoryTrash;
 import p455w0rd.wct.api.IWCTContainer;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
@@ -100,20 +97,20 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 	private IGridNode networkNode;
 
 	public ContainerWCT(EntityPlayer player, ITerminalHost hostIn, int slot, boolean isBauble) {
-		super(player.inventory, getActionHost(getGuiObject(isBauble ? Baubles.getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)), slot, isBauble);
+		super(player.inventory, getActionHost(getGuiObject(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot), player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ)), slot, isBauble);
 
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
 			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
-				addSlotToContainer(boosterSlot = new SlotBooster(boosterInventory, 134, -20));
+				addSlotToContainer(boosterSlot = WTApi.instance().createOldBoosterSlot(getBoosterInventory(), 134, -20));
 				boosterSlot.setContainer(this);
 			}
 			else {
-				addSlotToContainer(boosterSlot = new SlotBoosterEnergy(134, -20));
+				addSlotToContainer(boosterSlot = WTApi.instance().createInfinityBoosterSlot(134, -20));//new SlotBoosterEnergy(134, -20));
 				boosterSlot.setContainer(this);
 			}
 		}
 		else {
-			addSlotToContainer(boosterSlot = new NullSlot());
+			addSlotToContainer(boosterSlot = WTApi.instance().createNullSlot());
 			boosterSlot.setContainer(this);
 		}
 
@@ -166,7 +163,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 		bindPlayerInventory(getPlayerInv(), 8, 0);
 
 		for (int i = 0; i < 4; ++i) {
-			addSlotToContainer(new SlotArmor(player, new InvWrapper(getPlayerInv()), 39 - i, (int) 8.5, (i * 18) - 76, EntityEquipmentSlot.values()[6 - (i + 2)]));
+			addSlotToContainer(WTApi.instance().createArmorSlot(player, new InvWrapper(getPlayerInv()), 39 - i, (int) 8.5, (i * 18) - 76, EntityEquipmentSlot.values()[6 - (i + 2)]));
 		}
 
 		final IItemHandler crafting = getInventoryByName("crafting");
@@ -179,7 +176,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 		IActionSource actionSource = ReflectionHelper.getPrivateValue(AEBaseContainer.class, this, "mySrc");
 		addSlotToContainer(outputSlot = new SlotCraftingOutput(getPlayerInv().player, actionSource, getPowerSource(), getGuiObject(), crafting, crafting, output, Mods.BAUBLES.isLoaded() ? 142 : 174, -58, this));
 		addSlotToContainer(magnetSlot = new SlotMagnet(magnetInventory, 152, -20));
-		addSlotToContainer(new SlotTrash(trashInventory, 98, -22));
+		addSlotToContainer(WTApi.instance().createTrashSlot(trashInventory, 98, -22));
 		addSlotToContainer(new AppEngSlot(new InvWrapper(getPlayerInv()), 40, 80, -22) {
 			@Override
 			public boolean isItemValid(ItemStack stack) {
@@ -202,7 +199,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 		}
 
 		if (Mods.BAUBLES.isLoaded()) {
-			Baubles.addBaubleSlots(this, player);
+			WTApi.instance().getBaublesUtility().addBaubleSlots(this, player);
 		}
 
 		readNBT();
@@ -225,11 +222,12 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 		return getMagnetSlot().getStack();
 	}
 
-	public static WTGuiObject<IAEItemStack, IItemStorageChannel> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	@SuppressWarnings("unchecked")
+	public static WTGuiObject<IAEItemStack> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (!it.isEmpty()) {
 			IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh instanceof ICustomWirelessTermHandler) {
-				return new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, it, player, w, x, y, z);
+				return (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject((ICustomWirelessTermHandler) wh, it, player);
 			}
 		}
 		return null;
@@ -773,7 +771,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 
 	public int getBaublesIndex() {
 		for (int i = 0; i < inventorySlots.size(); i++) {
-			if (Baubles.isAEBaubleSlot(inventorySlots.get(i))) {
+			if (WTApi.instance().getBaublesUtility().isAEBaubleSlot(inventorySlots.get(i))) {
 				return i;
 			}
 		}
@@ -987,7 +985,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer, IMEMonit
 							return ItemStack.EMPTY;
 						}
 					}
-					else if (Mods.BAUBLES.isLoaded() && Baubles.isBaubleItem(tis) && WTApi.instance().getConfig().shiftClickBaublesEnabled()) {
+					else if (Mods.BAUBLES.isLoaded() && WTApi.instance().getBaublesUtility().isBaubleItem(tis) && WTApi.instance().getConfig().shiftClickBaublesEnabled()) {
 						ItemStack tisCopy = tis.copy();
 						tisCopy.setCount(1);
 						if (mergeItemStack(tisCopy, getBaublesIndex(), getBaublesIndex() + 7, false)) {

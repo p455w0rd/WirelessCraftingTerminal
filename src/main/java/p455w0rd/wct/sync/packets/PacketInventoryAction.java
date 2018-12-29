@@ -30,7 +30,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import p455w0rd.ae2wtlib.container.ContainerWT;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModGuiHandler;

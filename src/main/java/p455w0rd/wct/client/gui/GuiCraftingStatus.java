@@ -27,7 +27,7 @@ import appeng.core.localization.GuiText;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
+import p455w0rd.ae2wtlib.api.WTGuiObject;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiTabButton;
 import p455w0rd.wct.container.ContainerCraftingStatus;
@@ -54,7 +54,6 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 			ItemStack is = new ItemStack(ModItems.WCT);
 			((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 			myIcon = is;
-
 			originalGui = ModGuiHandler.GUI_WCT;
 		}
 	}

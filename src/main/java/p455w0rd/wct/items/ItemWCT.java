@@ -31,9 +31,9 @@ import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.client.render.StackSizeRenderer.ReadableNumberConverter;
 import p455w0rd.ae2wtlib.items.ItemWT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.util.WCTUtils;
@@ -101,7 +101,7 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 		String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
 			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
-				list.add(I18n.format("item.infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
+				list.add(I18n.format("item.ae2wtlib:infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
 			}
 			else {
 				int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(is);
@@ -116,7 +116,7 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 				}
 				String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
 				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
-				String infinityEnergyString = WTApi.instance().isWTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount));
+				String infinityEnergyString = WTApi.instance().isWTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ItemStackSizeRenderer.getInstance().getSlimConverter().toSlimReadableForm(infinityEnergyAmount));
 				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
 			}
 		}

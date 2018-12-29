@@ -20,7 +20,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import p455w0rd.ae2wtlib.container.ContainerWT;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;

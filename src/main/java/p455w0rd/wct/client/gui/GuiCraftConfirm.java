@@ -17,10 +17,7 @@ package p455w0rd.wct.client.gui;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -37,9 +34,9 @@ import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.client.gui.GuiWT;
-import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
+import p455w0rd.ae2wtlib.api.WTApi;
+import p455w0rd.ae2wtlib.api.WTGuiObject;
+import p455w0rd.ae2wtlib.api.base.GuiWT;
 import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModNetworking;
@@ -69,13 +66,9 @@ public class GuiCraftConfirm extends GuiWT {
 		super(new ContainerCraftConfirm(inventoryPlayer, te, isBauble, wctSlot));
 		xSize = 238;
 		ySize = 206;
-
-		final GuiScrollbar scrollbar = new GuiScrollbar();
-		this.setScrollBar(scrollbar);
-
+		setScrollBar(WTApi.instance().createScrollbar());
 		ccc = (ContainerCraftConfirm) inventorySlots;
 		this.inventoryPlayer = inventoryPlayer;
-
 		if (te instanceof WTGuiObject) {
 			OriginalGui = ModGuiHandler.GUI_WCT;
 		}

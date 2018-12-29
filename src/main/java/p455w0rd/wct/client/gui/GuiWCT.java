@@ -42,11 +42,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.client.gui.GuiWT;
-import p455w0rd.ae2wtlib.client.gui.widgets.GuiScrollbar;
-import p455w0rd.ae2wtlib.client.render.StackSizeRenderer.ReadableNumberConverter;
-import p455w0rd.ae2wtlib.container.ContainerWT;
+import p455w0rd.ae2wtlib.api.base.ContainerWT;
+import p455w0rd.ae2wtlib.api.base.GuiWT;
 import p455w0rd.ae2wtlib.container.slot.SlotTrash;
+import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.client.gui.widgets.*;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingOutput;
@@ -114,11 +113,10 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		standardSize = xSize;
 		setReservedSpace(73);
 		containerWCT = (ContainerWCT) container;
-		scrollBar = new GuiScrollbar();
+		setScrollBar(WTApi.instance().createScrollbar());
 		subGui = switchingGuis;
 		switchingGuis = false;
-		setScrollBar(scrollBar);
-		repo = new ItemRepo(scrollBar, this);
+		repo = new ItemRepo(getScrollBar(), this);
 		configSrc = containerWCT.getConfigManager();
 		devicePowered = containerWCT.isPowered();
 		((ContainerWCT) inventorySlots).setGui(this);
@@ -126,7 +124,29 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		isHalloween = calendar.get(2) + 1 == 10 && calendar.get(5) == 31;
+	}
 
+	@Override
+	public void drawSlot(final Slot s) {
+		if (s instanceof SlotME) {
+			try {
+				zLevel = 100.0F;
+				itemRender.zLevel = 100.0F;
+				if (!isPowered()) {
+					drawRect(s.xPos, s.yPos, 16 + s.xPos, 16 + s.yPos, 0x66111111);
+				}
+				zLevel = 0.0F;
+				itemRender.zLevel = 0.0F;
+				super.drawSlot(new Size1Slot((SlotME) s));
+				ItemStackSizeRenderer.getInstance().renderStackSize(fontRenderer, ((SlotME) s).getAEStack(), s.xPos, s.yPos);
+			}
+			catch (final Exception err) {
+			}
+			return;
+		}
+		else {
+			super.drawSlot(s);
+		}
 	}
 
 	public void postUpdate(final List<IAEItemStack> list) {
@@ -147,9 +167,8 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			final int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
 			mouseWheelEvent(x, y, i / Math.abs(i));
 		}
-		else if (i != 0 && scrollBar != null) {
-
-			scrollBar.wheel(i);
+		else if (i != 0 && getScrollBar() != null) {
+			getScrollBar().wheel(i);
 		}
 	}
 
@@ -179,11 +198,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private void setScrollBar() {
 		getScrollBar().setTop(18).setLeft(174).setHeight(rows * 18 - 2);
 		getScrollBar().setRange(0, (repo.size() + perRow - 1) / perRow - rows, Math.max(1, rows / 6));
-	}
-
-	@Override
-	protected void setScrollBar(final GuiScrollbar myScrollBar) {
-		scrollBar = myScrollBar;
 	}
 
 	@Override
@@ -677,8 +691,8 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		ySize_lo = mouseY;
 
 		final boolean hasClicked = Mouse.isButtonDown(0);
-		if (hasClicked && scrollBar != null) {
-			scrollBar.click(this, mouseX - guiLeft, mouseY - guiTop);
+		if (hasClicked && getScrollBar() != null) {
+			getScrollBar().click(this, mouseX - guiLeft, mouseY - guiTop);
 		}
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -692,21 +706,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		final int ox = guiLeft;
-		final int oy = guiTop;
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-		if (scrollBar != null) {
-			scrollBar.draw(this);
-		}
-		drawFG(ox, oy, mouseX, mouseY);
-
-	}
-
-	@Override
 	public void drawFG(int offsetX, int offsetY, int mouseX, int mouseY) {
-		super.drawFG(offsetX, offsetY, mouseX, mouseY);
 		String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
@@ -721,7 +721,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			}
 			if (!WTApi.instance().isWTCreative(getWirelessTerminal()) && isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
 				String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
-				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ReadableNumberConverter.INSTANCE.toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
+				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ItemStackSizeRenderer.getInstance().getSlimConverter().toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
 				drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
 			}
 		}
@@ -890,11 +890,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	public void bindTexture(final String file) {
 		final ResourceLocation loc = new ResourceLocation(ModGlobals.MODID, "textures/" + file);
 		mc.getTextureManager().bindTexture(loc);
-	}
-
-	@Override
-	protected GuiScrollbar getScrollBar() {
-		return scrollBar;
 	}
 
 	@Override

@@ -48,8 +48,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
-import p455w0rd.ae2wtlib.api.ICustomWirelessTermHandler;
-import p455w0rd.ae2wtlib.helpers.WTGuiObject;
+import p455w0rd.ae2wtlib.api.*;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.sync.WCTPacket;
@@ -93,11 +92,12 @@ public class PacketJEIRecipe extends WCTPacket {
 		configureWrite(data);
 	}
 
-	private WTGuiObject<IAEItemStack, IItemStorageChannel> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	@SuppressWarnings("unchecked")
+	private WTGuiObject<IAEItemStack> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
 			final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
-				return new WTGuiObject<IAEItemStack, IItemStorageChannel>(wh, it, player, w, x, y, z);
+				return (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, it, player);
 			}
 		}
 
@@ -117,7 +117,7 @@ public class PacketJEIRecipe extends WCTPacket {
 				if (wct.isEmpty() || !(wct.getItem() instanceof IWirelessCraftingTerminalItem)) {
 					return;
 				}
-				WTGuiObject<IAEItemStack, IItemStorageChannel> obj = getGuiObject(wct, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+				WTGuiObject<IAEItemStack> obj = getGuiObject(wct, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
 				if (obj != null) {
 					node = obj.getActionableNode(((IWirelessCraftingTerminalItem) wct.getItem()).checkForBooster(wct));
 				}
