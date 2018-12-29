@@ -20,11 +20,11 @@ import p455w0rd.ae2wtlib.api.WTApi;
 public class ModGlobals {
 
 	public static final String MODID = "wct";
-	public static final String VERSION = "3.11.86";
+	public static final String VERSION = "3.11.87";
 	public static final String NAME = "Wireless Crafting Terminal";
 	public static final String SERVER_PROXY = "p455w0rd.wct.proxy.CommonProxy";
 	public static final String CLIENT_PROXY = "p455w0rd.wct.proxy.ClientProxy";
-	public static final String DEP_LIST = "required-after:ae2wtlib@[1.0.5,);required-after:appliedenergistics2@[rv6-stable-4,);required-after:p455w0rdslib@[2.0.35,);after:baubles;after:mousetweaks;after:itemscroller";
+	public static final String DEP_LIST = "required-after:ae2wtlib@[1.0.6,);required-after:appliedenergistics2@[rv6-stable-6,);required-after:p455w0rdslib@[2.0.35,);after:baubles;after:mousetweaks;after:itemscroller";
 	public static final String CONFIG_FILE = WTApi.instance().getConfig().getConfigFile();
 
 }
