@@ -18,13 +18,13 @@ package p455w0rd.wct.items;
 import java.util.List;
 
 import appeng.core.localization.GuiText;
+import appeng.core.localization.PlayerMessages;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
@@ -33,9 +33,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.items.ItemWT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.init.ModGlobals;
-import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -59,12 +59,19 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack item = player.getHeldItem(hand);
-		if (!world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			ModGuiHandler.open(ModGuiHandler.GUI_WCT, player, world, player.getPosition(), false, false, player.inventory.currentItem);
+		if (world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
+			WCTApi.instance().openWCTGui(player, false, player.inventory.currentItem);
 			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 		}
-		if (getAECurrentPower(item) <= 0 && !world.isRemote) {
-			player.sendMessage(new TextComponentString("No Power"));
+		else if (!world.isRemote) {
+			if (getAECurrentPower(item) <= 0) {
+				player.sendMessage(PlayerMessages.DeviceNotPowered.get());
+				return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+			}
+			if (!WCTApi.instance().isTerminalLinked(item)) {
+				player.sendMessage(PlayerMessages.DeviceNotLinked.get());
+				return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+			}
 		}
 		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
 	}

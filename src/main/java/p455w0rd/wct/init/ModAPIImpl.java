@@ -70,7 +70,8 @@ public class ModAPIImpl extends WCTApi {
 		}
 	}
 
-	private boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
+	@Override
+	public boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
 		String sourceKey = "";
 		if (wirelessTerminalItemstack.getItem() instanceof IWirelessCraftingTerminalItem && wirelessTerminalItemstack.hasTagCompound()) {
 			sourceKey = ((IWirelessCraftingTerminalItem) wirelessTerminalItemstack.getItem()).getEncryptionKey(wirelessTerminalItemstack);

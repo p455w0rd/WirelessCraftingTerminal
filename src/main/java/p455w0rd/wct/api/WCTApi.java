@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 
 public abstract class WCTApi {
 
@@ -45,5 +46,7 @@ public abstract class WCTApi {
 
 	// use False and -1 for isWCTaBauble and wctSlot for held magnet item
 	public abstract void openMagnetGui(EntityPlayer player, boolean isWCTaBauble, int wctSlot);
+
+	public abstract boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack);
 
 }
