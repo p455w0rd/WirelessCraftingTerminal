@@ -1,0 +1,57 @@
+// Items
+item.wct:wct.name=Беспроводной терминал создания
+item.wct:wct_creative.name=Творческий беспроводной терминал создания
+item.wct:magnet_card.name=Магнитная карта
+
+// Blocks
+tile.advanced_charger.name=Улучшенный заряжатель (WIP)
+
+// Tooltips
+tooltip.press_shift.desc=<Нажмите Shift>
+tooltip.magnet.desc=Магнит, который автоматически помещает предметы в AE сеть.
+tooltip.magnet_set_filter.desc=Щёлкните пкм, чтобы установить фильтр 
+tooltip.or_press.desc=или нажмите
+tooltip.press.desc=Нажмите
+tooltip.status.desc=Состояние
+tooltip.active.desc=Активен
+tooltip.inactive.desc=Неактивен
+tooltip.to_switch.desc=сменить режим
+tooltip.magnet_active_1.desc=Доп. предметы, добавленные в инвентарь
+tooltip.magnet_active_2.desc=Доп. предметы, оставленные на земле
+tooltip.magnet_whitelisting.desc=Белый список
+tooltip.magnet_blacklisting.desc=Чёрный список
+tooltip.filter_mode.desc=Режим фильтра
+tooltip.not.desc=Нет
+tooltip.ignoring.desc=Игнорирование
+tooltip.nbt.desc=NBT-данные
+tooltip.meta.desc=Метаданные
+tooltip.oredict.desc=Словарь руд
+tooltip.using.desc=Применение
+tooltip.filtered_items.desc=Отфильтрованные предметы
+tooltip.only_works.desc=Работает только когда в слоте Беспроводной терминал создания!
+tooltip.units.desc=Единицы
+tooltip.shiftcraft.title=Shift-щелчок по выходу
+tooltip.shiftcraft.desc_pre=Shift-щелчок на выходном слоте\nсетки создания, отправит предметы в
+tooltip.shiftcraft.to_network=связанную ME сеть
+tooltip.shiftcraft.to_inventory=вашего инвентаря
+
+// Chat Messages
+chatmessages.magnet_deactivated.desc=Магнитная карта деактивирована
+chatmessages.magnet_activated.desc=Магнитная карта активирована
+chatmessages.magnet_init.desc=Вам необходимо сначала щёлкнуть пкм с магнитной картой в руке, прежде чем использовать бинды!
+
+// Keybindings
+key.open_wct.desc=Открыть беспроводной терминал создания
+key.open_magnet.desc=Открыть GUI фильтра магнитной карты
+key.switch_magnet_mode.desc=Активировать/деактивировать магнитную карту
+
+// GUI
+gui.title.magnet_filter=Магнитный фильтр
+gui.openmagnetgui=Открыть GUI магнитного фильтра
+gui.openmagnetgui.desc=Открывает фильтр магнитной карты
+gui.openmagnetgui.desc2=GUI для настройки фильтруемых предметов
+gui.magnetmode=Режим магнита
+
+// JEI
+jei.wct.desc=Беспроводная версия Терминал создания AE2. Чтобы функционировать, он должен быть подключён к ME сети через Терминал безопасности. Keybind может быть установлен в Настройки->Управление, чтобы открыть GUI.
+jei.magnet_card.desc=Магнит, который может автоматически помещать предметы в подключённую ME сеть. Shift+правый клик, чтобы изменить режим (Режимы также можно переключать через keybind). Щёлкните пкм, чтобы открыть GUI фильтра (это также можно с помощью keybound).
