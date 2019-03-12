@@ -36,7 +36,6 @@ import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.init.ModGlobals;
-import p455w0rd.wct.util.WCTUtils;
 
 /**
  * @author p455w0rd
@@ -79,7 +78,7 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(final ItemStack is, final World world, final List<String> list, final ITooltipFlag advancedTooltips) {
-		if (getPlayer() == null || WCTUtils.getGUIObject(is, getPlayer()) == null) {
+		if (getPlayer() == null || WTApi.instance().getGUIObject(is, getPlayer()) == null) {
 			return;
 		}
 		String encKey = getEncryptionKey(is);
@@ -132,17 +131,10 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 
 	@Override
 	public void onUpdate(final ItemStack wirelessTerminal, final World w, final Entity e, int i, boolean f) {
-		if (!(e instanceof EntityPlayer)) {
-			return;
-		}
-		EntityPlayer p = (EntityPlayer) e;
-		if (getPlayer() == null) {
-			setPlayer(p);
-		}
+		super.onUpdate(wirelessTerminal, w, e, i, f);
 		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
 			return;
 		}
-		super.onUpdate(wirelessTerminal, w, e, i, f);
 		ItemMagnet.isMagnetInstalled(wirelessTerminal);
 	}
 

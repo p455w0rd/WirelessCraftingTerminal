@@ -15,7 +15,7 @@
  */
 package p455w0rd.wct.init;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -53,7 +53,6 @@ import p455w0rd.wct.util.WCTUtils;
 public class ModEvents {
 
 	public static long CLIENT_TICKS = 0L;
-	public static long SERVER_TICKS = 0L;
 
 	@SubscribeEvent
 	public static void onItemRegistryReady(RegistryEvent.Register<Item> event) {
@@ -67,15 +66,15 @@ public class ModEvents {
 			return;
 		}
 		InventoryPlayer playerInv = player.inventory;
-		List<Pair<Boolean, Pair<Integer, ItemStack>>> terminals = WCTUtils.getCraftingTerminals(player);
+		Set<Pair<Boolean, Pair<Integer, ItemStack>>> terminals = WCTUtils.getCraftingTerminals(player);
 		int invSize = playerInv.getSizeInventory();
 		if (invSize <= 0) {
 			return;
 		}
-		for (int i = 0; i < terminals.size(); i++) {
-			ItemStack wct = terminals.get(i).getRight().getRight();
+		for (Pair<Boolean, Pair<Integer, ItemStack>> termPair : terminals) {
+			ItemStack wct = termPair.getRight().getRight();
 			if (!ItemMagnet.getMagnetFromWCT(wct).isEmpty()) {
-				((ItemMagnet) ItemMagnet.getMagnetFromWCT(wct).getItem()).doMagnet(player, wct, terminals.get(i).getLeft(), terminals.get(i).getRight().getLeft());
+				((ItemMagnet) ItemMagnet.getMagnetFromWCT(wct).getItem()).doMagnet(player, wct, termPair.getLeft(), termPair.getRight().getLeft());
 			}
 		}
 	}

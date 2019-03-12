@@ -51,6 +51,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -208,7 +209,7 @@ public class ItemMagnet extends ItemBase {
 		ItemStack item = player.getHeldItem(hand);
 		if (world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty()) {
 			if (!isMagnetInitialized(item)) {
-				ModNetworking.instance().sendToServer(new PacketMagnetFilterHeld(0, true));
+				ModNetworking.instance().sendToServer(new PacketMagnetFilterHeld(MagnetItemMode.INIT, true));
 			}
 			if (player.isSneaking()) {
 				cycleMagnetFunctionModeHeld(player);
@@ -231,7 +232,8 @@ public class ItemMagnet extends ItemBase {
 		distanceFromPlayer = 6;
 		NonNullList<ItemStack> filteredList = getFilteredItems(magnet);
 		// items
-		Iterator<Entity> iterator = getEntitiesInRange(EntityItem.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
+
+		Iterator<Entity> iterator = getEntitiesInRange(EntityItem.class, world, player.getPosition(), distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
 			EntityItem itemToGet = (EntityItem) iterator.next();
 			if (itemToGet == null) {
@@ -241,7 +243,7 @@ public class ItemMagnet extends ItemBase {
 				continue;
 			}
 			// Demagnetize integration
-			if (itemToGet.getEntityData() != null && itemToGet.getEntityData().hasKey("PreventRemoteMovement")) {
+			if (itemToGet.getEntityData().hasKey("PreventRemoteMovement")) {
 				return;
 			}
 			ItemStack itemStackToGet = itemToGet.getItem();
@@ -249,7 +251,7 @@ public class ItemMagnet extends ItemBase {
 				return;
 			}
 			int stackSize = itemStackToGet.getCount();
-			WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+			WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player);
 			boolean ignoreRange = WTApi.instance().hasInfiniteRange(wirelessTerminal);
 			boolean hasAxxess = hasNetworkAccess(SecurityPermissions.INJECT, true, player, wirelessTerminal);
 			if ((ignoreRange && hasAxxess) || (obj.rangeCheck() && hasAxxess)) {
@@ -286,7 +288,7 @@ public class ItemMagnet extends ItemBase {
 		}
 
 		// xp
-		iterator = getEntitiesInRange(EntityXPOrb.class, world, (int) player.posX, (int) player.posY, (int) player.posZ, distanceFromPlayer).iterator();
+		iterator = getEntitiesInRange(EntityXPOrb.class, world, player.getPosition(), distanceFromPlayer).iterator();
 		while (iterator.hasNext()) {
 			EntityXPOrb xpToGet = (EntityXPOrb) iterator.next();
 			if (xpToGet.isDead || xpToGet.isInvisible()) {
@@ -319,7 +321,7 @@ public class ItemMagnet extends ItemBase {
 				return true;
 			}
 		}
-		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player);
 		IEnergySource powerSrc = obj;
 		IActionSource mySrc = new WTPlayerSource(player, obj);
 		ais = Platform.poweredInsert(powerSrc, obj, ais, mySrc);
@@ -421,7 +423,7 @@ public class ItemMagnet extends ItemBase {
 		if (player.capabilities.isCreativeMode) {
 			return true;
 		}
-		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerm, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+		WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerm, player);
 		final IGrid g = obj.getTargetGrid();
 		if (g != null) {
 			if (requirePower) {
@@ -503,80 +505,50 @@ public class ItemMagnet extends ItemBase {
 			if (nbtTC.hasKey(WHITELISTING_NBT)) {
 				return nbtTC.getBoolean(WHITELISTING_NBT);
 			}
-			else {
-				return true;
-			}
+			return true;
 		}
 		else if (type == 2) {
 			if (nbtTC.hasKey(IGNORE_NBT)) {
 				return nbtTC.getBoolean(IGNORE_NBT);
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
 		else if (type == 3) {
 			if (nbtTC.hasKey(IGNORE_META_NBT)) {
 				return nbtTC.getBoolean(IGNORE_META_NBT);
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
 		else if (type == 4) {
 			if (nbtTC.hasKey(USE_OREDICT_NBT)) {
 				return nbtTC.getBoolean(USE_OREDICT_NBT);
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
-		else {
-			return true;
-		}
+		return true;
 	}
 
-	public static void setItemMode(@Nonnull ItemStack magnet, int type, boolean mode) {
+	public static void setItemMode(@Nonnull ItemStack magnet, MagnetItemMode whichMode, boolean isActive) {
 		if (!magnet.isEmpty()) {
 			if (!magnet.hasTagCompound()) {
 				magnet.setTagCompound(new NBTTagCompound());
 			}
-			NBTTagCompound nbt = magnet.getTagCompound();
-
-			if (type == 0) {
-				nbt.setBoolean(INIT_NBT, mode);
-			}
-			else if (type == 1) {
-				nbt.setBoolean(WHITELISTING_NBT, mode);
-			}
-			else if (type == 2) {
-				nbt.setBoolean(IGNORE_NBT, mode);
-			}
-			else if (type == 3) {
-				nbt.setBoolean(IGNORE_META_NBT, mode);
-			}
-			else if (type == 4) {
-				nbt.setBoolean(USE_OREDICT_NBT, mode);
-			}
-			else {
-				return;
-			}
+			magnet.getTagCompound().setBoolean(whichMode.getNBTKey(), isActive);
 		}
 	}
 
-	private WTGuiObject<IAEItemStack> getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
+	private WTGuiObject<IAEItemStack> getGuiObject(@Nonnull final ItemStack it, final EntityPlayer player) {
 		if (!it.isEmpty()) {
 			final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
 				return (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, it, player);
 			}
 		}
-
 		return null;
 	}
 
-	public static List<Entity> getEntitiesInRange(Class<? extends Entity> entityType, World world, int x, int y, int z, int distance) {
-		return world.getEntitiesWithinAABB(entityType, new AxisAlignedBB(x - distance, y - distance, z - distance, x + distance, y + distance, z + distance));
+	public static List<Entity> getEntitiesInRange(Class<? extends Entity> entityType, World world, BlockPos playerPos, int distance) {
+		return world.getEntitiesWithinAABB(entityType, new AxisAlignedBB(playerPos.down(distance).west(distance).south(distance), playerPos.up(distance).east(distance).north(distance)));
 	}
 
 	@Nonnull
@@ -660,7 +632,7 @@ public class ItemMagnet extends ItemBase {
 			return MagnetFunctionMode.INACTIVE;
 		}
 		if (!magnet.hasTagCompound()) {
-			setItemMode(magnet, 0, true);
+			setItemMode(magnet, MagnetItemMode.INIT, true);
 		}
 		MagnetFunctionMode mode = cycleMagnetFunctionMode(magnet);
 		if (!(player instanceof EntityPlayerMP)) {
@@ -678,7 +650,7 @@ public class ItemMagnet extends ItemBase {
 			return;
 		}
 		if (!magnet.hasTagCompound()) {
-			ItemMagnet.setItemMode(magnet, 0, true);
+			ItemMagnet.setItemMode(magnet, MagnetItemMode.INIT, true);
 		}
 		MagnetFunctionMode mode = cycleMagnetFunctionMode(magnet);
 		if (!(player instanceof EntityPlayerMP)) {
@@ -751,6 +723,7 @@ public class ItemMagnet extends ItemBase {
 			ACTIVE_LEAVE_ON_GROUND(I18n.translateToLocal("chatmessages.magnet_activated.desc") + " - " + I18n.translateToLocal("tooltip.magnet_active_2.desc"));
 
 		String message;
+
 		public static MagnetFunctionMode[] VALUES = new MagnetFunctionMode[] {
 				INACTIVE, ACTIVE_KEEP_IN_INVENTORY, ACTIVE_LEAVE_ON_GROUND
 		};
@@ -761,6 +734,42 @@ public class ItemMagnet extends ItemBase {
 
 		public String getMessage() {
 			return message;
+		}
+
+	}
+
+	/*
+	 * nbt.setBoolean(INIT_NBT, mode);
+			}
+			else if (type == 1) {
+				nbt.setBoolean(WHITELISTING_NBT, mode);
+			}
+			else if (type == 2) {
+				nbt.setBoolean(IGNORE_NBT, mode);
+			}
+			else if (type == 3) {
+				nbt.setBoolean(IGNORE_META_NBT, mode);
+			}
+			else if (type == 4) {
+				nbt.setBoolean(USE_OREDICT_NBT, mode);
+	 */
+	public static enum MagnetItemMode {
+
+			INIT(INIT_NBT), WHITELIST(WHITELISTING_NBT), IGNORENBT(IGNORE_NBT), IGNOREMETA(IGNORE_META_NBT),
+			USEOREDICT(USE_OREDICT_NBT);
+
+		String nbtKey;
+
+		public static MagnetItemMode[] VALUES = new MagnetItemMode[] {
+				INIT, WHITELIST, IGNORENBT, IGNOREMETA, USEOREDICT
+		};
+
+		MagnetItemMode(String nbtKey) {
+			this.nbtKey = nbtKey;
+		}
+
+		public String getNBTKey() {
+			return nbtKey;
 		}
 
 	}

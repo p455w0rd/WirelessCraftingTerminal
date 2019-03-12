@@ -19,6 +19,7 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import p455w0rd.ae2wtlib.api.WTApi;
 
 /**
  * @author p455w0rd
@@ -31,7 +32,7 @@ public class ModKeybindings {
 	//public static KeyBinding changeMagnetMode;
 
 	public static void preInit() {
-		openTerminal = new KeyBinding("key.open_wct.desc", Keyboard.CHAR_NONE, "itemGroup.ae2wtlib");
+		openTerminal = new KeyBinding("key.open_wct.desc", Keyboard.CHAR_NONE, WTApi.instance().getConstants().getItemGroup());
 		//openMagnetFilter = new KeyBinding("key.open_magnet.desc", Keyboard.CHAR_NONE, "itemGroup.ae2wtlib");
 		//changeMagnetMode = new KeyBinding("key.switch_magnet_mode.desc", Keyboard.CHAR_NONE, "itemGroup.ae2wtlib");
 		ClientRegistry.registerKeyBinding(openTerminal);

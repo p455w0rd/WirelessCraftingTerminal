@@ -20,6 +20,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.items.ItemMagnet.MagnetItemMode;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -30,20 +31,20 @@ public class PacketMagnetFilterHeld extends WCTPacket {
 	// 2 = ignore NBT
 	// 3 = ignore meta
 	// 4 = use oredict
-	int whichMode;
+	MagnetItemMode whichMode;
 	boolean modeValue;
 
 	public PacketMagnetFilterHeld(final ByteBuf stream) {
-		whichMode = stream.readInt();
+		whichMode = MagnetItemMode.VALUES[stream.readInt()];
 		modeValue = stream.readBoolean();
 	}
 
-	public PacketMagnetFilterHeld(final int mode, final boolean modeVal) {
+	public PacketMagnetFilterHeld(final MagnetItemMode mode, final boolean modeVal) {
 		modeValue = modeVal;
 		whichMode = mode;
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(getPacketID());
-		data.writeInt(whichMode);
+		data.writeInt(whichMode.ordinal());
 		data.writeBoolean(modeValue);
 		configureWrite(data);
 	}

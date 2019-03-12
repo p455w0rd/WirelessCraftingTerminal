@@ -64,7 +64,7 @@ dependencies {
 	deobfCompile "info.loenwind.autosave:AutoSave:1.12.2-1.0.8"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-	deobfCompile "appeng:appliedenergistics2:rv6-stable-6"
+	deobfCompile "appeng:appliedenergistics2:rv6-stable-4"
 	deobfCompile "cofh:RedstoneFlux:1.12-2.0.2.4:universal"
 	deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.23-16"
 	deobfCompile "p455w0rd:p455w0rdslib:1.12.2-2.0.36"

@@ -44,9 +44,10 @@ public class ModItems {
 	private static final Item[] ITEM_ARRAY = new Item[] {
 			WCT, CREATIVE_WCT, MAGNET_CARD
 	};
+	private static final List<Item> ITEM_LIST = Lists.newArrayList(ITEM_ARRAY);
 
 	public static final List<Item> getList() {
-		return Lists.newArrayList(ITEM_ARRAY);
+		return ITEM_LIST;
 	}
 
 	public static final void register(IForgeRegistry<Item> registry) {

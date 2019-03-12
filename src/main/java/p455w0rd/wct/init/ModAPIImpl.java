@@ -62,10 +62,7 @@ public class ModAPIImpl extends WCTApi {
 			return;
 		}
 		ItemStack is = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
-		if (is.isEmpty()) {
-			return;
-		}
-		if (isTerminalLinked(is)) {
+		if (!is.isEmpty() && isTerminalLinked(is)) {
 			ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WCT, wctSlot, isBauble));
 		}
 	}

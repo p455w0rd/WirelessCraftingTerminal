@@ -15,8 +15,6 @@
  */
 package p455w0rd.wct.integration;
 
-import com.google.common.collect.Lists;
-
 import p455w0rd.wct.init.ModIntegration.Mods;
 
 /**
@@ -27,7 +25,7 @@ public class ItemScroller {
 
 	public static void blackListSlots() {
 		if (Mods.ITEMSCROLLER.isLoaded()) {
-			fi.dy.masa.itemscroller.config.Configs.GUI_BLACKLIST.addAll(Lists.<String>newArrayList("p455w0rd.wct.client.gui.GuiWCT", "p455w0rd.wct.client.gui.GuiWFT"));
+			fi.dy.masa.itemscroller.config.Configs.GUI_BLACKLIST.add("p455w0rd.wct.client.gui.GuiWCT");
 		}
 	}
 

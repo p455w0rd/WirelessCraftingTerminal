@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.items.ItemMagnet.MagnetItemMode;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
@@ -37,26 +38,26 @@ public class PacketMagnetFilterWCT extends WCTPacket {
 	// 2 = ignore NBT
 	// 3 = ignore meta
 	// 4 = use oredict
-	int whichMode;
+	MagnetItemMode whichMode;
 	boolean modeValue;
 	int slot;
 	boolean isBauble;
 
 	public PacketMagnetFilterWCT(final ByteBuf stream) {
-		whichMode = stream.readInt();
+		whichMode = MagnetItemMode.VALUES[stream.readInt()];
 		slot = stream.readInt();
 		isBauble = stream.readBoolean();
 		modeValue = stream.readBoolean();
 	}
 
-	public PacketMagnetFilterWCT(final int mode, final boolean modeVal, boolean isBauble, int slot) {
+	public PacketMagnetFilterWCT(final MagnetItemMode mode, final boolean modeVal, boolean isBauble, int slot) {
 		modeValue = modeVal;
 		whichMode = mode;
 		this.isBauble = isBauble;
 		this.slot = slot;
 		final ByteBuf data = Unpooled.buffer();
 		data.writeInt(getPacketID());
-		data.writeInt(whichMode);
+		data.writeInt(whichMode.ordinal());
 		data.writeInt(slot);
 		data.writeBoolean(isBauble);
 		data.writeBoolean(modeValue);

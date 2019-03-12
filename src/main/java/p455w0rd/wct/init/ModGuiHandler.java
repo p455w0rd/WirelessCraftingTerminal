@@ -38,7 +38,6 @@ import p455w0rd.wct.util.WCTUtils;
  */
 public class ModGuiHandler implements IGuiHandler {
 
-	private static final ModGuiHandler INSTANCE = new ModGuiHandler();
 	public static final int GUI_WCT = 0;
 	public static final int GUI_CRAFT_CONFIRM = 1;
 	public static final int GUI_CRAFT_AMOUNT = 2;
@@ -48,10 +47,6 @@ public class ModGuiHandler implements IGuiHandler {
 	private static int slot = -1;
 	private static boolean isBauble = false;
 	private static boolean isMagnetHeld = false;
-
-	public static ModGuiHandler getInstance() {
-		return INSTANCE;
-	}
 
 	public static boolean isBauble() {
 		return isBauble;
@@ -136,9 +131,6 @@ public class ModGuiHandler implements IGuiHandler {
 
 	@SuppressWarnings("unchecked")
 	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos, boolean isBauble, int slot) {
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
 		ItemStack wirelessTerminal = ItemStack.EMPTY;
 		if (slot >= 0) {
 			wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WTApi.instance().getWTBySlot(player, slot);

@@ -15,10 +15,9 @@
  */
 package p455w0rd.wct.util;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,7 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.ae2wtlib.api.*;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.container.ContainerWCT;
@@ -42,7 +41,7 @@ public class WCTUtils {
 
 	// Parent pair contains a boolean which tells whether or not this is a bauble slot
 	// Child pair gives the slot number and ItemStack
-	public static List<Pair<Boolean, Pair<Integer, ItemStack>>> getCraftingTerminals(EntityPlayer player) {
+	public static Set<Pair<Boolean, Pair<Integer, ItemStack>>> getCraftingTerminals(EntityPlayer player) {
 		return WTApi.instance().getAllWirelessTerminalsByType(player, IWirelessCraftingTerminalItem.class);
 	}
 
@@ -99,6 +98,7 @@ public class WCTUtils {
 		return wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem;
 	}
 
+	/*
 	public static WTGuiObject<?> getGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
 		if (wirelessTerm == null) {
 			if (player.openContainer instanceof ContainerWCT) {
@@ -117,6 +117,7 @@ public class WCTUtils {
 		}
 		return null;
 	}
+	*/
 
 	@SideOnly(Side.CLIENT)
 	public static void handleKeybind() {

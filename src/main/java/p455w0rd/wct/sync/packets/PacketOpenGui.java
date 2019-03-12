@@ -56,10 +56,8 @@ public class PacketOpenGui extends WCTPacket {
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		if (player.openContainer instanceof ContainerPlayer) {
-			if (slot >= 0) {
-				ModGuiHandler.open(whichGui, player, player.getEntityWorld(), new BlockPos((int) player.posX, (int) player.posY, (int) player.posZ), false, isBauble, slot);
-			}
+		if (player.openContainer instanceof ContainerPlayer && slot >= 0) {
+			ModGuiHandler.open(whichGui, player, player.getEntityWorld(), new BlockPos((int) player.posX, (int) player.posY, (int) player.posZ), false, isBauble, slot);
 		}
 	}
 

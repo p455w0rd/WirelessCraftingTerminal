@@ -44,6 +44,8 @@ import net.minecraftforge.fml.common.Loader;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.api.base.ContainerWT;
 import p455w0rd.ae2wtlib.api.base.GuiWT;
+import p455w0rd.ae2wtlib.api.client.gui.widgets.*;
+import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiTrashButton;
 import p455w0rd.ae2wtlib.container.slot.SlotTrash;
 import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.client.gui.widgets.*;
@@ -80,7 +82,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private final IConfigManager configSrc;
 	private GuiTabButton craftingStatusBtn;
 	private GuiMagnetButton magnetGUIButton;
-	private MEGuiTextField searchField;
+	private GuiMETextField searchField;
 	private int perRow = 9;
 	private boolean customSortOrder = true;
 	private GuiImgButton ViewBox;
@@ -209,16 +211,11 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 		if (btn instanceof GuiImgButton) {
 			final boolean backwards = Mouse.isButtonDown(1);
-
 			final GuiImgButton iBtn = (GuiImgButton) btn;
 			if (iBtn.getSetting() != Settings.ACTIONS) {
 				final Enum<?> cv = iBtn.getCurrentValue();
 				final Enum<?> next = Platform.rotateEnum(cv, backwards, iBtn.getSetting().getPossibleValues());
-
-				if (btn == terminalStyleBox) {
-					AEConfig.instance().getConfigManager().putSetting(iBtn.getSetting(), next);
-				}
-				if (btn == searchBoxSettings) {
+				if (btn == terminalStyleBox || btn == searchBoxSettings) {
 					AEConfig.instance().getConfigManager().putSetting(iBtn.getSetting(), next);
 				}
 				else {
@@ -228,7 +225,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 					catch (final IOException e) {
 					}
 				}
-
 				iBtn.set(next);
 
 				if (next.getClass() == SearchBoxMode.class || next.getClass() == TerminalStyle.class) {
@@ -243,7 +239,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 						s = (Slot) j;
 					}
 				}
-
 				if (s != null) {
 					final PacketInventoryAction p = new PacketInventoryAction(InventoryAction.MOVE_REGION, s.slotNumber, 0);
 					ModNetworking.instance().sendToServer(p);
@@ -259,7 +254,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 						s = (Slot) j;
 					}
 				}
-
 				if (s != null) {
 					if (s.getHasStack()) {
 						containerWCT.getTrashSlot().clearStack();
@@ -288,9 +282,9 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		final Slot slot = getSlot(x, y);
 		final ItemStack itemstack = ((EntityPlayer) entity).inventory.getItemStack();
 
-		if (getScrollBar() != null) {
-			getScrollBar().click(this, x - guiLeft, y - guiTop);
-		}
+		//if (getScrollBar() != null) {
+		//	getScrollBar().click(this, x - guiLeft, y - guiTop);
+		//}
 		if (slot instanceof SlotFake && itemstack != null) {
 			drag_click.add(slot);
 			if (drag_click.size() > 1) {
@@ -556,7 +550,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			buttonList.add(magnetModeBox = new GuiImgButtonMagnetMode(guiLeft - 18, offset, containerWCT));
 		}
 
-		searchField = new MEGuiTextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
+		searchField = new GuiMETextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
 		searchField.setMaxStringLength(25);
 		searchField.setTextColor(0xFFFFFF);
@@ -840,7 +834,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		return ((ContainerWCT) inventorySlots).getCustomName();
 	}
 
-	public MEGuiTextField getSearchField() {
+	public GuiMETextField getSearchField() {
 		return searchField;
 	}
 

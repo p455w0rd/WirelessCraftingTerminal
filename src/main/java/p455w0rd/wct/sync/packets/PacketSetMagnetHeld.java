@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemMagnet.MagnetFunctionMode;
+import p455w0rd.wct.items.ItemMagnet.MagnetItemMode;
 import p455w0rd.wct.sync.WCTPacket;
 import p455w0rd.wct.sync.network.INetworkInfo;
 
@@ -48,7 +49,7 @@ public class PacketSetMagnetHeld extends WCTPacket {
 			return;
 		}
 		if (!magnetItem.hasTagCompound()) {
-			ItemMagnet.setItemMode(magnetItem, 0, true);
+			ItemMagnet.setItemMode(magnetItem, MagnetItemMode.INIT, true);
 		}
 		ItemMagnet.setMagnetFunctionMode(magnetItem, mode);
 	}
