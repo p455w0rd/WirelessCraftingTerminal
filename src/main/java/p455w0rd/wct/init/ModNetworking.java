@@ -23,9 +23,9 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import p455w0rd.ae2wtlib.api.networking.IPacketHandler;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.IPacketHandler;
 import p455w0rd.wct.sync.network.WCTClientPacketHandler;
 import p455w0rd.wct.sync.network.WCTServerPacketHandler;
 

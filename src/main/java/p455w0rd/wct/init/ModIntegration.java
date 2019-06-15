@@ -15,9 +15,15 @@
  */
 package p455w0rd.wct.init;
 
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.item.Item;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.integration.ItemScroller;
+import p455w0rdslib.LibGlobals.Mods;
+import p455w0rdslib.api.client.IModelHolder;
+import p455w0rdslib.api.client.ItemRenderingRegistry;
 
 /**
  * @author p455w0rd
@@ -26,38 +32,22 @@ import p455w0rd.wct.integration.ItemScroller;
 public class ModIntegration {
 
 	public static void preInit() {
-		WTApi.instance().getRegistry().registerWirelessTerminal(ModItems.WCT);
-		WTApi.instance().getRegistry().registerWirelessTerminal(ModItems.CREATIVE_WCT);
+		WTApi.instance().getWirelessTerminalRegistry().registerWirelessTerminal(ModItems.WCT);
+		WTApi.instance().getWirelessTerminalRegistry().registerWirelessTerminal(ModItems.CREATIVE_WCT);
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static void preInitClient() {
+		for (final Item item : ModItems.getList()) {
+			if (item instanceof IModelHolder && !(item instanceof ICustomWirelessTerminalItem)) {
+				ItemRenderingRegistry.registerCustomRenderingItem((IModelHolder) item);
+			}
+		}
 	}
 
 	public static void postInit() {
 		if (Mods.ITEMSCROLLER.isLoaded()) {
 			ItemScroller.blackListSlots();
-		}
-	}
-
-	public static enum Mods {
-			BAUBLES("baubles", "Baubles"),
-			BAUBLESAPI("Baubles|API", "Baubles API"),
-			JEI("jei", "Just Enough Items"), ITEMSCROLLER("itemscroller", "Item Scroller");
-
-		private String modid, name;
-
-		Mods(String modidIn, String nameIn) {
-			modid = modidIn;
-			name = nameIn;
-		}
-
-		public String getId() {
-			return modid;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public boolean isLoaded() {
-			return Loader.isModLoaded(getId());
 		}
 	}
 

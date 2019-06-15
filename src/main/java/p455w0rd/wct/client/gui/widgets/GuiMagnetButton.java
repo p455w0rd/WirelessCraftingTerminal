@@ -22,13 +22,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.ae2wtlib.api.WTApi;
 
 public class GuiMagnetButton extends GuiButton implements ITooltip {
 
-	public GuiMagnetButton(int xIn, int yIn) {
+	public GuiMagnetButton(final int xIn, final int yIn) {
 		super(xIn, yIn, 8, "");
 		x = xIn;
 		y = yIn;
@@ -38,14 +37,14 @@ public class GuiMagnetButton extends GuiButton implements ITooltip {
 	}
 
 	@Override
-	public void drawButton(final Minecraft mc, final int par2, final int par3, float partial) {
+	public void drawButton(final Minecraft mc, final int par2, final int par3, final float partial) {
 		if (visible) {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x, y, 0.0F);
 			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 			//GlStateManager.scale(0.025F, 0.025F, 0.025F);
 			//GL11.glScalef(2.0f, 2.0f, 2.0f);
-			mc.getTextureManager().bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
+			mc.getTextureManager().bindTexture(WTApi.instance().getConstants().getStatesTexture());
 			hovered = par2 >= x && par3 >= y && par2 < x + width && par3 < y + height;
 			GlStateManager.scale(0.5F, 0.5F, 0.5F);
 			this.drawTexturedModalRect(0, 0, 0, 0, 16, 16);

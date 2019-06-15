@@ -26,18 +26,19 @@ import p455w0rd.wct.init.ModKeybindings;
 public class ClientProxy extends CommonProxy {
 
 	@Override
-	public void preInit(FMLPreInitializationEvent e) {
+	public void preInit(final FMLPreInitializationEvent e) {
 		super.preInit(e);
 		ModKeybindings.preInit();
+		ModIntegration.preInitClient();
 	}
 
 	@Override
-	public void init(FMLInitializationEvent e) {
+	public void init(final FMLInitializationEvent e) {
 		super.init(e);
 	}
 
 	@Override
-	public void postInit(FMLPostInitializationEvent e) {
+	public void postInit(final FMLPostInitializationEvent e) {
 		ModIntegration.postInit();
 		super.postInit(e);
 	}

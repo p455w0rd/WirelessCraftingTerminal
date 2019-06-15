@@ -1,17 +1,26 @@
-bin
-run
-tmp
-*.class
-.gradle
-.settings
-.classpath
-build
-.project
-*.launch
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+#Stolen form AE2 Repo. :D
+# exclude all
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+/*
 
-maven.bat
+# Include important folders
+
+# Gradle stuff
+!gradle/
+!gradlew
+!gradlew.bat
+!build.gradle
+!gradle.properties
+!settings.gradle
+
+# Other Files.
+!LICENSE
+!README.md
+
+# Include git important files
+!.gitmodules
+!.gitignore
+
+# Include Important Folders
+!src/
+!libs/

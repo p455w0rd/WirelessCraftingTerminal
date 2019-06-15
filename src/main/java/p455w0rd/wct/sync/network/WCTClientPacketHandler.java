@@ -21,6 +21,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketThreadUtil;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
+import p455w0rd.ae2wtlib.api.networking.IPacketHandler;
 import p455w0rd.wct.sync.*;
 
 public class WCTClientPacketHandler extends WCTPacketHandlerBase implements IPacketHandler {

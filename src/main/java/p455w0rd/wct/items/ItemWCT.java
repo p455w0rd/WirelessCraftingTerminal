@@ -17,8 +17,11 @@ package p455w0rd.wct.items;
 
 import java.util.List;
 
+import appeng.api.config.*;
+import appeng.api.util.IConfigManager;
 import appeng.core.localization.GuiText;
 import appeng.core.localization.PlayerMessages;
+import appeng.util.Platform;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -27,52 +30,64 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.items.ItemWT;
+import p455w0rd.ae2wtlib.api.client.ItemStackSizeRenderer;
+import p455w0rd.ae2wtlib.api.item.ItemWT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
-import p455w0rd.wct.api.client.ItemStackSizeRenderer;
 import p455w0rd.wct.init.ModGlobals;
 
 /**
  * @author p455w0rd
  *
  */
-@Optional.InterfaceList(value = {
 
-		@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles|API", striprefs = true)
-})
 public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 
 	public ItemWCT() {
 		this(new ResourceLocation(ModGlobals.MODID, "wct"));
 	}
 
-	protected ItemWCT(ResourceLocation registryName) {
+	protected ItemWCT(final ResourceLocation registryName) {
 		super(registryName);
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-		ItemStack item = player.getHeldItem(hand);
+	public IConfigManager getConfigManager(final ItemStack target) {
+		final IConfigManager out = super.getConfigManager(target);
+		out.registerSetting(Settings.SORT_BY, SortOrder.NAME);
+		out.registerSetting(Settings.VIEW_MODE, ViewItems.ALL);
+		out.registerSetting(Settings.SORT_DIRECTION, SortDir.ASCENDING);
+		out.readFromNBT(Platform.openNbtData(target).copy());
+		return out;
+	}
+
+	@Override
+	public void openGui(final EntityPlayer player, final boolean isBauble, final int playerSlot) {
+		WCTApi.instance().openWCTGui(player, isBauble, playerSlot);
+	}
+
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(final World world, final EntityPlayer player, final EnumHand hand) {
+		final ItemStack item = player.getHeldItem(hand);
 		if (world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			WCTApi.instance().openWCTGui(player, false, player.inventory.currentItem);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+			openGui(player, false, player.inventory.currentItem);
+			return new ActionResult<>(EnumActionResult.SUCCESS, item);
 		}
 		else if (!world.isRemote) {
 			if (getAECurrentPower(item) <= 0) {
 				player.sendMessage(PlayerMessages.DeviceNotPowered.get());
-				return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+				return new ActionResult<>(EnumActionResult.FAIL, item);
 			}
 			if (!WCTApi.instance().isTerminalLinked(item)) {
 				player.sendMessage(PlayerMessages.DeviceNotLinked.get());
-				return new ActionResult<ItemStack>(EnumActionResult.FAIL, item);
+				return new ActionResult<>(EnumActionResult.FAIL, item);
 			}
 		}
-		return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, item);
+		return new ActionResult<>(EnumActionResult.SUCCESS, item);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -81,11 +96,10 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 		if (getPlayer() == null || WTApi.instance().getGUIObject(is, getPlayer()) == null) {
 			return;
 		}
-		String encKey = getEncryptionKey(is);
-		//String shift = I18n.format("tooltip.press_shift.desc").replace("Shift", TextFormatting.YELLOW + "" + TextFormatting.BOLD + "" + TextFormatting.ITALIC + "Shift" + TextFormatting.GRAY);
+		final String encKey = getEncryptionKey(is);
 		String pctTxtColor = TextFormatting.WHITE + "";
-		double aeCurrPower = getAECurrentPower(is);
-		double aeCurrPowerPct = (int) Math.floor(aeCurrPower / getAEMaxPower(is) * 1e4) / 1e2;
+		final double aeCurrPower = getAECurrentPower(is);
+		final double aeCurrPowerPct = (int) Math.floor(aeCurrPower / getAEMaxPower(is) * 1e4) / 1e2;
 		if ((int) aeCurrPowerPct >= 75) {
 			pctTxtColor = TextFormatting.GREEN + "";
 		}
@@ -104,25 +118,25 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
 		}
 		list.add("Link Status: " + linked);
-		String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
+		final String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
 			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
-				list.add(I18n.format("item.ae2wtlib:infinity_booster_card.name") + ": " + (checkForBooster(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
+				list.add(I18n.format("item.ae2wtlib:infinity_booster_card.name") + ": " + (hasInfiniteRange(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
 			}
 			else {
-				int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(is);
-				String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
+				final int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(is);
+				final String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
 				String reasonString = "";
 				if (infinityEnergyAmount <= 0) {
 					reasonString = "(" + I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc") + ")";
 				}
-				boolean outsideOfWAPRange = !WTApi.instance().isInRange(is);
+				final boolean outsideOfWAPRange = !WTApi.instance().isInRange(is);
 				if (!outsideOfWAPRange) {
 					reasonString = I18n.format("tooltip.in_wap_range.desc");
 				}
-				String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
+				final String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
 				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
-				String infinityEnergyString = WTApi.instance().isWTCreative(is) ? I18n.format("tooltip.infinite.desc") : (isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ItemStackSizeRenderer.getInstance().getSlimConverter().toSlimReadableForm(infinityEnergyAmount));
+				final String infinityEnergyString = WTApi.instance().isWTCreative(is) ? I18n.format("tooltip.infinite.desc") : isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ItemStackSizeRenderer.getInstance().getConverter().toSlimReadableForm(infinityEnergyAmount);
 				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
 			}
 		}
@@ -130,12 +144,22 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 	}
 
 	@Override
-	public void onUpdate(final ItemStack wirelessTerminal, final World w, final Entity e, int i, boolean f) {
+	public void onUpdate(final ItemStack wirelessTerminal, final World w, final Entity e, final int i, final boolean f) {
 		super.onUpdate(wirelessTerminal, w, e, i, f);
-		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof IWirelessCraftingTerminalItem)) {
+		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof ICustomWirelessTerminalItem)) {
 			return;
 		}
 		ItemMagnet.isMagnetInstalled(wirelessTerminal);
+	}
+
+	@Override
+	public ResourceLocation getMenuIcon() {
+		return new ResourceLocation(ModGlobals.MODID, "textures/items/wct.png");
+	}
+
+	@Override
+	public int getColor() {
+		return 0xFFB8231D;
 	}
 
 }

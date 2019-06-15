@@ -27,8 +27,8 @@ import appeng.core.localization.GuiText;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.api.WTGuiObject;
-import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiTabButton;
+import p455w0rd.ae2wtlib.api.*;
+import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiItemIconButton;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerCraftingStatus;
 import p455w0rd.wct.init.*;
@@ -40,7 +40,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 	private final ContainerCraftingStatus status;
 	private GuiButton selectCPU;
 
-	private GuiTabButton originalGuiBtn;
+	private GuiItemIconButton originalGuiBtn;
 	private int originalGui;
 	private ItemStack myIcon = null;
 
@@ -51,9 +51,15 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 		final IDefinitions definitions = AEApi.instance().definitions();
 		if (target instanceof WTGuiObject) {
 			myIcon = definitions.items().wirelessTerminal().maybeStack(1).orElse(null);
-			ItemStack is = new ItemStack(ModItems.WCT);
-			((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
-			myIcon = is;
+			if (status.getWirelessTerminal() == WTApi.instance().getWTBySlot(inventoryPlayer.player, wtSlot)) {
+				myIcon = new ItemStack(status.getWirelessTerminal().getItem());
+				((ICustomWirelessTerminalItem) myIcon.getItem()).injectAEPower(myIcon, 6400001, Actionable.MODULATE);
+			}
+			else {
+				ItemStack is = new ItemStack(ModItems.WCT);
+				((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
+				myIcon = is;
+			}
 			originalGui = ModGuiHandler.GUI_WCT;
 		}
 	}
@@ -65,11 +71,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 		final boolean backwards = Mouse.isButtonDown(1);
 
 		if (btn == selectCPU) {
-			try {
-				ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
-			}
-			catch (final IOException e) {
-			}
+			ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
 		}
 
 		if (btn == originalGuiBtn) {
@@ -86,7 +88,7 @@ public class GuiCraftingStatus extends GuiCraftingCPU {
 		buttonList.add(selectCPU);
 
 		if (myIcon != null) {
-			buttonList.add(originalGuiBtn = new GuiTabButton(guiLeft + 213, guiTop - 4, myIcon, myIcon.getDisplayName(), itemRender));
+			buttonList.add(originalGuiBtn = new GuiItemIconButton(guiLeft + 213, guiTop - 4, myIcon, myIcon.getDisplayName(), itemRender));
 			originalGuiBtn.setHideEdge(13);
 		}
 	}

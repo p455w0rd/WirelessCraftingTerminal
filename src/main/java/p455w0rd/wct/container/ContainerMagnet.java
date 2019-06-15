@@ -26,7 +26,7 @@ import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.wct.api.IWCTContainer;
+import p455w0rd.wct.api.IMagnetContainer;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.container.slot.SlotMagnetFilter;
@@ -35,7 +35,7 @@ import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.util.WCTUtils;
 import p455w0rdslib.util.MathUtils;
 
-public class ContainerMagnet extends Container implements IWCTContainer {
+public class ContainerMagnet extends Container implements IMagnetContainer {
 
 	public final InventoryPlayer inventoryPlayer;
 	public final ItemStack magnetItem;

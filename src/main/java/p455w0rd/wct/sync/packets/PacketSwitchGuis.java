@@ -26,7 +26,8 @@ import p455w0rd.wct.api.IWCTContainer;
 import p455w0rd.wct.client.gui.GuiWCT;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.ae2wtlib.api.container.IWTContainer;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 
 public class PacketSwitchGuis extends WCTPacket {
 
@@ -63,12 +64,15 @@ public class PacketSwitchGuis extends WCTPacket {
 		boolean isBauble = false;
 		boolean isHeld = false;
 		int slot = -1;
-		if (c instanceof IWCTContainer) {
-			IWCTContainer wctContainer = (IWCTContainer) c;
-			isBauble = wctContainer.isWTBauble();
-			slot = wctContainer.getWTSlot();
-			isHeld = wctContainer.isMagnetHeld();
+		if (c instanceof IWTContainer) {
+			IWTContainer wtContainer = (IWTContainer) c;
+			isBauble = wtContainer.isWTBauble();
+			slot = wtContainer.getWTSlot();
 		}
+		if (c instanceof IWCTContainer) {
+			isHeld = ((IWCTContainer) c).isMagnetHeld();
+		}
+		//WCTApi.instance().openWCTGui(player, isBauble, slot);
 		ModGuiHandler.open(newGui, player, world, new BlockPos(x, y, z), isHeld, isBauble, slot);
 	}
 

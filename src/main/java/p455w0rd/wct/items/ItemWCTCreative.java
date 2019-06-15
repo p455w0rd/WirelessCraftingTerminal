@@ -17,8 +17,7 @@ package p455w0rd.wct.items;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
@@ -41,11 +40,11 @@ public class ItemWCTCreative extends ItemWCT {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void initModel() {
-		ModelLoader.setCustomModelResourceLocation(this, 0, getModelResource());
+		ModelLoader.setCustomModelResourceLocation(this, 0, getModelResource(this));
 	}
 
 	@Override
-	public ModelResourceLocation getModelResource() {
+	public ModelResourceLocation getModelResource(final Item item) {
 		return new ModelResourceLocation(ModItems.WCT.getRegistryName(), "inventory");
 	}
 
@@ -55,7 +54,7 @@ public class ItemWCTCreative extends ItemWCT {
 	}
 
 	@Override
-	public EnumRarity getRarity(ItemStack wirelessTerm) {
+	public EnumRarity getRarity(final ItemStack wirelessTerm) {
 		return EnumRarity.RARE;
 	}
 

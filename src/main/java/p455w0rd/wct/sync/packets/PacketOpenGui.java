@@ -18,11 +18,10 @@ package p455w0rd.wct.sync.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.util.math.BlockPos;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 
 public class PacketOpenGui extends WCTPacket {
 
@@ -56,7 +55,8 @@ public class PacketOpenGui extends WCTPacket {
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		if (player.openContainer instanceof ContainerPlayer && slot >= 0) {
+		player.closeScreen();
+		if (slot >= 0) {
 			ModGuiHandler.open(whichGui, player, player.getEntityWorld(), new BlockPos((int) player.posX, (int) player.posY, (int) player.posZ), false, isBauble, slot);
 		}
 	}

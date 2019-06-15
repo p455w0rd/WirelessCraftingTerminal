@@ -22,9 +22,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketSetShiftCraft;
 import p455w0rd.wct.util.WCTUtils;
@@ -39,7 +38,7 @@ public class GuiImgButtonShiftCraft extends GuiButton implements ITooltip {
 	private boolean currentValue = true;
 	int iconIndex = 0;
 
-	public GuiImgButtonShiftCraft(final int x, final int y, ItemStack wirelessTerminal) {
+	public GuiImgButtonShiftCraft(final int x, final int y, final ItemStack wirelessTerminal) {
 		super(0, x, y, "");
 		this.x = x;
 		this.y = y;
@@ -55,12 +54,12 @@ public class GuiImgButtonShiftCraft extends GuiButton implements ITooltip {
 	}
 
 	@Override
-	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, float partial) {
+	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, final float partial) {
 		if (visible) {
 			hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
+			mc.renderEngine.bindTexture(WTApi.instance().getConstants().getStatesTexture());
 			this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
-			this.drawTexturedModalRect(x, y, (!getCurrentValue() ? 4 : 5) * 16, 0, 16, 16);
+			this.drawTexturedModalRect(x, y, (!getCurrentValue() ? 7 : 8) * 16, 0, 16, 16);
 			mouseDragged(mc, mouseX, mouseY);
 		}
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);

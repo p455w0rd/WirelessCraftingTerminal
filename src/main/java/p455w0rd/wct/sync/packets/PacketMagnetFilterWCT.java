@@ -20,11 +20,11 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import p455w0rd.ae2wtlib.api.WTApi;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemMagnet.MagnetItemMode;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
 import p455w0rd.wct.util.WCTUtils;
 
 /**
@@ -72,6 +72,18 @@ public class PacketMagnetFilterWCT extends WCTPacket {
 			if (!magnet.isEmpty()) {
 				ItemMagnet.setItemMode(magnet, whichMode, modeValue);
 				/*
+				ItemStack actualTerminal = wirelessTerminal;
+				if (WTApi.instance().getWUTUtility().isWUT(wirelessTerminal)) {
+					ItemStack wutTerm = WTApi.instance().getWUTUtility().getSelectedTerminal(wirelessTerminal).getLeft();
+				}
+				else {
+					wirelessTerminal.getSubCompound(MAGNET_SLOT_NBT).getTagList(ITEMS_NBT, 10).set(0, magnet.serializeNBT());
+				}
+				*/
+				/*
+				if (WTApi.instance().getWUTUtility().isWUT(wirelessTerminal)) {
+					wirelessTerminal = WTApi.instance().getWUTUtility().getSelectedTerminal(wirelessTerminal).getLeft();
+				}
 				NBTTagCompound newNBT = wirelessTerminal.getSubCompound(ItemMagnet.MAGNET_SLOT_NBT);
 				if (newNBT != null) {
 					NBTTagList magnetNBTList = newNBT.getTagList(ItemMagnet.ITEMS_NBT, 10);

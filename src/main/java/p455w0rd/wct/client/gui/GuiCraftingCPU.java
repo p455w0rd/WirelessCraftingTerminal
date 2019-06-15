@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Joiner;
@@ -38,8 +39,9 @@ import appeng.util.ReadableNumberConverter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.api.base.GuiWT;
+import p455w0rd.ae2wtlib.api.client.gui.GuiWT;
 import p455w0rd.wct.container.ContainerCraftingCPU;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketValueConfig;
@@ -77,11 +79,11 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 	private IItemList<IAEItemStack> active = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 	private IItemList<IAEItemStack> pending = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 
-	private List<IAEItemStack> visual = new ArrayList<IAEItemStack>();
+	private List<IAEItemStack> visual = new ArrayList<>();
 	private GuiButton cancel;
 	private int tooltip = -1;
 
-	public GuiCraftingCPU(final InventoryPlayer inventoryPlayer, final Object te, int wtSlot, boolean isWTBauble) {
+	public GuiCraftingCPU(final InventoryPlayer inventoryPlayer, final Object te, final int wtSlot, final boolean isWTBauble) {
 		this(new ContainerCraftingCPU(inventoryPlayer, te, wtSlot, isWTBauble));
 	}
 
@@ -97,19 +99,14 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 		storage = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 		active = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 		pending = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
-		visual = new ArrayList<IAEItemStack>();
+		visual = new ArrayList<>();
 	}
 
 	@Override
 	protected void actionPerformed(final GuiButton btn) throws IOException {
 		super.actionPerformed(btn);
-
 		if (cancel == btn) {
-			try {
-				ModNetworking.instance().sendToServer(new PacketValueConfig("TileCrafting.Cancel", "Cancel"));
-			}
-			catch (final IOException e) {
-			}
+			ModNetworking.instance().sendToServer(new PacketValueConfig("TileCrafting.Cancel", "Cancel"));
 		}
 	}
 
@@ -180,7 +177,7 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 		final int viewEnd = viewStart + 3 * 6;
 
 		String dspToolTip = "";
-		final List<String> lineList = new LinkedList<String>();
+		final List<String> lineList = new LinkedList<>();
 		int toolPosX = 0;
 		int toolPosY = 0;
 
@@ -216,17 +213,17 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 				if (AEConfig.instance().isUseColoredCraftingStatus() && (active || scheduled)) {
 					final int bgColor = (active ? AEColor.GREEN.blackVariant : AEColor.YELLOW.blackVariant) | BACKGROUND_ALPHA;
 					final int startX = (x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET) * 2;
-					final int startY = ((y * offY + ITEMSTACK_TOP_OFFSET) - 3) * 2;
-					drawRect(startX, startY, startX + (SECTION_LENGTH * 2), startY + (offY * 2) - 2, bgColor);
+					final int startY = (y * offY + ITEMSTACK_TOP_OFFSET - 3) * 2;
+					drawRect(startX, startY, startX + SECTION_LENGTH * 2, startY + offY * 2 - 2, bgColor);
 				}
 
-				final int negY = ((lines - 1) * 5) / 2;
+				final int negY = (lines - 1) * 5 / 2;
 				int downY = 0;
 
 				if (stored != null && stored.getStackSize() > 0) {
 					final String str = GuiText.Stored.getLocal() + ": " + converter.toWideReadableForm(stored.getStackSize());
 					final int w = 4 + fontRenderer.getStringWidth(str);
-					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - (w * 0.5)) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
+					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - w * 0.5) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.Stored.getLocal() + ": " + Long.toString(stored.getStackSize()));
@@ -239,7 +236,7 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 					final String str = GuiText.Crafting.getLocal() + ": " + converter.toWideReadableForm(activeStack.getStackSize());
 					final int w = 4 + fontRenderer.getStringWidth(str);
 
-					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - (w * 0.5)) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
+					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - w * 0.5) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.Crafting.getLocal() + ": " + Long.toString(activeStack.getStackSize()));
@@ -252,7 +249,7 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 					final String str = GuiText.Scheduled.getLocal() + ": " + converter.toWideReadableForm(pendingStack.getStackSize());
 					final int w = 4 + fontRenderer.getStringWidth(str);
 
-					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - (w * 0.5)) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
+					fontRenderer.drawString(str, (int) ((x * (1 + SECTION_LENGTH) + ITEMSTACK_LEFT_OFFSET + SECTION_LENGTH - 19 - w * 0.5) * 2), (y * offY + ITEMSTACK_TOP_OFFSET + 6 - negY + downY) * 2, TEXT_COLOR);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.Scheduled.getLocal() + ": " + Long.toString(pendingStack.getStackSize()));
@@ -294,8 +291,17 @@ public class GuiCraftingCPU extends GuiWT implements ISortSource {
 
 	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		this.bindTexture("appliedenergistics2", "guis/craftingcpu.png");
+		mc.getTextureManager().bindTexture(new ResourceLocation("appliedenergistics2", "textures/guis/craftingcpu.png"));
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, xSize, ySize);
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		final int i = Mouse.getEventDWheel();
+		if (i != 0 && getScrollBar() != null) {
+			getScrollBar().wheel(i);
+		}
 	}
 
 	public void postUpdate(final List<IAEItemStack> list, final byte ref) {

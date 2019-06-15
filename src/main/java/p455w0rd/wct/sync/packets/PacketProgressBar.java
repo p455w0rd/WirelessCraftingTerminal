@@ -19,9 +19,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import p455w0rd.ae2wtlib.api.base.ContainerWT;
+import p455w0rd.ae2wtlib.api.container.ContainerWT;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 
 public class PacketProgressBar extends WCTPacket {
 

@@ -24,8 +24,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWCTContainer;
-import p455w0rd.wct.init.ModGlobals;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.items.ItemMagnet;
 import p455w0rd.wct.items.ItemMagnet.MagnetFunctionMode;
@@ -41,7 +41,7 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	final IWCTContainer container;
 	int iconIndex = 0;
 
-	public GuiImgButtonMagnetMode(final int x, final int y, IWCTContainer container) {
+	public GuiImgButtonMagnetMode(final int x, final int y, final IWCTContainer container) {
 		super(0, x, y, "");
 		this.container = container;
 		this.x = x;
@@ -59,11 +59,11 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 	}
 
 	@Override
-	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, float partial) {
+	public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, final float partial) {
 		if (visible) {
 			hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 			GlStateManager.pushMatrix();
-			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
+			mc.renderEngine.bindTexture(WTApi.instance().getConstants().getStatesTexture());
 			this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
 			this.drawTexturedModalRect(x, y, 16, 0, 16, 16);
 			GlStateManager.popMatrix();
@@ -110,11 +110,11 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 		ModNetworking.instance().sendToServer(new PacketSetMagnetWCT(currentValue));
 	}
 
-	public void renderGlint(Minecraft mc) {
+	public void renderGlint(final Minecraft mc) {
 		if (currentValue == MagnetFunctionMode.INACTIVE) {
 			return;
 		}
-		Color color = new Color(-8372020);
+		final Color color = new Color(-8372020);
 		mc.renderEngine.bindTexture(new ResourceLocation("textures/misc/enchanted_item_glint.png"));
 		GlStateManager.enableBlend();
 		GlStateManager.depthFunc(514);
@@ -130,7 +130,7 @@ public class GuiImgButtonMagnetMode extends GuiButton implements ITooltip {
 			GlStateManager.rotate(30.0F - i * 60.0F, 0.0F, 0.0F, 1.0F);
 			GlStateManager.translate(0.0F, Minecraft.getSystemTime() % 3000L / 3000.0F / 3.0F, 0.0F);
 			GlStateManager.matrixMode(5888);
-			mc.renderEngine.bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/gui/states.png"));
+			mc.renderEngine.bindTexture(WTApi.instance().getConstants().getStatesTexture());
 			//this.drawTexturedModalRect(x, y, 0, 0, 16, 16);
 			this.drawTexturedModalRect(x, y, 16, 0, 16, 16);
 		}

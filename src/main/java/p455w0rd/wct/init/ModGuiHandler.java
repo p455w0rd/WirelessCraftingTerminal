@@ -43,7 +43,6 @@ public class ModGuiHandler implements IGuiHandler {
 	public static final int GUI_CRAFT_AMOUNT = 2;
 	public static final int GUI_CRAFTING_STATUS = 3;
 	public static final int GUI_MAGNET = 4;
-	public static final int GUI_WFT = 5;
 	private static int slot = -1;
 	private static boolean isBauble = false;
 	private static boolean isMagnetHeld = false;
@@ -52,7 +51,7 @@ public class ModGuiHandler implements IGuiHandler {
 		return isBauble;
 	}
 
-	public static void setIsBauble(boolean value) {
+	public static void setIsBauble(final boolean value) {
 		isBauble = value;
 	}
 
@@ -60,7 +59,7 @@ public class ModGuiHandler implements IGuiHandler {
 		return slot;
 	}
 
-	public static void setSlot(int value) {
+	public static void setSlot(final int value) {
 		slot = value;
 	}
 
@@ -68,14 +67,14 @@ public class ModGuiHandler implements IGuiHandler {
 		return isMagnetHeld;
 	}
 
-	public static void setMagnetHeld(boolean isHeld) {
+	public static void setMagnetHeld(final boolean isHeld) {
 		isMagnetHeld = isHeld;
 	}
 
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getServerGuiElement(final int ID, final EntityPlayer player, final World world, final int x, final int y, final int z) {
 		if (ID != GUI_MAGNET) {
-			ITerminalHost terminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
+			final ITerminalHost terminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
 			if (terminal != null) {
 				if (ID == GUI_WCT) {
 					return new ContainerWCT(player, terminal, getSlot(), isBauble());
@@ -101,9 +100,9 @@ public class ModGuiHandler implements IGuiHandler {
 	}
 
 	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+	public Object getClientGuiElement(final int ID, final EntityPlayer player, final World world, final int x, final int y, final int z) {
 		if (ID != GUI_MAGNET) {
-			ITerminalHost craftingTerminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
+			final ITerminalHost craftingTerminal = getCraftingTerminal(player, world, new BlockPos(x, y, z), isBauble(), getSlot());
 			if (craftingTerminal != null) {
 				if (ID == GUI_WCT) {
 					GuiWCT.setSwitchingGuis(false);
@@ -130,26 +129,26 @@ public class ModGuiHandler implements IGuiHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ITerminalHost getCraftingTerminal(EntityPlayer player, World world, BlockPos pos, boolean isBauble, int slot) {
+	private ITerminalHost getCraftingTerminal(final EntityPlayer player, final World world, final BlockPos pos, final boolean isBauble, final int slot) {
 		ItemStack wirelessTerminal = ItemStack.EMPTY;
 		if (slot >= 0) {
 			wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WTApi.instance().getWTBySlot(player, slot);
 		}
 		else {
-			Pair<Boolean, Pair<Integer, ItemStack>> firstTerm = WCTUtils.getFirstWirelessCraftingTerminal(player.inventory);
+			final Pair<Boolean, Pair<Integer, ItemStack>> firstTerm = WCTUtils.getFirstWirelessCraftingTerminal(player.inventory);
 			wirelessTerminal = firstTerm.getRight().getRight();
 			setSlot(firstTerm.getRight().getLeft());
 			setIsBauble(firstTerm.getLeft());
 		}
-		final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(wirelessTerminal);
+		final ICustomWirelessTerminalItem wh = (ICustomWirelessTerminalItem) AEApi.instance().registries().wireless().getWirelessTerminalHandler(wirelessTerminal);
 		final WTGuiObject<IAEItemStack> terminal = wh == null ? null : (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, wirelessTerminal, player);
 		return terminal;
 	}
 
-	public static void open(int ID, EntityPlayer player, World world, BlockPos pos, boolean isMagnetHeld, boolean isBauble, int slot) {
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
+	public static void open(final int ID, final EntityPlayer player, final World world, final BlockPos pos, final boolean isMagnetHeld, final boolean isBauble, final int slot) {
+		final int x = pos.getX();
+		final int y = pos.getY();
+		final int z = pos.getZ();
 		setIsBauble(isBauble);
 		setSlot(slot);
 		setMagnetHeld(isMagnetHeld);

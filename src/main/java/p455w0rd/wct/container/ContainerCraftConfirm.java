@@ -28,6 +28,7 @@ import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
 import appeng.api.networking.crafting.*;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IStorageGrid;
@@ -45,7 +46,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import p455w0rd.ae2wtlib.api.WTGuiObject;
-import p455w0rd.ae2wtlib.api.base.ContainerWT;
+import p455w0rd.ae2wtlib.api.container.ContainerWT;
 import p455w0rd.ae2wtlib.api.networking.security.WTIActionHost;
 import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
 import p455w0rd.wct.init.ModGuiHandler;
@@ -55,7 +56,7 @@ import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 
 public class ContainerCraftConfirm extends ContainerWT {
 
-	public final ArrayList<CraftingCPURecord> cpus = new ArrayList<CraftingCPURecord>();
+	public final ArrayList<CraftingCPURecord> cpus = new ArrayList<>();
 	private int wctSlot = -1;
 	private boolean isBauble = false;
 	private Future<ICraftingJob> job;
@@ -77,7 +78,7 @@ public class ContainerCraftConfirm extends ContainerWT {
 	@GuiSync(7)
 	public String myName = "";
 
-	public ContainerCraftConfirm(final InventoryPlayer ip, final ITerminalHost te, boolean isBauble, int wctSlot) {
+	public ContainerCraftConfirm(final InventoryPlayer ip, final ITerminalHost te, final boolean isBauble, final int wctSlot) {
 		super(ip, te, wctSlot, isBauble);
 		this.isBauble = isBauble;
 		this.wctSlot = wctSlot;
@@ -132,7 +133,11 @@ public class ContainerCraftConfirm extends ContainerWT {
 			return;
 		}
 
-		final ICraftingGrid cc = getGrid().getCache(ICraftingGrid.class);
+		final IGrid gr = getGrid();
+		if (gr == null) {
+			return;
+		}
+		final ICraftingGrid cc = gr.getCache(ICraftingGrid.class);
 		final ImmutableSet<ICraftingCPU> cpuSet = cc.getCpus();
 
 		int matches = 0;
@@ -268,9 +273,12 @@ public class ContainerCraftConfirm extends ContainerWT {
 	}
 
 	private IGrid getGrid() {
-		final WTIActionHost h = ((WTIActionHost) getTarget());
-		return h.getActionableNode(true).getGrid();
-		//return obj2.getTargetGrid();
+		final WTIActionHost h = (WTIActionHost) getTarget();
+		final IGridNode an = h.getActionableNode(true);
+		if (an != null) {
+			return an.getGrid();
+		}
+		return null;
 	}
 
 	private boolean cpuMatches(final ICraftingCPU c) {
@@ -308,11 +316,11 @@ public class ContainerCraftConfirm extends ContainerWT {
 			if (g != null && originalGui == 0)// && this.getOpenContext() != null )
 			{
 				ModNetworking.instance().sendTo(new PacketSwitchGuis(originalGui), (EntityPlayerMP) getInventoryPlayer().player);
-				EntityPlayerMP player = (EntityPlayerMP) getInventoryPlayer().player;
-				World world = getWorld();
-				int x = (int) player.posX;
-				int y = (int) player.posY;
-				int z = (int) player.posZ;
+				final EntityPlayerMP player = (EntityPlayerMP) getInventoryPlayer().player;
+				final World world = getWorld();
+				final int x = (int) player.posX;
+				final int y = (int) player.posY;
+				final int z = (int) player.posZ;
 				ModGuiHandler.open(originalGui, player, world, new BlockPos(x, y, z), false, isBauble, wctSlot);
 			}
 		}
@@ -417,6 +425,6 @@ public class ContainerCraftConfirm extends ContainerWT {
 	}
 
 	@Override
-	public void doAction(EntityPlayerMP player, InventoryAction action, int slot, long id) {
+	public void doAction(final EntityPlayerMP player, final InventoryAction action, final int slot, final long id) {
 	}
 }

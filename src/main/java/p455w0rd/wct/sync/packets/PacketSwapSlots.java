@@ -20,7 +20,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 
 public class PacketSwapSlots extends WCTPacket {
 

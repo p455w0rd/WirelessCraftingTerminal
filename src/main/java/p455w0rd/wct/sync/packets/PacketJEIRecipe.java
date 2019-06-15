@@ -49,10 +49,9 @@ import net.minecraft.nbt.*;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import p455w0rd.ae2wtlib.api.*;
-import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
 
 public class PacketJEIRecipe extends WCTPacket {
 
@@ -95,7 +94,7 @@ public class PacketJEIRecipe extends WCTPacket {
 	@SuppressWarnings("unchecked")
 	private WTGuiObject<IAEItemStack> getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y, final int z) {
 		if (it != null) {
-			final ICustomWirelessTermHandler wh = (ICustomWirelessTermHandler) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			final ICustomWirelessTerminalItem wh = (ICustomWirelessTerminalItem) AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
 				return (WTGuiObject<IAEItemStack>) WTApi.instance().getGUIObject(wh, it, player);
 			}
@@ -113,13 +112,13 @@ public class PacketJEIRecipe extends WCTPacket {
 			final IContainerCraftingPacket cct = (IContainerCraftingPacket) con;
 			IGridNode node = cct.getNetworkNode();
 			if (node == null) {
-				ItemStack wct = ((ContainerWCT) con).getWirelessTerminal();
-				if (wct.isEmpty() || !(wct.getItem() instanceof IWirelessCraftingTerminalItem)) {
+				final ItemStack wct = ((ContainerWCT) con).getWirelessTerminal();
+				if (wct.isEmpty() || !(wct.getItem() instanceof ICustomWirelessTerminalItem)) {
 					return;
 				}
-				WTGuiObject<IAEItemStack> obj = getGuiObject(wct, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
+				final WTGuiObject<IAEItemStack> obj = getGuiObject(wct, player, player.getEntityWorld(), (int) player.posX, (int) player.posY, (int) player.posZ);
 				if (obj != null) {
-					node = obj.getActionableNode(((IWirelessCraftingTerminalItem) wct.getItem()).checkForBooster(wct));
+					node = obj.getActionableNode(((ICustomWirelessTerminalItem) wct.getItem()).hasInfiniteRange(wct));
 				}
 			}
 
@@ -147,7 +146,7 @@ public class PacketJEIRecipe extends WCTPacket {
 						// prepare slots
 						if (!currentItem.isEmpty()) {
 							// already the correct item?
-							ItemStack newItem = canUseInSlot(x, currentItem);
+							final ItemStack newItem = canUseInSlot(x, currentItem);
 
 							// put away old item
 							if (newItem != currentItem && security.hasPermission(player, SecurityPermissions.INJECT)) {
@@ -192,7 +191,7 @@ public class PacketJEIRecipe extends WCTPacket {
 
 									// try inventory
 									if (currentItem.isEmpty()) {
-										AdaptorItemHandler ad = new AdaptorItemHandler(playerInventory);
+										final AdaptorItemHandler ad = new AdaptorItemHandler(playerInventory);
 
 										if (cct.useRealItems()) {
 											currentItem = ad.removeItems(1, recipe[x][y], null);
@@ -213,9 +212,9 @@ public class PacketJEIRecipe extends WCTPacket {
 	}
 
 	@Nonnull
-	private ItemStack canUseInSlot(int slot, ItemStack is) {
+	private ItemStack canUseInSlot(final int slot, final ItemStack is) {
 		if (recipe[slot] != null) {
-			for (ItemStack option : recipe[slot]) {
+			for (final ItemStack option : recipe[slot]) {
 				if (is.isItemEqual(option)) {
 					return is;
 				}

@@ -34,9 +34,10 @@ import appeng.util.Platform;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.api.WTGuiObject;
-import p455w0rd.ae2wtlib.api.base.GuiWT;
+import p455w0rd.ae2wtlib.api.client.gui.GuiWT;
 import p455w0rd.wct.container.ContainerCraftConfirm;
 import p455w0rd.wct.init.ModGuiHandler;
 import p455w0rd.wct.init.ModNetworking;
@@ -53,7 +54,7 @@ public class GuiCraftConfirm extends GuiWT {
 	private final IItemList<IAEItemStack> pending = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 	private final IItemList<IAEItemStack> missing = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
 
-	private final List<IAEItemStack> visual = new ArrayList<IAEItemStack>();
+	private final List<IAEItemStack> visual = new ArrayList<>();
 
 	private int OriginalGui = 0;
 	private GuiButton cancel;
@@ -62,7 +63,7 @@ public class GuiCraftConfirm extends GuiWT {
 	private int tooltip = -1;
 	InventoryPlayer inventoryPlayer;
 
-	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te, boolean isBauble, int wctSlot) {
+	public GuiCraftConfirm(final InventoryPlayer inventoryPlayer, final ITerminalHost te, final boolean isBauble, final int wctSlot) {
 		super(new ContainerCraftConfirm(inventoryPlayer, te, isBauble, wctSlot));
 		xSize = 238;
 		ySize = 206;
@@ -164,9 +165,9 @@ public class GuiCraftConfirm extends GuiWT {
 		final long bytesUsed = ccc.getUsedBytes();
 		final long availBytes = ccc.getCpuAvailableBytes();
 		final int availCoCPUs = ccc.getCpuCoProcessors();
-		String byteUsed = NumberFormat.getInstance().format(bytesUsed);
+		final String byteUsed = NumberFormat.getInstance().format(bytesUsed);
 
-		final String Add = bytesUsed > 0 ? (byteUsed + ' ' + GuiText.BytesUsed.getLocal()) : GuiText.CalculatingWait.getLocal();
+		final String Add = bytesUsed > 0 ? byteUsed + ' ' + GuiText.BytesUsed.getLocal() : GuiText.CalculatingWait.getLocal();
 		fontRenderer.drawString(GuiText.CraftingPlan.getLocal() + " -- " + Add, 8, 7, 4210752);
 
 		String dsp = null;
@@ -175,7 +176,7 @@ public class GuiCraftConfirm extends GuiWT {
 			dsp = GuiText.Simulation.getLocal();
 		}
 		else {
-			dsp = availBytes > 0 ? (GuiText.Bytes.getLocal() + ": " + availBytes + " : " + GuiText.CoProcessors.getLocal() + ": " + availCoCPUs) : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
+			dsp = availBytes > 0 ? GuiText.Bytes.getLocal() + ": " + availBytes + " : " + GuiText.CoProcessors.getLocal() + ": " + availCoCPUs : GuiText.Bytes.getLocal() + ": N/A : " + GuiText.CoProcessors.getLocal() + ": N/A";
 		}
 
 		final int offset = (219 - fontRenderer.getStringWidth(dsp)) / 2;
@@ -191,7 +192,7 @@ public class GuiCraftConfirm extends GuiWT {
 		final int viewEnd = viewStart + 3 * rows;
 
 		String dspToolTip = "";
-		final List<String> lineList = new LinkedList<String>();
+		final List<String> lineList = new LinkedList<>();
 		int toolPosX = 0;
 		int toolPosY = 0;
 
@@ -219,7 +220,7 @@ public class GuiCraftConfirm extends GuiWT {
 					lines++;
 				}
 
-				final int negY = ((lines - 1) * 5) / 2;
+				final int negY = (lines - 1) * 5 / 2;
 				int downY = 0;
 
 				if (stored != null && stored.getStackSize() > 0) {
@@ -233,7 +234,7 @@ public class GuiCraftConfirm extends GuiWT {
 
 					str = GuiText.FromStorage.getLocal() + ": " + str;
 					final int w = 4 + fontRenderer.getStringWidth(str);
-					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - (w * 0.5)) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
+					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - w * 0.5) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.FromStorage.getLocal() + ": " + Long.toString(stored.getStackSize()));
@@ -254,7 +255,7 @@ public class GuiCraftConfirm extends GuiWT {
 
 					str = GuiText.Missing.getLocal() + ": " + str;
 					final int w = 4 + fontRenderer.getStringWidth(str);
-					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - (w * 0.5)) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
+					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - w * 0.5) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.Missing.getLocal() + ": " + Long.toString(missingStack.getStackSize()));
@@ -275,7 +276,7 @@ public class GuiCraftConfirm extends GuiWT {
 
 					str = GuiText.ToCraft.getLocal() + ": " + str;
 					final int w = 4 + fontRenderer.getStringWidth(str);
-					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - (w * 0.5)) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
+					fontRenderer.drawString(str, (int) ((x * (1 + sectionLength) + xo + sectionLength - 19 - w * 0.5) * 2), (y * offY + yo + 6 - negY + downY) * 2, 4210752);
 
 					if (tooltip == z - viewStart) {
 						lineList.add(GuiText.ToCraft.getLocal() + ": " + Long.toString(pendingStack.getStackSize()));
@@ -324,7 +325,7 @@ public class GuiCraftConfirm extends GuiWT {
 	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		this.setScrollBar();
-		this.bindTexture("appliedenergistics2", "guis/craftingreport.png");
+		mc.getTextureManager().bindTexture(new ResourceLocation("appliedenergistics2", "textures/guis/craftingreport.png"));
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, xSize, ySize);
 	}
 
@@ -333,6 +334,15 @@ public class GuiCraftConfirm extends GuiWT {
 
 		getScrollBar().setTop(19).setLeft(218).setHeight(114);
 		getScrollBar().setRange(0, (size + 2) / 3 - rows, 1);
+	}
+
+	@Override
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		final int i = Mouse.getEventDWheel();
+		if (i != 0 && getScrollBar() != null) {
+			getScrollBar().wheel(i);
+		}
 	}
 
 	public void postUpdate(final List<IAEItemStack> list, final byte ref) {
@@ -449,27 +459,16 @@ public class GuiCraftConfirm extends GuiWT {
 	@Override
 	protected void actionPerformed(final GuiButton btn) throws IOException {
 		super.actionPerformed(btn);
-
 		final boolean backwards = Mouse.isButtonDown(1);
-
 		if (btn == selectCPU) {
-			try {
-				ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
-			}
-			catch (final IOException e) {
-			}
+			ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
 		}
-
 		if (btn == cancel) {
 			ModNetworking.instance().sendToServer(new PacketSwitchGuis(OriginalGui));
 		}
 
 		if (btn == start) {
-			try {
-				ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Start", "Start"));
-			}
-			catch (final Throwable e) {
-			}
+			ModNetworking.instance().sendToServer(new PacketValueConfig("Terminal.Start", "Start"));
 		}
 	}
 }

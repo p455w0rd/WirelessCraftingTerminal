@@ -25,14 +25,17 @@ import com.google.common.collect.Lists;
 
 import appeng.api.config.Actionable;
 import appeng.client.gui.widgets.ITooltip;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
+import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiMECheckbox;
-import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiTabButton;
+import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiItemIconButton;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.client.gui.widgets.GuiBinaryModeButton;
 import p455w0rd.wct.container.ContainerMagnet;
@@ -52,7 +55,7 @@ public class GuiMagnet extends GuiContainer {
 	private GuiMECheckbox ignoreNBTBox;
 	private GuiMECheckbox ignoreMetaBox;
 	private GuiMECheckbox useOreDictBox;
-	private GuiTabButton originalGuiBtn;
+	private GuiItemIconButton originalGuiBtn;
 	private ItemStack myIcon = null;
 	private final ContainerMagnet container;
 
@@ -65,7 +68,13 @@ public class GuiMagnet extends GuiContainer {
 		height = ySize;
 		magnetItem = c.magnetItem;
 		ItemStack is = new ItemStack(ModItems.WCT);
-		((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
+		if (!c.isMagnetHeld()) {
+			ItemStack wirelessTerminal = c.isWTBauble() ? WTApi.instance().getBaublesUtility().getWTBySlot(Minecraft.getMinecraft().player, c.getWTSlot(), ICustomWirelessTerminalItem.class) : WTApi.instance().getWTBySlot(Minecraft.getMinecraft().player, c.getWTSlot());
+			if (!wirelessTerminal.isEmpty() && WTApi.instance().isAnyWT(wirelessTerminal)) {
+				is = wirelessTerminal;
+			}
+		}
+		((ICustomWirelessTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
 		myIcon = is;
 		loadSettings();
 	}
@@ -123,7 +132,7 @@ public class GuiMagnet extends GuiContainer {
 		buttonList.add(ignoreMetaBox = new GuiMECheckbox(2, guiLeft + 61, guiTop + 32, "Ignore Meta Data", ignoreMeta, 107));
 		buttonList.add(useOreDictBox = new GuiMECheckbox(3, guiLeft + 61, guiTop + 44, "Use Ore Dictionary", useOreDict, 107));
 		if (myIcon != null && GuiWCT.isSwitchingGuis()) {
-			buttonList.add(originalGuiBtn = new GuiTabButton(guiLeft + 1, guiTop + 30, myIcon, myIcon.getDisplayName(), itemRender));
+			buttonList.add(originalGuiBtn = new GuiItemIconButton(guiLeft + 1, guiTop + 30, myIcon, myIcon.getDisplayName(), itemRender));
 			originalGuiBtn.setHideEdge(13);
 		}
 	}

@@ -26,9 +26,10 @@ import appeng.helpers.Reflected;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.api.WTGuiObject;
-import p455w0rd.ae2wtlib.api.base.GuiWT;
-import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiTabButton;
+import net.minecraft.util.ResourceLocation;
+import p455w0rd.ae2wtlib.api.*;
+import p455w0rd.ae2wtlib.api.client.gui.GuiWT;
+import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiItemIconButton;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.container.ContainerCraftAmount;
 import p455w0rd.wct.init.*;
@@ -38,7 +39,7 @@ import p455w0rd.wct.sync.packets.PacketSwitchGuis;
 public class GuiCraftAmount extends GuiWT {
 
 	private GuiNumberBox amountToCraft;
-	private GuiTabButton originalGuiBtn;
+	private GuiItemIconButton originalGuiBtn;
 
 	private GuiButton next;
 
@@ -56,11 +57,17 @@ public class GuiCraftAmount extends GuiWT {
 	private int originalGui;
 
 	@Reflected
-	public GuiCraftAmount(final InventoryPlayer inventoryPlayer, final ITerminalHost te, int wtSlot, boolean isWTBauble) {
+	public GuiCraftAmount(final InventoryPlayer inventoryPlayer, final ITerminalHost te, final int wtSlot, final boolean isWTBauble) {
 		super(new ContainerCraftAmount(inventoryPlayer, te, wtSlot, isWTBauble));
-		ItemStack is = new ItemStack(ModItems.WCT);
-		((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
-		myIcon = is;
+		if (((ContainerCraftAmount) inventorySlots).getWirelessTerminal() == WTApi.instance().getWTBySlot(inventoryPlayer.player, wtSlot)) {
+			myIcon = new ItemStack(((ContainerCraftAmount) inventorySlots).getWirelessTerminal().getItem());
+			((ICustomWirelessTerminalItem) myIcon.getItem()).injectAEPower(myIcon, 6400001, Actionable.MODULATE);
+		}
+		else {
+			final ItemStack is = new ItemStack(ModItems.WCT);
+			((IWirelessCraftingTerminalItem) is.getItem()).injectAEPower(is, 6400001, Actionable.MODULATE);
+			myIcon = is;
+		}
 	}
 
 	@Override
@@ -90,7 +97,7 @@ public class GuiCraftAmount extends GuiWT {
 		}
 
 		if (originalGui == 0 && myIcon != null) {
-			buttonList.add(originalGuiBtn = new GuiTabButton(guiLeft + 154, guiTop - 4, myIcon, myIcon.getDisplayName(), itemRender));
+			buttonList.add(originalGuiBtn = new GuiItemIconButton(guiLeft + 154, guiTop - 4, myIcon, myIcon.getDisplayName(), itemRender));
 		}
 
 		amountToCraft = new GuiNumberBox(fontRenderer, guiLeft + 62, guiTop + 57, 59, fontRenderer.FONT_HEIGHT, Integer.class);
@@ -111,7 +118,7 @@ public class GuiCraftAmount extends GuiWT {
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
 		next.displayString = isShiftKeyDown() ? GuiText.Start.getLocal() : GuiText.Next.getLocal();
 
-		this.bindTexture("appliedenergistics2", "guis/craft_amt.png");
+		mc.getTextureManager().bindTexture(new ResourceLocation("appliedenergistics2", "textures/guis/craft_amt.png"));
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, xSize, ySize);
 
 		try {
@@ -167,13 +174,10 @@ public class GuiCraftAmount extends GuiWT {
 	@Override
 	protected void actionPerformed(final GuiButton btn) throws IOException {
 		super.actionPerformed(btn);
-
 		try {
-
 			if (btn == originalGuiBtn) {
 				ModNetworking.instance().sendToServer(new PacketSwitchGuis(originalGui));
 			}
-
 			if (btn == next) {
 				ModNetworking.instance().sendToServer(new PacketCraftRequest(Integer.parseInt(amountToCraft.getText()), isShiftKeyDown()));
 			}

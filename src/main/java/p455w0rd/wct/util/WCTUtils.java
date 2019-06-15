@@ -28,12 +28,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModKeybindings;
+import p455w0rdslib.LibGlobals.Mods;
 
 public class WCTUtils {
 
@@ -41,11 +42,11 @@ public class WCTUtils {
 
 	// Parent pair contains a boolean which tells whether or not this is a bauble slot
 	// Child pair gives the slot number and ItemStack
-	public static Set<Pair<Boolean, Pair<Integer, ItemStack>>> getCraftingTerminals(EntityPlayer player) {
+	public static Set<Pair<Boolean, Pair<Integer, ItemStack>>> getCraftingTerminals(final EntityPlayer player) {
 		return WTApi.instance().getAllWirelessTerminalsByType(player, IWirelessCraftingTerminalItem.class);
 	}
 
-	public static ItemStack getWCTBySlot(EntityPlayer player, int slot) {
+	public static ItemStack getWCTBySlot(final EntityPlayer player, final int slot) {
 		if (slot >= 0) {
 			return WTApi.instance().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class);
 		}
@@ -58,31 +59,34 @@ public class WCTUtils {
 	 * the boolean tells whether or not the Integer is a Baubles slot
 	 */
 	@Nonnull
-	public static Pair<Boolean, Pair<Integer, ItemStack>> getFirstWirelessCraftingTerminal(InventoryPlayer playerInv) {
+	public static Pair<Boolean, Pair<Integer, ItemStack>> getFirstWirelessCraftingTerminal(final InventoryPlayer playerInv) {
 		boolean isBauble = false;
 		int slotID = -1;
 		ItemStack wirelessTerm = ItemStack.EMPTY;
-		if (!playerInv.player.getHeldItemMainhand().isEmpty() && playerInv.player.getHeldItemMainhand().getItem() instanceof IWirelessCraftingTerminalItem) {
+		if (!playerInv.player.getHeldItemMainhand().isEmpty() && (playerInv.player.getHeldItemMainhand().getItem() instanceof IWirelessCraftingTerminalItem || WTApi.instance().getWUTUtility().doesWUTSupportType(playerInv.player.getHeldItemMainhand(), IWirelessCraftingTerminalItem.class))) {
 			slotID = playerInv.currentItem;
 			wirelessTerm = playerInv.player.getHeldItemMainhand();
 		}
 		else {
 			if (Mods.BAUBLES.isLoaded()) {
-				wirelessTerm = WTApi.instance().getBaublesUtility().getFirstWTBauble(playerInv.player).getRight();
-				slotID = WTApi.instance().getBaublesUtility().getFirstWTBauble(playerInv.player).getLeft();
-				if (!wirelessTerm.isEmpty()) {
-					isBauble = true;
+				final Pair<Integer, ItemStack> bauble = WTApi.instance().getBaublesUtility().getFirstWTBaubleByType(playerInv.player, IWirelessCraftingTerminalItem.class);
+				if (!bauble.getRight().isEmpty()) {
+					wirelessTerm = bauble.getRight();
+					slotID = bauble.getLeft();
+					if (!wirelessTerm.isEmpty()) {
+						isBauble = true;
+					}
 				}
 			}
 			if (wirelessTerm.isEmpty()) {
-				int invSize = playerInv.getSizeInventory();
+				final int invSize = playerInv.getSizeInventory();
 				if (invSize > 0) {
 					for (int i = 0; i < invSize; ++i) {
-						ItemStack item = playerInv.getStackInSlot(i);
+						final ItemStack item = playerInv.getStackInSlot(i);
 						if (item.isEmpty()) {
 							continue;
 						}
-						if (item.getItem() instanceof IWirelessCraftingTerminalItem) {
+						if (isAnyWCT(item)) {
 							wirelessTerm = item;
 							slotID = i;
 							break;
@@ -94,46 +98,25 @@ public class WCTUtils {
 		return Pair.of(isBauble, Pair.of(slotID, wirelessTerm));
 	}
 
-	public static boolean isAnyWCT(@Nonnull ItemStack wirelessTerm) {
-		return wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem;
+	public static boolean isAnyWCT(@Nonnull final ItemStack wirelessTerm) {
+		return wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem || WTApi.instance().getWUTUtility().doesWUTSupportType(wirelessTerm, IWirelessCraftingTerminalItem.class);
 	}
-
-	/*
-	public static WTGuiObject<?> getGUIObject(@Nullable ItemStack wirelessTerm, @Nonnull EntityPlayer player) {
-		if (wirelessTerm == null) {
-			if (player.openContainer instanceof ContainerWCT) {
-				ContainerWCT c = (ContainerWCT) player.openContainer;
-				if (c.getGuiObject() != null) {
-					return c.getGuiObject();
-				}
-			}
-		}
-		else {
-			if (wirelessTerm.getItem() instanceof ICustomWirelessTermHandler) {
-				if (player != null && player.getEntityWorld() != null) {
-					return WTApi.instance().getGUIObject((ICustomWirelessTermHandler) wirelessTerm.getItem(), wirelessTerm, player);
-				}
-			}
-		}
-		return null;
-	}
-	*/
 
 	@SideOnly(Side.CLIENT)
 	public static void handleKeybind() {
-		EntityPlayer p = Minecraft.getMinecraft().player;
+		final EntityPlayer p = Minecraft.getMinecraft().player;
 		if (p.openContainer == null) {
 			return;
 		}
 		if (ModKeybindings.openTerminal.isPressed()) {
-			Pair<Boolean, Pair<Integer, ItemStack>> pair = WCTUtils.getFirstWirelessCraftingTerminal(p.inventory);
-			ItemStack is = pair.getRight().getRight();
+			final Pair<Boolean, Pair<Integer, ItemStack>> pair = WCTUtils.getFirstWirelessCraftingTerminal(p.inventory);
+			final ItemStack is = pair.getRight().getRight();
 			if (is.isEmpty()) {
 				return;
 			}
-			int slot = pair.getRight().getLeft();
-			boolean isBauble = pair.getLeft();
-			IWirelessCraftingTerminalItem wirelessTerm = (IWirelessCraftingTerminalItem) is.getItem();
+			final int slot = pair.getRight().getLeft();
+			final boolean isBauble = pair.getLeft();
+			final ICustomWirelessTerminalItem wirelessTerm = (ICustomWirelessTerminalItem) is.getItem();
 			if (wirelessTerm != null) {
 				if (!(p.openContainer instanceof ContainerWCT)) {
 					if (slot >= 0) {
@@ -147,7 +130,7 @@ public class WCTUtils {
 		}
 	}
 
-	public static boolean getShiftCraftMode(@Nonnull ItemStack wirelessTerminal) {
+	public static boolean getShiftCraftMode(@Nonnull final ItemStack wirelessTerminal) {
 		if (!wirelessTerminal.isEmpty() && wirelessTerminal.hasTagCompound() && wirelessTerminal.getTagCompound().hasKey(SHIFTCRAFT_NBT, NBT.TAG_BYTE)) {
 			return !wirelessTerminal.getTagCompound().getBoolean(SHIFTCRAFT_NBT);
 		}

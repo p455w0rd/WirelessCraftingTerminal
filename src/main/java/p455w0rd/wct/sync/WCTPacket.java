@@ -20,12 +20,10 @@ import java.io.IOException;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.Packet;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.*;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
 import p455w0rd.wct.init.ModNetworking;
-import p455w0rd.wct.sync.network.INetworkInfo;
 
 @SuppressWarnings("rawtypes")
 public abstract class WCTPacket implements Packet {

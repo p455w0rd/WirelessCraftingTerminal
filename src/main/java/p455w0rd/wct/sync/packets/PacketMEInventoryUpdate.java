@@ -15,9 +15,7 @@
  */
 package p455w0rd.wct.sync.packets;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.BufferOverflowException;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,11 +34,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import p455w0rd.wct.client.gui.GuiCraftConfirm;
-import p455w0rd.wct.client.gui.GuiCraftingCPU;
-import p455w0rd.wct.client.gui.GuiWCT;
+import p455w0rd.ae2wtlib.api.networking.INetworkInfo;
+import p455w0rd.wct.client.gui.*;
 import p455w0rd.wct.sync.WCTPacket;
-import p455w0rd.wct.sync.network.INetworkInfo;
 
 public class PacketMEInventoryUpdate extends WCTPacket {
 	private static final int UNCOMPRESSED_PACKET_BYTE_LIMIT = 16 * 1024 * 1024;

@@ -15,17 +15,18 @@
  */
 package p455w0rd.wct.api;
 
-import net.minecraft.item.ItemStack;
-import p455w0rd.ae2wtlib.api.IWTContainer;
+import appeng.api.implementations.tiles.IViewCellStorage;
+import appeng.api.storage.IMEMonitorHandlerReceiver;
+import appeng.api.storage.data.IAEItemStack;
+import appeng.api.util.IConfigurableObject;
+import appeng.helpers.IContainerCraftingPacket;
+import appeng.util.IConfigManagerHost;
+import appeng.util.inv.IAEAppEngInventory;
 
 /**
  * @author p455w0rd
  *
  */
-public interface IWCTContainer extends IWTContainer {
-
-	ItemStack getMagnet();
-
-	boolean isMagnetHeld();
+public interface IWCTContainer extends IConfigurableObject, IConfigManagerHost, IMagnetContainer, IAEAppEngInventory, IContainerCraftingPacket, IMEMonitorHandlerReceiver<IAEItemStack>, IViewCellStorage {
 
 }

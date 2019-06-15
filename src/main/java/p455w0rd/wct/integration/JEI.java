@@ -41,10 +41,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.container.ContainerWCT;
-import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
 import p455w0rd.wct.sync.packets.PacketJEIRecipe;
+import p455w0rdslib.LibGlobals.Mods;
 
 /**
  * @author p455w0rd
@@ -54,35 +54,35 @@ import p455w0rd.wct.sync.packets.PacketJEIRecipe;
 public class JEI implements IModPlugin {
 
 	@Override
-	public void register(@Nonnull IModRegistry registry) {
-		IJeiHelpers helpers = registry.getJeiHelpers();
-		IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
+	public void register(@Nonnull final IModRegistry registry) {
+		final IJeiHelpers helpers = registry.getJeiHelpers();
+		final IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
 		if (!WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
 			blackList.addIngredientToBlacklist(new ItemStack(WTApi.instance().getBoosterCard()));
 		}
-		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<ContainerWCT>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
-		String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wt_bauble.desc" : "";
+		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
+		final String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wt_bauble.desc" : "";
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), VanillaTypes.ITEM, "jei.wct.desc", wctBaublesDescKey);
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.MAGNET_CARD)), VanillaTypes.ITEM, "jei.magnet_card.desc");
 	}
 
 	@Override
-	public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+	public void onRuntimeAvailable(final IJeiRuntime jeiRuntime) {
 	}
 
 	@Override
-	public void registerIngredients(IModIngredientRegistration registry) {
+	public void registerIngredients(final IModIngredientRegistration registry) {
 	}
 
 	@Override
-	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
+	public void registerItemSubtypes(final ISubtypeRegistry subtypeRegistry) {
 	}
 
 	public class RecipeTransferHandler<T extends Container> implements IRecipeTransferHandler<T> {
 
 		private final Class<T> containerClass;
 
-		RecipeTransferHandler(Class<T> containerClass) {
+		RecipeTransferHandler(final Class<T> containerClass) {
 			this.containerClass = containerClass;
 		}
 
@@ -93,19 +93,19 @@ public class JEI implements IModPlugin {
 
 		@Nullable
 		@Override
-		public IRecipeTransferError transferRecipe(T container, IRecipeLayout recipeLayout, EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
+		public IRecipeTransferError transferRecipe(final T container, final IRecipeLayout recipeLayout, final EntityPlayer player, final boolean maxTransfer, final boolean doTransfer) {
 
 			if (!doTransfer) {
 				return null;
 			}
 
-			Map<Integer, ? extends IGuiIngredient<ItemStack>> ingredients = recipeLayout.getItemStacks().getGuiIngredients();
+			final Map<Integer, ? extends IGuiIngredient<ItemStack>> ingredients = recipeLayout.getItemStacks().getGuiIngredients();
 
 			final NBTTagCompound recipe = new NBTTagCompound();
 
 			int slotIndex = 0;
-			for (Map.Entry<Integer, ? extends IGuiIngredient<ItemStack>> ingredientEntry : ingredients.entrySet()) {
-				IGuiIngredient<ItemStack> ingredient = ingredientEntry.getValue();
+			for (final Map.Entry<Integer, ? extends IGuiIngredient<ItemStack>> ingredientEntry : ingredients.entrySet()) {
+				final IGuiIngredient<ItemStack> ingredient = ingredientEntry.getValue();
 				if (!ingredient.isInput()) {
 					continue;
 				}
@@ -114,7 +114,7 @@ public class JEI implements IModPlugin {
 					if (slot instanceof SlotCraftingMatrix || slot instanceof SlotFakeCraftingMatrix) {
 						if (slot.getSlotIndex() == slotIndex) {
 							final NBTTagList tags = new NBTTagList();
-							final List<ItemStack> list = new LinkedList<ItemStack>();
+							final List<ItemStack> list = new LinkedList<>();
 							final ItemStack displayed = ingredient.getDisplayedIngredient();
 
 							// prefer currently displayed item
@@ -122,9 +122,8 @@ public class JEI implements IModPlugin {
 								list.add(displayed);
 							}
 
-							// prefer non-pure crystals. :)
-							for (ItemStack stack : ingredient.getAllIngredients()) {
-								if (!Platform.isRecipePrioritized(stack)) {
+							for (final ItemStack stack : ingredient.getAllIngredients()) {
+								if (Platform.isRecipePrioritized(stack)) {
 									list.add(0, stack);
 								}
 								else {
@@ -151,7 +150,7 @@ public class JEI implements IModPlugin {
 			try {
 				ModNetworking.instance().sendToServer(new PacketJEIRecipe(recipe));
 			}
-			catch (IOException e) {
+			catch (final IOException e) {
 
 			}
 

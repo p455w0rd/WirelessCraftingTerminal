@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Stopwatch;
 
@@ -26,8 +25,7 @@ import appeng.integration.Integrations;
 import appeng.util.IConfigManagerHost;
 import appeng.util.Platform;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -42,20 +40,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.Loader;
 import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.api.base.ContainerWT;
-import p455w0rd.ae2wtlib.api.base.GuiWT;
+import p455w0rd.ae2wtlib.api.client.ItemStackSizeRenderer;
+import p455w0rd.ae2wtlib.api.client.gui.GuiWT;
 import p455w0rd.ae2wtlib.api.client.gui.widgets.*;
-import p455w0rd.ae2wtlib.api.client.gui.widgets.GuiTrashButton;
-import p455w0rd.ae2wtlib.container.slot.SlotTrash;
-import p455w0rd.wct.api.client.ItemStackSizeRenderer;
+import p455w0rd.ae2wtlib.api.container.ContainerWT;
+import p455w0rd.ae2wtlib.api.container.slot.SlotTrash;
 import p455w0rd.wct.client.gui.widgets.*;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.container.slot.SlotCraftingOutput;
 import p455w0rd.wct.init.*;
-import p455w0rd.wct.init.ModIntegration.Mods;
 import p455w0rd.wct.sync.packets.*;
 import p455w0rd.wct.util.WCTUtils;
-import p455w0rdslib.util.EasyMappings;
+import p455w0rdslib.LibGlobals.Mods;
 import p455w0rdslib.util.RenderUtils;
 import yalter.mousetweaks.api.MouseTweaksIgnore;
 
@@ -73,14 +69,13 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private static final String BG_TEXTURE_BAUBLES = "gui/crafting_baubles.png";
 	private final ContainerWCT containerWCT;
 	private boolean isFullScreen, init = true, reInit, wasResized = false;
-	//private GuiScrollbar scrollBar = null;
 	public static int craftingGridOffsetX = 80;
 	public static int craftingGridOffsetY;
 
 	private final ItemRepo repo;
 	private final int offsetX = 8;
 	private final IConfigManager configSrc;
-	private GuiTabButton craftingStatusBtn;
+	private GuiItemIconButton craftingStatusBtn;
 	private GuiMagnetButton magnetGUIButton;
 	private GuiMETextField searchField;
 	private int perRow = 9;
@@ -95,7 +90,6 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private GuiImgButtonBooster autoConsumeBoostersBox;
 	private GuiImgButtonMagnetMode magnetModeBox;
 	private GuiImgButtonShiftCraft shiftCraftButton;
-	public boolean devicePowered = false;
 	private boolean isJEIEnabled;
 	private boolean wasTextboxFocused = false;
 	private int screenResTicks = 0;
@@ -108,7 +102,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	boolean isHalloween = false;
 	private final ItemStack[] myCurrentViewCells = new ItemStack[4];
 
-	public GuiWCT(Container container) {
+	public GuiWCT(final Container container) {
 		super(container);
 		xSize = GUI_WIDTH;
 		ySize = GUI_HEIGHT;
@@ -120,10 +114,9 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		switchingGuis = false;
 		repo = new ItemRepo(getScrollBar(), this);
 		configSrc = containerWCT.getConfigManager();
-		devicePowered = containerWCT.isPowered();
 		((ContainerWCT) inventorySlots).setGui(this);
 		entity = Minecraft.getMinecraft().player;
-		Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
 		isHalloween = calendar.get(2) + 1 == 10 && calendar.get(5) == 31;
 	}
@@ -203,7 +196,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	@Override
-	protected void actionPerformed(final GuiButton btn) {
+	protected void actionPerformed(final GuiButton btn) throws IOException {
 		if (btn == craftingStatusBtn) {
 			ModNetworking.instance().sendToServer(new PacketSwitchGuis(ModGuiHandler.GUI_CRAFTING_STATUS));
 			return;
@@ -219,11 +212,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 					AEConfig.instance().getConfigManager().putSetting(iBtn.getSetting(), next);
 				}
 				else {
-					try {
-						ModNetworking.instance().sendToServer(new PacketValueConfig(iBtn.getSetting().name(), next.name()));
-					}
-					catch (final IOException e) {
-					}
+					ModNetworking.instance().sendToServer(new PacketValueConfig(iBtn.getSetting().name(), next.name()));
 				}
 				iBtn.set(next);
 
@@ -275,16 +264,15 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		if (btn == shiftCraftButton) {
 			shiftCraftButton.cycleValue();
 		}
+		else {
+			super.actionPerformed(btn);
+		}
 	}
 
 	@Override
 	protected void mouseClickMove(final int x, final int y, final int c, final long d) {
 		final Slot slot = getSlot(x, y);
 		final ItemStack itemstack = ((EntityPlayer) entity).inventory.getItemStack();
-
-		//if (getScrollBar() != null) {
-		//	getScrollBar().click(this, x - guiLeft, y - guiTop);
-		//}
 		if (slot instanceof SlotFake && itemstack != null) {
 			drag_click.add(slot);
 			if (drag_click.size() > 1) {
@@ -321,7 +309,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			}
 			else {
 				// Craft stack on right-click, craft single on left-click
-				action = (mouseButton == 1) ? InventoryAction.CRAFT_STACK : InventoryAction.CRAFT_ITEM;
+				action = mouseButton == 1 ? InventoryAction.CRAFT_STACK : InventoryAction.CRAFT_ITEM;
 			}
 			final PacketInventoryAction p = new PacketInventoryAction(action, slotIdx, 0);
 			ModNetworking.instance().sendToServer(p);
@@ -354,10 +342,10 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			InventoryAction action = null;
 			switch (clickType) {
 			case PICKUP: // pickup / set-down.
-				action = (mouseButton == 1) ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
+				action = mouseButton == 1 ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
 				break;
 			case QUICK_MOVE:
-				action = (mouseButton == 1) ? InventoryAction.PICKUP_SINGLE : InventoryAction.SHIFT_CLICK;
+				action = mouseButton == 1 ? InventoryAction.PICKUP_SINGLE : InventoryAction.SHIFT_CLICK;
 				break;
 
 			case CLONE: // creative dupe:
@@ -384,16 +372,16 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 			switch (clickType) {
 			case PICKUP: // pickup / set-down.
-				action = (mouseButton == 1) ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
+				action = mouseButton == 1 ? InventoryAction.SPLIT_OR_PLACE_SINGLE : InventoryAction.PICKUP_OR_SET_DOWN;
 				stack = ((SlotME) slot).getAEStack();
 
-				if (stack != null && action == InventoryAction.PICKUP_OR_SET_DOWN && stack.getStackSize() == 0 && player.inventory.getItemStack().isEmpty()) {
+				if (stack != null && action == InventoryAction.PICKUP_OR_SET_DOWN && player.inventory.getItemStack().isEmpty() && (stack.getStackSize() == 0 || stack.getStackSize() > 0 && GuiScreen.isAltKeyDown())) {
 					action = InventoryAction.AUTO_CRAFT;
 				}
 
 				break;
 			case QUICK_MOVE:
-				action = (mouseButton == 1) ? InventoryAction.PICKUP_SINGLE : InventoryAction.SHIFT_CLICK;
+				action = mouseButton == 1 ? InventoryAction.PICKUP_SINGLE : InventoryAction.SHIFT_CLICK;
 				stack = ((SlotME) slot).getAEStack();
 				break;
 
@@ -478,7 +466,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		maxRows = getMaxRows();
-		perRow = AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE) != TerminalStyle.FULL ? 9 : 9 + ((width - standardSize) / 18);
+		perRow = AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE) != TerminalStyle.FULL ? 9 : 9 + (width - standardSize) / 18;
 		isJEIEnabled = Loader.isModLoaded("JEI");
 		int top = isJEIEnabled ? 22 : 0;
 		final int magicNumber = 114 + 1;
@@ -504,7 +492,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			}
 		}
 		if (AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE) != TerminalStyle.FULL) {
-			xSize = standardSize + ((perRow - 9) * 18);
+			xSize = standardSize + (perRow - 9) * 18;
 		}
 		else {
 			xSize = standardSize;
@@ -513,43 +501,27 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		ySize = magicNumber + rows * 18 + reservedSpace;
 		final int unusedSpace = height - ySize;
 		guiTop = (int) Math.floor(unusedSpace / (unusedSpace < 0 ? 3.8f : 2.0f));
-		int offset = guiTop + 8;
 
 		super.initGui();
 
-		buttonList.clear();
 		buttonList.add(clearBtn = new GuiImgButton(guiLeft + 134, guiTop + ySize - 160, Settings.ACTIONS, ActionItems.STASH));
 		buttonList.add(trashBtn = new GuiTrashButton(guiLeft + 116, guiTop + ySize - 104));
 		clearBtn.setHalfSize(true);
 		if (customSortOrder) {
-			buttonList.add(SortByBox = new GuiImgButton(guiLeft - 18, offset, Settings.SORT_BY, configSrc.getSetting(Settings.SORT_BY)));
-			offset += 20;
+			getButtonPanel().addButton(SortByBox = new GuiImgButton(getButtonPanelXOffset(), getButtonPanelYOffset(), Settings.SORT_BY, configSrc.getSetting(Settings.SORT_BY)));
 		}
-
-		buttonList.add(ViewBox = new GuiImgButton(guiLeft - 18, offset, Settings.VIEW_MODE, configSrc.getSetting(Settings.VIEW_MODE)));
-		offset += 20;
-
-		buttonList.add(SortDirBox = new GuiImgButton(guiLeft - 18, offset, Settings.SORT_DIRECTION, configSrc.getSetting(Settings.SORT_DIRECTION)));
-		offset += 20;
-
-		buttonList.add(searchBoxSettings = new GuiImgButton(guiLeft - 18, offset, Settings.SEARCH_MODE, AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE)));
-		offset += 20;
-
-		buttonList.add(terminalStyleBox = new GuiImgButton(guiLeft - 18, offset, Settings.TERMINAL_STYLE, AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE)));
-		offset += 20;
-
-		buttonList.add(shiftCraftButton = new GuiImgButtonShiftCraft(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
-
+		getButtonPanel().addButton(ViewBox = new GuiImgButton(getButtonPanelXOffset(), getButtonPanelYOffset(), Settings.VIEW_MODE, configSrc.getSetting(Settings.VIEW_MODE)));
+		getButtonPanel().addButton(SortDirBox = new GuiImgButton(getButtonPanelXOffset(), getButtonPanelYOffset(), Settings.SORT_DIRECTION, configSrc.getSetting(Settings.SORT_DIRECTION)));
+		getButtonPanel().addButton(searchBoxSettings = new GuiImgButton(getButtonPanelXOffset(), getButtonPanelYOffset(), Settings.SEARCH_MODE, AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE)));
+		getButtonPanel().addButton(terminalStyleBox = new GuiImgButton(getButtonPanelXOffset(), getButtonPanelYOffset(), Settings.TERMINAL_STYLE, AEConfig.instance().getConfigManager().getSetting(Settings.TERMINAL_STYLE)));
+		getButtonPanel().addButton(shiftCraftButton = new GuiImgButtonShiftCraft(getButtonPanelXOffset(), getButtonPanelYOffset(), containerWCT.getWirelessTerminal()));
 		if (!WTApi.instance().getConfig().isOldInfinityMechanicEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
-			offset += 20;
-			buttonList.add(autoConsumeBoostersBox = new GuiImgButtonBooster(guiLeft - 18, offset, containerWCT.getWirelessTerminal()));
+			getButtonPanel().addButton(autoConsumeBoostersBox = new GuiImgButtonBooster(getButtonPanelXOffset(), getButtonPanelYOffset(), containerWCT.getWirelessTerminal()));
 		}
-
 		if (containerWCT.getWirelessTerminal() != null && WCTUtils.isAnyWCT(containerWCT.getWirelessTerminal())) {
-			offset += 20;
-			buttonList.add(magnetModeBox = new GuiImgButtonMagnetMode(guiLeft - 18, offset, containerWCT));
+			getButtonPanel().addButton(magnetModeBox = new GuiImgButtonMagnetMode(getButtonPanelXOffset(), getButtonPanelYOffset(), containerWCT));
 		}
-
+		getButtonPanel().init(this);
 		searchField = new GuiMETextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
 		searchField.setMaxStringLength(25);
@@ -557,7 +529,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		searchField.setSelectionColor(0xFF99FF99);
 		searchField.setVisible(true);
 
-		buttonList.add(craftingStatusBtn = new GuiTabButton(guiLeft + 169, guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
+		buttonList.add(craftingStatusBtn = new GuiItemIconButton(guiLeft + 169, guiTop - 4, 2 + 11 * 16, GuiText.CraftingStatus.getLocal(), itemRender));
 		buttonList.add(magnetGUIButton = new GuiMagnetButton(guiLeft + 157, guiTop + ySize - 115));
 		craftingStatusBtn.setHideEdge(13);
 
@@ -617,9 +589,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 	@Override
 	public void updateScreen() {
-		devicePowered = containerWCT.isPowered();
-		repo.setPower(devicePowered);
-
+		repo.setPower(containerWCT.isPowered());
 		super.updateScreen();
 		if (init) {
 			currScreenWidth = mc.displayWidth;
@@ -670,7 +640,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	private boolean hasScreenResChanged() {
-		if ((currScreenWidth != mc.displayWidth) || (currScreenHeight != mc.displayHeight) || (isFullScreen != mc.isFullScreen())) {
+		if (currScreenWidth != mc.displayWidth || currScreenHeight != mc.displayHeight || isFullScreen != mc.isFullScreen()) {
 			currScreenWidth = mc.displayWidth;
 			currScreenHeight = mc.displayHeight;
 			isFullScreen = mc.isFullScreen();
@@ -680,7 +650,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+	public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
 		xSize_lo = mouseX;
 		ySize_lo = mouseY;
 
@@ -694,18 +664,12 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	@Override
-	public void bindTexture(final String base, final String file) {
-		final ResourceLocation loc = new ResourceLocation(base, "textures/" + file);
-		mc.getTextureManager().bindTexture(loc);
-	}
-
-	@Override
-	public void drawFG(int offsetX, int offsetY, int mouseX, int mouseY) {
-		String s = "Terminal";
+	public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
+		final String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
-			int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(getWirelessTerminal());
+			final int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(getWirelessTerminal());
 			if (WTApi.instance().hasInfiniteRange(getWirelessTerminal())) {
 				if (!WTApi.instance().isInRangeOfWAP(getWirelessTerminal(), Minecraft.getMinecraft().player)) {
 					if (infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount()) {
@@ -713,27 +677,18 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 					}
 				}
 			}
-			if (!WTApi.instance().isWTCreative(getWirelessTerminal()) && isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
-				String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
-				String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ItemStackSizeRenderer.getInstance().getSlimConverter().toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
-				drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
-			}
+			//if (!WTApi.instance().isWTCreative(getWirelessTerminal()) && isPointInRegion(containerWCT.getBoosterSlot().xPos, containerWCT.getBoosterSlot().yPos, 16, 16, mouseX, mouseY) && EasyMappings.player().inventory.getItemStack().isEmpty()) {
+			//final String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
+			//final String infinityEnergy = I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + (isShiftKeyDown() ? infinityEnergyAmount : ItemStackSizeRenderer.getInstance().getConverter().toSlimReadableForm(infinityEnergyAmount)) + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc");
+			//drawTooltip(mouseX - offsetX, mouseY - offsetY, infinityEnergy);
+			//}
 		}
 		mc.fontRenderer.drawString(I18n.format("container.inventory") + " " + warning, 7, ySize - 172 + 3, 4210752);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(final float f, final int x, final int y) {
-		final int ox = guiLeft;
-		final int oy = guiTop;
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		drawBG(ox, oy, x, y);
-
-	}
-
-	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		this.bindTexture(Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE);
+		mc.getTextureManager().bindTexture(new ResourceLocation(ModGlobals.MODID, "textures/" + (Mods.BAUBLES.isLoaded() ? BG_TEXTURE_BAUBLES : BG_TEXTURE)));
 		final int x_width = 199;
 		boolean update = false;
 
@@ -757,20 +712,20 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		drawTexturedModalRect(offsetX - 40, offsetY + 16 + rows * 18 + lowerTextureOffset + 119, 213, 0, 43, 52);
 
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
-			drawTexturedModalRect(guiLeft + 132, (guiTop + rows * 18) + 83, 237, 237, 19, 19);
+			drawTexturedModalRect(guiLeft + 132, guiTop + rows * 18 + 83, 237, 237, 19, 19);
 		}
 
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, (guiTop + rows * 18) + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, (guiTop + rows * 18) + 50 - ySize_lo, (!isAltKeyDown() ? entity : Minecraft.getMinecraft().player));
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, guiTop + rows * 18 + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, guiTop + rows * 18 + 50 - ySize_lo, !isAltKeyDown() ? entity : Minecraft.getMinecraft().player);
 
 		if (isHalloween && !isAltKeyDown()) {
 
 			String name = "Happy Halloween!            ";
-			int idx = (int) ((CLIENT_TICKS / 4) % name.length());
+			final int idx = (int) (CLIENT_TICKS / 4 % name.length());
 			name = (name + " " + name).substring(idx, idx + 10);
 
-			FontRenderer fr = RenderUtils.getFontRenderer();
+			final FontRenderer fr = RenderUtils.getFontRenderer();
 			GlStateManager.disableDepth();
-			fr.drawStringWithShadow(name, (guiLeft + 52) - fr.getStringWidth(name) / 2, (guiTop + rows * 18) + 90, 0xFFFFA00F);
+			fr.drawStringWithShadow(name, guiLeft + 52 - fr.getStringWidth(name) / 2, guiTop + rows * 18 + 90, 0xFFFFA00F);
 			GlStateManager.enableDepth();
 		}
 
@@ -799,7 +754,11 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 	@Override
 	protected void mouseClicked(final int xCoord, final int yCoord, final int btn) throws IOException {
-		searchField.mouseClicked(xCoord, yCoord, btn);
+		final Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+
+		if (searchMode != SearchBoxMode.AUTOSEARCH && searchMode != SearchBoxMode.JEI_AUTOSEARCH) {
+			searchField.mouseClicked(xCoord, yCoord, btn);
+		}
 
 		if (btn == 1 && searchField.isMouseIn(xCoord, yCoord)) {
 			searchField.setText("");
@@ -845,7 +804,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 				return;
 			}
 			if (ModKeybindings.openTerminal.getKeyCode() == key) {
-				Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+				final Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
 				if ((searchMode == SearchBoxMode.MANUAL_SEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH) && !searchField.isFocused()) {
 					Minecraft.getMinecraft().player.closeScreen();
 				}
@@ -881,18 +840,12 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	}
 
 	@Override
-	public void bindTexture(final String file) {
-		final ResourceLocation loc = new ResourceLocation(ModGlobals.MODID, "textures/" + file);
-		mc.getTextureManager().bindTexture(loc);
-	}
-
-	@Override
 	protected List<InternalSlotME> getMeSlots() {
 		return meSlots;
 	}
 
 	@Override
-	public void updateSetting(final IConfigManager manager, Enum settingName, Enum newValue) {
+	public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
 		if (SortByBox != null) {
 			SortByBox.set(configSrc.getSetting(Settings.SORT_BY));
 		}
