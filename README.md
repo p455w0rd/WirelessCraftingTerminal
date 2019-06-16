@@ -41,7 +41,8 @@ I'm just glad I could help make another person's life better in some way.
 
 ## Installation
 
-You install this mod by putting it into the `minecraft/mods/` folder. It requires that [AE2 RV6 Stable](http://ae-mod.info/Downloads/) also be installed.
+You install this mod by putting it into the `minecraft/mods/` folder.
+It requires that [AE2 RV6 Stable](http://ae-mod.info/Downloads/) also be installed.
 
 ## Issues/Feature Requests
 
