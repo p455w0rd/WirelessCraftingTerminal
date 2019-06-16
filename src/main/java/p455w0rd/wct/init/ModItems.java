@@ -46,33 +46,4 @@ public class ModItems {
 		registry.registerAll(ITEM_ARRAY);
 	}
 
-	/*
-	@SideOnly(Side.CLIENT)
-	public static final void initModels(final ModelBakeEvent event) {
-		for (final Item item : getList()) {
-			if (item instanceof IModelHolder) {
-				final IModelHolder holder = (IModelHolder) item;
-				holder.initModel();
-				if (holder.shouldUseInternalTEISR()) {
-					final IBakedModel wtModel = event.getModelRegistry().getObject(holder.getModelResource(item));
-					holder.setWrappedModel(new ItemLayerWrapper(wtModel).setRenderer(WTItemRenderer.getRendererForItem(item)));
-					event.getModelRegistry().putObject(holder.getModelResource(item), holder.getWrappedModel());
-				}
-			}
-		}
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public static final void registerTEISRs(final ModelRegistryEvent event) {
-		for (final Item item : getList()) {
-			if (item instanceof IModelHolder) {
-				final IModelHolder holder = (IModelHolder) item;
-				if (holder.shouldUseInternalTEISR()) {
-					item.setTileEntityItemStackRenderer((TileEntityItemStackRenderer) WTItemRenderer.getRendererForItem(item));
-				}
-			}
-		}
-	}
-	*/
-
 }

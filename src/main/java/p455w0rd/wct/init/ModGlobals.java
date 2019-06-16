@@ -21,7 +21,7 @@ import p455w0rd.ae2wtlib.init.LibGlobals;
 public class ModGlobals {
 
 	public static final String MODID = "wct";
-	public static final String VERSION = "3.12.92";
+	public static final String VERSION = "3.12.93";
 	public static final String NAME = "Wireless Crafting Terminal";
 	public static final String SERVER_PROXY = "p455w0rd.wct.proxy.CommonProxy";
 	public static final String CLIENT_PROXY = "p455w0rd.wct.proxy.ClientProxy";
