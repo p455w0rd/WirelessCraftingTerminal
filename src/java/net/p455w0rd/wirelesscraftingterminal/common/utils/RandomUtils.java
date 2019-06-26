@@ -111,11 +111,14 @@ public class RandomUtils {
 	}
 	
 	public static boolean isMagnetInstalled(InventoryPlayer ip) {
-		NBTTagCompound magnetNBTForm = RandomUtils.getWirelessTerm(ip).getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
-		if (magnetNBTForm != null) {
-			ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
-			if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
-				return true;
+		ItemStack wirelessTerminal = RandomUtils.getWirelessTerm(ip);
+		if (wirelessTerminal != null && wirelessTerminal.hasTagCompound()) {
+			NBTTagCompound magnetNBTForm = wirelessTerminal.getTagCompound().getTagList("MagnetSlot", 10).getCompoundTagAt(0);
+			if (magnetNBTForm != null) {
+				ItemStack magnetItem = ItemStack.loadItemStackFromNBT(magnetNBTForm);
+				if (magnetItem != null && magnetItem.getItem() instanceof ItemMagnet) {
+					return true;
+				}
 			}
 		}
 		return false;
