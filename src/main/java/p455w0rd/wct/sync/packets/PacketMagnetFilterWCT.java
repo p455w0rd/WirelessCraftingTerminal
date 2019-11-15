@@ -50,7 +50,7 @@ public class PacketMagnetFilterWCT extends WCTPacket {
 		modeValue = stream.readBoolean();
 	}
 
-	public PacketMagnetFilterWCT(final MagnetItemMode mode, final boolean modeVal, boolean isBauble, int slot) {
+	public PacketMagnetFilterWCT(final MagnetItemMode mode, final boolean modeVal, final boolean isBauble, final int slot) {
 		modeValue = modeVal;
 		whichMode = mode;
 		this.isBauble = isBauble;
@@ -66,9 +66,9 @@ public class PacketMagnetFilterWCT extends WCTPacket {
 
 	@Override
 	public void serverPacketData(final INetworkInfo manager, final WCTPacket packet, final EntityPlayer player) {
-		ItemStack wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot);
+		final ItemStack wirelessTerminal = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot, false);
 		if (!wirelessTerminal.isEmpty() && wirelessTerminal.hasTagCompound()) {
-			ItemStack magnet = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
+			final ItemStack magnet = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
 			if (!magnet.isEmpty()) {
 				ItemMagnet.setItemMode(magnet, whichMode, modeValue);
 				/*

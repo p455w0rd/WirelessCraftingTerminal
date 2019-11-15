@@ -62,6 +62,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import p455w0rd.ae2wtlib.api.*;
 import p455w0rd.ae2wtlib.api.item.ItemBase;
 import p455w0rd.ae2wtlib.api.networking.security.WTPlayerSource;
+import p455w0rd.ae2wtlib.items.ItemWUT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.init.*;
@@ -321,7 +322,11 @@ public class ItemMagnet extends ItemBase {
 				return true;
 			}
 		}
-		final WTGuiObject<IAEItemStack> obj = getGuiObject(wirelessTerminal, player);
+		ItemStack tempTerminal = wirelessTerminal.copy();
+		if (WTApi.instance().getWUTUtility().isWUT(wirelessTerminal)) {
+			tempTerminal = getWCTFromWUT(wirelessTerminal);
+		}
+		final WTGuiObject<IAEItemStack> obj = getGuiObject(tempTerminal, player);
 		final IEnergySource powerSrc = obj;
 		final IActionSource mySrc = new WTPlayerSource(player, obj);
 		ais = Platform.poweredInsert(powerSrc, obj, ais, mySrc);
@@ -467,6 +472,9 @@ public class ItemMagnet extends ItemBase {
 	@Nonnull
 	public static ItemStack getMagnetFromWCT(@Nonnull final ItemStack wirelessTerm) {
 		if (!wirelessTerm.isEmpty() && wirelessTerm.hasTagCompound() && (wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem || WTApi.instance().getWUTUtility().doesWUTSupportType(wirelessTerm, IWirelessCraftingTerminalItem.class))) {
+			if (WTApi.instance().getWUTUtility().isWUT(wirelessTerm)) {
+				//wirelessTerm = getWCTFromWUT(wirelessTerm);
+			}
 			final NBTTagCompound magnetNBT = wirelessTerm.getSubCompound(MAGNET_SLOT_NBT);
 			if (magnetNBT != null) {
 				final NBTTagList magnetSlot = magnetNBT.getTagList(ITEMS_NBT, 10);
@@ -474,6 +482,16 @@ public class ItemMagnet extends ItemBase {
 				if (magnetItem != null && !magnetItem.isEmpty() && magnetItem.getItem() == ModItems.MAGNET_CARD) {
 					return magnetItem;
 				}
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	private static ItemStack getWCTFromWUT(final ItemStack wut) {
+		if (!wut.isEmpty() && wut.hasTagCompound() && WTApi.instance().getWUTUtility().doesWUTSupportType(wut, IWirelessCraftingTerminalItem.class) && WTApi.instance().getWUTUtility().isWUT(wut)) {
+			final ItemStack wct = ItemWUT.getStoredTerminalByHandler(wut, IWirelessCraftingTerminalItem.class);
+			if (WCTUtils.isAnyWCT(wct, true) && !WTApi.instance().getWUTUtility().isWUT(wct)) {
+				return wct;
 			}
 		}
 		return ItemStack.EMPTY;
@@ -628,7 +646,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static MagnetFunctionMode cycleMagnetFunctionModeWCT(final EntityPlayer player, final int wctSlot, final boolean isBauble) {
-		final ItemStack magnet = getMagnetFromWCT(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot));
+		final ItemStack magnet = getMagnetFromWCT(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot, false));
 		if (player == null || magnet.isEmpty() || wctSlot < 0) {
 			return MagnetFunctionMode.INACTIVE;
 		}
@@ -681,7 +699,7 @@ public class ItemMagnet extends ItemBase {
 	}
 
 	public static boolean isMagnetInstalled(final EntityPlayer player, final boolean isBauble, final int slot) {
-		return isMagnetInstalled(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot));
+		return isMagnetInstalled(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot, false));
 	}
 
 	public static boolean isMagnetInstalled(final ItemStack wirelessTerm) {

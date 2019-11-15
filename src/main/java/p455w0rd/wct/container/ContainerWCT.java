@@ -56,7 +56,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.relauncher.*;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.PlayerInvWrapper;
@@ -98,7 +98,7 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer {
 	private IGridNode networkNode;
 
 	public ContainerWCT(final EntityPlayer player, final ITerminalHost hostIn, final int slot, final boolean isBauble) {
-		super(player.inventory, getActionHost(getGuiObject(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot), player)), slot, isBauble, true, 134, -20);
+		super(player.inventory, getActionHost(getGuiObject(isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, slot, false), player)), slot, isBauble, true, 134, -20);
 		craftingInv = new InventoryCrafting(matrixContainer, 3, 3);
 		setCustomName("WCTContainer");
 		setTerminalHost(hostIn);
@@ -157,23 +157,11 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer {
 				addSlotToContainer(craftingSlots[j + i * 3] = new SlotCraftingMatrix(this, crafting, j + i * 3, 80 + j * 18, i * 18 - 76));
 			}
 		}
-		final IActionSource actionSource = ReflectionHelper.getPrivateValue(AEBaseContainer.class, this, "mySrc");
+		final IActionSource actionSource = ObfuscationReflectionHelper.getPrivateValue(AEBaseContainer.class, this, "mySrc");
 		addSlotToContainer(outputSlot = new SlotCraftingOutput(getPlayerInv().player, actionSource, getPowerSource(), getGuiObject(), crafting, crafting, output, Mods.BAUBLES.isLoaded() ? 142 : 174, -58, this));
 		addSlotToContainer(magnetSlot = new SlotMagnet(magnetInventory, 152, -20));
 		addSlotToContainer(WTApi.instance().createTrashSlot(trashInventory, 98, -22));
-		addSlotToContainer(new AppEngSlot(new InvWrapper(getPlayerInv()), 40, 80, -22) {
-			@Override
-			public boolean isItemValid(final ItemStack stack) {
-				return super.isItemValid(stack);
-			}
-
-			@Override
-			@SideOnly(Side.CLIENT)
-			public String getSlotTexture() {
-				return "minecraft:items/empty_armor_slot_shield";
-			}
-		});
-
+		bindOffhandSlot(getPlayerInv(), 80, -22);
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
 				viewCellSlots[j + i * 2] = new SlotRestrictedInput(PlacableItemType.VIEW_CELL, getViewCellStorage(), j + i * 2, i * 18 - 32, j * 18 + 40, getInventoryPlayer());
@@ -308,9 +296,9 @@ public class ContainerWCT extends ContainerWT implements IWCTContainer {
 
 	@Override
 	protected void sendCustomName() {
-		final boolean hasSent = ReflectionHelper.getPrivateValue(AEBaseContainer.class, this, "sentCustomName");
+		final boolean hasSent = ObfuscationReflectionHelper.getPrivateValue(AEBaseContainer.class, this, "sentCustomName");
 		if (!hasSent) {
-			ReflectionHelper.setPrivateValue(AEBaseContainer.class, this, true, "sentCustomName");
+			ObfuscationReflectionHelper.setPrivateValue(AEBaseContainer.class, this, true, "sentCustomName");
 			if (Platform.isServer()) {
 				ICustomNameObject name = null;
 				if (getGuiObject() instanceof ICustomNameObject) {

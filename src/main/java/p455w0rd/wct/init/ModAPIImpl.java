@@ -22,7 +22,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState;
 import net.minecraftforge.fml.relauncher.Side;
-import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
 import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.WCT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
@@ -59,27 +58,17 @@ public class ModAPIImpl extends WCTApi {
 
 	@Override
 	public void openWCTGui(final EntityPlayer player, final boolean isBauble, final int wctSlot) {
-		if ((player == null) || (player instanceof FakePlayer) || (player instanceof EntityPlayerMP) || FMLCommonHandler.instance().getSide() == Side.SERVER) {
+		if (player == null || player instanceof FakePlayer || player instanceof EntityPlayerMP || FMLCommonHandler.instance().getSide() == Side.SERVER) {
 			return;
 		}
-		ItemStack is = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
-		if (!is.isEmpty() && isTerminalLinked(is)) {
+		final ItemStack is = isBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot, false);
+		if (!is.isEmpty() && WTApi.instance().isTerminalLinked(is)) {
 			ModNetworking.instance().sendToServer(new PacketOpenGui(ModGuiHandler.GUI_WCT, wctSlot, isBauble));
 		}
 	}
 
 	@Override
-	public boolean isTerminalLinked(final ItemStack wirelessTerminalItemstack) {
-		String sourceKey = "";
-		if (wirelessTerminalItemstack.getItem() instanceof ICustomWirelessTerminalItem && wirelessTerminalItemstack.hasTagCompound()) {
-			sourceKey = ((ICustomWirelessTerminalItem) wirelessTerminalItemstack.getItem()).getEncryptionKey(wirelessTerminalItemstack);
-			return (sourceKey != null) && (!sourceKey.isEmpty());
-		}
-		return false;
-	}
-
-	@Override
-	public void openMagnetGui(EntityPlayer player, boolean isWCTaBauble, int wctSlot) {
+	public void openMagnetGui(final EntityPlayer player, final boolean isWCTaBauble, final int wctSlot) {
 		ModGuiHandler.open(ModGuiHandler.GUI_MAGNET, player, player.getEntityWorld(), player.getPosition(), true, isWCTaBauble, wctSlot);
 	}
 

@@ -29,7 +29,8 @@ import appeng.util.Platform;
 import mezz.jei.api.*;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.*;
+import mezz.jei.api.ingredients.IModIngredientRegistration;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
@@ -39,7 +40,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import p455w0rd.ae2wtlib.api.WTApi;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModItems;
 import p455w0rd.wct.init.ModNetworking;
@@ -56,10 +56,6 @@ public class JEI implements IModPlugin {
 	@Override
 	public void register(@Nonnull final IModRegistry registry) {
 		final IJeiHelpers helpers = registry.getJeiHelpers();
-		final IIngredientBlacklist blackList = helpers.getIngredientBlacklist();
-		if (!WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
-			blackList.addIngredientToBlacklist(new ItemStack(WTApi.instance().getBoosterCard()));
-		}
 		registry.getRecipeTransferRegistry().addRecipeTransferHandler(new RecipeTransferHandler<>(ContainerWCT.class), VanillaRecipeCategoryUid.CRAFTING);
 		final String wctBaublesDescKey = Mods.BAUBLES.isLoaded() ? "jei.wt_bauble.desc" : "";
 		registry.addIngredientInfo(Lists.newArrayList(new ItemStack(ModItems.WCT)), VanillaTypes.ITEM, "jei.wct.desc", wctBaublesDescKey);

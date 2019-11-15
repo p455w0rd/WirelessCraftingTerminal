@@ -32,8 +32,7 @@ import p455w0rdslib.api.client.ItemRenderingRegistry;
 public class ModIntegration {
 
 	public static void preInit() {
-		WTApi.instance().getWirelessTerminalRegistry().registerWirelessTerminal(ModItems.WCT);
-		WTApi.instance().getWirelessTerminalRegistry().registerWirelessTerminal(ModItems.CREATIVE_WCT);
+		WTApi.instance().getWirelessTerminalRegistry().registerWirelessTerminal(ModItems.WCT, ModItems.CREATIVE_WCT);
 	}
 
 	@SideOnly(Side.CLIENT)

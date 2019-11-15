@@ -68,7 +68,7 @@ public class ModEvents {
 	@SubscribeEvent
 	public static void tickEvent(final TickEvent.PlayerTickEvent e) {
 		final EntityPlayer player = e.player;
-		if (!(player instanceof EntityPlayerMP)) {
+		if (!(player instanceof EntityPlayerMP) || player.isSneaking()) {
 			return;
 		}
 		final InventoryPlayer playerInv = player.inventory;
@@ -78,9 +78,10 @@ public class ModEvents {
 			return;
 		}
 		for (final Pair<Boolean, Pair<Integer, ItemStack>> termPair : terminals) {
-			final ItemStack wct = termPair.getRight().getRight();
-			if (!ItemMagnet.getMagnetFromWCT(wct).isEmpty()) {
-				((ItemMagnet) ItemMagnet.getMagnetFromWCT(wct).getItem()).doMagnet(player, wct, termPair.getLeft(), termPair.getRight().getLeft());
+			final ItemStack wt = termPair.getRight().getRight();
+			final ItemStack magnetStack = ItemMagnet.getMagnetFromWCT(wt);
+			if (!magnetStack.isEmpty() && magnetStack.getItem() instanceof ItemMagnet) {
+				((ItemMagnet) magnetStack.getItem()).doMagnet(player, wt, termPair.getLeft(), termPair.getRight().getLeft());
 			}
 		}
 	}

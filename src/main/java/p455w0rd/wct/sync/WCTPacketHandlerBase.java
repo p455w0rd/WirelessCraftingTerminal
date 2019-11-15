@@ -25,7 +25,7 @@ import io.netty.handler.codec.DecoderException;
 import p455w0rd.wct.sync.packets.*;
 
 public class WCTPacketHandlerBase {
-	private static final Map<Class<? extends WCTPacket>, PacketTypes> REVERSE_LOOKUP = new HashMap<Class<? extends WCTPacket>, WCTPacketHandlerBase.PacketTypes>();
+	private static final Map<Class<? extends WCTPacket>, PacketTypes> REVERSE_LOOKUP = new HashMap<>();
 
 	public enum PacketTypes {
 			PACKET_INVENTORY_ACTION(PacketInventoryAction.class),
@@ -53,6 +53,8 @@ public class WCTPacketHandlerBase {
 			PACKET_SWITCHMAGNETMODE_HELD(PacketSetMagnetHeld.class),
 
 			PACKET_SWITCHMAGNETMODE_WCT(PacketSetMagnetWCT.class),
+
+			PACKET_CYCLEMAGNETMODE_KEYBIND(PacketCycleMagnetKeybind.class),
 
 			PACKET_SHIFTCRAFT(PacketSetShiftCraft.class);
 
@@ -82,7 +84,7 @@ public class WCTPacketHandlerBase {
 		}
 
 		public static PacketTypes getPacket(final int id) {
-			return (values())[id];
+			return values()[id];
 		}
 
 		static PacketTypes getID(final Class<? extends WCTPacket> c) {

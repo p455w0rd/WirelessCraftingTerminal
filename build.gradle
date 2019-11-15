@@ -17,5 +17,4 @@ apply from : 'https://github.com/p455w0rd/buildscripts/raw/master/enderio.gradle
 apply from : 'https://github.com/p455w0rd/buildscripts/raw/master/demagnetize.gradle'
 apply from : 'https://github.com/p455w0rd/buildscripts/raw/master/ic2.gradle'
 apply from : 'https://github.com/p455w0rd/buildscripts/raw/master/itemscroller.gradle'
-apply from : 'https://github.com/p455w0rd/buildscripts/raw/master/mousetweaks.gradle'
 

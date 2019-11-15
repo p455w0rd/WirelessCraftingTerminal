@@ -42,7 +42,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	public WCTInventoryMagnetFilter magnetInventory;
 	private int distributeState = 0;
 	private int pressedKeyInRange = -1;
-	private final Set<Slot> distributeSlotSet = new HashSet<Slot>();
+	private final Set<Slot> distributeSlotSet = new HashSet<>();
 	private final int PLAYER_INV_START = 0, PLAYER_INV_END = 26, HOTBAR_START = 27, HOTBAR_END = 35, FILTERS_START = 36,
 			FILTERS_END = 62;
 	private final boolean isHeld;
@@ -50,7 +50,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	private final int wctSlot;
 	private final ItemStack wirelessTerminal;
 
-	public ContainerMagnet(EntityPlayer player, boolean isHeld, boolean isWCTBauble, int wctSlot) {
+	public ContainerMagnet(final EntityPlayer player, final boolean isHeld, final boolean isWCTBauble, final int wctSlot) {
 		inventoryPlayer = player.inventory;
 		this.isHeld = isHeld;
 		this.isWCTBauble = isWCTBauble;
@@ -60,7 +60,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 			wirelessTerminal = ItemStack.EMPTY;
 		}
 		else {
-			wirelessTerminal = isWCTBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot);
+			wirelessTerminal = isWCTBauble ? WTApi.instance().getBaublesUtility().getWTBySlot(player, wctSlot, IWirelessCraftingTerminalItem.class) : WCTUtils.getWCTBySlot(player, wctSlot, false);
 			magnetItem = ItemMagnet.getMagnetFromWCT(wirelessTerminal);
 		}
 		magnetInventory = new WCTInventoryMagnetFilter(magnetItem);
@@ -86,7 +86,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	}
 
 	@Override
-	public void onContainerClosed(EntityPlayer playerIn) {
+	public void onContainerClosed(final EntityPlayer playerIn) {
 		if (Platform.isClient()) {
 			GuiWCT.setSwitchingGuis(false);
 		}
@@ -122,25 +122,25 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		return magnetItem;
 	}
 
-	private boolean isInHotbar(int slotNum) {
-		return (slotNum >= HOTBAR_START) && (slotNum <= HOTBAR_END);
+	private boolean isInHotbar(final int slotNum) {
+		return slotNum >= HOTBAR_START && slotNum <= HOTBAR_END;
 	}
 
-	private boolean isInPlayerInventory(int slotNum) {
-		return (slotNum >= PLAYER_INV_START) && (slotNum <= PLAYER_INV_END);
+	private boolean isInPlayerInventory(final int slotNum) {
+		return slotNum >= PLAYER_INV_START && slotNum <= PLAYER_INV_END;
 	}
 
 	@SuppressWarnings("unused")
-	private boolean isInFilters(int slotNum) {
-		return (slotNum >= FILTERS_START) && (slotNum <= FILTERS_END);
+	private boolean isInFilters(final int slotNum) {
+		return slotNum >= FILTERS_START && slotNum <= FILTERS_END;
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer p) {
+	public boolean canInteractWith(final EntityPlayer p) {
 		return true;
 	}
 
-	private boolean alreadyFiltered(ItemStack item) {
+	private boolean alreadyFiltered(final ItemStack item) {
 		for (int i = 0; i < magnetInventory.getSizeInventory(); i++) {
 			if (isIdenticalItem(item, magnetInventory.getStackInSlot(i))) {
 				return true;
@@ -150,11 +150,11 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	}
 
 	@Override
-	public ItemStack slotClick(int slotNum, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+	public ItemStack slotClick(final int slotNum, final int dragType, final ClickType clickTypeIn, final EntityPlayer player) {
 		if (slotNum >= inventorySlots.size()) {
 			return null;
 		}
-		InventoryPlayer inventoryplayer = player.inventory;
+		final InventoryPlayer inventoryplayer = player.inventory;
 		ItemStack itemstack3 = ItemStack.EMPTY;
 		ItemStack stack = ItemStack.EMPTY;
 		int sizeOrID;
@@ -185,7 +185,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 			//if (isInFilters(slotNum)) {
 			//	return null;
 			//}
-			int currentDistributeState = distributeState;
+			final int currentDistributeState = distributeState;
 			distributeState = checkForPressedButton(dragType);
 
 			if ((currentDistributeState != 1 || distributeState != 2) && currentDistributeState != distributeState) {
@@ -206,7 +206,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 				}
 			}
 			else if (distributeState == 1) {
-				Slot slot = inventorySlots.get(slotNum);
+				final Slot slot = inventorySlots.get(slotNum);
 
 				if (slot != null && stackFitsInSlot(slot, inventoryplayer.getItemStack(), true) && slot.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().getCount() > distributeSlotSet.size() && canDragIntoSlot(slot)) {
 					distributeSlotSet.add(slot);
@@ -216,14 +216,14 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 				if (!distributeSlotSet.isEmpty()) {
 					itemstack3 = inventoryplayer.getItemStack().copy();
 					sizeOrID = inventoryplayer.getItemStack().getCount();
-					Iterator<Slot> iterator = distributeSlotSet.iterator();
+					final Iterator<Slot> iterator = distributeSlotSet.iterator();
 
 					while (iterator.hasNext()) {
-						Slot slot1 = iterator.next();
+						final Slot slot1 = iterator.next();
 
 						if (slot1 != null && stackFitsInSlot(slot1, inventoryplayer.getItemStack(), true) && slot1.isItemValid(inventoryplayer.getItemStack()) && inventoryplayer.getItemStack().getCount() >= distributeSlotSet.size() && canDragIntoSlot(slot1)) {
-							ItemStack itemstack1 = itemstack3.copy();
-							int j1 = slot1.getHasStack() ? slot1.getStack().getCount() : 0;
+							final ItemStack itemstack1 = itemstack3.copy();
+							final int j1 = slot1.getHasStack() ? slot1.getStack().getCount() : 0;
 							setSlotStack(distributeSlotSet, pressedKeyInRange, itemstack1, j1);
 
 							if (itemstack1.getCount() > itemstack1.getMaxStackSize()) {
@@ -261,9 +261,9 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 
 		else if (getSlot(slotNum) != null && getSlot(slotNum) instanceof SlotMagnetFilter) {
 
-			SlotMagnetFilter slot = (SlotMagnetFilter) getSlot(slotNum);
+			final SlotMagnetFilter slot = (SlotMagnetFilter) getSlot(slotNum);
 
-			ItemStack stackSlot = slot.getStack();
+			final ItemStack stackSlot = slot.getStack();
 			if (alreadyFiltered(player.inventory.getItemStack()) && !player.inventory.getItemStack().isEmpty()) {
 				return ItemStack.EMPTY;
 			}
@@ -275,9 +275,9 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 				fillPhantomSlot(slot, ItemStack.EMPTY, clickTypeIn);
 			}
 			else if (dragType == 0 || dragType == 1) {
-				InventoryPlayer playerInv = player.inventory;
+				final InventoryPlayer playerInv = player.inventory;
 
-				ItemStack stackHeld = playerInv.getItemStack();
+				final ItemStack stackHeld = playerInv.getItemStack();
 
 				if (stackSlot.isEmpty()) {
 					if (!stackHeld.isEmpty() && slot.isItemValid(stackHeld)) {
@@ -304,7 +304,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		return stack;
 	}
 
-	public static void setSlotStack(Set<Slot> slotSet, int stackSizeSelector, @Nonnull ItemStack stackToResize, int currentSlotStackSize) {
+	public static void setSlotStack(final Set<Slot> slotSet, final int stackSizeSelector, @Nonnull final ItemStack stackToResize, final int currentSlotStackSize) {
 		switch (stackSizeSelector) {
 		case 0:
 			stackToResize.setCount(MathUtils.floor((float) stackToResize.getCount() / (float) slotSet.size()));
@@ -316,26 +316,26 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		stackToResize.grow(currentSlotStackSize);
 	}
 
-	public static boolean stackFitsInSlot(Slot slot, @Nonnull ItemStack itemStack, boolean sizeMatters) {
+	public static boolean stackFitsInSlot(final Slot slot, @Nonnull final ItemStack itemStack, final boolean sizeMatters) {
 		boolean flag1 = slot == null || !slot.getHasStack();
 
 		if (slot != null && slot.getHasStack() && !itemStack.isEmpty() && itemStack.isItemEqual(slot.getStack()) && ItemStack.areItemStackTagsEqual(slot.getStack(), itemStack)) {
-			int i = sizeMatters ? 0 : itemStack.getCount();
+			final int i = sizeMatters ? 0 : itemStack.getCount();
 			flag1 |= slot.getStack().getCount() + i <= itemStack.getMaxStackSize();
 		}
 
 		return flag1;
 	}
 
-	public static int checkForPressedButton(int btn) {
+	public static int checkForPressedButton(final int btn) {
 		return btn & 3;
 	}
 
-	public static int checkForPressedButton2(int mouseButtonPressed) {
+	public static int checkForPressedButton2(final int mouseButtonPressed) {
 		return mouseButtonPressed >> 2 & 3;
 	}
 
-	public static boolean checkValue(int value) {
+	public static boolean checkValue(final int value) {
 		return value == 0 || value == 1;
 	}
 
@@ -345,7 +345,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	}
 
 	private void arrangeSlots() {
-		int invSize = magnetInventory.getSizeInventory();
+		final int invSize = magnetInventory.getSizeInventory();
 		if (invSize <= 0) {
 			return;
 		}
@@ -365,7 +365,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		}
 	}
 
-	private void fillPhantomSlot(SlotMagnetFilter slot, @Nonnull ItemStack stackHeld, ClickType clickType) {
+	private void fillPhantomSlot(final SlotMagnetFilter slot, @Nonnull final ItemStack stackHeld, final ClickType clickType) {
 		if (!slot.canAdjustPhantom()) {
 			return;
 		}
@@ -378,7 +378,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		if (stackSize > slot.getSlotStackLimit()) {
 			stackSize = slot.getSlotStackLimit();
 		}
-		ItemStack phantomStack = stackHeld.copy();
+		final ItemStack phantomStack = stackHeld.copy();
 		ItemMagnet.removeTimerTags(phantomStack);
 		phantomStack.setCount(stackSize);
 
@@ -386,7 +386,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		arrangeSlots();
 	}
 
-	private void adjustPhantomSlot(SlotMagnetFilter slot, int mouseButton, ClickType clickType) {
+	private void adjustPhantomSlot(final SlotMagnetFilter slot, final int mouseButton, final ClickType clickType) {
 		if (!slot.canAdjustPhantom()) {
 			return;
 		}
@@ -415,11 +415,11 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 
 	@Override
 	public ItemStack transferStackInSlot(final EntityPlayer p, final int slotIndex) {
-		Slot slot = inventorySlots.get(slotIndex);
+		final Slot slot = inventorySlots.get(slotIndex);
 		if (slot == null || slot.getStack().isEmpty()) {
 			return ItemStack.EMPTY;
 		}
-		ItemStack stack = slot.getStack();
+		final ItemStack stack = slot.getStack();
 		if (isInHotbar(slotIndex)) {
 			if (!mergePhantomStack(stack)) {
 				if (!mergeItemStack(stack, PLAYER_INV_START, PLAYER_INV_END + 1, false)) {
@@ -453,7 +453,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		return stack;
 	}
 
-	protected boolean mergePhantomStack(@Nonnull ItemStack stack) {
+	protected boolean mergePhantomStack(@Nonnull final ItemStack stack) {
 		if (!alreadyFiltered(stack)) {
 			for (int i = FILTERS_START; i <= FILTERS_END; i++) {
 				if (!getSlot(i).getStack().isEmpty()) {
@@ -468,7 +468,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 		return false;
 	}
 
-	public boolean isIdenticalItem(@Nonnull ItemStack lhs, @Nonnull ItemStack rhs) {
+	public boolean isIdenticalItem(@Nonnull final ItemStack lhs, @Nonnull final ItemStack rhs) {
 		if (lhs == rhs) {
 			return true;
 		}
@@ -491,9 +491,9 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 	}
 
 	@Override
-	protected boolean mergeItemStack(@Nonnull ItemStack stack, int start, int end, boolean backwards) {
+	protected boolean mergeItemStack(@Nonnull final ItemStack stack, final int start, final int end, final boolean backwards) {
 		boolean flag1 = false;
-		int k = (backwards ? end - 1 : start);
+		int k = backwards ? end - 1 : start;
 		Slot slot;
 		ItemStack itemstack1 = ItemStack.EMPTY;
 
@@ -503,12 +503,12 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 				itemstack1 = slot.getStack();
 
 				if (!slot.isItemValid(stack)) {
-					k += (backwards ? -1 : 1);
+					k += backwards ? -1 : 1;
 					continue;
 				}
 
 				if (!itemstack1.isEmpty() && itemstack1.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(stack, itemstack1)) {
-					int l = itemstack1.getCount() + stack.getCount();
+					final int l = itemstack1.getCount() + stack.getCount();
 
 					if (l <= stack.getMaxStackSize() && l <= slot.getSlotStackLimit()) {
 						stack.setCount(0);
@@ -524,22 +524,22 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 					}
 				}
 
-				k += (backwards ? -1 : 1);
+				k += backwards ? -1 : 1;
 			}
 		}
 		if (stack.getCount() > 0) {
-			k = (backwards ? end - 1 : start);
+			k = backwards ? end - 1 : start;
 			while (!backwards && k < end || backwards && k >= start) {
 				slot = inventorySlots.get(k);
 				itemstack1 = slot.getStack();
 
 				if (!slot.isItemValid(stack)) {
-					k += (backwards ? -1 : 1);
+					k += backwards ? -1 : 1;
 					continue;
 				}
 
 				if (itemstack1.isEmpty()) {
-					int l = stack.getCount();
+					final int l = stack.getCount();
 					if (l <= slot.getSlotStackLimit()) {
 						slot.putStack(stack.copy());
 						stack.setCount(0);
@@ -555,7 +555,7 @@ public class ContainerMagnet extends Container implements IMagnetContainer {
 					}
 				}
 
-				k += (backwards ? -1 : 1);
+				k += backwards ? -1 : 1;
 			}
 		}
 

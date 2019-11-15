@@ -29,15 +29,15 @@ public class ModKeybindings {
 
 	public static KeyBinding openTerminal;
 	//public static KeyBinding openMagnetFilter;
-	//public static KeyBinding changeMagnetMode;
+	public static KeyBinding cycleMagnetMode;
 
 	public static void preInit() {
 		openTerminal = new KeyBinding("key.open_wct.desc", Keyboard.CHAR_NONE, WTApi.instance().getConstants().getItemGroup());
 		//openMagnetFilter = new KeyBinding("key.open_magnet.desc", Keyboard.CHAR_NONE, "itemGroup.ae2wtlib");
-		//changeMagnetMode = new KeyBinding("key.switch_magnet_mode.desc", Keyboard.CHAR_NONE, "itemGroup.ae2wtlib");
+		cycleMagnetMode = new KeyBinding("key.cycle_magnet_mode.desc", Keyboard.CHAR_NONE, WTApi.instance().getConstants().getItemGroup());
 		ClientRegistry.registerKeyBinding(openTerminal);
 		//ClientRegistry.registerKeyBinding(openMagnetFilter);
-		//ClientRegistry.registerKeyBinding(changeMagnetMode);
+		ClientRegistry.registerKeyBinding(cycleMagnetMode);
 	}
 
 }

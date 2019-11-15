@@ -16,9 +16,7 @@
 package p455w0rd.wct.items;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.*;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
@@ -56,11 +54,6 @@ public class ItemWCTCreative extends ItemWCT {
 	@Override
 	public EnumRarity getRarity(final ItemStack wirelessTerm) {
 		return EnumRarity.RARE;
-	}
-
-	@Override
-	protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
-		itemStacks.add(new ItemStack(this));
 	}
 
 	@Override

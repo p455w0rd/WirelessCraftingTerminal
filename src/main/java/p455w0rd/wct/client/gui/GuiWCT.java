@@ -14,11 +14,13 @@ import com.google.common.base.Stopwatch;
 import appeng.api.config.*;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.IConfigManager;
+import appeng.client.ActionKey;
 import appeng.client.gui.widgets.GuiImgButton;
 import appeng.client.gui.widgets.ISortSource;
 import appeng.client.me.*;
 import appeng.container.slot.*;
 import appeng.core.AEConfig;
+import appeng.core.AppEng;
 import appeng.core.localization.GuiText;
 import appeng.helpers.InventoryAction;
 import appeng.integration.Integrations;
@@ -87,6 +89,9 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private GuiImgButton clearBtn;
 	private GuiTrashButton trashBtn;
 	private GuiImgButton terminalStyleBox;
+	private boolean isAutoFocus = false;
+	private int currentMouseX = 0;
+	private int currentMouseY = 0;
 	private GuiImgButtonBooster autoConsumeBoostersBox;
 	private GuiImgButtonMagnetMode magnetModeBox;
 	private GuiImgButtonShiftCraft shiftCraftButton;
@@ -522,7 +527,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 			getButtonPanel().addButton(magnetModeBox = new GuiImgButtonMagnetMode(getButtonPanelXOffset(), getButtonPanelYOffset(), containerWCT));
 		}
 		getButtonPanel().init(this);
-		searchField = new GuiMETextField(fontRenderer, guiLeft + Math.max(80, offsetX), guiTop + 4, 90, 12);
+		searchField = new GuiMETextField(fontRenderer, guiLeft + Math.max(78, offsetX), guiTop + 4, 90, 12);
 		searchField.setEnableBackgroundDrawing(false);
 		searchField.setMaxStringLength(25);
 		searchField.setTextColor(0xFFFFFF);
@@ -534,7 +539,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		craftingStatusBtn.setHideEdge(13);
 
 		final Enum<?> searchModeSetting = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
-		final boolean isAutoFocus = SearchBoxMode.AUTOSEARCH == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH == searchModeSetting || SearchBoxMode.AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH_KEEP == searchModeSetting;
+		isAutoFocus = SearchBoxMode.AUTOSEARCH == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH == searchModeSetting || SearchBoxMode.AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH_KEEP == searchModeSetting;
 		final boolean isManualFocus = SearchBoxMode.MANUAL_SEARCH == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH == searchModeSetting || SearchBoxMode.MANUAL_SEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH_KEEP == searchModeSetting;
 		final boolean isKeepFilter = SearchBoxMode.AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_AUTOSEARCH_KEEP == searchModeSetting || SearchBoxMode.MANUAL_SEARCH_KEEP == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH_KEEP == searchModeSetting;
 		final boolean isJEIEnabled = SearchBoxMode.JEI_AUTOSEARCH == searchModeSetting || SearchBoxMode.JEI_MANUAL_SEARCH == searchModeSetting;
@@ -665,6 +670,8 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 
 	@Override
 	public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
+		currentMouseX = mouseX;
+		currentMouseY = mouseY;
 		final String s = "Terminal";
 		mc.fontRenderer.drawString(s, 7, 5, 4210752);
 		String warning = "";
@@ -800,6 +807,14 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	@Override
 	protected void keyTyped(final char character, final int key) throws IOException {
 		if (!checkHotbarKeys(key)) {
+			if (AppEng.proxy.isActionKey(ActionKey.TOGGLE_FOCUS, key)) {
+				searchField.setFocused(!searchField.isFocused());
+				return;
+			}
+			if (searchField.isFocused() && key == Keyboard.KEY_RETURN) {
+				searchField.setFocused(false);
+				return;
+			}
 			if (character == ' ' && searchField.getText().isEmpty()) {
 				return;
 			}
@@ -823,10 +838,17 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 					searchField.selectAll();
 				}
 			}
+
+			final boolean mouseInGui = isPointInRegion(0, 0, xSize, ySize, currentMouseX, currentMouseY);
+
+			if (isAutoFocus && !searchField.isFocused() && mouseInGui) {
+				searchField.setFocused(true);
+			}
 			if (searchField.textboxKeyTyped(character, key)) {
 				repo.setSearchString(searchField.getText());
 				repo.updateView();
 				setScrollBar();
+				keyHandled = mouseInGui;
 			}
 			else {
 				super.keyTyped(character, key);

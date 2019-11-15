@@ -34,6 +34,9 @@ import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.container.ContainerWCT;
 import p455w0rd.wct.init.ModKeybindings;
+import p455w0rd.wct.init.ModNetworking;
+import p455w0rd.wct.items.ItemMagnet;
+import p455w0rd.wct.sync.packets.PacketCycleMagnetKeybind;
 import p455w0rdslib.LibGlobals.Mods;
 
 public class WCTUtils {
@@ -46,9 +49,9 @@ public class WCTUtils {
 		return WTApi.instance().getAllWirelessTerminalsByType(player, IWirelessCraftingTerminalItem.class);
 	}
 
-	public static ItemStack getWCTBySlot(final EntityPlayer player, final int slot) {
+	public static ItemStack getWCTBySlot(final EntityPlayer player, final int slot, final boolean isBauble) {
 		if (slot >= 0) {
-			return WTApi.instance().getWTBySlot(player, slot, IWirelessCraftingTerminalItem.class);
+			return WTApi.instance().getWTBySlot(player, isBauble, slot, IWirelessCraftingTerminalItem.class);
 		}
 		return ItemStack.EMPTY;
 	}
@@ -102,6 +105,13 @@ public class WCTUtils {
 		return wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem || WTApi.instance().getWUTUtility().doesWUTSupportType(wirelessTerm, IWirelessCraftingTerminalItem.class);
 	}
 
+	public static boolean isAnyWCT(@Nonnull final ItemStack wirelessTerm, final boolean excludeUltimateTerminal) {
+		if (!excludeUltimateTerminal) {
+			return isAnyWCT(wirelessTerm);
+		}
+		return wirelessTerm.getItem() instanceof IWirelessCraftingTerminalItem;
+	}
+
 	@SideOnly(Side.CLIENT)
 	public static void handleKeybind() {
 		final EntityPlayer p = Minecraft.getMinecraft().player;
@@ -125,6 +135,19 @@ public class WCTUtils {
 				}
 				else {
 					p.closeScreen();
+				}
+			}
+		}
+		else if (ModKeybindings.cycleMagnetMode.isPressed()) {
+			final Set<Pair<Boolean, Pair<Integer, ItemStack>>> termPairs = WCTUtils.getCraftingTerminals(p);
+			for (final Pair<Boolean, Pair<Integer, ItemStack>> currentPair : termPairs) {
+				final ItemStack currentTerminal = currentPair.getRight().getRight();
+				final ItemStack magnet = ItemMagnet.getMagnetFromWCT(currentTerminal);
+				if (!magnet.isEmpty()) {
+					final int slot = currentPair.getRight().getLeft();
+					final boolean isBauble = currentPair.getLeft();
+					ItemMagnet.cycleMagnetFunctionModeWCT(p, slot, isBauble);
+					ModNetworking.instance().sendToServer(new PacketCycleMagnetKeybind(slot, isBauble));
 				}
 			}
 		}

@@ -19,26 +19,25 @@ import java.util.List;
 
 import appeng.api.config.*;
 import appeng.api.util.IConfigManager;
-import appeng.core.localization.GuiText;
-import appeng.core.localization.PlayerMessages;
 import appeng.util.Platform;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import p455w0rd.ae2wtlib.api.ICustomWirelessTerminalItem;
-import p455w0rd.ae2wtlib.api.WTApi;
-import p455w0rd.ae2wtlib.api.client.ItemStackSizeRenderer;
 import p455w0rd.ae2wtlib.api.item.ItemWT;
 import p455w0rd.wct.api.IWirelessCraftingTerminalItem;
 import p455w0rd.wct.api.WCTApi;
 import p455w0rd.wct.init.ModGlobals;
+import p455w0rd.wct.init.ModKeybindings;
+import p455w0rd.wct.items.ItemMagnet.MagnetFunctionMode;
 
 /**
  * @author p455w0rd
@@ -70,83 +69,44 @@ public class ItemWCT extends ItemWT implements IWirelessCraftingTerminalItem {
 		WCTApi.instance().openWCTGui(player, isBauble, playerSlot);
 	}
 
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(final World world, final EntityPlayer player, final EnumHand hand) {
-		final ItemStack item = player.getHeldItem(hand);
-		if (world.isRemote && hand == EnumHand.MAIN_HAND && !item.isEmpty() && getAECurrentPower(item) > 0) {
-			openGui(player, false, player.inventory.currentItem);
-			return new ActionResult<>(EnumActionResult.SUCCESS, item);
-		}
-		else if (!world.isRemote) {
-			if (getAECurrentPower(item) <= 0) {
-				player.sendMessage(PlayerMessages.DeviceNotPowered.get());
-				return new ActionResult<>(EnumActionResult.FAIL, item);
-			}
-			if (!WCTApi.instance().isTerminalLinked(item)) {
-				player.sendMessage(PlayerMessages.DeviceNotLinked.get());
-				return new ActionResult<>(EnumActionResult.FAIL, item);
-			}
-		}
-		return new ActionResult<>(EnumActionResult.SUCCESS, item);
-	}
-
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addCheckedInformation(final ItemStack is, final World world, final List<String> list, final ITooltipFlag advancedTooltips) {
-		if (getPlayer() == null || WTApi.instance().getGUIObject(is, getPlayer()) == null) {
-			return;
+		if (hasValidGuiObject(is)) {
+			super.addCheckedInformation(is, world, list, advancedTooltips);
+			addTooltipMagnetInfo(is, list);
 		}
-		final String encKey = getEncryptionKey(is);
-		String pctTxtColor = TextFormatting.WHITE + "";
-		final double aeCurrPower = getAECurrentPower(is);
-		final double aeCurrPowerPct = (int) Math.floor(aeCurrPower / getAEMaxPower(is) * 1e4) / 1e2;
-		if ((int) aeCurrPowerPct >= 75) {
-			pctTxtColor = TextFormatting.GREEN + "";
-		}
-		if ((int) aeCurrPowerPct <= 5) {
-			pctTxtColor = TextFormatting.RED + "";
-		}
-		list.add(TextFormatting.AQUA + "==============================");
-		if (WTApi.instance().isWTCreative(is)) {
-			list.add(GuiText.StoredEnergy.getLocal() + ": " + TextFormatting.GREEN + "" + I18n.format("tooltip.infinite.desc"));
+	}
+
+	@SideOnly(Side.CLIENT)
+	private void addTooltipMagnetInfo(final ItemStack wirelessTerminal, final List<String> tooltip) {
+		final boolean isMagnetInstalled = ItemMagnet.isMagnetInstalled(wirelessTerminal);
+		final String magnetStatus = (isMagnetInstalled ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
+		if (isMagnetInstalled) {
+			final String magnetActive = TextFormatting.GREEN + I18n.format("tooltip.active.desc");
+			final String magnetInactive = TextFormatting.GRAY + I18n.format("tooltip.inactive.desc");
+			final MagnetFunctionMode magnetMode = ItemMagnet.getMagnetFunctionMode(ItemMagnet.getMagnetFromWCT(wirelessTerminal));
+			final boolean isActive = magnetMode.ordinal() != 0;
+			tooltip.add(I18n.format("item.wct:magnet_card.name") + ": " + magnetStatus + TextFormatting.GRAY + " / " + (isActive ? magnetActive : magnetInactive));
+			if (isActive && GuiScreen.isShiftKeyDown()) {
+				final String magnetModeMsg = magnetMode.getMessage().split("-")[1];
+				tooltip.add(" - " + TextFormatting.ITALIC + magnetModeMsg);
+				tooltip.add("");
+			}
+			if (GuiScreen.isShiftKeyDown()) {
+				tooltip.add(TextFormatting.BLUE + I18n.format("tooltip.magnet_mode_keybind.desc") + ": " + TextFormatting.RESET + ModKeybindings.cycleMagnetMode.getDisplayName());
+				tooltip.add("");
+			}
 		}
 		else {
-			list.add(GuiText.StoredEnergy.getLocal() + ": " + pctTxtColor + (int) aeCurrPower + " AE - " + aeCurrPowerPct + "%");
+			tooltip.add(I18n.format("item.wct:magnet_card.name") + ": " + magnetStatus);
 		}
-		String linked = TextFormatting.RED + GuiText.Unlinked.getLocal();
-		if (encKey != null && !encKey.isEmpty()) {
-			linked = TextFormatting.BLUE + GuiText.Linked.getLocal();
-		}
-		list.add("Link Status: " + linked);
-		final String magnetStatus = (ItemMagnet.isMagnetInstalled(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc");
-		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled()) {
-			if (WTApi.instance().getConfig().isOldInfinityMechanicEnabled()) {
-				list.add(I18n.format("item.ae2wtlib:infinity_booster_card.name") + ": " + (hasInfiniteRange(is) ? TextFormatting.GREEN + "" : TextFormatting.RED + "" + I18n.format("tooltip.not.desc")) + " " + I18n.format("tooltip.installed.desc"));
-			}
-			else {
-				final int infinityEnergyAmount = WTApi.instance().getInfinityEnergy(is);
-				final String amountColor = infinityEnergyAmount < WTApi.instance().getConfig().getLowInfinityEnergyWarningAmount() ? TextFormatting.RED.toString() : TextFormatting.GREEN.toString();
-				String reasonString = "";
-				if (infinityEnergyAmount <= 0) {
-					reasonString = "(" + I18n.format("tooltip.out_of.desc") + " " + I18n.format("tooltip.infinity_energy.desc") + ")";
-				}
-				final boolean outsideOfWAPRange = !WTApi.instance().isInRange(is);
-				if (!outsideOfWAPRange) {
-					reasonString = I18n.format("tooltip.in_wap_range.desc");
-				}
-				final String activeString = infinityEnergyAmount > 0 && outsideOfWAPRange ? TextFormatting.GREEN + "" + I18n.format("tooltip.active.desc") : TextFormatting.GRAY + "" + I18n.format("tooltip.inactive.desc") + " " + reasonString;
-				list.add(I18n.format("tooltip.infinite_range.desc") + ": " + activeString);
-				final String infinityEnergyString = WTApi.instance().isWTCreative(is) ? I18n.format("tooltip.infinite.desc") : isShiftKeyDown() ? "" + infinityEnergyAmount + "" + TextFormatting.GRAY + " " + I18n.format("tooltip.units.desc") : ItemStackSizeRenderer.getInstance().getConverter().toSlimReadableForm(infinityEnergyAmount);
-				list.add(I18n.format("tooltip.infinity_energy.desc") + ": " + amountColor + "" + infinityEnergyString);
-			}
-		}
-		list.add(I18n.format("item.wct:magnet_card.name") + ": " + magnetStatus);
 	}
 
 	@Override
 	public void onUpdate(final ItemStack wirelessTerminal, final World w, final Entity e, final int i, final boolean f) {
 		super.onUpdate(wirelessTerminal, w, e, i, f);
-		if (wirelessTerminal == null || !(wirelessTerminal.getItem() instanceof ICustomWirelessTerminalItem)) {
+		if (!(wirelessTerminal.getItem() instanceof ICustomWirelessTerminalItem)) {
 			return;
 		}
 		ItemMagnet.isMagnetInstalled(wirelessTerminal);
