@@ -103,6 +103,7 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 	private int standardSize;
 	private final int lowerTextureOffset = 0;
 	private int rows = 0;
+	EntityLivingBase halloween;
 	EntityLivingBase entity;
 	boolean isHalloween = false;
 	private final ItemStack[] myCurrentViewCells = new ItemStack[4];
@@ -579,8 +580,8 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		}
 
 		if (isHalloween) {
-			entity = new EntityWitherSkeleton(Minecraft.getMinecraft().world);
-			entity.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(Blocks.LIT_PUMPKIN));
+			halloween = new EntityWitherSkeleton(Minecraft.getMinecraft().world);
+			halloween.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(Blocks.LIT_PUMPKIN));
 		}
 	}
 
@@ -634,12 +635,12 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		if (!mc.player.isEntityAlive() || mc.player.isDead) {
 			mc.player.closeScreen();
 		}
-		if (isHalloween && entity != Minecraft.getMinecraft().player) {
-			if (!entity.getHeldItemMainhand().isItemEqual(Minecraft.getMinecraft().player.getHeldItemMainhand())) {
-				entity.setHeldItem(EnumHand.MAIN_HAND, Minecraft.getMinecraft().player.getHeldItemMainhand());
+		if (isHalloween && halloween != null) {
+			if (!halloween.getHeldItemMainhand().isItemEqual(Minecraft.getMinecraft().player.getHeldItemMainhand())) {
+				halloween.setHeldItem(EnumHand.MAIN_HAND, Minecraft.getMinecraft().player.getHeldItemMainhand());
 			}
-			if (!entity.getHeldItemOffhand().isItemEqual(Minecraft.getMinecraft().player.getHeldItemOffhand())) {
-				entity.setHeldItem(EnumHand.OFF_HAND, Minecraft.getMinecraft().player.getHeldItemOffhand());
+			if (!halloween.getHeldItemOffhand().isItemEqual(Minecraft.getMinecraft().player.getHeldItemOffhand())) {
+				halloween.setHeldItem(EnumHand.OFF_HAND, Minecraft.getMinecraft().player.getHeldItemOffhand());
 			}
 		}
 	}
@@ -721,9 +722,10 @@ public class GuiWCT extends GuiWT implements ISortSource, IConfigManagerHost {
 		if (WTApi.instance().getConfig().isInfinityBoosterCardEnabled() && !WTApi.instance().isWTCreative(getWirelessTerminal())) {
 			drawTexturedModalRect(guiLeft + 132, guiTop + rows * 18 + 83, 237, 237, 19, 19);
 		}
-
-		GuiInventory.drawEntityOnScreen(guiLeft + 51, guiTop + rows * 18 + (isHalloween && !isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, guiTop + rows * 18 + 50 - ySize_lo, !isAltKeyDown() ? entity : Minecraft.getMinecraft().player);
-
+		if(isHalloween)
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, guiTop + rows * 18 + (!isAltKeyDown() ? 98 : 94), 32, guiLeft + 51 - xSize_lo, guiTop + rows * 18 + 50 - ySize_lo, !isAltKeyDown() ? halloween : Minecraft.getMinecraft().player);
+		else
+		GuiInventory.drawEntityOnScreen(guiLeft + 51, guiTop + rows * 18 + 94, 32, guiLeft + 51 - xSize_lo, guiTop + rows * 18 + 50 - ySize_lo, Minecraft.getMinecraft().player);
 		if (isHalloween && !isAltKeyDown()) {
 
 			String name = "Happy Halloween!            ";
