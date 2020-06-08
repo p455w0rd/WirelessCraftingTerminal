@@ -27,7 +27,6 @@ import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import appeng.container.ContainerNull;
-import appeng.container.implementations.ContainerCraftingTerm;
 import appeng.container.slot.AppEngCraftingSlot;
 import appeng.helpers.IContainerCraftingPacket;
 import appeng.helpers.InventoryAction;
@@ -169,8 +168,8 @@ public class SlotCraftingOutput extends AppEngCraftingSlot {
 	}
 
 	protected IRecipe findRecipe(InventoryCrafting ic, World world) {
-		if (container instanceof ContainerCraftingTerm) {
-			final ContainerCraftingTerm containerTerminal = (ContainerCraftingTerm) container;
+		if (container instanceof ContainerWCT) {
+			final ContainerWCT containerTerminal = (ContainerWCT) container;
 			final IRecipe recipe = containerTerminal.getCurrentRecipe();
 
 			if (recipe != null && recipe.matches(ic, world)) {
@@ -183,8 +182,8 @@ public class SlotCraftingOutput extends AppEngCraftingSlot {
 
 	@Override
 	protected NonNullList<ItemStack> getRemainingItems(InventoryCrafting ic, World world) {
-		if (container instanceof ContainerCraftingTerm) {
-			final ContainerCraftingTerm containerTerminal = (ContainerCraftingTerm) container;
+		if (container instanceof ContainerWCT) {
+			final ContainerWCT containerTerminal = (ContainerWCT) container;
 			final IRecipe recipe = containerTerminal.getCurrentRecipe();
 
 			if (recipe != null && recipe.matches(ic, world)) {
